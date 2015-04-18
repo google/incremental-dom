@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
+var hooks = require('./src/hooks');
 var patch = require('./src/patch').patch;
 var elements = require('./src/virtual_elements');
 
 module.exports = {
   patch: patch,
+  addShouldUpdateHook: hooks.addShouldUpdateHook,
+  removeShouldUpdateHook: hooks.removeShouldUpdateHook,
   ve_void: elements.ve_void,
   ve_open: elements.ve_open,
   ve_close: elements.ve_close,
+  ve_component: elements.ve_component,
   vt: elements.vt,
 };
 

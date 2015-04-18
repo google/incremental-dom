@@ -16,6 +16,8 @@
 
 var alignWithDOM = require('./alignment').alignWithDOM;
 var updateAttribute = require('./attributes').updateAttribute;
+var getShouldUpdateHook = require('./hooks').getShouldUpdateHook;
+var getData = require('./node_data').getData;
 var traversal = require('./traversal'),
     firstChild = traversal.firstChild,
     nextSibling = traversal.nextSibling,
@@ -66,6 +68,44 @@ var ve_void = function(tag, key, statics) {
 };
 
 
+var ve_component = function(tag, key, statics) {
+  var node = alignWithDOM(tag, key, statics);
+  var data = getData(node);
+  var newAttrs = {};
+
+  for (var i=ATTRIBUTES_OFFSET; i<arguments.length; i+=2) {
+    newAttrs[arguments[i]] = arguments[i+1];
+  }
+
+  var shouldUpdate = getShouldUpdateHook(data.attrs) || data.attrs.shouldUpdate || node.shouldUpdate;
+  var renderChildren = data.attrs.renderChildren || node.renderChildren;
+  var dirty;
+ 
+  if (!data.rendered) {
+    dirty = true;
+  } else if (shouldUpdate) {
+    dirty = shouldUpdate.call(node, data.attrs, newAttrs);
+  } else {
+    dirty = true;
+  }
+
+  for (var i=ATTRIBUTES_OFFSET; i<arguments.length; i+=2) {
+    updateAttribute(node, arguments[i], arguments[i+1]);
+  }
+
+  if (dirty) {
+    firstChild();
+
+    renderChildren.call(node, newAttrs);
+    data.rendered = true;
+
+    parentNode();
+  }
+
+  nextSibling();
+};
+
+
 /**
  * Closes an open virtual element.
  */
@@ -96,6 +136,7 @@ module.exports = {
   ve_open: ve_open,
   ve_void: ve_void,
   ve_close: ve_close,
+  ve_component: ve_component,
   vt: vt
 };
 

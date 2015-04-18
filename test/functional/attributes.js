@@ -60,6 +60,30 @@ describe('attribute updates', function() {
     });
   });
 
+  describe('function attributes', function() {
+    it('should not be be set on the node', function() {
+      patch(container, () => {
+        ve_void('div', '', null,
+                'fn', () => {});
+      });
+      var el = container.childNodes[0];
+
+      expect(el.hasAttribute('fn')).to.be.false;
+    });
+  });
+
+  describe('object attributes', function() {
+    it('should not be be set on the node', function() {
+      patch(container, () => {
+        ve_void('div', '', null,
+                'obj', {});
+      });
+      var el = container.childNodes[0];
+
+      expect(el.hasAttribute('obj')).to.be.false;
+    });
+  });
+
   describe('style', function() {
     function render(style) {
       ve_void('div', '', [],

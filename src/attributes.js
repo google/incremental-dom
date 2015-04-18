@@ -20,6 +20,7 @@ var getData = require('./node_data').getData;
 var applyAttr = function(node, name, value) {
   var data = getData(node);
   var attrs = data.attrs;
+  var type = typeof value;
 
   if (attrs[name] === value) {
     return;
@@ -27,7 +28,7 @@ var applyAttr = function(node, name, value) {
 
   if (value === undefined) {
     node.removeAttribute(name);
-  } else {
+  } else if (type !== 'object' && type !== 'function') {
     node.setAttribute(name, value);
   }
 
