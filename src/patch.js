@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-var importElement = require('./nodes').importElement;
 var traversal = require('./traversal'),
     firstChild = traversal.firstChild,
     parentNode = traversal.parentNode;
@@ -23,30 +22,10 @@ var setWalker = require('./walker').setWalker;
 
 
 /**
- * Imports an element and all the elements under it.
- */
-var importTree = function(root) {
-  // TODO - don't rely on querySelectorAll so that you could patch things that aren't real DOM nodes
-  var nodes = root.querySelectorAll('*');
-
-  for(var i=0; i<nodes.length; i++) {
-     importElement(nodes[i]);
-  }
-
-  importElement(root);
-};
-
-
-/**
  * Patches the document starting at el with the provided function.
  */
 var patch = function(el, fn) {
   setWalker(new TreeWalker(el));
-
-  if (!el.__idomImported) {
-    el.__idomImported = true;
-    importTree(el);
-  }
 
   firstChild();
   fn();

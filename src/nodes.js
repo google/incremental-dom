@@ -20,11 +20,6 @@ var nodeData = require('./node_data'),
     initData = nodeData.initData;
 
 
-var importElement = function(el) {
-  initData(el, el.tagName.toLowerCase(), el.getAttribute('key') || '');
-};
-
-
 var createElement = function(doc, tag, key, staticAttrs) {
   var el = doc.createElement(tag);
   initData(el, tag, key);
@@ -118,7 +113,6 @@ var registerChild = function(parent, key, child) {
 
 module.exports =  {
   createNode: createNode,
-  importElement: importElement,
   getKey: getKey,
   getTag: getTag,
   getChild: getChild,

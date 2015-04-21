@@ -30,6 +30,10 @@ var initData = function(el, tag, key) {
 
 
 var getData = function(el) {
+  if (!el.__incrementalDOMData && el.tagName) {
+    initData(el, el.tagName.toLowerCase(), el.getAttribute('key') || ''); 
+  }
+
   return el.__incrementalDOMData;
 };
 
