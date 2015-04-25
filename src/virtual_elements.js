@@ -31,6 +31,35 @@ var traversal = require('./traversal'),
 var ATTRIBUTES_OFFSET = 3;
 
 
+var hasChangedAttrs = function() {
+  var data = getData(this);
+  var attrsArr = data.attrsArr;
+  var attrsChanged = false;  
+
+  for (var i=ATTRIBUTES_OFFSET; i<arguments.length; i+=2) {
+    if (attrsArr[(i - ATTRIBUTES_OFFSET) >> 1] !== arguments[i+1]) {
+      attrsChanged = true;
+      break;
+    }
+  }
+
+  if (attrsChanged) {
+    for (var i=ATTRIBUTES_OFFSET; i<arguments.length; i+=2) {
+      attrsArr[(i - ATTRIBUTES_OFFSET) >> 1] = arguments[i+1];
+    }
+  }
+
+  return attrsChanged;
+};
+
+
+var updateAttributes = function() {
+  for (var i=ATTRIBUTES_OFFSET; i<arguments.length; i+=2) {
+    updateAttribute(this, arguments[i], arguments[i+1]);
+  }
+};
+
+
 /**
  * Declares a virtual element at the current location in the document. This
  * corresponds to an opening tag and a ve_close tag is required.
@@ -50,9 +79,9 @@ var ATTRIBUTES_OFFSET = 3;
  */
 var ve_open = function(tag, key, statics) {
   var node = alignWithDOM(tag, key, statics);
-
-  for (var i=ATTRIBUTES_OFFSET; i<arguments.length; i+=2) {
-    updateAttribute(node, arguments[i], arguments[i+1]);
+  
+  if (hasChangedAttrs.apply(node, arguments)) {
+    updateAttributes.apply(node, arguments);
   }
 
   firstChild();
@@ -89,8 +118,8 @@ var ve_component = function(tag, key, statics) {
     dirty = true;
   }
 
-  for (var i=ATTRIBUTES_OFFSET; i<arguments.length; i+=2) {
-    updateAttribute(node, arguments[i], arguments[i+1]);
+  if (hasChangedAttrs.apply(node, arguments)) {
+    updateAttributes.apply(node, arguments);
   }
 
   if (dirty) {
