@@ -17,6 +17,7 @@
 function NodeData(el, tag, key) {
   this.attrs = {};
   this.attrsArr = [];
+  this.newAttrs = {};
   this.key = key;
   this.keyMap = null;
   this.lastVisitedChild = null;

@@ -80,7 +80,7 @@ var updateAttributes = function() {
 var ve_open = function(tag, key, statics) {
   var node = alignWithDOM(tag, key, statics);
   
-  if (hasChangedAttrs.apply(node, arguments)) {
+  if (arguments.length > ATTRIBUTES_OFFSET && hasChangedAttrs.apply(node, arguments)) {
     updateAttributes.apply(node, arguments);
   }
 
@@ -100,14 +100,15 @@ var ve_void = function(tag, key, statics) {
 var ve_component = function(tag, key, statics) {
   var node = alignWithDOM(tag, key, statics);
   var data = getData(node);
-  var newAttrs = {};
+  var attrs = data.attrs;
+  var newAttrs = data.newAttrs;
 
   for (var i=ATTRIBUTES_OFFSET; i<arguments.length; i+=2) {
     newAttrs[arguments[i]] = arguments[i+1];
   }
 
-  var shouldUpdate = getShouldUpdateHook(data.attrs) || data.attrs.shouldUpdate || node.shouldUpdate;
-  var renderChildren = data.attrs.renderChildren || node.renderChildren;
+  var shouldUpdate = attrs.shouldUpdate || node.shouldUpdate || getShouldUpdateHook(data.attrs);
+  var renderChildren = attrs.renderChildren || node.renderChildren;
   var dirty;
  
   if (!data.rendered) {
@@ -118,7 +119,7 @@ var ve_component = function(tag, key, statics) {
     dirty = true;
   }
 
-  if (hasChangedAttrs.apply(node, arguments)) {
+  if (arguments.length > ATTRIBUTES_OFFSET && hasChangedAttrs.apply(node, arguments)) {
     updateAttributes.apply(node, arguments);
   }
 
