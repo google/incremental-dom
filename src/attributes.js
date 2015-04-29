@@ -29,7 +29,9 @@ var applyAttr = function(node, name, value) {
 
   if (value === undefined) {
     node.removeAttribute(name);
-  } else if (type !== 'object' && type !== 'function') {
+  } else if (type === 'object' || type === 'function') {
+    node[name] = value;
+  } else {
     node.setAttribute(name, value);
   }
 

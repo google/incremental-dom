@@ -61,26 +61,50 @@ describe('attribute updates', function() {
   });
 
   describe('function attributes', function() {
-    it('should not be be set on the node', function() {
+    it('should not be set as attributes', function() {
+      var fn = () =>{};
       patch(container, () => {
         ve_void('div', '', null,
-                'fn', () => {});
+                'fn', fn);
       });
       var el = container.childNodes[0];
 
       expect(el.hasAttribute('fn')).to.be.false;
     });
+
+    it('should be set on the node', function() {
+      var fn = () =>{};
+      patch(container, () => {
+        ve_void('div', '', null,
+                'fn', fn);
+      });
+      var el = container.childNodes[0];
+
+      expect(el.fn).to.equal(fn);
+    });
   });
 
   describe('object attributes', function() {
-    it('should not be be set on the node', function() {
+    it('should not be set as attributes', function() {
+      var obj = {};
       patch(container, () => {
         ve_void('div', '', null,
-                'obj', {});
+                'obj', obj);
       });
       var el = container.childNodes[0];
 
       expect(el.hasAttribute('obj')).to.be.false;
+    });
+
+    it('should be set on the node', function() {
+      var obj = {};
+      patch(container, () => {
+        ve_void('div', '', null,
+                'obj', obj);
+      });
+      var el = container.childNodes[0];
+
+      expect(el.obj).to.equal(obj);
     });
   });
 

@@ -107,8 +107,8 @@ var ve_component = function(tag, key, statics) {
     newAttrs[arguments[i]] = arguments[i+1];
   }
 
-  var shouldUpdate = attrs.shouldUpdate || node.shouldUpdate || getShouldUpdateHook(data.attrs);
-  var renderChildren = attrs.renderChildren || node.renderChildren;
+  var shouldUpdate = node.shouldUpdate || getShouldUpdateHook(data.attrs);
+  var renderChildren = node.renderChildren;
   var dirty;
  
   if (!data.rendered) {
