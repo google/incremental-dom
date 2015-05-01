@@ -7,19 +7,19 @@ var IncrementalDOM = require('../../index'),
     addShouldUpdateHook = IncrementalDOM.addShouldUpdateHook,
     removeShouldUpdateHook = IncrementalDOM.removeShouldUpdateHook;
 
-describe('components', function() {
+describe('components', () => {
   var container;
 
-  beforeEach(function() {
+  beforeEach(() => {
     container = document.createElement('div');
     document.body.appendChild(container);
   });
 
-  afterEach(function() {
+  afterEach(() => {
     document.body.removeChild(container);
   });
 
-  describe('rendering children', function() {
+  describe('rendering children', () => {
     var createRenderer = function(su) {
       var rc = function(a) {
         ve_open('div', '', ['id', 'child']);
@@ -33,7 +33,7 @@ describe('components', function() {
       };
     };
 
-    it('should always render children on the first pass', function() {
+    it('should always render children on the first pass', () => {
       var render = createRenderer((p, n) => false);
 
       patch(container, () => render({ text: 'foo' }));
@@ -43,7 +43,7 @@ describe('components', function() {
       expect(child.textContent).to.equal('foo');
     });
 
-    it('should always update if no shouldRender function', function() {
+    it('should always update if no shouldRender function', () => {
       var render = createRenderer();
 
       patch(container, () => render({ text: 'foo' }));
@@ -53,7 +53,7 @@ describe('components', function() {
       expect(child.textContent).to.equal('bar');
     });
 
-    it('should not update if shouldRender returns false', function() {
+    it('should not update if shouldRender returns false', () => {
       var render = createRenderer((p, n) => false);
 
       patch(container, () => render({ text: 'foo' }));
@@ -63,7 +63,7 @@ describe('components', function() {
       expect(child.textContent).to.equal('foo');
     });
 
-    it('should update if shouldRender returns true', function() {
+    it('should update if shouldRender returns true', () => {
       var render = createRenderer((p, n) => true);
 
       patch(container, () => render({ text: 'foo' }));
@@ -73,7 +73,7 @@ describe('components', function() {
       expect(child.textContent).to.equal('bar');
     });
 
-    it('should provide new and old attributes shouldRender', function() {
+    it('should provide new and old attributes shouldRender', () => {
       var render = createRenderer((p, n) => p.data.text === 'foo' && n.data.text === 'bar');
 
       patch(container, () => render({ text: 'foo' }));
@@ -84,8 +84,8 @@ describe('components', function() {
     });
   });
 
-  describe('shouldUpdate hook', function() {
-    var createRenderer = function() {
+  describe('shouldUpdate hook', () => {
+    var createRenderer = () => {
       var rc = function(a) {
         ve_open('div', '', ['id', 'child']);
           vt(a.data.text);
@@ -97,7 +97,7 @@ describe('components', function() {
       };
     };
 
-    it('should prevent update when it returns false', function() {
+    it('should prevent update when it returns false', () => {
       var render = createRenderer();
       addShouldUpdateHook('magicAttr', () => false);
 
@@ -110,7 +110,7 @@ describe('components', function() {
       removeShouldUpdateHook('magicAttr');
     });
 
-    it('should allow update when it returns true', function() {
+    it('should allow update when it returns true', () => {
       var render = createRenderer();
       addShouldUpdateHook('magicAttr', () => true);
 

@@ -4,19 +4,19 @@ var IncrementalDOM = require('../../index'),
     ve_close = IncrementalDOM.ve_close,
     ve_void = IncrementalDOM.ve_void;
 
-describe('conditional rendering', function() {
+describe('conditional rendering', () => {
   var container;
 
-  beforeEach(function() {
+  beforeEach(() => {
     container = document.createElement('div');
     document.body.appendChild(container);
   });
 
-  afterEach(function() {
+  afterEach(() => {
     document.body.removeChild(container);
   });
 
-  describe('nodes', function() {
+  describe('nodes', () => {
     function render(condition) {
       ve_open('div', '', ['id', 'outer']);
         ve_void('div', '', ['id', 'one' ]);
@@ -30,7 +30,7 @@ describe('conditional rendering', function() {
       ve_close();
     }
 
-    it('should un-render when the condition becomes false', function() {
+    it('should un-render when the condition becomes false', () => {
       patch(container, () => render(true));
       patch(container, () => render(false));
       var outer = container.childNodes[0];
@@ -42,7 +42,7 @@ describe('conditional rendering', function() {
       expect(outer.childNodes[1].tagName).to.equal('SPAN');
     });
 
-    it('should render when the condition becomes true', function() {
+    it('should render when the condition becomes true', () => {
       patch(container, () => render(false));
       patch(container, () => render(true));
       var outer = container.childNodes[0];
@@ -59,7 +59,7 @@ describe('conditional rendering', function() {
     });
   });
 
-  describe('with only conditional childNodes', function() {
+  describe('with only conditional childNodes', () => {
     function render(condition) {
       ve_open('div', '', ['id', 'outer']);
 
@@ -71,7 +71,7 @@ describe('conditional rendering', function() {
       ve_close();
     }
 
-    it('should not leave any remaning nodes', function() {
+    it('should not leave any remaning nodes', () => {
       patch(container, () => render(true));
       patch(container, () => render(false));
       var outer = container.childNodes[0];
@@ -80,7 +80,7 @@ describe('conditional rendering', function() {
     });
   });
 
-  describe('nodes', function() {
+  describe('nodes', () => {
     function render(condition) {
       ve_open('div', '', [],
               'id', 'outer');
@@ -99,7 +99,7 @@ describe('conditional rendering', function() {
       ve_close();
     }
 
-    it('should strip children when a conflicting node is re-used', function() {
+    it('should strip children when a conflicting node is re-used', () => {
       patch(container, () => render(true));
       patch(container, () => render(false));
       var outer = container.childNodes[0];

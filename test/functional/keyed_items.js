@@ -2,26 +2,26 @@ var IncrementalDOM = require('../../index'),
     patch = IncrementalDOM.patch,
     ve_void = IncrementalDOM.ve_void;
 
-describe('rendering with keys', function() {
+describe('rendering with keys', () => {
   var container;
 
-  beforeEach(function() {
+  beforeEach(() => {
     container = document.createElement('div');
     document.body.appendChild(container);
   });
 
-  afterEach(function() {
+  afterEach(() => {
     document.body.removeChild(container);
   });
 
-  describe('an array of items', function() {
+  describe('an array of items', () => {
     function render(items) {
       for(var i=0; i<items.length; i++) {
         ve_void('div', items[i].key, [ 'id', items[i].key ]);
       }
     }
 
-    it('should not modify the DOM nodes when inserting', function() {
+    it('should not modify the DOM nodes when inserting', () => {
       var items = [
         { key: 'one' },
         { key: 'two' }
@@ -42,7 +42,7 @@ describe('rendering with keys', function() {
       expect(container.childNodes[2].id).to.equal('two');
     });
 
-    it('should not modify the DOM nodes when removing', function() {
+    it('should not modify the DOM nodes when removing', () => {
       var items = [
         { key: 'one' },
         { key: 'two' },
@@ -63,7 +63,7 @@ describe('rendering with keys', function() {
       expect(container.childNodes[1].id).to.equal('three');
     });
 
-    it('should not modify the DOM nodes when re-ordering', function() {
+    it('should not modify the DOM nodes when re-ordering', () => {
       var items = [
         { key: 'one' },
         { key: 'two' },

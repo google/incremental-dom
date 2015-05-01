@@ -2,25 +2,25 @@ var IncrementalDOM = require('../../index'),
     patch = IncrementalDOM.patch,
     ve_void = IncrementalDOM.ve_void;
 
-describe('attribute updates', function() {
+describe('attribute updates', () => {
   var container;
 
-  beforeEach(function() {
+  beforeEach(() => {
     container = document.createElement('div');
     document.body.appendChild(container);
   });
 
-  afterEach(function() {
+  afterEach(() => {
     document.body.removeChild(container);
   });
 
-  describe('conditional attribute', function() {
+  describe('conditional attribute', () => {
     function render(obj) {
       ve_void('div', '', [],
               'data-expanded', obj.key);
     }
 
-    it('should be present when it has a value', function() {
+    it('should be present when it has a value', () => {
       patch(container, () => render({
         key: 'hello'
       }));
@@ -29,7 +29,7 @@ describe('attribute updates', function() {
       expect(el.getAttribute('data-expanded')).to.equal('hello');
     });
 
-    it('should be present when falsy', function() {
+    it('should be present when falsy', () => {
       patch(container, () => render({
         key: false
       }));
@@ -38,7 +38,7 @@ describe('attribute updates', function() {
       expect(el.getAttribute('data-expanded')).to.equal('false');
     });
 
-    it('should be not present when undefined', function() {
+    it('should be not present when undefined', () => {
       patch(container, () => render({
         key: undefined
       }));
@@ -47,7 +47,7 @@ describe('attribute updates', function() {
       expect(el.getAttribute('data-expanded')).to.equal(null);
     });
 
-    it('should update the DOM when they change', function() {
+    it('should update the DOM when they change', () => {
       patch(container, () => render({
         key: true
       }));
@@ -60,8 +60,8 @@ describe('attribute updates', function() {
     });
   });
 
-  describe('function attributes', function() {
-    it('should not be set as attributes', function() {
+  describe('function attributes', () => {
+    it('should not be set as attributes', () => {
       var fn = () =>{};
       patch(container, () => {
         ve_void('div', '', null,
@@ -72,7 +72,7 @@ describe('attribute updates', function() {
       expect(el.hasAttribute('fn')).to.be.false;
     });
 
-    it('should be set on the node', function() {
+    it('should be set on the node', () => {
       var fn = () =>{};
       patch(container, () => {
         ve_void('div', '', null,
@@ -84,8 +84,8 @@ describe('attribute updates', function() {
     });
   });
 
-  describe('object attributes', function() {
-    it('should not be set as attributes', function() {
+  describe('object attributes', () => {
+    it('should not be set as attributes', () => {
       var obj = {};
       patch(container, () => {
         ve_void('div', '', null,
@@ -96,7 +96,7 @@ describe('attribute updates', function() {
       expect(el.hasAttribute('obj')).to.be.false;
     });
 
-    it('should be set on the node', function() {
+    it('should be set on the node', () => {
       var obj = {};
       patch(container, () => {
         ve_void('div', '', null,
@@ -108,13 +108,13 @@ describe('attribute updates', function() {
     });
   });
 
-  describe('style', function() {
+  describe('style', () => {
     function render(style) {
       ve_void('div', '', [],
               'style', style);
     }
 
-    it('should render with the correct style properties for objects', function() {
+    it('should render with the correct style properties for objects', () => {
       patch(container, () => render({
         color: 'white',
         backgroundColor: 'red'
@@ -125,7 +125,7 @@ describe('attribute updates', function() {
       expect(el.style.backgroundColor).to.equal('red');
     });
 
-    it('should update the correct style properties', function() {
+    it('should update the correct style properties', () => {
       patch(container, () => render({
         color: 'white'
       }));
@@ -137,7 +137,7 @@ describe('attribute updates', function() {
       expect(el.style.color).to.equal('red');
     });
 
-    it('should remove properties not present in the new object', function() {
+    it('should remove properties not present in the new object', () => {
       patch(container, () => render({
         color: 'white'
       }));
@@ -150,7 +150,7 @@ describe('attribute updates', function() {
       expect(el.style.backgroundColor).to.equal('red');
     });
 
-    it('should render with the correct style properties for strings', function() {
+    it('should render with the correct style properties for strings', () => {
       patch(container, () => render('color: white; background-color: red;'));
       var el = container.childNodes[0];
 
@@ -158,7 +158,7 @@ describe('attribute updates', function() {
       expect(el.style.backgroundColor).to.equal('red');
     });
 
-    it('should render with the correct style properties for String instances', function() {
+    it('should render with the correct style properties for String instances', () => {
       patch(container, () => render(new String('color: white; background-color: red;')));
       var el = container.childNodes[0];
 
