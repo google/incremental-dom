@@ -89,7 +89,8 @@ describe('conditional rendering', () => {
 
         if (condition) {
           ve_open('span', '', [],
-                  'id', 'conditional-one');
+                  'id', 'conditional-one',
+                  'data-foo', 'foo');
             ve_void('span', '', []);
           ve_close();
         }
@@ -110,6 +111,14 @@ describe('conditional rendering', () => {
       expect(outer.childNodes[1].id).to.equal('two');
       expect(outer.childNodes[1].tagName).to.equal('SPAN');
       expect(outer.childNodes[1].children.length).to.equal(0);
+    });
+
+    it('should strip attributes when a conflicting node is re-used', () => {
+      patch(container, () => render(true));
+      patch(container, () => render(false));
+      var outer = container.childNodes[0];
+
+      expect(outer.childNodes[1].getAttribute('data-foo')).to.be.null;
     });
   });
 });

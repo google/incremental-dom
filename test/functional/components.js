@@ -19,7 +19,7 @@ describe('components', () => {
     document.body.removeChild(container);
   });
 
-  describe('rendering children', () => {
+  describe('when rendering children', () => {
     var createRenderer = function(su) {
       var rc = function(a) {
         ve_open('div', '', ['id', 'child']);
@@ -84,7 +84,7 @@ describe('components', () => {
     });
   });
 
-  describe('shouldUpdate hook', () => {
+  describe('with a shouldUpdate hook', () => {
     var createRenderer = () => {
       var rc = function(a) {
         ve_open('div', '', ['id', 'child']);

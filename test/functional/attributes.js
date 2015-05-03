@@ -14,13 +14,13 @@ describe('attribute updates', () => {
     document.body.removeChild(container);
   });
 
-  describe('conditional attribute', () => {
+  describe('for conditional attributes', () => {
     function render(obj) {
       ve_void('div', '', [],
               'data-expanded', obj.key);
     }
 
-    it('should be present when it has a value', () => {
+    it('should be present when they have a value', () => {
       patch(container, () => render({
         key: 'hello'
       }));
@@ -49,18 +49,18 @@ describe('attribute updates', () => {
 
     it('should update the DOM when they change', () => {
       patch(container, () => render({
-        key: true
+        key: 'foo'
       }));
       patch(container, () => render({
-        key: false
+        key: 'bar'
       }));
       var el = container.childNodes[0];
 
-      expect(el.getAttribute('data-expanded')).to.equal('false');
+      expect(el.getAttribute('data-expanded')).to.equal('bar');
     });
   });
 
-  describe('function attributes', () => {
+  describe('for function attributes', () => {
     it('should not be set as attributes', () => {
       var fn = () =>{};
       patch(container, () => {
@@ -84,7 +84,7 @@ describe('attribute updates', () => {
     });
   });
 
-  describe('object attributes', () => {
+  describe('for object attributes', () => {
     it('should not be set as attributes', () => {
       var obj = {};
       patch(container, () => {
@@ -108,7 +108,7 @@ describe('attribute updates', () => {
     });
   });
 
-  describe('style', () => {
+  describe('for style', () => {
     function render(style) {
       ve_void('div', '', [],
               'style', style);

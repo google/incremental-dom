@@ -14,7 +14,7 @@ describe('text nodes', () => {
     document.body.removeChild(container);
   });
 
-  describe('creating a text nodes', () => {
+  describe('when created', () => {
     it('should render a text node with the specified value', () => {
       patch(container, () => {
         vt('Hello world!');
@@ -25,7 +25,7 @@ describe('text nodes', () => {
       expect(node).to.be.instanceof(Text);
     });
 
-    it('should allow creation of multiple text nodes under one element', () => {
+    it('should allow for multiple text nodes under one parent element', () => {
       patch(container, () => {
         vt('Hello ');
         vt('World');
@@ -36,7 +36,7 @@ describe('text nodes', () => {
     });
   });
 
-  describe('conditional text', () => {
+  describe('with conditional text', () => {
     function render(text) {
       vt(text);
     }

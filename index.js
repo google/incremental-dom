@@ -23,9 +23,12 @@ module.exports = {
   addShouldUpdateHook: hooks.addShouldUpdateHook,
   removeShouldUpdateHook: hooks.removeShouldUpdateHook,
   ve_void: elements.ve_void,
+  ve_open_start: elements.ve_open_start,
+  ve_open_end: elements.ve_open_end,
   ve_open: elements.ve_open,
   ve_close: elements.ve_close,
   ve_component: elements.ve_component,
   vt: elements.vt,
+  va: elements.va
 };
 

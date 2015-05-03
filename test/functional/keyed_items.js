@@ -14,7 +14,7 @@ describe('rendering with keys', () => {
     document.body.removeChild(container);
   });
 
-  describe('an array of items', () => {
+  describe('for an array of items', () => {
     function render(items) {
       for(var i=0; i<items.length; i++) {
         ve_void('div', items[i].key, [ 'id', items[i].key ]);

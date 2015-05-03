@@ -4,7 +4,7 @@ var IncrementalDOM = require('../../index'),
     ve_close = IncrementalDOM.ve_close,
     ve_void = IncrementalDOM.ve_void;
 
-describe('created elements', () => {
+describe('element creation', () => {
   var container;
 
   beforeEach(() => {
@@ -16,7 +16,7 @@ describe('created elements', () => {
     document.body.removeChild(container);
   });
 
-  describe('creating a single node', () => {
+  describe('when creating a single node', () => {
     var el;
 
     beforeEach(() => {
