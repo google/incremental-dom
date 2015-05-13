@@ -1,8 +1,8 @@
 var IncrementalDOM = require('../../index'),
     patch = IncrementalDOM.patch,
-    ve_open = IncrementalDOM.ve_open,
-    ve_close = IncrementalDOM.ve_close,
-    ve_void = IncrementalDOM.ve_void;
+    ie_open = IncrementalDOM.ie_open,
+    ie_close = IncrementalDOM.ie_close,
+    ie_void = IncrementalDOM.ie_void;
 
 describe('conditional rendering', () => {
   var container;
@@ -18,16 +18,16 @@ describe('conditional rendering', () => {
 
   describe('nodes', () => {
     function render(condition) {
-      ve_open('div', '', ['id', 'outer']);
-        ve_void('div', '', ['id', 'one' ]);
+      ie_open('div', '', ['id', 'outer']);
+        ie_void('div', '', ['id', 'one' ]);
 
         if (condition) {
-          ve_void('div', '', ['id', 'conditional-one' ]);
-          ve_void('div', '', ['id', 'conditional-two' ]);
+          ie_void('div', '', ['id', 'conditional-one' ]);
+          ie_void('div', '', ['id', 'conditional-two' ]);
         }
 
-        ve_void('span', '', ['id', 'two' ]);
-      ve_close();
+        ie_void('span', '', ['id', 'two' ]);
+      ie_close();
     }
 
     it('should un-render when the condition becomes false', () => {
@@ -61,14 +61,14 @@ describe('conditional rendering', () => {
 
   describe('with only conditional childNodes', () => {
     function render(condition) {
-      ve_open('div', '', ['id', 'outer']);
+      ie_open('div', '', ['id', 'outer']);
 
         if (condition) {
-          ve_void('div', '', ['id', 'conditional-one' ]);
-          ve_void('div', '', ['id', 'conditional-two' ]);
+          ie_void('div', '', ['id', 'conditional-one' ]);
+          ie_void('div', '', ['id', 'conditional-two' ]);
         }
 
-      ve_close();
+      ie_close();
     }
 
     it('should not leave any remaning nodes', () => {
@@ -82,22 +82,22 @@ describe('conditional rendering', () => {
 
   describe('nodes', () => {
     function render(condition) {
-      ve_open('div', '', [],
+      ie_open('div', '', [],
               'id', 'outer');
-        ve_void('div', '', [],
+        ie_void('div', '', [],
                 'id', 'one' );
 
         if (condition) {
-          ve_open('span', '', [],
+          ie_open('span', '', [],
                   'id', 'conditional-one',
                   'data-foo', 'foo');
-            ve_void('span', '', []);
-          ve_close();
+            ie_void('span', '', []);
+          ie_close();
         }
 
-        ve_void('span', '', [],
+        ie_void('span', '', [],
                 'id', 'two');
-      ve_close();
+      ie_close();
     }
 
     it('should strip children when a conflicting node is re-used', () => {

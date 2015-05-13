@@ -1,6 +1,6 @@
 var IncrementalDOM = require('../../index'),
     patch = IncrementalDOM.patch,
-    ve_void = IncrementalDOM.ve_void;
+    ie_void = IncrementalDOM.ie_void;
 
 describe('attribute updates', () => {
   var container;
@@ -16,7 +16,7 @@ describe('attribute updates', () => {
 
   describe('for conditional attributes', () => {
     function render(obj) {
-      ve_void('div', '', [],
+      ie_void('div', '', [],
               'data-expanded', obj.key);
     }
 
@@ -64,7 +64,7 @@ describe('attribute updates', () => {
     it('should not be set as attributes', () => {
       var fn = () =>{};
       patch(container, () => {
-        ve_void('div', '', null,
+        ie_void('div', '', null,
                 'fn', fn);
       });
       var el = container.childNodes[0];
@@ -75,7 +75,7 @@ describe('attribute updates', () => {
     it('should be set on the node', () => {
       var fn = () =>{};
       patch(container, () => {
-        ve_void('div', '', null,
+        ie_void('div', '', null,
                 'fn', fn);
       });
       var el = container.childNodes[0];
@@ -88,7 +88,7 @@ describe('attribute updates', () => {
     it('should not be set as attributes', () => {
       var obj = {};
       patch(container, () => {
-        ve_void('div', '', null,
+        ie_void('div', '', null,
                 'obj', obj);
       });
       var el = container.childNodes[0];
@@ -99,7 +99,7 @@ describe('attribute updates', () => {
     it('should be set on the node', () => {
       var obj = {};
       patch(container, () => {
-        ve_void('div', '', null,
+        ie_void('div', '', null,
                 'obj', obj);
       });
       var el = container.childNodes[0];
@@ -110,7 +110,7 @@ describe('attribute updates', () => {
 
   describe('for style', () => {
     function render(style) {
-      ve_void('div', '', [],
+      ie_void('div', '', [],
               'style', style);
     }
 

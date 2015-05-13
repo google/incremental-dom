@@ -1,9 +1,9 @@
 var IncrementalDOM = require('../../index'),
     patch = IncrementalDOM.patch,
-    ve_component = IncrementalDOM.ve_component,
-    ve_open = IncrementalDOM.ve_open,
-    ve_close = IncrementalDOM.ve_close,
-    vt = IncrementalDOM.vt,
+    ie_component = IncrementalDOM.ie_component,
+    ie_open = IncrementalDOM.ie_open,
+    ie_close = IncrementalDOM.ie_close,
+    itext = IncrementalDOM.itext,
     addShouldUpdateHook = IncrementalDOM.addShouldUpdateHook,
     removeShouldUpdateHook = IncrementalDOM.removeShouldUpdateHook;
 
@@ -22,14 +22,14 @@ describe('components', () => {
   describe('when rendering children', () => {
     var createRenderer = function(su) {
       var rc = function(a) {
-        ve_open('div', '', ['id', 'child']);
-          vt(a.data.text);
-        ve_close('div');
+        ie_open('div', '', ['id', 'child']);
+          itext(a.data.text);
+        ie_close('div');
       };
       var statics = ['shouldUpdate', su, 'renderChildren', rc];
 
       return function(data) {
-        ve_component('div', '', statics, 'data', data);
+        ie_component('div', '', statics, 'data', data);
       };
     };
 
@@ -87,13 +87,13 @@ describe('components', () => {
   describe('with a shouldUpdate hook', () => {
     var createRenderer = () => {
       var rc = function(a) {
-        ve_open('div', '', ['id', 'child']);
-          vt(a.data.text);
-        ve_close('div');
+        ie_open('div', '', ['id', 'child']);
+          itext(a.data.text);
+        ie_close('div');
       };
 
       return function(data) {
-        ve_component('div', '', [ 'magicAttr', '', 'renderChildren', rc ], 'data', data);
+        ie_component('div', '', [ 'magicAttr', '', 'renderChildren', rc ], 'data', data);
       };
     };
 

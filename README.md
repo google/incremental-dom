@@ -6,21 +6,22 @@ iDOM is a library for declaring DOM trees that are updated in-place when data ch
 
 ## Usage
 
-HTML is expressed in iDOM using the ve_open, ve_close, ve_void and vt methods. Consider the following example:
+HTML is expressed in iDOM using the ie_open, ie_close, ie_void and itext methods. Consider the following example:
 
 ```javascript
 var idom = require('idom'),
-    ve_open = idom.ve_open,
-    ve_close = idom.ve_close,
-    ve_void = idom.ve_void;
+    ie_open = idom.ie_open,
+    ie_close = idom.ie_close,
+    ie_void = idom.ie_void,
+    itext = idom.itext;
 
 function render(data) {
-  ve_void('input', '', [ 'type', 'text' ]);
-  ve_open('div', '', null);
+  ie_void('input', '', [ 'type', 'text' ]);
+  ie_open('div', '', null);
     if (data.someCondition) {
-      vt(data.text);
+      itext(data.text);
     }
-  ve_close('div');
+  ie_close('div');
 }
 ```
 

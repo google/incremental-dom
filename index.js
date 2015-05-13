@@ -22,13 +22,13 @@ module.exports = {
   patch: patch,
   addShouldUpdateHook: hooks.addShouldUpdateHook,
   removeShouldUpdateHook: hooks.removeShouldUpdateHook,
-  ve_void: elements.ve_void,
-  ve_open_start: elements.ve_open_start,
-  ve_open_end: elements.ve_open_end,
-  ve_open: elements.ve_open,
-  ve_close: elements.ve_close,
-  ve_component: elements.ve_component,
-  vt: elements.vt,
-  va: elements.va
+  ie_void: elements.ie_void,
+  ie_open_start: elements.ie_open_start,
+  ie_open_end: elements.ie_open_end,
+  ie_open: elements.ie_open,
+  ie_close: elements.ie_close,
+  ie_component: elements.ie_component,
+  itext: elements.itext,
+  iattr: elements.iattr
 };
 

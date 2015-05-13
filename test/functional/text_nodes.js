@@ -1,6 +1,6 @@
 var IncrementalDOM = require('../../index'),
     patch = IncrementalDOM.patch,
-    vt = IncrementalDOM.vt;
+    itext = IncrementalDOM.itext;
 
 describe('text nodes', () => {
   var container;
@@ -17,7 +17,7 @@ describe('text nodes', () => {
   describe('when created', () => {
     it('should render a text node with the specified value', () => {
       patch(container, () => {
-        vt('Hello world!');
+        itext('Hello world!');
       });
       var node = container.childNodes[0];
 
@@ -27,9 +27,9 @@ describe('text nodes', () => {
 
     it('should allow for multiple text nodes under one parent element', () => {
       patch(container, () => {
-        vt('Hello ');
-        vt('World');
-        vt('!');
+        itext('Hello ');
+        itext('World');
+        itext('!');
       });
 
       expect(container.textContent).to.equal('Hello World!');
@@ -38,7 +38,7 @@ describe('text nodes', () => {
 
   describe('with conditional text', () => {
     function render(text) {
-      vt(text);
+      itext(text);
     }
 
     it('should update the DOM when the text is updated', () => {

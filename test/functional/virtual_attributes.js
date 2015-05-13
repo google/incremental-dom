@@ -1,9 +1,9 @@
 var IncrementalDOM = require('../../index'),
     patch = IncrementalDOM.patch,
-    ve_open_start = IncrementalDOM.ve_open_start,
-    ve_open_end = IncrementalDOM.ve_open_end,
-    ve_close = IncrementalDOM.ve_close,
-    va = IncrementalDOM.va;
+    ie_open_start = IncrementalDOM.ie_open_start,
+    ie_open_end = IncrementalDOM.ie_open_end,
+    ie_close = IncrementalDOM.ie_close,
+    iattr = IncrementalDOM.iattr;
 
 describe('virtual attribute updates', () => {
   var container;
@@ -19,12 +19,12 @@ describe('virtual attribute updates', () => {
 
   describe('for conditional attributes', () => {
     function render(obj) {  
-      ve_open_start('div', '', []);
+      ie_open_start('div', '', []);
         if (obj.key) {
-          va('data-expanded', obj.key);
+          iattr('data-expanded', obj.key);
         }
-      ve_open_end();
-      ve_close('div');
+      ie_open_end();
+      ie_close('div');
     }
 
     it('should be present when specified', () => {

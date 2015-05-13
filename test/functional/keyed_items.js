@@ -1,6 +1,6 @@
 var IncrementalDOM = require('../../index'),
     patch = IncrementalDOM.patch,
-    ve_void = IncrementalDOM.ve_void;
+    ie_void = IncrementalDOM.ie_void;
 
 describe('rendering with keys', () => {
   var container;
@@ -17,7 +17,7 @@ describe('rendering with keys', () => {
   describe('for an array of items', () => {
     function render(items) {
       for(var i=0; i<items.length; i++) {
-        ve_void('div', items[i].key, [ 'id', items[i].key ]);
+        ie_void('div', items[i].key, [ 'id', items[i].key ]);
       }
     }
 

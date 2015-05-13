@@ -79,7 +79,7 @@ var updateAttributes = function() {
 
 /**
  * Declares a virtual element at the current location in the document. This
- * corresponds to an opening tag and a ve_close tag is required.
+ * corresponds to an opening tag and a ie_close tag is required.
  *
  * @param {string} tag
  *   The element's tag name.
@@ -94,7 +94,7 @@ var updateAttributes = function() {
  *   Pairs of attributes and their values. This should be used for attributes
  *   that may change.
  */
-var ve_open = function(tag, key, statics) {
+var ie_open = function(tag, key, statics) {
   var node = alignWithDOM(tag, key, statics);
   
   if (hasChangedAttrs.apply(node, arguments)) {
@@ -107,10 +107,10 @@ var ve_open = function(tag, key, statics) {
 
 /**
  * Declares a virtual element at the current location in the document. This
- * corresponds to an opening tag and a ve_close tag is required. This is like
- * ve_open, but the attributes are defined using the va function rather than
+ * corresponds to an opening tag and a ie_close tag is required. This is like
+ * ie_open, but the attributes are defined using the va function rather than
  * being passed as arguments. Must be folllowed by 0 or more calls to va, then
- * a call to ve_open_end.
+ * a call to ie_open_end.
  *
  * @param {string} tag
  *   The element's tag name.
@@ -122,7 +122,7 @@ var ve_open = function(tag, key, statics) {
  *   Pairs of attributes and their values. This should be used for attributes
  *   that will never change.
  */
-var ve_open_start = function(tag, key, statics) {
+var ie_open_start = function(tag, key, statics) {
   var node = alignWithDOM(tag, key, statics);
 
   currentAttributesArray.length = ATTRIBUTES_OFFSET;
@@ -130,9 +130,9 @@ var ve_open_start = function(tag, key, statics) {
 
 
 /**
- * Closes an open tag started with ve_open_start.
+ * Closes an open tag started with ie_open_start.
  */
-var ve_open_end = function() {
+var ie_open_end = function() {
   var node = getWalker().currentNode;
 
   if (hasChangedAttrs.apply(node, currentAttributesArray)) {
@@ -146,13 +146,13 @@ var ve_open_end = function() {
 /**
  * Declare a virtual element that has no children.
  */
-var ve_void = function(tag, key, statics) {
-  ve_open.apply(this, arguments);
-  ve_close.apply(this, arguments);
+var ie_void = function(tag, key, statics) {
+  ie_open.apply(this, arguments);
+  ie_close.apply(this, arguments);
 };
 
 
-var ve_component = function(tag, key, statics) {
+var ie_component = function(tag, key, statics) {
   var node = alignWithDOM(tag, key, statics);
   var data = getData(node);
   var attrs = data.attrs;
@@ -194,7 +194,7 @@ var ve_component = function(tag, key, statics) {
 /**
  * Closes an open virtual element.
  */
-var ve_close = function(tag) {
+var ie_close = function(tag) {
   parentNode();
   nextSibling();
 };
@@ -205,7 +205,7 @@ var ve_close = function(tag) {
  *
  * @param {string} value
  */
-var vt = function(value) {
+var itext = function(value) {
   var node = alignWithDOM(undefined, undefined, value);
 
   if (node.__incrementalDOMText !== value) {
@@ -219,25 +219,25 @@ var vt = function(value) {
 
 /***
  * Defines a virtual attribute at this point of the DOM. This is only valid
- * when called between ve_open_start and ve_open_end.
+ * when called between ie_open_start and ie_open_end.
  *
  * @param {string} name
  * @param {*} value
  */
-var va = function(name, value) {
+var iattr = function(name, value) {
   currentAttributesArray.push(name);
   currentAttributesArray.push(value);
 };
 
 
 module.exports = {
-  ve_open_start: ve_open_start,
-  ve_open_end: ve_open_end,
-  ve_open: ve_open,
-  ve_void: ve_void,
-  ve_close: ve_close,
-  ve_component: ve_component,
-  vt: vt,
-  va: va
+  ie_open_start: ie_open_start,
+  ie_open_end: ie_open_end,
+  ie_open: ie_open,
+  ie_void: ie_void,
+  ie_close: ie_close,
+  ie_component: ie_component,
+  itext: itext,
+  iattr: iattr
 };
 
