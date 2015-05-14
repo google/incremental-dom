@@ -1,9 +1,9 @@
 {
-  "name": "Incremental",
+  "name": "incremental-dom",
   "version": "0.0.0",
   "description": "An in-place virtual DOM library",
   "main": "index.js",
-  "author": "The iDOM Authors",
+  "author": "The Incremental DOM Authors",
   "license": "Apache-2.0",
   "devDependencies": {
     "browserify": "~9.0.8",
