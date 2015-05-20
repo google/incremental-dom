@@ -19,20 +19,23 @@ var traversal = require('./traversal'),
     firstChild = traversal.firstChild,
     parentNode = traversal.parentNode;
 var TreeWalker = require('./tree_walker').TreeWalker;
-var setWalker = require('./walker').setWalker;
+var walker = require('./walker'),
+    getWalker = walker.getWalker,
+    setWalker = walker.setWalker;
 
 
 /**
  * Patches the document starting at el with the provided function.
  */
 var patch = function(el, fn) {
+  var prevWalker = getWalker();
   setWalker(new TreeWalker(el));
 
   firstChild();
   fn();
   parentNode();
 
-  setWalker(null);
+  setWalker(prevWalker);
 };
 
 
