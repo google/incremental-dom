@@ -40,8 +40,9 @@ var hasChangedAttrs = function() {
   var data = getData(this);
   var attrsArr = data.attrsArr;
   var attrsChanged = false;  
+  var i;
 
-  for (var i=ATTRIBUTES_OFFSET; i<arguments.length; i+=2) {
+  for (i=ATTRIBUTES_OFFSET; i<arguments.length; i+=2) {
     if (attrsArr[(i - ATTRIBUTES_OFFSET) >> 1] !== arguments[i+1]) {
       attrsChanged = true;
       break;
@@ -49,7 +50,7 @@ var hasChangedAttrs = function() {
   }
 
   if (attrsChanged) {
-    for (var i=ATTRIBUTES_OFFSET; i<arguments.length; i+=2) {
+    for (i=ATTRIBUTES_OFFSET; i<arguments.length; i+=2) {
       attrsArr[(i - ATTRIBUTES_OFFSET) >> 1] = arguments[i+1];
     }
   }
@@ -62,8 +63,9 @@ var updateAttributes = function() {
   var node = this;
   var data = getData(node);
   var newAttrs = data.newAttrs;
-
-  for (var attr in newAttrs) {
+  var attr;
+ 
+  for (attr in newAttrs) {
     newAttrs[attr] = undefined;
   }
 
@@ -71,7 +73,7 @@ var updateAttributes = function() {
     newAttrs[arguments[i]] = arguments[i+1];
   }
 
-  for (var attr in newAttrs) {
+  for (attr in newAttrs) {
     updateAttribute(node, attr, newAttrs[attr]);
   }
 };
