@@ -17,7 +17,6 @@
 
 var alignWithDOM = require('./alignment').alignWithDOM;
 var updateAttribute = require('./attributes').updateAttribute;
-var getShouldUpdateHook = require('./hooks').getShouldUpdateHook;
 var getData = require('./node_data').getData;
 var getWalker = require('./walker').getWalker;
 var traversal = require('./traversal'),
@@ -33,7 +32,7 @@ var traversal = require('./traversal'),
 var ATTRIBUTES_OFFSET = 3;
 
 
-var currentAttributesArray = [];
+var argsBuilder = [];
 
 
 var hasChangedAttrs = function() {
@@ -59,13 +58,12 @@ var hasChangedAttrs = function() {
 };
 
 
-var updateAttributes = function() {
+var updateNewAttrs = function() {
   var node = this;
   var data = getData(node);
   var newAttrs = data.newAttrs;
-  var attr;
  
-  for (attr in newAttrs) {
+  for (var attr in newAttrs) {
     newAttrs[attr] = undefined;
   }
 
@@ -73,7 +71,12 @@ var updateAttributes = function() {
     newAttrs[arguments[i]] = arguments[i+1];
   }
 
-  for (attr in newAttrs) {
+  return newAttrs;
+};
+
+
+var updateAttributes = function(node, newAttrs) {
+  for (var attr in newAttrs) {
     updateAttribute(node, attr, newAttrs[attr]);
   }
 };
@@ -100,7 +103,9 @@ var ie_open = function(tag, key, statics) {
   var node = alignWithDOM(tag, key, statics);
   
   if (hasChangedAttrs.apply(node, arguments)) {
-    updateAttributes.apply(node, arguments);
+    var newAttrs = updateNewAttrs.apply(node, arguments);
+    
+    updateAttributes(node, newAttrs);
   }
 
   firstChild();
@@ -125,9 +130,22 @@ var ie_open = function(tag, key, statics) {
  *   that will never change.
  */
 var ie_open_start = function(tag, key, statics) {
-  var node = alignWithDOM(tag, key, statics);
+  argsBuilder[0] = tag;
+  argsBuilder[1] = key;
+  argsBuilder[2] = statics;
+  argsBuilder.length = ATTRIBUTES_OFFSET;
+};
 
-  currentAttributesArray.length = ATTRIBUTES_OFFSET;
+
+/***
+ * Defines a virtual attribute at this point of the DOM. This is only valid
+ * when called between ie_open_start and ie_open_end.
+ *
+ * @param {string} name
+ * @param {*} value
+ */
+var iattr = function(name, value) {
+  argsBuilder.push(name, value);
 };
 
 
@@ -135,61 +153,7 @@ var ie_open_start = function(tag, key, statics) {
  * Closes an open tag started with ie_open_start.
  */
 var ie_open_end = function() {
-  var node = getWalker().currentNode;
-
-  if (hasChangedAttrs.apply(node, currentAttributesArray)) {
-    updateAttributes.apply(node, currentAttributesArray);
-  }
-
-  firstChild();
-};
-
-
-/**
- * Declare a virtual element that has no children.
- */
-var ie_void = function(tag, key, statics) {
-  ie_open.apply(this, arguments);
-  ie_close.apply(this, arguments);
-};
-
-
-var ie_component = function(tag, key, statics) {
-  var node = alignWithDOM(tag, key, statics);
-  var data = getData(node);
-  var attrs = data.attrs;
-  var newAttrs = data.newAttrs;
-
-  for (var i=ATTRIBUTES_OFFSET; i<arguments.length; i+=2) {
-    newAttrs[arguments[i]] = arguments[i+1];
-  }
-
-  var shouldUpdate = node.shouldUpdate || getShouldUpdateHook(data.attrs);
-  var renderChildren = node.renderChildren;
-  var dirty;
- 
-  if (!data.rendered) {
-    dirty = true;
-  } else if (shouldUpdate) {
-    dirty = shouldUpdate.call(node, data.attrs, newAttrs);
-  } else {
-    dirty = true;
-  }
-
-  if (hasChangedAttrs.apply(node, arguments)) {
-    updateAttributes.apply(node, arguments);
-  }
-
-  if (dirty) {
-    firstChild();
-
-    renderChildren.call(node, newAttrs);
-    data.rendered = true;
-
-    parentNode();
-  }
-
-  nextSibling();
+  ie_open.apply(this, argsBuilder); 
 };
 
 
@@ -199,6 +163,15 @@ var ie_component = function(tag, key, statics) {
 var ie_close = function(tag) {
   parentNode();
   nextSibling();
+};
+
+
+/**
+ * Declare a virtual element that has no children.
+ */
+var ie_void = function(tag, key, statics) {
+  ie_open.apply(this, arguments);
+  ie_close.apply(this, arguments);
 };
 
 
@@ -219,16 +192,29 @@ var itext = function(value) {
 };
 
 
-/***
- * Defines a virtual attribute at this point of the DOM. This is only valid
- * when called between ie_open_start and ie_open_end.
- *
- * @param {string} name
- * @param {*} value
- */
-var iattr = function(name, value) {
-  currentAttributesArray.push(name);
-  currentAttributesArray.push(value);
+var ie_component = function(tag, key, statics) {
+  var node = alignWithDOM(tag, key, statics);
+  var data = getData(node);
+  var attrs = data.attrs;
+
+  var attrsChanged = hasChangedAttrs.apply(node, arguments);
+
+  if (attrsChanged || node.renderChildren) {
+    var newAttrs = updateNewAttrs.apply(node, arguments);
+
+    if (node.renderChildren && (!node.shouldUpdate || !data.rendered || node.shouldUpdate(attrs, newAttrs))) {
+      firstChild();
+      node.renderChildren(newAttrs);
+      parentNode();
+      data.rendered = true; 
+    }
+
+    if (attrsChanged) {
+      updateAttributes(node, newAttrs);
+    }
+  }
+
+  nextSibling();
 };
 
 
