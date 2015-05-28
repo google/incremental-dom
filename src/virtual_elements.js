@@ -192,39 +192,12 @@ var itext = function(value) {
 };
 
 
-var ie_component = function(tag, key, statics) {
-  var node = alignWithDOM(tag, key, statics);
-  var data = getData(node);
-  var attrs = data.attrs;
-
-  var attrsChanged = hasChangedAttrs.apply(node, arguments);
-
-  if (attrsChanged || node.renderChildren) {
-    var newAttrs = updateNewAttrs.apply(node, arguments);
-
-    if (node.renderChildren && (!node.shouldUpdate || !data.rendered || node.shouldUpdate(attrs, newAttrs))) {
-      firstChild();
-      node.renderChildren(newAttrs);
-      parentNode();
-      data.rendered = true; 
-    }
-
-    if (attrsChanged) {
-      updateAttributes(node, newAttrs);
-    }
-  }
-
-  nextSibling();
-};
-
-
 module.exports = {
   ie_open_start: ie_open_start,
   ie_open_end: ie_open_end,
   ie_open: ie_open,
   ie_void: ie_void,
   ie_close: ie_close,
-  ie_component: ie_component,
   itext: itext,
   iattr: iattr
 };
