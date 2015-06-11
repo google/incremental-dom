@@ -33,7 +33,7 @@ describe('rendering with keys', () => {
   describe('for an array of items', () => {
     function render(items) {
       for(var i=0; i<items.length; i++) {
-        ie_void('div', items[i].key, [ 'id', items[i].key ]);
+        ie_void('div', items[i].key, ['id', items[i].key]);
       }
     }
 

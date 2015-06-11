@@ -1,5 +1,4 @@
 /**
- * @license
  * Copyright 2015 The Incremental DOM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,36 +17,60 @@
 /**
  * Similar to the built-in Treewalker class, but simplified and allows direct
  * access to modify the currentNode property.
+ * @param {!Node} node The root Node of the subtree the walker should start
+ *     traversing.
+ * @constructor
  */
 function TreeWalker(node) {
-  this.stack = [];
+  /**
+   * Keeps track of the current parent node. This is necessary as the traversal
+   * methods may traverse past the last child and we still need a way to get
+   * back to the parent.
+   * @const @private {!Array<!Node>}
+   */
+  this.stack_ = [];
+
+  /** {?Node} */
   this.currentNode = node;
+
+  /** {!Document} */
   this.doc = node.ownerDocument;
 }
 
 
+/**
+ * @return {!Node} The current parent of the current location in the subtree.
+ */
 TreeWalker.prototype.getCurrentParent = function() {
-  return this.stack[this.stack.length - 1];
+  return this.stack_[this.stack_.length - 1];
 };
 
 
+/**
+ * Changes the current location the firstChild of the current location.
+ */
 TreeWalker.prototype.firstChild = function() {
-  this.stack.push(this.currentNode);
+  this.stack_.push(this.currentNode);
   this.currentNode = this.currentNode.firstChild;
 };
 
 
+/**
+ * Changes the current location the nextSibling of the current location.
+ */
 TreeWalker.prototype.nextSibling = function() {
   this.currentNode = this.currentNode.nextSibling;
 };
 
 
+/**
+ * Changes the current location the parentNode of the current location.
+ */
 TreeWalker.prototype.parentNode = function() {
-  this.currentNode = this.stack.pop();
+  this.currentNode = this.stack_.pop();
 };
 
 
-module.exports = {
-  TreeWalker: TreeWalker
-};
+/** */
+module.exports = TreeWalker;
 

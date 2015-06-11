@@ -15,7 +15,7 @@
  */
 
 var gulp = require('gulp');
-var jshint = require('gulp-jshint');
+var gjslint = require('gulp-gjslint');
 var sourcemaps = require('gulp-sourcemaps');
 var del = require('del');
 var karma = require('karma').server;
@@ -37,26 +37,25 @@ gulp.task('clean', function(cb) {
 
  
 gulp.task('unit', function(done) {
-    karma.start({
-        configFile: path.resolve('karma.conf.js'),
-        singleRun: true,
-        files: tests
-    }, done);
+  karma.start({
+    configFile: path.resolve('karma.conf.js'),
+    singleRun: true,
+    files: tests
+  }, done);
 });
 
 gulp.task('unit-watch', function(done) {
-    karma.start({
-        configFile: path.resolve('karma.conf.js'),
-        files: tests
-    }, done);
+  karma.start({
+    configFile: path.resolve('karma.conf.js'),
+    files: tests,
+    browsers: ['Chrome']
+  }, done);
 });
 
 gulp.task('lint', function() {
   return gulp.src(srcs, tests)
-    .pipe(jshint({
-      esnext: true
-    }))
-    .pipe(jshint.reporter('default'))
+    .pipe(gjslint())
+    .pipe(gjslint.reporter('console'))
 });
 
 

@@ -1,5 +1,4 @@
 /**
- * @license
  * Copyright 2015 The Incremental DOM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,33 +14,96 @@
  * limitations under the License.
  */
 
-function NodeData(el, tag, key) {
+
+/**
+ * Keeps track of information needed to perform diffs for a given DOM node.
+ * @param {string} tag
+ * @param {?string} key
+ * @constructor
+ */
+function NodeData(tag, key) {
+  /**
+   * The attributes and their values.
+   * @const
+   */
   this.attrs = {};
+
+  /**
+   * An array of attribute name/value pairs, used for quickly diffing the
+   * incomming attributes to see if the DOM node's attributes need to be
+   * updated.
+   * @const {Array<*>}
+   */
   this.attrsArr = [];
+
+  /**
+   * The incoming attributes for this Node, before they are updated.
+   * @const {!Object<string, *>}
+   */
   this.newAttrs = {};
+
+  /**
+   * The key used to identify this node, used to preserve DOM nodes when they
+   * move within their parent.
+   * @const
+   */
   this.key = key;
+
+  /**
+   * Keeps track of children within this node by their key.
+   * {?Object<string, Node>}
+   */
   this.keyMap = null;
+
+  /**
+   * The last child to have been visited within the current pass.
+   * {?Node}
+   */
   this.lastVisitedChild = null;
+
+  /**
+   * The tag for this element.
+   * @const
+   */
   this.tag = tag;
-  this.text = null;
 }
 
 
-var initData = function(el, tag, key) {
-  el.__incrementalDOMData = new NodeData(el, tag, key);
+/**
+ * Initializes a NodeData object for a Node.
+ *
+ * @param {!Node} node The node to initialze data for.
+ * @param {string} tag The tag of node.
+ * @param {?string} key The key that identifies the node.
+ * @return {!NodeData} The newly initialized data object
+ */
+var initData = function(node, tag, key) {
+  var data = new NodeData(tag, key);
+  node['__incrementalDOMData'] = data;
+  return data;
 };
 
 
-var getData = function(el) {
-  if (!el.__incrementalDOMData && el.tagName) {
-    initData(el, el.tagName.toLowerCase(), el.getAttribute('key') || ''); 
+/**
+ * Retrieves the NodeData object for an Element, creating it if necessary.
+ *
+ * @param {!Node} node The node to retrieve the data for.
+ * @return {?NodeData} The NodeData if an Element, undefined otherwise.
+ */
+var getData = function(node) {
+  var data = node['__incrementalDOMData'];
+
+  if (!data && node.tagName) {
+    data = initData(node, node.tagName.toLowerCase(), node.getAttribute('key'));
   }
 
-  return el.__incrementalDOMData;
+  return data;
 };
 
 
-module.exports =  {
+/** */
+module.exports = {
   getData: getData,
   initData: initData
 };
+

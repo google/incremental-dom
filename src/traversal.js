@@ -1,5 +1,4 @@
 /**
- * @license
  * Copyright 2015 The Incremental DOM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,13 +18,21 @@ var getWalker = require('./walker').getWalker;
 var getData = require('./node_data').getData;
 
 
+/**
+ * Enters a Element, clearing out the last visited child field.
+ * @param {!Element} node
+ */
 var enterNode = function(node) {
   var data = getData(node);
   data.lastVisitedChild = null;
 };
 
 
-// Sweep out any unused nodes
+/**
+ * Clears out any unvisited Nodes, as the corresponding virtual element
+ * functions were never called for them.
+ * @param {!Element} node
+ */
 var exitNode = function(node) {
   var data = getData(node);
   var lastVisitedChild = data.lastVisitedChild;
@@ -44,12 +51,20 @@ var exitNode = function(node) {
 };
 
 
+/**
+ * Marks a parent as having visited a child.
+ * @param {!Element} parent
+ * @param {!Node} child
+ */
 var markVisited = function(parent, child) {
   var data = getData(parent);
   data.lastVisitedChild = child;
 };
 
 
+/**
+ * Changes to the first child of the current node.
+ */
 var firstChild = function() {
   var walker = getWalker();
   enterNode(walker.currentNode);
@@ -57,12 +72,18 @@ var firstChild = function() {
 };
 
 
+/**
+ * Changes to the next sibling of the current node.
+ */
 var nextSibling = function() {
   var walker = getWalker();
   walker.nextSibling();
 };
 
 
+/**
+ * Changes to the parent of the current node, removing any unvisited children.
+ */
 var parentNode = function() {
   var walker = getWalker();
   walker.parentNode();
@@ -70,9 +91,11 @@ var parentNode = function() {
 };
 
 
+/** */
 module.exports = {
   firstChild: firstChild,
   nextSibling: nextSibling,
   parentNode: parentNode,
   markVisited: markVisited
 };
+

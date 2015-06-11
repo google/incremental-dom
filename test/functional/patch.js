@@ -37,7 +37,7 @@ describe('patching an element', () => {
     var div;
 
     function render() {
-      ie_void('div', '',null,
+      ie_void('div', null, null,
               'tabindex', '0');
     }
 

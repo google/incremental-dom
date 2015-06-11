@@ -1,5 +1,4 @@
 /**
- * @license
  * Copyright 2015 The Incremental DOM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,6 +24,14 @@ var markVisited = require('./traversal').markVisited;
 var getWalker = require('./walker').getWalker;
 
 
+/**
+ * Checks whether or not a given node matches the specified tag and key.
+ *
+ * @param {?Node} node An HTML node, typically an HTMLElement or TextNode.
+ * @param {?string} tag The tag for this node.
+ * @param {?string} key An optional key that identifies a node.
+ * @return {boolean} True if the node matches, false otherwise.
+ */
 var matches = function(node, tag, key) {
   return node &&
          key === getKey(node) &&
@@ -33,14 +40,15 @@ var matches = function(node, tag, key) {
 
 
 /**
- * @param {string|null} tag
- *  For an Element, this should be a valid tag string
- *  For a text node, this should be null
- * @param {string|null} key
- *  The key used to identify this element
- * @param {Array|string} statics
- *  For an Element, this should be an array of name-value pairs
- *  For a text node, this should be the text content of the node
+ * Aligns the virtual Element definition with the actual DOM, moving the
+ * corresponding DOM node to the correct location or creating it if necessary.
+ * @param {?string} tag For an Element, this should be a valid tag string. For a
+ *     TextNode, this should be null.
+ * @param {?string} key The key used to identify this element.
+ * @param {?Array<*>|string} statics For an Element, this should be an array of
+ *     name-value pairs. For a TextNode, this should be the text content of the
+ *     node.
+ * @return {!Node} The matching node.
  */
 var alignWithDOM = function(tag, key, statics) {
   var walker = getWalker();
@@ -48,11 +56,14 @@ var alignWithDOM = function(tag, key, statics) {
   var parent = walker.getCurrentParent();
   var matchingNode;
 
+  // Check to see if we have a node to reuse
   if (matches(currentNode, tag, key)) {
     matchingNode = currentNode;
   } else {
     var existingNode = key && getChild(parent, key);
 
+    // Check to see if the node has moved within the parent or if a new one
+    // should be created
     if (existingNode) {
       matchingNode = existingNode;
     } else {
@@ -70,6 +81,8 @@ var alignWithDOM = function(tag, key, statics) {
 };
 
 
+/** */
 module.exports = {
   alignWithDOM: alignWithDOM
 };
+

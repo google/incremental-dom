@@ -1,5 +1,4 @@
 /**
- * @license
  * Copyright 2015 The Incremental DOM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,62 +17,88 @@
 var getData = require('./node_data').getData;
 
 
-var applyAttr = function(node, name, value) {
-  var data = getData(node);
+/**
+ * Applies an attribute or property to a given Element. If the value is a object
+ * or a function (which includes null), it is set as a property on the Element.
+ * Otherwise, the value is set as an attribute.
+ * @param {!Element} el
+ * @param {string} name The attribute's name.
+ * @param {*} value The attribute's value. If the value is a string, it is set
+ *     as an HTML attribute, otherwise, it is set on node.
+ */
+var applyAttr = function(el, name, value) {
+  var data = getData(el);
   var attrs = data.attrs;
 
   if (attrs[name] === value) {
     return;
   }
-  
+
   var type = typeof value;
 
   if (value === undefined) {
-    node.removeAttribute(name);
+    el.removeAttribute(name);
   } else if (type === 'object' || type === 'function') {
-    node[name] = value;
+    el[name] = value;
   } else {
-    node.setAttribute(name, value);
+    el.setAttribute(name, value);
   }
 
   attrs[name] = value;
 };
 
 
-var applyStyle = function(node, style) {
+/**
+ * Applies a style to an Element. No vendor prefix expansion is done for
+ * property names/values.
+ * @param {!Element} el
+ * @param {string|Object<string,string>} style The style to set. Either a string
+ *     of css or an object containing property-value pairs.
+ */
+var applyStyle = function(el, style) {
   if (typeof style === 'string' || style instanceof String) {
-    node.style.cssText = style;
+    el.style.cssText = style;
   } else {
-    node.style.cssText = '';
+    el.style.cssText = '';
 
-    for(var prop in style) {
-      node.style[prop] = style[prop];
+    for (var prop in style) {
+      el.style[prop] = style[prop];
     }
   }
 };
 
 
-var updateAttribute = function(node, name, value) {
-  switch(name) {
+/**
+ * Updates a single attribute on an Element. For some types (e.g. id or class),
+ * the value is applied directly to the Element using the corresponding accessor
+ * function.
+ * @param {!Element} el
+ * @param {string} name The attribute's name.
+ * @param {*} value The attribute's value. If the value is a string, it is set
+ *     as an HTML attribute, otherwise, it is set on node.
+ */
+var updateAttribute = function(el, name, value) {
+  switch (name) {
     case 'id':
-      node.id = value;
+      el.id = value;
       break;
     case 'class':
-      node.className = value;
+      el.className = value;
       break;
     case 'tabindex':
-      node.tabIndex = value;
+      el.tabIndex = value;
       break;
     case 'style':
-      applyStyle(node, value);
+      applyStyle(el, value);
       break;
     default:
-      applyAttr(node, name, value);
+      applyAttr(el, name, value);
       break;
   }
 };
 
 
+/** */
 module.exports = {
   updateAttribute: updateAttribute
 };

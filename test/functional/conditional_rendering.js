@@ -35,11 +35,11 @@ describe('conditional rendering', () => {
   describe('nodes', () => {
     function render(condition) {
       ie_open('div', '', ['id', 'outer']);
-        ie_void('div', '', ['id', 'one' ]);
+        ie_void('div', '', ['id', 'one']);
 
         if (condition) {
-          ie_void('div', '', ['id', 'conditional-one' ]);
-          ie_void('div', '', ['id', 'conditional-two' ]);
+          ie_void('div', '', ['id', 'conditional-one']);
+          ie_void('div', '', ['id', 'conditional-two']);
         }
 
         ie_void('span', '', ['id', 'two' ]);

@@ -1,5 +1,4 @@
 /**
- * @license
  * Copyright 2015 The Incremental DOM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,14 +17,18 @@
 var traversal = require('./traversal'),
     firstChild = traversal.firstChild,
     parentNode = traversal.parentNode;
-var TreeWalker = require('./tree_walker').TreeWalker;
+var TreeWalker = require('./tree_walker');
 var walker = require('./walker'),
     getWalker = walker.getWalker,
     setWalker = walker.setWalker;
 
 
 /**
- * Patches the document starting at el with the provided function.
+ * Patches the document starting at el with the provided function. This function
+ * may be called during an existing patch operation.
+ * @param {!Element} el the element to patch
+ * @param {!function} fn A function containing ie_open/ie_close/etc. calls that
+ *     describe the DOM.
  */
 var patch = function(el, fn) {
   var prevWalker = getWalker();
@@ -39,6 +42,7 @@ var patch = function(el, fn) {
 };
 
 
+/** */
 module.exports = {
   patch: patch
 };
