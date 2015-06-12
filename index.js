@@ -25,7 +25,6 @@ module.exports = {
   ie_open_end: elements.ie_open_end,
   ie_open: elements.ie_open,
   ie_close: elements.ie_close,
-  ie_component: elements.ie_component,
   itext: elements.itext,
   iattr: elements.iattr
 };
