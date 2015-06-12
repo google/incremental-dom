@@ -50,11 +50,15 @@ patch(myElement, function() {
 });
 ```
 
+### Installation
+
+`npm install incremental-dom`
+
 ## Development
 
 To install the required development packages, run the following command:
 
-`npm install incremental-dom`
+`npm i`
 
 ### Running tests
 
