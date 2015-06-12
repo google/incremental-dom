@@ -2,7 +2,10 @@
 
 ## Overview
 
-Incremental DOM is a library for declaring DOM trees that are updated in-place when data changes. This differs from virtual DOM based libraries in that an intermediate tree is not created. It is primarily intended as a compilation target of a templating language, such as [Closure Templates](https://developers.google.com/closure/templates/)
+Incremental DOM is a library for building up DOM trees and update them in-place when data changes. It differs from the established virtual DOM approach in that no intermediate tree is created (the existing tree is mutated in-place). This significantly reduces memory allocation for incremental updates to the DOM tree and thus increases performance significantly in some cases.
+
+Incremental DOM is primarily intended as a compilation target for templating languages or it could be used to implement a higher level API for human consumption. The API was carefully designed to minimize heap allocations and where unavoidable ensure that as many objects a possible can be de-allocated by incremental GC. One unique feature of its API that separates opening and closing of tags so that it is suitable as a compilation target for templating languages that allow (temporarily) unbalanced HTML in templates (e.g. tags that are opened and closed in separate templates) and arbitrary logic for creating HTML attributes.
+*Think of it as ASM.dom.*
 
 ## Usage
 
@@ -32,7 +35,7 @@ To render or update an existing DOM node, the patch function is used:
 var patch = require('incremental-dom').patch;
 
 var data = {
-  text: 'Hello Wrld!',
+  text: 'Hello World!',
   someCondition: true
 };
 
@@ -51,7 +54,7 @@ patch(myElement, function() {
 
 To install the required development packages, run the following command:
 
-`npm i`
+`npm install incremental-dom`
 
 ### Running tests
 
