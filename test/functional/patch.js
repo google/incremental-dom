@@ -84,3 +84,16 @@ describe('patching an element', () => {
   });
 });
 
+describe('patching a documentFragment', function() {
+  it('should create the required DOM nodes', function() {
+    var frag = document.createDocumentFragment();
+
+    patch(frag, function() {
+      ie_open('div', null, null,
+              'id', 'aDiv');
+      ie_close('div');
+    });
+
+    expect(frag.children[0].id).to.equal('aDiv');
+  });
+});
