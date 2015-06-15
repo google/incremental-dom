@@ -17,11 +17,11 @@
 
 /**
  * Keeps track of information needed to perform diffs for a given DOM node.
- * @param {string} tag
+ * @param {?string} nodeName
  * @param {?string} key
  * @constructor
  */
-function NodeData(tag, key) {
+function NodeData(nodeName, key) {
   /**
    * The attributes and their values.
    * @const
@@ -62,10 +62,15 @@ function NodeData(tag, key) {
   this.lastVisitedChild = null;
 
   /**
-   * The tag for this element.
+   * The node name for this node.
    * @const
    */
-  this.tag = tag;
+  this.nodeName = nodeName;
+
+  /**
+   * @const {string}
+   */
+  this.text = null;
 }
 
 
@@ -73,28 +78,35 @@ function NodeData(tag, key) {
  * Initializes a NodeData object for a Node.
  *
  * @param {!Node} node The node to initialze data for.
- * @param {string} tag The tag of node.
+ * @param {string} nodeName The node name of node.
  * @param {?string} key The key that identifies the node.
  * @return {!NodeData} The newly initialized data object
  */
-var initData = function(node, tag, key) {
-  var data = new NodeData(tag, key);
+var initData = function(node, nodeName, key) {
+  var data = new NodeData(nodeName, key);
   node['__incrementalDOMData'] = data;
   return data;
 };
 
 
 /**
- * Retrieves the NodeData object for an Element, creating it if necessary.
+ * Retrieves the NodeData object for a Node, creating it if necessary.
  *
  * @param {!Node} node The node to retrieve the data for.
- * @return {?NodeData} The NodeData if an Element, undefined otherwise.
+ * @return {NodeData} The NodeData for this Node.
  */
 var getData = function(node) {
   var data = node['__incrementalDOMData'];
 
-  if (!data && node.tagName) {
-    data = initData(node, node.tagName.toLowerCase(), node.getAttribute('key'));
+  if (!data) {
+    var nodeName = node.nodeName.toLowerCase();
+    var key = null;
+
+    if (node instanceof Element) {
+      key = node.getAttribute('key');
+    }
+
+    data = initData(node, nodeName, key);
   }
 
   return data;

@@ -17,7 +17,7 @@
 var nodes = require('./nodes'),
     createNode = nodes.createNode,
     getKey = nodes.getKey,
-    getTag = nodes.getTag,
+    getNodeName = nodes.getNodeName,
     getChild = nodes.getChild,
     registerChild = nodes.registerChild;
 var markVisited = require('./traversal').markVisited;
@@ -25,39 +25,39 @@ var getWalker = require('./walker').getWalker;
 
 
 /**
- * Checks whether or not a given node matches the specified tag and key.
+ * Checks whether or not a given node matches the specified nodeName and key.
  *
- * @param {?Node} node An HTML node, typically an HTMLElement or TextNode.
- * @param {?string} tag The tag for this node.
+ * @param {?Node} node An HTML node, typically an HTMLElement or Text.
+ * @param {?string} nodeName The nodeName for this node.
  * @param {?string} key An optional key that identifies a node.
  * @return {boolean} True if the node matches, false otherwise.
  */
-var matches = function(node, tag, key) {
+var matches = function(node, nodeName, key) {
   return node &&
          key === getKey(node) &&
-         tag === getTag(node);
+         nodeName === getNodeName(node);
 };
 
 
 /**
  * Aligns the virtual Element definition with the actual DOM, moving the
  * corresponding DOM node to the correct location or creating it if necessary.
- * @param {?string} tag For an Element, this should be a valid tag string. For a
- *     TextNode, this should be null.
+ * @param {?string} nodeName For an Element, this should be a valid tag string.
+ *     For a Text, this should be #text.
  * @param {?string} key The key used to identify this element.
  * @param {?Array<*>|string} statics For an Element, this should be an array of
- *     name-value pairs. For a TextNode, this should be the text content of the
+ *     name-value pairs. For a Text, this should be the text content of the
  *     node.
  * @return {!Node} The matching node.
  */
-var alignWithDOM = function(tag, key, statics) {
+var alignWithDOM = function(nodeName, key, statics) {
   var walker = getWalker();
   var currentNode = walker.currentNode;
   var parent = walker.getCurrentParent();
   var matchingNode;
 
   // Check to see if we have a node to reuse
-  if (matches(currentNode, tag, key)) {
+  if (matches(currentNode, nodeName, key)) {
     matchingNode = currentNode;
   } else {
     var existingNode = key && getChild(parent, key);
@@ -67,7 +67,7 @@ var alignWithDOM = function(tag, key, statics) {
     if (existingNode) {
       matchingNode = existingNode;
     } else {
-      matchingNode = createNode(walker.doc, tag, key, statics);
+      matchingNode = createNode(walker.doc, nodeName, key, statics);
       registerChild(parent, key, matchingNode);
     }
 

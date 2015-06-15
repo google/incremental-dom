@@ -285,18 +285,19 @@ var ie_void = function(tag, key, statics, var_args) {
 
 
 /**
- * Declares a virtual TextNode at this point in the document.
+ * Declares a virtual Text at this point in the document.
  *
- * @param {string} value The text of the TextNode.
+ * @param {string} value The text of the Text.
  */
 var itext = function(value) {
   assertNotInAttributes();
 
-  var node = alignWithDOM(undefined, undefined, value);
+  var node = alignWithDOM('#text', null, value);
+  var data = getData(node);
 
-  if (node['__incrementalDOMText'] !== value) {
+  if (data.text !== value) {
     node.data = value;
-    node['__incrementalDOMText'] = value;
+    data.text = value;
   }
 
   nextSibling();

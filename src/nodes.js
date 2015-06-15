@@ -43,37 +43,38 @@ var createElement = function(doc, tag, key, statics) {
 };
 
 /**
- * Creates a TextNode.
- * @param {!Document} doc The document with which to create the TextNode.
- * @param {string} text The intial content of the TextNode.
- * @return {!TextNode}
+ * Creates a Text.
+ * @param {!Document} doc The document with which to create the Text.
+ * @param {string} text The intial content of the Text.
+ * @return {!Text}
  */
 var createTextNode = function(doc, text) {
   var node = doc.createTextNode(text);
-  node['__incrementalDOMText'] = text;
+  getData(node).text = text;
 
   return node;
 };
 
 
 /**
- * Creates a Node, either a TextNode or an Element. If a tag is specified, then
- * an Element is created, otherwise a TextNode is created.
+ * Creates a Node, either a Text or an Element depending on the node name
+ * provided.
  * @param {!Document} doc The document with which to create the Node.
- * @param {string} tag The tag for the Node.
+ * @param {string} nodeName The tag if creating an element or #text to create
+ *     a Text.
  * @param {?string} key A key to identify the Element.
  * @param {?Array<*>|string} statics The static data to initialize the Node
  *     with. For an Element, an array of attribute name/value pairs of
- *     the static attributes for the Element. For a TextNode, a strign with the
- *     intial content of the TextNode.
+ *     the static attributes for the Element. For a Text, a string with the
+ *     intial content of the Text.
  * @return {!Node}
  */
-var createNode = function(doc, tag, key, statics) {
-  if (tag) {
-    return createElement(doc, tag, key, statics);
+var createNode = function(doc, nodeName, key, statics) {
+  if (nodeName === '#text') {
+    return createTextNode(doc, statics);
   }
 
-  return createTextNode(doc, statics);
+  return createElement(doc, nodeName, key, statics);
 };
 
 
@@ -106,24 +107,16 @@ var createKeyMap = function(el) {
  * @return {?string} The key for the Node, if applicable.
  */
 var getKey = function(node) {
-  var data = getData(node);
-
-  if (data) {
-    return data.key;
-  }
+  return getData(node).key;
 };
 
 
 /**
- * @param {?Node} node A node to get the tag for.
- * @return {?string} The tag for the Node, if applicable.
+ * @param {?Node} node A node to get the node name for.
+ * @return {?string} The node name for the Node, if applicable.
  */
-var getTag = function(node) {
-  var data = getData(node);
-
-  if (data) {
-    return data.tag;
-  }
+var getNodeName = function(node) {
+  return getData(node).nodeName;
 };
 
 
@@ -175,7 +168,7 @@ var registerChild = function(parent, key, child) {
 module.exports = {
   createNode: createNode,
   getKey: getKey,
-  getTag: getTag,
+  getNodeName: getNodeName,
   getChild: getChild,
   registerChild: registerChild
 };
