@@ -8,10 +8,12 @@
   "devDependencies": {
     "browserify": "~9.0.8",
     "del": "~1.1.1",
+    "envify": "~3.4.0",
     "es6ify": "~1.6.0",
     "gulp": "~3.8.11",
-    "gulp-jshint": "~1.10.0",
+    "gulp-gjslint": "~0.1.4",
     "gulp-sourcemaps": "~1.5.1",
+    "gulp-uglify": "~1.2.0",
     "gulp-util": "~3.0.4",
     "karma": "~0.12.31",
     "karma-browserify": "~4.1.2",
@@ -24,7 +26,6 @@
     "sinon-chai": "~2.7.0",
     "vinyl-buffer": "~1.0.0",
     "vinyl-source-stream": "~1.1.0",
-    "watchify": "~3.1.1",
-    "gulp-gjslint": "~0.1.4"
+    "watchify": "~3.1.1"
   }
 }
