@@ -41,49 +41,45 @@ var ATTRIBUTES_OFFSET = 3;
 var argsBuilder = [];
 
 
-if (process.env.node_env === 'production') {
+if (process.env.NODE_ENV !== 'production') {
   /**
    * Keeps track whether or not we are in an attributes declaration (after
    * ie_open_start, but before ie_open_end).
    * @type {boolean}
    */
   var inAttributes = false;
-}
 
 
-/** Makes sure that the caller is not where attributes are expected. */
-var assertNotInAttributes = function() {
-  if (process.env.node_env === 'production' && inAttributes) {
-    throw new Error('Was not expecting a call to iattr or ie_open_end, ' +
-        'they must follow a call to ie_open_start.');
-  }
-};
+  /** Makes sure that the caller is not where attributes are expected. */
+  var assertNotInAttributes = function() {
+    if (inAttributes) {
+      throw new Error('Was not expecting a call to iattr or ie_open_end, ' +
+          'they must follow a call to ie_open_start.');
+    }
+  };
 
 
-/** Makes sure that the caller is where attributes are expected. */
-var assertInAttributes = function() {
-  if (process.env.node_env === 'production' && !inAttributes) {
-    throw new Error('Was expecting a call to iattr or ie_open_end. ' +
-        'ie_open_start must be followed by zero or more calls to iattr, ' +
-        'then one call to ie_open_end.');
-  }
-};
+  /** Makes sure that the caller is where attributes are expected. */
+  var assertInAttributes = function() {
+    if (!inAttributes) {
+      throw new Error('Was expecting a call to iattr or ie_open_end. ' +
+          'ie_open_start must be followed by zero or more calls to iattr, ' +
+          'then one call to ie_open_end.');
+    }
+  };
 
 
-/** Updates the state to being in an attribute declaration. */
-var setInAttributes = function() {
-  if (process.env.node_env === 'production') {
+  /** Updates the state to being in an attribute declaration. */
+  var setInAttributes = function() {
     inAttributes = true;
-  }
-};
+  };
 
 
-/** Updates the state to not being in an attribute declaration. */
-var setNotInAttributes = function() {
-  if (process.env.node_env === 'production') {
+  /** Updates the state to not being in an attribute declaration. */
+  var setNotInAttributes = function() {
     inAttributes = false;
-  }
-};
+  };
+}
 
 
 /**
@@ -187,7 +183,9 @@ var updateAttributes = function(node, newAttrs) {
  *     for the Element.
  */
 var ie_open = function(tag, key, statics, var_args) {
-  assertNotInAttributes();
+  if (process.env.NODE_ENV !== 'production') {
+    assertNotInAttributes();
+  }
 
   var node = alignWithDOM(tag, key, statics);
 
@@ -215,8 +213,10 @@ var ie_open = function(tag, key, statics, var_args) {
  *     Element is created.
  */
 var ie_open_start = function(tag, key, statics) {
-  assertNotInAttributes();
-  setInAttributes();
+  if (process.env.NODE_ENV !== 'production') {
+    assertNotInAttributes();
+    setInAttributes();
+  }
 
   argsBuilder[0] = tag;
   argsBuilder[1] = key;
@@ -233,7 +233,9 @@ var ie_open_start = function(tag, key, statics) {
  * @param {*} value
  */
 var iattr = function(name, value) {
-  assertInAttributes();
+  if (process.env.NODE_ENV !== 'production') {
+    assertInAttributes();
+  }
 
   argsBuilder.push(name, value);
 };
@@ -243,8 +245,10 @@ var iattr = function(name, value) {
  * Closes an open tag started with ie_open_start.
  */
 var ie_open_end = function() {
-  assertInAttributes();
-  setNotInAttributes();
+  if (process.env.NODE_ENV !== 'production') {
+    assertInAttributes();
+    setNotInAttributes();
+  }
 
   ie_open.apply(null, argsBuilder);
 };
@@ -256,7 +260,9 @@ var ie_open_end = function() {
  * @param {string} tag The element's tag.
  */
 var ie_close = function(tag) {
-  assertNotInAttributes();
+  if (process.env.NODE_ENV !== 'production') {
+    assertNotInAttributes();
+  }
 
   parentNode();
   nextSibling();
@@ -277,7 +283,9 @@ var ie_close = function(tag) {
  *     for the Element.
  */
 var ie_void = function(tag, key, statics, var_args) {
-  assertNotInAttributes();
+  if (process.env.NODE_ENV !== 'production') {
+    assertNotInAttributes();
+  }
 
   ie_open.apply(null, arguments);
   ie_close.apply(null, arguments);
@@ -290,7 +298,9 @@ var ie_void = function(tag, key, statics, var_args) {
  * @param {string} value The text of the Text.
  */
 var itext = function(value) {
-  assertNotInAttributes();
+  if (process.env.NODE_ENV !== 'production') {
+    assertNotInAttributes();
+  }
 
   var node = alignWithDOM('#text', null, value);
   var data = getData(node);

@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-var gulp = require('gulp');
-var gjslint = require('gulp-gjslint');
-var sourcemaps = require('gulp-sourcemaps');
+var assign = require('lodash').assign;
+var browserify = require('browserify');
+var buffer = require('vinyl-buffer');
 var del = require('del');
+var gjslint = require('gulp-gjslint');
+var gulp = require('gulp');
+var gutil = require('gulp-util');
 var karma = require('karma').server;
 var path = require('path');
-var browserify = require('browserify');
 var source = require('vinyl-source-stream');
-var buffer = require('vinyl-buffer');
+var sourcemaps = require('gulp-sourcemaps');
+var uglify = require('gulp-uglify');
 var watchify = require('watchify');
-var gutil = require('gulp-util');
-var assign = require('lodash').assign;
 
 var jsFileName = 'incremental-dom.js';
 var srcs = [jsFileName, 'src/**/*.js'];
@@ -63,7 +64,8 @@ gulp.task('lint', function() {
 var customOpts = {
   entries: './index.js',
   standalone: 'IncrementalDOM',
-  debug: true
+  debug: true,
+  transform: [ 'envify' ]
 };
 var opts = assign({}, watchify.args, customOpts);
 var b_watch = watchify(browserify(opts));
@@ -78,6 +80,8 @@ function bundle(browserify) {
     .pipe(source(jsFileName))
     .pipe(buffer())
     .pipe(sourcemaps.init({loadMaps: true}))
+      .pipe(uglify())
+      .on('error', gutil.log)
     .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest('dist'));
 }
