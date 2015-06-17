@@ -11,6 +11,7 @@
     "envify": "~3.4.0",
     "es6ify": "~1.6.0",
     "gulp": "~3.8.11",
+    "gulp-git": "~1.2.4",
     "gulp-gjslint": "~0.1.4",
     "gulp-sourcemaps": "~1.5.1",
     "gulp-uglify": "~1.2.0",

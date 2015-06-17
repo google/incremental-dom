@@ -18,6 +18,8 @@ var assign = require('lodash').assign;
 var browserify = require('browserify');
 var buffer = require('vinyl-buffer');
 var del = require('del');
+var envify = require('envify');
+var git = require('gulp-git');
 var gjslint = require('gulp-gjslint');
 var gulp = require('gulp');
 var gutil = require('gulp-util');
@@ -32,50 +34,42 @@ var jsFileName = 'incremental-dom.js';
 var srcs = [jsFileName, 'src/**/*.js'];
 var tests = ['test/functional/**/*.js'];
 
-gulp.task('clean', function(cb) {
-  del(['dist'], cb);
-});
+function clean(done) {
+  del(['dist'], done);
+}
 
- 
-gulp.task('unit', function(done) {
+function unit(done) {
   karma.start({
     configFile: path.resolve('karma.conf.js'),
     singleRun: true,
     files: tests
   }, done);
-});
+}
 
-gulp.task('unit-watch', function(done) {
+function unitWatch(done) {
   karma.start({
     configFile: path.resolve('karma.conf.js'),
     files: tests,
     browsers: ['Chrome']
   }, done);
-});
+}
 
-gulp.task('lint', function() {
+function lint() {
   return gulp.src(srcs, tests)
     .pipe(gjslint())
     .pipe(gjslint.reporter('console'))
-});
+}
 
-
-// Build with watch
-var customOpts = {
+var customBrowserifyOpts = {
   entries: './index.js',
   standalone: 'IncrementalDOM',
-  debug: true,
-  transform: [ 'envify' ]
+  debug: true
 };
-var opts = assign({}, watchify.args, customOpts);
-var b_watch = watchify(browserify(opts));
-var b_plain = browserify(customOpts);
 
-b_watch.on('update', bundle.bind(null, b_watch));
-b_watch.on('log', gutil.log);
-
-function bundle(browserify) {
-  return browserify.bundle()
+function bundle(browserify, env) {
+  return browserify
+    .transform(envify, env)
+    .bundle()
     .on('error', gutil.log.bind(gutil, 'Browserify Error'))
     .pipe(source(jsFileName))
     .pipe(buffer())
@@ -86,8 +80,48 @@ function bundle(browserify) {
     .pipe(gulp.dest('dist'));
 }
 
-// Plain build
-gulp.task('js', bundle.bind(null, b_plain));
-gulp.task('js-watch', bundle.bind(null, b_watch));
+function js() {
+  var b_plain = browserify(customBrowserifyOpts);
 
-gulp.task('default', ['lint', 'unit', 'js']);
+  return bundle(b_plain, {});
+}
+
+function jsWatch() {
+  var opts = assign({}, watchify.args, customBrowserifyOpts);
+  var b_watch = watchify(browserify(opts));
+
+  b_watch.on('update', bundle.bind(null, b_watch));
+  b_watch.on('log', gutil.log);
+  
+  return bundle(b_watch, {});
+}
+
+function jsDist() {
+  var b_plain = browserify(customBrowserifyOpts);
+
+  return bundle(b_plain, {
+    _: 'purge',
+    NODE_ENV: 'production'
+  });
+}
+
+function addDist() {
+  return gulp.src('dist')
+    .pipe(git.add({
+      args: '-f'
+    }));
+}
+
+gulp.task('clean', clean);
+gulp.task('unit', unit);
+gulp.task('unit-watch', unitWatch);
+gulp.task('lint', lint);
+gulp.task('js', js);
+gulp.task('js-watch', jsWatch);
+gulp.task('js-dist', jsDist);
+gulp.task('build', ['lint', 'unit', 'js']);
+gulp.task('dist', ['lint', 'unit', 'js-dist'], function() {
+  return addDist();
+});
+
+gulp.task('default', ['build']);
