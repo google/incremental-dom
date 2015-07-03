@@ -80,7 +80,9 @@ function bundle(browserify) {
     .pipe(source(jsFileName))
     .pipe(buffer())
     .pipe(sourcemaps.init({loadMaps: true}))
-      .pipe(uglify())
+      .pipe(uglify({
+        preserveComments: 'some'    
+      }))
       .on('error', gutil.log)
     .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest('dist'));
