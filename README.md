@@ -12,7 +12,7 @@ Incremental DOM is primarily intended as a compilation target for templating lan
 HTML is expressed in Incremental DOM using the ie_open, ie_close, ie_void and itext methods. Consider the following example:
 
 ```javascript
-var IncrementalDOM = require('incremental-dom'),
+var idom = require('incremental-dom'),
     ie_open = idom.ie_open,
     ie_close = idom.ie_close,
     ie_void = idom.ie_void,
