@@ -1,0 +1,41 @@
+<script src="/bower_components/prism/prism.js"></script>
+<link href="/bower_components/prism/themes/prism.css" rel="stylesheet">
+
+<dom-module is="code-prism">
+  <style>
+    :host {
+      // extra padding to make horziontal scrollbars usable
+      padding-bottom: 5px;
+      display: block;
+    }
+  </style>
+
+  <template>
+    <pre><code>
+        <content></content>
+    </code></pre>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'code-prism',
+
+      stripEmptyText: function(node) {
+        if (node instanceof Text && !node.data.trim()) {
+          node.parentNode.removeChild(node);
+        }
+      },
+
+      attached: function() {
+        var code = this.querySelector('code');
+        code.normalize();
+        code.firstChild.data = code.firstChild.data.trim();
+
+        var pre = this.querySelector('pre');
+        pre.className = 'lang-' + this.getAttribute('lang');
+
+        Prism.highlightElement(code);
+      }
+    });
+  </script>
+</dom-module>

@@ -1,0 +1,93 @@
+<link href="/bower_components/paper-item/paper-item.html" rel="import">
+<link href="/bower_components/paper-menu/paper-menu.html" rel="import">
+
+<dom-module id="hash-menu">
+  <style>
+    paper-menu {
+      background: transparent;
+    }
+ 
+    paper-item {
+      font-size: 90%;
+      min-height: 36px;
+      padding: 0;
+    }
+
+    paper-item > a {
+      display: flex;
+      flex: 1;
+      padding: 0 16px;
+    }
+ 
+    paper-menu paper-menu paper-item {
+      text-indent: 1em;
+      font-size: 90%;
+    }
+  </style>
+
+  <template>
+    <nav>
+      <paper-menu
+          attr-for-selected="name"
+          selected="[[hash]]">
+        <template
+            is="dom-repeat"
+            items="[[articles]]">
+          <paper-item name="[[item.href]]">
+            <a href="[[item.href]]">[[item.label]]</a>
+          </paper-item>
+          <paper-menu
+              attr-for-selected="name"
+              selected="[[hash]]"
+              hidden$="[[!item.sections.length]]">
+            <template
+                is="dom-repeat"
+                items="[[item.sections]]">
+              <paper-item name="[[item.href]]">
+                <a href="[[item.href]]">[[item.label]]</a>
+              </paper-item>
+            </template>
+          </paper-menu>
+        </template>
+      </paper-menu>
+    </nav>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'hash-menu',
+
+      properties: {
+        hash: {
+          type: String,
+          notify: true
+        }
+      },    
+ 
+      attached: function() {
+        var updateHash = this.updateHash.bind(this);
+
+        this.articles = this.getHeadings(document, 2);
+
+        updateHash();
+        window.addEventListener('hashchange', updateHash);
+        window.addEventListener('app:replacestate', updateHash);
+      },
+
+      getHeadings: function getHeadings(node, level) {
+        return [].slice.call(node.querySelectorAll('h' + level))
+          .map(function(heading) {
+            return {
+              href: '#' + heading.getAttribute('id'),
+              label: heading.firstChild.data,
+              sections: getHeadings(heading.parentNode, level + 1)
+            };
+          });
+      },
+
+      updateHash: function() {
+        this.hash = location.hash;
+      }
+    });
+  </script>
+</dom-module>

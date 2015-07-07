@@ -1,0 +1,32 @@
+<style>
+  [is$="-with-link"] a {
+    display: none;
+    margin-left: 5px;
+  }
+
+  [is$="-with-link"]:hover a {
+    display: inline;
+  }
+</style>
+
+<script>
+  (function() {
+    var proto = Object.create(HTMLHeadingElement.prototype);
+
+    proto.createdCallback = function() {
+      var a = document.createElement('a');
+      a.href = '#' + this.getAttribute('id');
+      a.textContent = '#';
+      a.title = 'permanent link';
+
+      this.appendChild(a);
+    };
+
+    ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].forEach(function(tagName) {
+      document.registerElement(tagName + '-with-link', {
+        prototype: Object.create(proto),
+        extends: tagName
+      });
+    });
+  })();
+</script>
