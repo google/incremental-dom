@@ -11,9 +11,7 @@
   </style>
 
   <template>
-    <pre><code>
-        <content></content>
-    </code></pre>
+    <content></content>
   </template>
 
   <script>
@@ -26,15 +24,23 @@
         }
       },
 
-      attached: function() {
-        var code = this.querySelector('code');
-        code.normalize();
-        code.firstChild.data = code.firstChild.data.trim();
+      ready: function() {
+        this.normalize();
 
-        var pre = this.querySelector('pre');
+        // TODO - working around a bug where distributing content is not
+        // working when polyfills are used in this specific case. Not able to
+        // reproduce in an isolated example or figure out what is going on.
+        var code = document.createElement('code');
+        var pre = document.createElement('pre');
+
         pre.className = 'lang-' + this.getAttribute('lang');
+        pre.appendChild(code);
+        code.textContent = this.textContent.trim();
 
         Prism.highlightElement(code);
+
+        this.textContent = '';
+        this.appendChild(pre);
       }
     });
   </script>
