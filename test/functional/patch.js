@@ -16,10 +16,10 @@
 
 var IncrementalDOM = require('../../index'),
     patch = IncrementalDOM.patch,
-    ie_open = IncrementalDOM.ie_open,
-    ie_close = IncrementalDOM.ie_close,
-    ie_void = IncrementalDOM.ie_void,
-    itext = IncrementalDOM.itext;
+    elementOpen = IncrementalDOM.elementOpen,
+    elementClose = IncrementalDOM.elementClose,
+    elementVoid = IncrementalDOM.elementVoid,
+    text = IncrementalDOM.text;
 
 describe('patching an element', () => {
   var container;
@@ -37,8 +37,8 @@ describe('patching an element', () => {
     var div;
 
     function render() {
-      ie_void('div', null, null,
-              'tabindex', '0');
+      elementVoid('div', null, null,
+          'tabindex', '0');
     }
 
     beforeEach(function() {
@@ -67,14 +67,14 @@ describe('patching an element', () => {
     var containerTwo = document.createElement('div');
 
     function renderOne() {
-      ie_open('div');
+      elementOpen('div');
         patch(containerTwo, renderTwo);
-        itext('hello');
-      ie_close('div');
+        text('hello');
+      elementClose('div');
     }
 
     function renderTwo() {
-      itext('foobar');
+      text('foobar');
     }
 
     patch(containerOne, renderOne);
@@ -89,9 +89,9 @@ describe('patching a documentFragment', function() {
     var frag = document.createDocumentFragment();
 
     patch(frag, function() {
-      ie_open('div', null, null,
-              'id', 'aDiv');
-      ie_close('div');
+      elementOpen('div', null, null,
+          'id', 'aDiv');
+      elementClose('div');
     });
 
     expect(frag.children[0].id).to.equal('aDiv');

@@ -16,9 +16,9 @@
 
 var IncrementalDOM = require('../../index'),
     patch = IncrementalDOM.patch,
-    ie_open = IncrementalDOM.ie_open,
-    ie_close = IncrementalDOM.ie_close,
-    ie_void = IncrementalDOM.ie_void;
+    elementOpen = IncrementalDOM.elementOpen,
+    elementClose = IncrementalDOM.elementClose,
+    elementVoid = IncrementalDOM.elementVoid;
 
 describe('conditional rendering', () => {
   var container;
@@ -34,16 +34,16 @@ describe('conditional rendering', () => {
 
   describe('nodes', () => {
     function render(condition) {
-      ie_open('div', '', ['id', 'outer']);
-        ie_void('div', '', ['id', 'one']);
+      elementOpen('div', '', ['id', 'outer']);
+        elementVoid('div', '', ['id', 'one']);
 
         if (condition) {
-          ie_void('div', '', ['id', 'conditional-one']);
-          ie_void('div', '', ['id', 'conditional-two']);
+          elementVoid('div', '', ['id', 'conditional-one']);
+          elementVoid('div', '', ['id', 'conditional-two']);
         }
 
-        ie_void('span', '', ['id', 'two' ]);
-      ie_close();
+        elementVoid('span', '', ['id', 'two' ]);
+      elementClose();
     }
 
     it('should un-render when the condition becomes false', () => {
@@ -77,14 +77,14 @@ describe('conditional rendering', () => {
 
   describe('with only conditional childNodes', () => {
     function render(condition) {
-      ie_open('div', '', ['id', 'outer']);
+      elementOpen('div', '', ['id', 'outer']);
 
         if (condition) {
-          ie_void('div', '', ['id', 'conditional-one' ]);
-          ie_void('div', '', ['id', 'conditional-two' ]);
+          elementVoid('div', '', ['id', 'conditional-one' ]);
+          elementVoid('div', '', ['id', 'conditional-two' ]);
         }
 
-      ie_close();
+      elementClose();
     }
 
     it('should not leave any remaning nodes', () => {
@@ -98,22 +98,22 @@ describe('conditional rendering', () => {
 
   describe('nodes', () => {
     function render(condition) {
-      ie_open('div', '', [],
-              'id', 'outer');
-        ie_void('div', '', [],
-                'id', 'one' );
+      elementOpen('div', '', [],
+          'id', 'outer');
+        elementVoid('div', '', [],
+            'id', 'one' );
 
         if (condition) {
-          ie_open('span', '', [],
-                  'id', 'conditional-one',
-                  'data-foo', 'foo');
-            ie_void('span', '', []);
-          ie_close();
+          elementOpen('span', '', [],
+              'id', 'conditional-one',
+              'data-foo', 'foo');
+            elementVoid('span', '', []);
+          elementClose();
         }
 
-        ie_void('span', '', [],
-                'id', 'two');
-      ie_close();
+        elementVoid('span', '', [],
+            'id', 'two');
+      elementClose();
     }
 
     it('should strip children when a conflicting node is re-used', () => {

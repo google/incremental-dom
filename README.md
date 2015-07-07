@@ -9,22 +9,22 @@ Incremental DOM is primarily intended as a compilation target for templating lan
 
 ## Usage
 
-HTML is expressed in Incremental DOM using the ie_open, ie_close, ie_void and itext methods. Consider the following example:
+HTML is expressed in Incremental DOM using the elementOpen, elementClose, elementVoid and text methods. Consider the following example:
 
 ```javascript
 var IncrementalDOM = require('incremental-dom'),
-    ie_open = IncrementalDOM.ie_open,
-    ie_close = IncrementalDOM.ie_close,
-    ie_void = IncrementalDOM.ie_void,
-    itext = IncrementalDOM.itext;
+    elementOpen = IncrementalDOM.elementOpen,
+    elementClose = IncrementalDOM.elementClose,
+    elementVoid = IncrementalDOM.elementVoid,
+    text = IncrementalDOM.text;
 
 function render(data) {
-  ie_void('input', '', [ 'type', 'text' ]);
-  ie_open('div', '', null);
+  elementVoid('input', '', [ 'type', 'text' ]);
+  elementOpen('div', '', null);
     if (data.someCondition) {
-      itext(data.text);
+      text(data.text);
     }
-  ie_close('div');
+  elementClose('div');
 }
 ```
 

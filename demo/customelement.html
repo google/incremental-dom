@@ -31,10 +31,10 @@
   <script>
     (function() {
       var patch = IncrementalDOM.patch,
-          ie_open = IncrementalDOM.ie_open,
-          ie_void = IncrementalDOM.ie_void,
-          ie_close = IncrementalDOM.ie_close,
-          itext = IncrementalDOM.itext;
+          elementOpen = IncrementalDOM.elementOpen,
+          elementVoid = IncrementalDOM.elementVoid,
+          elementClose = IncrementalDOM.elementClose,
+          text = IncrementalDOM.text;
 
       /**
        * This demo uses a bit of logic in define_component.js to use React-like
@@ -67,25 +67,25 @@
          * element.
          */
         render: function() {
-          itext(this.props.text);
+          text(this.props.text);
         }
       });
 
       function update(data) {
         patch(container, function() {
           data.items.forEach(function(item, index) {
-            ie_open('x-item', index, null,
-                    'data-selected', index === data.selectedIndex,
-                    'props', {
-                      text: item
-                    });
-            ie_close('x-item');      
+            elementOpen('x-item', index, null,
+                'data-selected', index === data.selectedIndex,
+                'props', {
+                  text: item
+                });
+            elementClose('x-item');      
           });
 
-          ie_open('div', null, null,
+          elementOpen('div', null, null,
                   'style', 'position: absolute; top: 0; right: 0;');
-            itext('calls to x-item\'s render: ' + data.itemRenderCount);
-          ie_close('div');
+            text('calls to x-item\'s render: ' + data.itemRenderCount);
+          elementClose('div');
         });
       }
 

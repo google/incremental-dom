@@ -20,12 +20,12 @@ var elements = require('./src/virtual_elements');
 
 module.exports = {
   patch: patch,
-  ie_void: elements.ie_void,
-  ie_open_start: elements.ie_open_start,
-  ie_open_end: elements.ie_open_end,
-  ie_open: elements.ie_open,
-  ie_close: elements.ie_close,
-  itext: elements.itext,
-  iattr: elements.iattr
+  elementVoid: elements.elementVoid,
+  elementOpenStart: elements.elementOpenStart,
+  elementOpenEnd: elements.elementOpenEnd,
+  elementOpen: elements.elementOpen,
+  elementClose: elements.elementClose,
+  text: elements.text,
+  attr: elements.attr
 };
 

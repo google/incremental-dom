@@ -27,8 +27,8 @@ var walker = require('./walker'),
  * Patches the document starting at el with the provided function. This function
  * may be called during an existing patch operation.
  * @param {!Element} el the element to patch
- * @param {!function} fn A function containing ie_open/ie_close/etc. calls that
- *     describe the DOM.
+ * @param {!function} fn A function containing elementOpen/elementClose/etc.
+ *     calls that describe the DOM.
  */
 var patch = function(el, fn) {
   var prevWalker = getWalker();

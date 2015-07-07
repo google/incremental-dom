@@ -33,8 +33,8 @@ var ATTRIBUTES_OFFSET = 3;
 
 
 /**
- * Builds an array of arguments for use with ie_open_start, iattr and
- * ie_open_end.
+ * Builds an array of arguments for use with elementOpenStart, attr and
+ * elementOpenEnd.
  * @type {Array<*>}
  * @const
  */
@@ -44,7 +44,7 @@ var argsBuilder = [];
 if (process.env.NODE_ENV !== 'production') {
   /**
    * Keeps track whether or not we are in an attributes declaration (after
-   * ie_open_start, but before ie_open_end).
+   * elementOpenStart, but before elementOpenEnd).
    * @type {boolean}
    */
   var inAttributes = false;
@@ -53,8 +53,8 @@ if (process.env.NODE_ENV !== 'production') {
   /** Makes sure that the caller is not where attributes are expected. */
   var assertNotInAttributes = function() {
     if (inAttributes) {
-      throw new Error('Was not expecting a call to iattr or ie_open_end, ' +
-          'they must follow a call to ie_open_start.');
+      throw new Error('Was not expecting a call to attr or elementOpenEnd, ' +
+          'they must follow a call to elementOpenStart.');
     }
   };
 
@@ -62,9 +62,9 @@ if (process.env.NODE_ENV !== 'production') {
   /** Makes sure that the caller is where attributes are expected. */
   var assertInAttributes = function() {
     if (!inAttributes) {
-      throw new Error('Was expecting a call to iattr or ie_open_end. ' +
-          'ie_open_start must be followed by zero or more calls to iattr, ' +
-          'then one call to ie_open_end.');
+      throw new Error('Was expecting a call to attr or elementOpenEnd. ' +
+          'elementOpenStart must be followed by zero or more calls to attr, ' +
+          'then one call to elementOpenEnd.');
     }
   };
 
@@ -89,7 +89,7 @@ if (process.env.NODE_ENV !== 'production') {
  * of this function is minimal.
  *
  * This function is called in the context of the Element and the arguments from
- * ie_open-like function so that the arguments are not de-optimized.
+ * elementOpen-like function so that the arguments are not de-optimized.
  *
  * @this {Element} The Element to check for changed attributes.
  * @param {*} unused1
@@ -130,7 +130,7 @@ var hasChangedAttrs = function(unused1, unused2, unused3, var_args) {
  * Updates the newAttrs object for an Element.
  *
  * This function is called in the context of the Element and the arguments from
- * ie_open-like function so that the arguments are not de-optimized.
+ * elementOpen-like function so that the arguments are not de-optimized.
  *
  * @this {Element} The Element to update newAttrs for.
  * @param {*} unused1
@@ -171,7 +171,7 @@ var updateAttributes = function(node, newAttrs) {
 
 /**
  * Declares a virtual Element at the current location in the document. This
- * corresponds to an opening tag and a ie_close tag is required.
+ * corresponds to an opening tag and a elementClose tag is required.
  * @param {string} tag The element's tag.
  * @param {?string} key The key used to identify this element. This can be an
  *     empty string, but performance may be better if a unique value is used
@@ -182,7 +182,7 @@ var updateAttributes = function(node, newAttrs) {
  * @param {...*} var_args Attribute name/value pairs of the dynamic attributes
  *     for the Element.
  */
-var ie_open = function(tag, key, statics, var_args) {
+var elementOpen = function(tag, key, statics, var_args) {
   if (process.env.NODE_ENV !== 'production') {
     assertNotInAttributes();
   }
@@ -200,10 +200,10 @@ var ie_open = function(tag, key, statics, var_args) {
 
 /**
  * Declares a virtual Element at the current location in the document. This
- * corresponds to an opening tag and a ie_close tag is required. This is like
- * ie_open, but the attributes are defined using the iattr function rather than
- * being passed as arguments. Must be folllowed by 0 or more calls to iattr,
- * then a call to ie_open_end.
+ * corresponds to an opening tag and a elementClose tag is required. This is
+ * like elementOpen, but the attributes are defined using the attr function
+ * rather than being passed as arguments. Must be folllowed by 0 or more calls
+ * to attr, then a call to elementOpenEnd.
  * @param {string} tag The element's tag.
  * @param {?string} key The key used to identify this element. This can be an
  *     empty string, but performance may be better if a unique value is used
@@ -212,7 +212,7 @@ var ie_open = function(tag, key, statics, var_args) {
  *     static attributes for the Element. These will only be set once when the
  *     Element is created.
  */
-var ie_open_start = function(tag, key, statics) {
+var elementOpenStart = function(tag, key, statics) {
   if (process.env.NODE_ENV !== 'production') {
     assertNotInAttributes();
     setInAttributes();
@@ -227,12 +227,12 @@ var ie_open_start = function(tag, key, statics) {
 
 /***
  * Defines a virtual attribute at this point of the DOM. This is only valid
- * when called between ie_open_start and ie_open_end.
+ * when called between elementOpenStart and elementOpenEnd.
  *
  * @param {string} name
  * @param {*} value
  */
-var iattr = function(name, value) {
+var attr = function(name, value) {
   if (process.env.NODE_ENV !== 'production') {
     assertInAttributes();
   }
@@ -242,15 +242,15 @@ var iattr = function(name, value) {
 
 
 /**
- * Closes an open tag started with ie_open_start.
+ * Closes an open tag started with elementOpenStart.
  */
-var ie_open_end = function() {
+var elementOpenEnd = function() {
   if (process.env.NODE_ENV !== 'production') {
     assertInAttributes();
     setNotInAttributes();
   }
 
-  ie_open.apply(null, argsBuilder);
+  elementOpen.apply(null, argsBuilder);
 };
 
 
@@ -259,7 +259,7 @@ var ie_open_end = function() {
  *
  * @param {string} tag The element's tag.
  */
-var ie_close = function(tag) {
+var elementClose = function(tag) {
   if (process.env.NODE_ENV !== 'production') {
     assertNotInAttributes();
   }
@@ -282,13 +282,13 @@ var ie_close = function(tag) {
  * @param {...*} var_args Attribute name/value pairs of the dynamic attributes
  *     for the Element.
  */
-var ie_void = function(tag, key, statics, var_args) {
+var elementVoid = function(tag, key, statics, var_args) {
   if (process.env.NODE_ENV !== 'production') {
     assertNotInAttributes();
   }
 
-  ie_open.apply(null, arguments);
-  ie_close.apply(null, arguments);
+  elementOpen.apply(null, arguments);
+  elementClose.apply(null, arguments);
 };
 
 
@@ -297,7 +297,7 @@ var ie_void = function(tag, key, statics, var_args) {
  *
  * @param {string} value The text of the Text.
  */
-var itext = function(value) {
+var text = function(value) {
   if (process.env.NODE_ENV !== 'production') {
     assertNotInAttributes();
   }
@@ -316,12 +316,12 @@ var itext = function(value) {
 
 /** */
 module.exports = {
-  ie_open_start: ie_open_start,
-  ie_open_end: ie_open_end,
-  ie_open: ie_open,
-  ie_void: ie_void,
-  ie_close: ie_close,
-  itext: itext,
-  iattr: iattr
+  elementOpenStart: elementOpenStart,
+  elementOpenEnd: elementOpenEnd,
+  elementOpen: elementOpen,
+  elementVoid: elementVoid,
+  elementClose: elementClose,
+  text: text,
+  attr: attr
 };
 

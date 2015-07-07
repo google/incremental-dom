@@ -16,34 +16,34 @@
   <script>
     setTimeout(function() {
       var patch = IncrementalDOM.patch,
-          ie_open = IncrementalDOM.ie_open,
-          ie_void = IncrementalDOM.ie_void,
-          ie_close = IncrementalDOM.ie_close,
-          itext = IncrementalDOM.itext;
+          elementOpen = IncrementalDOM.elementOpen,
+          elementVoid = IncrementalDOM.elementVoid,
+          elementClose = IncrementalDOM.elementClose,
+          text = IncrementalDOM.text;
 
 
       function update(data) {
         patch(container, function() {
           var moreThanFourCharacters = data.text.length > 4;
 
-          ie_open('div', null);
-            ie_void('input', null, null,
-                    'value', 'world', // value is the HTML (initial) value attribute
-                    'type', 'text',
-                    'oninput', handleInput,
-                    'style', {
-                      'background-color': moreThanFourCharacters ? '' : 'rgba(255, 0, 0, 0.1)'
-                    });
-          ie_close('div');
-          ie_open('div', null);
-            itext('Hello ');
-            ie_open('strong', null);
-              itext(data.text);
-            ie_close('strong');
-          ie_close('div');
+          elementOpen('div', null);
+            elementVoid('input', null, null,
+                'value', 'world', // value is the HTML (initial) value attribute
+                'type', 'text',
+                'oninput', handleInput,
+                'style', {
+                  'background-color': moreThanFourCharacters ? '' : 'rgba(255, 0, 0, 0.1)'
+                });
+          elementClose('div');
+          elementOpen('div', null);
+            text('Hello ');
+            elementOpen('strong', null);
+              text(data.text);
+            elementClose('strong');
+          elementClose('div');
 
           if (moreThanFourCharacters) {
-            itext('A string with more than 4 characters');
+            text('A string with more than 4 characters');
           }
         });
       }
