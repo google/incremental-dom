@@ -16,9 +16,9 @@
 
 var IncrementalDOM = require('../../index'),
     patch = IncrementalDOM.patch,
-    ie_open = IncrementalDOM.ie_open,
-    ie_close = IncrementalDOM.ie_close,
-    ie_void = IncrementalDOM.ie_void;
+    elementOpen = IncrementalDOM.elementOpen,
+    elementClose = IncrementalDOM.elementClose,
+    elementVoid = IncrementalDOM.elementVoid;
 
 describe('element creation', () => {
   var container;
@@ -37,9 +37,9 @@ describe('element creation', () => {
 
     beforeEach(() => {
       patch(container, () => {
-        ie_void('div', '', ['id', 'someId', 'class', 'someClass', 'data-custom', 'custom'],
-                'data-foo', 'Hello',
-                'data-bar', 'World');
+        elementVoid('div', '', ['id', 'someId', 'class', 'someClass', 'data-custom', 'custom'],
+            'data-foo', 'Hello',
+            'data-bar', 'World');
       });
 
       el = container.childNodes[0];
@@ -63,8 +63,8 @@ describe('element creation', () => {
 
   it('should allow creation without static attributes', () => {
     patch(container, () => {
-      ie_void('div', '', null,
-              'id', 'test');
+      elementVoid('div', '', null,
+          'id', 'test');
     });
     var el = container.childNodes[0];
     expect(el.id).to.equal('test');

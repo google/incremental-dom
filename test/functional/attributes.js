@@ -16,7 +16,7 @@
 
 var IncrementalDOM = require('../../index'),
     patch = IncrementalDOM.patch,
-    ie_void = IncrementalDOM.ie_void;
+    elementVoid = IncrementalDOM.elementVoid;
 
 describe('attribute updates', () => {
   var container;
@@ -32,8 +32,8 @@ describe('attribute updates', () => {
 
   describe('for conditional attributes', () => {
     function render(obj) {
-      ie_void('div', '', [],
-              'data-expanded', obj.key);
+      elementVoid('div', '', [],
+          'data-expanded', obj.key);
     }
 
     it('should be present when they have a value', () => {
@@ -80,8 +80,8 @@ describe('attribute updates', () => {
     it('should not be set as attributes', () => {
       var fn = () =>{};
       patch(container, () => {
-        ie_void('div', '', null,
-                'fn', fn);
+        elementVoid('div', '', null,
+            'fn', fn);
       });
       var el = container.childNodes[0];
 
@@ -91,8 +91,8 @@ describe('attribute updates', () => {
     it('should be set on the node', () => {
       var fn = () =>{};
       patch(container, () => {
-        ie_void('div', '', null,
-                'fn', fn);
+        elementVoid('div', '', null,
+            'fn', fn);
       });
       var el = container.childNodes[0];
 
@@ -104,8 +104,8 @@ describe('attribute updates', () => {
     it('should not be set as attributes', () => {
       var obj = {};
       patch(container, () => {
-        ie_void('div', '', null,
-                'obj', obj);
+        elementVoid('div', '', null,
+            'obj', obj);
       });
       var el = container.childNodes[0];
 
@@ -115,8 +115,8 @@ describe('attribute updates', () => {
     it('should be set on the node', () => {
       var obj = {};
       patch(container, () => {
-        ie_void('div', '', null,
-                'obj', obj);
+        elementVoid('div', '', null,
+            'obj', obj);
       });
       var el = container.childNodes[0];
 
@@ -126,8 +126,8 @@ describe('attribute updates', () => {
 
   describe('for style', () => {
     function render(style) {
-      ie_void('div', '', [],
-              'style', style);
+      elementVoid('div', '', [],
+          'style', style);
     }
 
     it('should render with the correct style properties for objects', () => {
