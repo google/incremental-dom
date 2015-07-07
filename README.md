@@ -13,10 +13,10 @@ HTML is expressed in Incremental DOM using the ie_open, ie_close, ie_void and it
 
 ```javascript
 var IncrementalDOM = require('incremental-dom'),
-    ie_open = idom.ie_open,
-    ie_close = idom.ie_close,
-    ie_void = idom.ie_void,
-    itext = idom.itext;
+    ie_open = IncrementalDOM.ie_open,
+    ie_close = IncrementalDOM.ie_close,
+    ie_void = IncrementalDOM.ie_void,
+    itext = IncrementalDOM.itext;
 
 function render(data) {
   ie_void('input', '', [ 'type', 'text' ]);
