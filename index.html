@@ -12504,7 +12504,7 @@ pre[class*="language-"] {
   })();
 </script>
 </head>
-  <body><div hidden="" by-vulcanize=""><dom-module id="iron-icon" assetpath="/bower_components/iron-icon/">
+  <body><div hidden="" by-vulcanize=""><dom-module id="iron-icon" assetpath="bower_components/iron-icon/">
 
   <style>
     :host {
@@ -12874,7 +12874,7 @@ pre[class*="language-"] {
 <g id="zoom-out"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zM7 9h5v1H7z"></path></g>
 </defs></svg>
 </iron-iconset-svg>
-<dom-module id="paper-drawer-panel" assetpath="/bower_components/paper-drawer-panel/">
+<dom-module id="paper-drawer-panel" assetpath="bower_components/paper-drawer-panel/">
   <style>
 /**
 @license
@@ -13495,7 +13495,7 @@ iron-selector:not(.narrow-layout) #main ::content [paper-drawer-toggle] {
   }());
 
 </script>
-<dom-module id="paper-header-panel" assetpath="/bower_components/paper-header-panel/">
+<dom-module id="paper-header-panel" assetpath="bower_components/paper-header-panel/">
 
   <style>
     :host {
@@ -13875,7 +13875,7 @@ iron-selector:not(.narrow-layout) #main ::content [paper-drawer-toggle] {
   })();
 
 </script>
-<dom-module id="paper-ripple" assetpath="/bower_components/paper-ripple/">
+<dom-module id="paper-ripple" assetpath="bower_components/paper-ripple/">
 
   
 
@@ -14516,7 +14516,7 @@ iron-selector:not(.narrow-layout) #main ::content [paper-drawer-toggle] {
     });
   })();
 </script>
-<dom-module id="paper-icon-button" assetpath="/bower_components/paper-icon-button/">
+<dom-module id="paper-icon-button" assetpath="bower_components/paper-icon-button/">
   <style>
 
     :host {
@@ -14601,7 +14601,7 @@ iron-selector:not(.narrow-layout) #main ::content [paper-drawer-toggle] {
     }
   });
 </script>
-<dom-module id="paper-toolbar" assetpath="/bower_components/paper-toolbar/">
+<dom-module id="paper-toolbar" assetpath="bower_components/paper-toolbar/">
 
   <style>
     :host {
@@ -14897,7 +14897,7 @@ iron-selector:not(.narrow-layout) #main ::content [paper-drawer-toggle] {
   }());
 
 </script>
-<dom-module id="paper-item" assetpath="/bower_components/paper-item/">
+<dom-module id="paper-item" assetpath="bower_components/paper-item/">
 
   <style>
 /*
@@ -14957,7 +14957,7 @@ iron-selector:not(.narrow-layout) #main ::content [paper-drawer-toggle] {
 })();
 
 </script>
-<dom-module id="paper-menu" assetpath="/bower_components/paper-menu/">
+<dom-module id="paper-menu" assetpath="bower_components/paper-menu/">
 
   <style>
 
@@ -15032,7 +15032,7 @@ iron-selector:not(.narrow-layout) #main ::content [paper-drawer-toggle] {
 })();
 
 </script>
-<dom-module id="hash-menu" assetpath="/components/hash-menu/">
+<dom-module id="hash-menu" assetpath="components/hash-menu/">
   <style>
     paper-menu {
       background: transparent;
@@ -15139,8 +15139,9 @@ iron-selector:not(.narrow-layout) #main ::content [paper-drawer-toggle] {
       ready: function() {
         this.normalize();
 
-        // Need to manually create the pre and code elements as the polyfills
-        // do not correctly distribute Text nodes into content.
+        // TODO - working around a bug where distributing content is not
+        // working when polyfills are used in this specific case. Not able to
+        // reproduce in an isolated example or figure out what is going on.
         var code = document.createElement('code');
         var pre = document.createElement('pre');
 
@@ -15156,7 +15157,7 @@ iron-selector:not(.narrow-layout) #main ::content [paper-drawer-toggle] {
     });
   </script>
 </dom-module>
-<dom-module id="app-content" assetpath="/content/app-content/">
+<dom-module id="app-content" assetpath="content/app-content/">
   <style>
     :host {
       display: block;
@@ -15560,7 +15561,7 @@ patch(myElement, render);
           The section on <a href="#conditional-rendering/array-of-items">arrays of items</a> mentions why using a key is important when iterating over an item. This demo shows how using a key prevents DOM nodes corresponding to separate items from being seen as a diff. In this case, a newly added item at the head of an array causes a new element by be created rather than all the items being updated.
         </p>
         <p>
-          <a href="/demo/keys.html">Demo</a>
+          <a href="demo/keys.html">Demo</a>
         </p>    
       </section>
 
@@ -15570,7 +15571,7 @@ patch(myElement, render);
           Incremental DOM itself only renders Elements and Text nodes, but you may want to use components when building an application. One way this chould be solved is by using the emerging <a href="http://w3c.github.io/webcomponents/spec/custom/">web components</a> standards. The following demo shows one way you could create components.
         </p>
         <p>
-          <a href="/demo/customelement.html">Demo</a>
+          <a href="demo/customelement.html">Demo</a>
         </p>
       </section>
     </article>
@@ -15643,7 +15644,7 @@ patch(myElement, render);
 });
 </script>
 </dom-module>
-<dom-module id="app-main" assetpath="/content/app-main/">
+<dom-module id="app-main" assetpath="content/app-main/">
   <style>
     :host {
       --default-primary-color: var(--paper-green-500);
