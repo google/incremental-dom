@@ -1,0 +1,47 @@
+<script src="/bower_components/prism/prism.js"></script>
+<link href="/bower_components/prism/themes/prism.css" rel="stylesheet">
+
+<dom-module is="code-prism">
+  <style>
+    :host {
+      // extra padding to make horziontal scrollbars usable
+      padding-bottom: 5px;
+      display: block;
+    }
+  </style>
+
+  <template>
+    <content></content>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'code-prism',
+
+      stripEmptyText: function(node) {
+        if (node instanceof Text && !node.data.trim()) {
+          node.parentNode.removeChild(node);
+        }
+      },
+
+      ready: function() {
+        this.normalize();
+
+        // TODO - working around a bug where distributing content is not
+        // working when polyfills are used in this specific case. Not able to
+        // reproduce in an isolated example or figure out what is going on.
+        var code = document.createElement('code');
+        var pre = document.createElement('pre');
+
+        pre.className = 'lang-' + this.getAttribute('lang');
+        pre.appendChild(code);
+        code.textContent = this.textContent.trim();
+
+        Prism.highlightElement(code);
+
+        this.textContent = '';
+        this.appendChild(pre);
+      }
+    });
+  </script>
+</dom-module>

@@ -1,0 +1,445 @@
+<link href="/components/code-prism/code-prism.html" rel="import">
+<link href="/components/heading-with-link/heading-with-link.html" rel="import">
+
+<dom-module id="app-content">
+  <style>
+    :host {
+      display: block;
+      padding: 0 1.5em;
+    }
+
+    article {
+      margin: 3em 0;
+      max-width: 40em;
+    }
+
+    section {
+      margin: 2em 0;
+    }
+
+    h2 {
+      padding: .4em 0;
+      margin: .4em 0;
+      border-bottom: 1px solid var(--divider-color);
+    }
+
+    table {
+      margin: .5em 0;
+    }
+
+    thead {
+      color: white;
+      background-color: var(--dark-primary-color);
+    }
+
+    tr:nth-child(even) {
+      background-color: var(--light-primary-color);
+    }
+ 
+    td,
+    th {
+      padding: .25em .5em;
+    }
+
+    .centered-text {
+      text-align: center;
+    }
+
+    .api-article > section > div {
+      padding-left: 1em;
+      border-left: 1px solid var(--divider-color);
+    }
+  </style>
+
+  <template>
+    <article>
+      <h2 is="h2-with-link" id="about">About</h2>
+      <section>
+        <p>
+          Incremental DOM is a library for expressing and applying updates to DOM trees. JavaScript can be used to extract, iterate over and transform data into calls generating <code>HTMLElement</code>s and <code>Text</code> nodes. It differs from Virtual DOM approaches in that a diff operation is performed <em>incrementally</em> (that is one node at a time) against the DOM, rather than on a virtual DOM tree.
+        </p>
+        <p>
+          Rather than directly targeting direct usage, Incremental DOM aims to provide a platform for a higher level library or framework to target. As you might notice from the examples, Incremental DOM-style markup can be somewhat challenging to write and read. See <a href="#why-incremental-dom">Why Incremental DOM</a> for an explanation.
+        </p>
+        <p>
+          
+        </p>
+      </section>
+    </article>
+   
+    <article>
+      <h2 is="h2-with-link" id="rendering-dom">Rendering DOM</h2>
+      <section>
+        <p>
+          The DOM to be rendered is described with the incremental node functions, <a href="#api/elementOpen"><code>elementOpen</code></a>, <a href="#api/elementClose"><code>elementClose</code></a> and <a href="#api/text"><code>text</code></a>. For example, the following function:
+        </p>
+        <code-prism lang="javascript">
+function renderPart() {
+  elementOpen('div');
+    text('Hello world');
+  elementClose('div');
+}
+        </code-prism>
+        <p>would correspond to</p>
+        <code-prism lang="markup">
+&lt;div&gt;
+  Hello world
+&lt;/div&gt;
+        </code-prism>
+
+        <p>
+          Using the <code>renderPart</code> function from above, the <a href="#api/patch"><code>patch</code></a> function can be used to render the desired structure into an existing <a href="https://developer.mozilla.org/en-US/docs/Web/API/element"><code>Element</code></a> or <a href="https://developer.mozilla.org/en-US/docs/Web/API/document"><code>Document</code></a> (which includes Shadow DOM). Calling the patch function again will patch the DOM tree with any changes, updating attributes, and creating/removing DOM nodes as needed.
+        </p>
+        <code-prism lang="javascript">
+patch(document.getElementById('someId'), renderPart);
+        </code-prism>
+      </section>
+      <section>
+        <h3 is="h3-with-link" id="rendering-dom/attributes-and-properties">Attributes and Properties</h3>
+        <p>
+          In addition to creating DOM nodes, you can also add/update attributes and properties on Elements. They are specified as variable arguments, alternating between attribute/property name and value. Values that are Objects or Functions are set as properties, with all others being set as attributes.
+        </p>
+        <aside>
+          <figure>
+            <table>
+              <thead>
+                <tr>
+                  <th>typeof value</th>
+                  <th>Set as attribute</th>
+                  <th>Set as property</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>object</td><td></td><td class="centered-text">x</td></tr>
+                <tr><td>function</td><td></td><td class="centered-text">x</td></tr>
+                <tr><td>undefined</td><td class="centered-text">x</td><td></td></tr>
+                <tr><td>boolean</td><td class="centered-text">x</td><td></td></tr>
+                <tr><td>number</td><td class="centered-text">x</td><td></td></tr>
+                <tr><td>string</td><td class="centered-text">x</td><td></td></tr>
+              </tbody>
+            </table>
+            <figcaption>How values provided to elementOpen are set</figcaption>
+          </figure>
+        </aside>
+        <p>
+One use for setting a property could be to store callbacks for use with an event delegation library. Since you can assign to any property on the DOM node, you can even assign to on* handlers, like onclick. 
+        </p>
+        <code-prism lang="javascript">
+elementOpen('div', null, null,
+    'class', 'someClass',
+    'onclick', someFunction);
+  &hellip;
+elementClose('div');
+        </code-prism>
+      </section>
+
+      <section>
+        <h3 is="h3-with-link" id="rendering-dom/statics-array">Statics Array</h3>
+        <p>
+          Often times, you know that some properties on a DOM node will not change. One example would be the <code>type</code> attribute in <code>&lt;input type="text"&gt;</code>. Incremental DOM provides a shortcut to avoid comparing attributes/properties you know will not change. The third argument to <code><a href="#api/elementOpen">elementOpen</a></code> is an array of unchanging attributes. To avoid allocating an array on each pass, you will want to declare the array in a scope that is only executed once. 
+        </p>
+        <p>
+          If the statics array is provided, you must also provide a key. This ensures that an Element with the same tag but different statics array is never re-used by Incremental DOM.
+        </p>
+        <code-prism lang="javascript">
+var render = (function() {
+  var s1 = [ 'type', 'text', 'placeholder', '&hellip;'];
+
+  return function(isDisabled) {
+    elementOpen('input', '1', s1,
+        'disabled', isDisabled);
+    elementClose('input');
+  };
+})();
+        </code-prism>
+      </section>
+
+      <section>
+        <h3 is="h3-with-link" id="rendering-dom/applying-styles">Applying Styles</h3>
+        <p>
+          Styles for an element can be set either using a string or an object. When setting styles using an object, the names should be camelCase as they are set on the Element's style property. 
+        </p>
+        <h4>As a string</h4>
+        <code-prism lang="javascript">
+elementOpen('div', null, null,
+    'style', 'color: white; background-color: red;');
+  &hellip;
+elementClose('div');
+        </code-prism>
+        <h4>As an object</h4>
+        <code-prism lang="javascript">
+elementOpen('div', null, null,
+    'style', {
+      color: 'white',
+      backgroundColor: 'red'
+    });
+  &hellip;
+elementClose('div');
+        </code-prism>
+      </section>
+   </article>
+
+    <article>
+      <h2 is="h2-with-link" id="conditional-rendering">Conditional Rendering</h2>
+      <section>
+        <h3 is="h3-with-link" id="conditional-rendering/if-else">If/else</h3>
+        <p>
+    As you can mix node declarations and JavaScript, rendering conditional branches is fairly straightforward. Simply place the node declarations inside a branch. This works with switch statements too!
+        </p>
+        <code-prism lang="javascript">
+function renderGreeting(date, name) {
+  if (date.getHours() &lt; 12) {
+    elementOpen('strong');
+      text('Good morning, ');
+    elementClose('strong');
+  } else {
+    text('Hello ');
+  }
+
+  text(name);
+}
+        </code-prism>
+      </section>
+      <section>
+        <h3 is="h3-with-link" id="conditional-rendering/array-of-items">Array of Items</h3>
+        <p>
+        You can use your favorite way to render an array (or any sort of iterable) of items. When rendering an array of items, you will want to specify a 'key' as the second argument to the <code><a href="#api/elementOpen">elementOpen</a></code> function. Incremental DOM uses the key in order to:
+        </p>
+        <ol>
+          <li>Prevent the treating of newly added or moved items as a diff that needs to be reconciled.</li>
+          <li>Correctly maintain focus on any input fields, buttons or other items that may receive focus that have moved.</li>
+        </ol>
+        <p>
+          As Incremental DOM does not know when you are rendering an array of items, there is no warning generated when a key should be specified but is not present. If you are compiling from a template or transpiling, it might be a good idea to statically check to make sure a key is specified.
+        </p>
+        <code-prism lang="javascript">
+elementOpen('ul');
+  items.forEach(function(item) {
+    elementOpen('li', item.id);
+      text(item.text);
+    elementClose('li');
+  });
+elementClose('ul');
+        </code-prism>
+      </section>
+    </article>
+
+    <article>
+      <h2 is="h2-with-link" id="passing-functions">Passing Functions</h2>
+      <section>
+        <p>
+          The incremental node functions are evaluated when they are called. If you do not want to have them appear in the current location (e.g. to pass them to another function), simply wrap the statements in a function which can be called later.
+        </p>
+        <code-prism lang="javascript">
+function renderStatement(content, isStrong) {
+  if (isStrong) {
+    elementOpen('strong');
+      content();
+    elementClose('strong');
+  } else {
+    content();
+  }
+}
+
+function renderGreeting(name) {
+  function content() {
+    text('Hello ');
+    text(name);
+  }
+
+  elementOpen('div');
+    renderStatement(content, true);
+  elementClose('div');
+}
+        </code-prism>
+      </section>
+    </article>
+
+    <article class="api-article">
+      <h2 is="h2-with-link" id="api">API</h2>
+      <section>
+        <h3 is="h3-with-link" id="api/elementOpen">elementOpen</h3>
+        <div>
+          <h4>Description</h4>
+          <p>
+            Declares an Element with zero or more attributes/properties that should be present at the current location in the document tree.
+          </p>
+
+          <h4>Parameters</h4>
+          <dl>
+            <dt><code><em>string</em> tagname</code></dt>
+            <dd>The name of the tag, e.g. 'div' or 'span'. This could also be the tag of a custom element.</dd>
+            <dt><code><em>string</em> key</code></dt>
+            <dd>The key that identifies Element for reuse. See <a href="#conditional-rendering/array-of-items">Arrays of Items</a></dd>
+            <dt><code><em>Array</em> staticPropertyValuePairs</code></dt>
+            <dd>Pairs of property names and values. Depending on the type of the value, these will be set as either attributes or properties on the Element. These are only set on the Element once during creation. These will not be updated during subsequent passes. See <a href="#rendering-dom/statics-array">Statics Array</a>.</dd>
+            <dt><code><em>vargs</em> propertyValuePairs</code></dt>
+            <dd>Pairs of property names and values. Depending on the type of the value, these will be set as either attributes or properties on the Element.</dd>
+          </dl>
+
+          <h4>Usage</h4>
+          <code-prism lang="javascript">
+var elementOpen = IncrementalDOM.elementOpen;
+var somefunction = function() { &hellip; };
+&hellip; 
+elementOpen('div', item.key, ['staticAttr', 'staticValue'],
+   'someAttr', 'someValue',
+   'someFunctionAttr', somefunction);
+          </code-prism>
+        </div>
+      </section>
+
+      <section>
+        <h3 is="h3-with-link" id="api/elementClose">elementClose</h3>
+        <div>
+          <h4>Description</h4>
+          <p>
+            Signifies the end of the element opened with <code><a href="#api/elementOpen">elementOpen</a></code>, correspoding to a closing tag (e.g. <code>&lt;/div&gt;</code> in HTML). Any childNodes of the currently open Element that are in the DOM that have not been encountered in the current render pass are removed by the call to <code>elementClose</code>.
+          </p>
+
+          <h4>Parameters</h4>
+          <dl>
+            <dt><code><em>string</em> tagname</code></dt>
+            <dd>The name of the tag, e.g. 'div' or 'span'. This could also be the tag of a custom element.</dd>
+          </dl>
+
+          <h4>Usage</h4>
+          <code-prism lang="javascript">
+var elementClose = IncrementalDOM.elementClose;
+&hellip; 
+elementClose('div');
+          </code-prism>
+        </div>
+      </section>
+
+      <section>
+        <h3 is="h3-with-link" id="api/elementVoid">elementVoid</h3>
+        <div>
+          <h4>Description</h4>
+          <p>
+            A combination of <code><a href="#api/elementOpen">elementOpen</a></code>, followed by <code><a href="#api/elementClose">elementClose</a></code>.
+          </p>
+
+          <h4>Parameters</h4>
+          <dl>
+            <dt><code><em>string</em> tagname</code></dt>
+            <dd>The name of the tag, e.g. 'div' or 'span'. This could also be the tag of a custom element.</dd>
+            <dt><code><em>string</em> key</code></dt>
+            <dd>The key that identifies Element for reuse. See <a href="#conditional-rendering/array-of-items">Arrays of Items</a></dd>
+            <dt><code><em>Array</em> staticPropertyValuePairs</code></dt>
+            <dd>Pairs of property names and values. Depending on the type of the value, these will be set as either attributes or properties on the Element. These are only set on the Element once during creation. These will not be updated during subsequent passes. See <a href="#rendering-dom/statics-array">Statics Array</a>.</dd>
+            <dt><code><em>vargs</em> propertyValuePairs</code></dt>
+            <dd>Pairs of property names and values. Depending on the type of the value, these will be set as either attributes or properties on the Element.</dd>
+          </dl>
+
+          <h4>Usage</h4>
+          <code-prism lang="javascript">
+var elementClose = IncrementalDOM.elementClose;
+&hellip; 
+elementVoid('div', item.key, ['staticAttr', 'staticValue'],
+    'someAttr', 'someValue',
+    'someFunctionAttr', somefunction);
+          </code-prism>
+        </div>
+      </section>
+
+      <section>
+        <h3 is="h3-with-link" id="api/text">text</h3>
+        <div>
+          <h4>Description</h4>
+          <p>
+            Declares a Text node, with the specified text, should appear at the current location in the document tree.
+          </p>
+
+          <h4>Parameters</h4>
+          <dl>
+            <dt><code><em>string</em> text</code></dt>
+            <dd>The text for the Text node.</dd>
+          </dl>
+
+          <h4>Usage</h4>
+          <code-prism lang="javascript">
+var text = IncrementalDOM.text;
+&hellip; 
+text('hello world');
+          </code-prism>
+        </div>  
+      </section>
+
+      <section>
+        <h3 is="h3-with-link" id="api/patch">patch</h3>
+        <div>
+          <h4>Description</h4>
+          <p>
+            Updates the provided Node with a function containing zero or more calls to elementOpen, text and elementClose. The provided callback function may call other such functions. The patch function may be called with a new Node while a call to patch is already executing.
+          </p>
+
+          <h4>Parameters</h4>
+          <dl>
+            <dt><code><em>Node</em> node</code></dt>
+            <dd>The Node to patch. Typically, this will be an HTMLElement or DocumentFragment.</dd>
+            <dt><code><em>function</em> description</code></dt>
+            <dd>The description of the DOM tree underneath <code>node</code>.</dd>
+          </dl>
+
+          <h4>Usage</h4>
+          <code-prism lang="javascript">
+var patch = IncrementalDOM.patch;
+function render() {
+  elementOpen('div');
+  elementClose('div');
+  &hellip;
+}
+var myElement = document.getElementById(&hellip;);
+patch(myElement, render);
+          </code-prism>
+        </div>
+      </section>
+    </article>
+
+    <article>
+      <h2 is="h2-with-link" id="demos">Demos</h2>
+      <section>
+        <h3 is="h3-with-link" id="demos/using-keys">Using Keys</h3>
+        <p>
+          The section on <a href="#conditional-rendering/array-of-items">arrays of items</a> mentions why using a key is important when iterating over an item. This demo shows how using a key prevents DOM nodes corresponding to separate items from being seen as a diff. In this case, a newly added item at the head of an array causes a new element by be created rather than all the items being updated.
+        </p>
+        <p>
+          <a href="/demo/keys.html">Demo</a>
+        </p>    
+      </section>
+
+      <section>
+        <h3 is="h3-with-link" id="demos/using-with-web-components">Using with Web Components</h3>
+        <p>
+          Incremental DOM itself only renders Elements and Text nodes, but you may want to use components when building an application. One way this chould be solved is by using the emerging <a href="http://w3c.github.io/webcomponents/spec/custom/">web components</a> standards. The following demo shows one way you could create components.
+        </p>
+        <p>
+          <a href="/demo/customelement.html">Demo</a>
+        </p>
+      </section>
+    </article>
+
+    <article>
+      <h2 is="h2-with-link" id="why-incremental-dom">Why Incremental DOM</h2>
+      <section>
+        <p>
+          Incremental DOM has two main strengths compared to virtual DOM based approaches:
+          <ol>
+            <li>
+              The incremental nature allows for significantly reduced memory allocation during render passes, allowing for more predictable perfromance.
+            </li>
+            <li>
+              It easily maps to template based approaches. Control statements and loops can be mixed freely with element and attribute declarations.
+            </li>
+          </ol>
+        </p>
+        <p>
+          Incremental DOM is a small (2.6kB min+gzip), standalone and unopinionated library. It renders DOM nodes and allows setting attributes/properties, but leaves the rest, including how to organize views, up to you. For example, an existing Backbone application could use Incremental DOM for rendering and updating DOM in place of a traditional template and manual update approach.
+        </p>
+      </section>
+    </article>
+  </template>
+
+  <script src="app-content.js"></script>
+</dom-module>

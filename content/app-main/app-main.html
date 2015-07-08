@@ -1,0 +1,68 @@
+<link href="/bower_components/iron-icons/iron-icons.html" rel="import">
+<link href="/bower_components/paper-drawer-panel/paper-drawer-panel.html" rel="import">
+<link href="/bower_components/paper-header-panel/paper-header-panel.html" rel="import">
+<link href="/bower_components/paper-icon-button/paper-icon-button.html" rel="import">
+<link href="/bower_components/paper-styles/paper-styles.html" rel="import">
+<link href="/bower_components/paper-toolbar/paper-toolbar.html" rel="import">
+
+<link href="/components/hash-menu/hash-menu.html" rel="import">
+
+<link href="/content/app-content/app-content.html" rel="import">
+
+<dom-module id="app-main">
+  <style>
+    :host {
+      --default-primary-color: var(--paper-green-500);
+      --dark-primary-color: var(--paper-green-700);
+      --light-primary-color: var(--paper-green-50);
+
+      @apply(--paper-font-body1);
+    }
+
+    code {
+      @apply(--paper-font-code1);
+    }
+
+    paper-drawer-panel {
+      --paper-drawer-panel-drawer-container: {
+        background-color: var(--paper-grey-50);
+      };
+    }
+
+    .toolbar-link {
+      @apply(--paper-font-body2);
+      color: var(--text-primary-color);
+    }
+  </style>
+  <template>
+    <paper-drawer-panel>
+      <paper-header-panel drawer>
+        <paper-toolbar>
+        </paper-toolbar>
+        <hash-menu></hash-menu>
+      </paper-header-panel>
+      <paper-header-panel main on-content-scroll="handleScroll">
+        <paper-toolbar>
+          <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
+          <span class="title">Incremental DOM</span>
+          <a class="toolbar-link" href="https://github.com/google/incremental-dom">Github</a>
+        </paper-toolbar>
+        <app-content id="content"></app-content>
+      </paper-header-panel>
+    </paper-drawer-panel>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'app-main',
+
+      created: function() {
+        location.hash = location.hash || '#about';
+      },
+
+      handleScroll: function(e) {
+        this.$.content.handleScroll(e);
+      }
+    });
+  </script>
+</dom-module>

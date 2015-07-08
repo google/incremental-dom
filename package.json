@@ -1,0 +1,10 @@
+{
+  "name": "incremental-dom-docs",
+  "version": "0.0.0",
+  "description": "Documentation for Incremental DOM",
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-vulcanize": "^6.0.1"
+  },
+  "author": "Sepand Parhami"
+}

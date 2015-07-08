@@ -1,0 +1,77 @@
+<html>
+<head>
+  <script src="../dist/incremental-dom.js"></script>
+  <script src="demo_utils.js"></script>
+</head>
+<body>
+  <div id="container"></div>
+
+  <script>
+    (function() {
+      var patch = IncrementalDOM.patch,
+          ie_open = IncrementalDOM.ie_open,
+          ie_void = IncrementalDOM.ie_void,
+          ie_close = IncrementalDOM.ie_close,
+          itext = IncrementalDOM.itext;
+
+      function update(data) {
+        patch(container, function() {
+          ie_open('div');
+            ie_void('input', null, null,
+                    'type', 'text',
+                    'oninput', handleInput);
+          ie_close('div');
+          ie_open('div');
+            itext('last 10 inputs');
+          ie_close('div');
+
+          ie_open('div');
+            lastInputs.forEach(function(item) {
+              // The key for this item is the item's id. During each update, DOM
+              // nodes are reused based on the key. This causes an additional
+              // div and text node to be created rather than all the text nodes
+              // being updated.
+              ie_open('div', item.id, null,
+                      'style', 'min-height: 1em');
+                itext(item.text);
+              ie_close('div');
+            });
+          ie_close('div');
+
+          ie_open('div', null, null,
+                  'style', 'position: absolute; top: 0; right: 0;');
+            itext('text nodes created: ' + data.textNodesCreated);
+          ie_close('div');
+        });
+      }
+
+      var lastInputs = [];
+      var textNodesCreated = 0;
+
+      before(document, 'createTextNode', function() {
+        textNodesCreated += 1;
+      });
+
+      function handleInput(e) {
+        lastInputs = [{
+            text: e.target.value,
+            id: Date.now()
+          }]
+          .concat(lastInputs)
+          .slice(0, 10);
+
+        update({
+          lastInputs: lastInputs,
+          textNodesCreated: textNodesCreated
+        });
+      }
+   
+      // Initial render 
+      update({
+        lastInputs: lastInputs,
+        textNodesCreated: textNodesCreated
+      });  
+    })();
+  </script>
+</body>
+</html>
