@@ -16,6 +16,7 @@
 
 var assign = require('lodash.assign');
 var browserify = require('browserify');
+var esperanto = require('esperanto');
 var buffer = require('vinyl-buffer');
 var del = require('del');
 var envify = require('envify');
@@ -29,6 +30,9 @@ var source = require('vinyl-source-stream');
 var sourcemaps = require('gulp-sourcemaps');
 var uglify = require('gulp-uglify');
 var watchify = require('watchify');
+
+var path = require('path');
+var fs = require('fs');
 
 var jsFileName = 'incremental-dom.js';
 var srcs = [jsFileName, 'src/**/*.js'];
@@ -98,13 +102,22 @@ function jsWatch() {
   return bundle(b_watch, {});
 }
 
-function jsDist() {
-  var b_plain = browserify(customBrowserifyOpts);
+function jsDist(done) {
+  esperanto.bundle({
+    entry: 'index.js'
+  }).then(function(bundle) {
+    var res = bundle.toUmd({
+      strict: true,
+      name: 'IncrementalDOM',
+      sourceMap: true,
+      sourceMapFile: 'incremental-dom.js',
+      sourceMapSource: 'incremental-dom.js'
+    });
 
-  return bundle(b_plain, {
-    _: 'purge',
-    NODE_ENV: 'production'
-  });
+    fs.writeFileSync('./dist/incremental-dom.js', res.code.toString());
+    fs.writeFileSync('./dist/incremental-dom.js.map', res.map.toString());
+    done();
+  }).catch(done);
 }
 
 function addDist() {

@@ -15,17 +15,13 @@
  * limitations under the License.
  */
 
-var patch = require('./src/patch').patch;
-var elements = require('./src/virtual_elements');
-
-module.exports = {
-  patch: patch,
-  elementVoid: elements.elementVoid,
-  elementOpenStart: elements.elementOpenStart,
-  elementOpenEnd: elements.elementOpenEnd,
-  elementOpen: elements.elementOpen,
-  elementClose: elements.elementClose,
-  text: elements.text,
-  attr: elements.attr
-};
-
+export {patch} from './src/patch';
+export {
+  elementVoid,
+  elementOpenStart,
+  elementOpenEnd,
+  elementOpen,
+  elementClose,
+  text,
+  attr,
+} from './src/virtual_elements';
