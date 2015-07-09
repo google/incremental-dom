@@ -21,7 +21,6 @@
           elementClose = IncrementalDOM.elementClose,
           text = IncrementalDOM.text;
 
-
       function update(data) {
         patch(container, function() {
           var moreThanFourCharacters = data.text.length > 4;
@@ -53,9 +52,9 @@
           text: e.target.value,
         });
       }
-   
-      // Calling update once to attach oninput 
-      update({ text: 'world' });  
+
+      // Calling update once to attach oninput
+      update({ text: 'world' });
     }, 500);
   </script>
 </body>
