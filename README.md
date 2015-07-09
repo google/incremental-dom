@@ -2,14 +2,14 @@
 
 ## Overview
 
-Incremental DOM is a library for building up DOM trees and update them in-place when data changes. It differs from the established virtual DOM approach in that no intermediate tree is created (the existing tree is mutated in-place). This significantly reduces memory allocation for incremental updates to the DOM tree and thus increases performance significantly in some cases.
+Incremental DOM is a library for building up DOM trees and updating them in-place when data changes. It differs from the established virtual DOM approach in that no intermediate tree is created (the existing tree is mutated in-place). This approach significantly reduces memory allocation and GC thrashing for incremental updates to the DOM tree therefore increasing performance significantly in some cases.
 
-Incremental DOM is primarily intended as a compilation target for templating languages or it could be used to implement a higher level API for human consumption. The API was carefully designed to minimize heap allocations and where unavoidable ensure that as many objects a possible can be de-allocated by incremental GC. One unique feature of its API that separates opening and closing of tags so that it is suitable as a compilation target for templating languages that allow (temporarily) unbalanced HTML in templates (e.g. tags that are opened and closed in separate templates) and arbitrary logic for creating HTML attributes.
+Incremental DOM is primarily intended as a compilation target for templating languages. It could be used to implement a higher level API for human consumption. The API was carefully designed to minimize heap allocations and where unavoidable ensure that as many objects as possible can be de-allocated by incremental GC. One unique feature of its API is that it separates opening and closing of tags so that it is suitable as a compilation target for templating languages that allow (temporarily) unbalanced HTML in templates (e.g. tags that are opened and closed in separate templates) and arbitrary logic for creating HTML attributes.
 *Think of it as ASM.dom.*
 
 ## Usage
 
-HTML is expressed in Incremental DOM using the elementOpen, elementClose, elementVoid and text methods. Consider the following example:
+HTML is expressed in Incremental DOM using the `elementOpen`, `elementClose`, `elementVoid` and `text` methods. Consider the following example:
 
 ```javascript
 var IncrementalDOM = require('incremental-dom'),
