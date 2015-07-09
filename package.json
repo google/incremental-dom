@@ -5,6 +5,10 @@
   "main": "index.js",
   "author": "The Incremental DOM Authors",
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/google/incremental-dom.git"
+  },
   "devDependencies": {
     "browserify": "^10.2.4",
     "chai": "^3.0.0",
