@@ -3,7 +3,6 @@
   <script src="../dist/incremental-dom.js"></script>
   <script src="define_component.js"></script>
   <script src="demo_utils.js"></script>
-  <link rel="stylesheet" href="style.css">
   <style>
     #container {
       margin-top: 20px;
@@ -21,7 +20,7 @@
 </head>
 <body>
   <div id="container"></div>
-  
+
   <p>
     The text of the zero-th item is updated and the highlighted item changes.
     A small wrapper, using native webcomponents, is used to create a React-like
@@ -41,7 +40,7 @@
        * props, shouldComponentUpdate and render functions. This is not part of
        * the library itself, but something that can be built without too much
        * trouble.
-       * 
+       *
        * An element that only diffs children if text or selected changed. The
        * constructor isn't used directly, only to keep track of the number of
        * times render is called.
@@ -52,7 +51,7 @@
        */
       Item = defineComponent({
         tag: 'x-item',
-      
+
         /*
          * Before calling render for this component, the component logic calls
          * shouldComponentUpdate to see if the contents need to be updated at
@@ -79,7 +78,7 @@
                 'props', {
                   text: item
                 });
-            elementClose('x-item');      
+            elementClose('x-item');
           });
 
           elementOpen('div', null, null,
@@ -108,7 +107,7 @@
           items: items,
           selectedIndex: selectedIndex,
           itemRenderCount: itemRenderCount
-        });  
+        });
       }, 1000);
 
       update({
