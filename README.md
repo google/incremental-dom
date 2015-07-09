@@ -50,6 +50,10 @@ patch(myElement, function() {
 });
 ```
 
+## Docs
+
+[Docs and demos](http://google.github.io/incremental-dom/)
+
 ### Installation
 
 `npm install incremental-dom`
