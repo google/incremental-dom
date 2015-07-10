@@ -182,5 +182,19 @@ describe('attribute updates', () => {
       expect(el.style.backgroundColor).to.equal('red');
     });
   });
+
+  describe('for svg elements', () => {
+    it('should correctly apply the class attribute', function() {
+      patch(container, () => {
+        elementVoid('svg', null, null,
+            'class', 'foo');
+      });
+      var el = container.childNodes[0];
+
+      expect(el.getAttribute('class')).to.equal('foo');
+    });
+
+
+  });
 });
 
