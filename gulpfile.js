@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-var assign = require('lodash').assign;
+var assign = require('lodash.assign');
 var browserify = require('browserify');
 var buffer = require('vinyl-buffer');
 var del = require('del');

@@ -27,7 +27,7 @@
     "karma-firefox-launcher": "~0.1.4",
     "karma-mocha": "^0.2.0",
     "karma-sinon-chai": "^1.0.0",
-    "lodash": "^3.10.0",
+    "lodash.assign": "^3.2.0",
     "mocha": "^2.2.5",
     "sinon": "^1.15.4",
     "sinon-chai": "^2.8.0",
