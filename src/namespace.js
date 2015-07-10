@@ -17,7 +17,6 @@
 var getWalker = require('./walker').getWalker;
 
 var SVG_NS = 'http://www.w3.org/2000/svg';
-var XHTML_NS = 'http://www.w3.org/1999/xhtml';
 
 /**
  * Enters a tag, checking to see if it is a namespace boundry, and if so,
@@ -28,7 +27,7 @@ var enterTag = function(tag) {
   if (tag === 'svg') {
     getWalker().enterNamespace(SVG_NS);
   } else if (tag === 'foreignObject') {
-    getWalker().enterNamespace(XHTML_NS);
+    getWalker().enterNamespace(undefined);
   }
 };
 
