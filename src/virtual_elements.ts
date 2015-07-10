@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-var alignWithDOM = require('./alignment').alignWithDOM;
-var updateAttribute = require('./attributes').updateAttribute;
-var getData = require('./node_data').getData;
-var getWalker = require('./walker').getWalker;
-var traversal = require('./traversal'),
-    firstChild = traversal.firstChild,
-    nextSibling = traversal.nextSibling,
-    parentNode = traversal.parentNode;
+declare var process;
+
+import {alignWithDOM} from './alignment';
+import {updateAttribute} from './attributes';
+import {getData} from './node_data';
+import {getWalker} from './walker';
+import traversal = require('./traversal');
+var {firstChild, nextSibling, parentNode} = traversal;
 
 
 /**
@@ -182,7 +182,7 @@ var updateAttributes = function(node, newAttrs) {
  * @param {...*} var_args Attribute name/value pairs of the dynamic attributes
  *     for the Element.
  */
-var elementOpen = function(tag, key, statics, var_args) {
+export var elementOpen = function(tag, key?, statics?, ...var_args) {
   if (process.env.NODE_ENV !== 'production') {
     assertNotInAttributes();
   }
@@ -212,7 +212,7 @@ var elementOpen = function(tag, key, statics, var_args) {
  *     static attributes for the Element. These will only be set once when the
  *     Element is created.
  */
-var elementOpenStart = function(tag, key, statics) {
+export var elementOpenStart = function(tag, key, statics) {
   if (process.env.NODE_ENV !== 'production') {
     assertNotInAttributes();
     setInAttributes();
@@ -232,7 +232,7 @@ var elementOpenStart = function(tag, key, statics) {
  * @param {string} name
  * @param {*} value
  */
-var attr = function(name, value) {
+export var attr = function(name, value) {
   if (process.env.NODE_ENV !== 'production') {
     assertInAttributes();
   }
@@ -244,7 +244,7 @@ var attr = function(name, value) {
 /**
  * Closes an open tag started with elementOpenStart.
  */
-var elementOpenEnd = function() {
+export var elementOpenEnd = function() {
   if (process.env.NODE_ENV !== 'production') {
     assertInAttributes();
     setNotInAttributes();
@@ -256,10 +256,8 @@ var elementOpenEnd = function() {
 
 /**
  * Closes an open virtual Element.
- *
- * @param {string} tag The element's tag.
  */
-var elementClose = function(tag) {
+export var elementClose = function() {
   if (process.env.NODE_ENV !== 'production') {
     assertNotInAttributes();
   }
@@ -282,7 +280,7 @@ var elementClose = function(tag) {
  * @param {...*} var_args Attribute name/value pairs of the dynamic attributes
  *     for the Element.
  */
-var elementVoid = function(tag, key, statics, var_args) {
+export var elementVoid = function(tag, key, statics?, ...var_args) {
   if (process.env.NODE_ENV !== 'production') {
     assertNotInAttributes();
   }
@@ -297,7 +295,7 @@ var elementVoid = function(tag, key, statics, var_args) {
  *
  * @param {string} value The text of the Text.
  */
-var text = function(value) {
+export var text = function(value) {
   if (process.env.NODE_ENV !== 'production') {
     assertNotInAttributes();
   }
@@ -311,17 +309,5 @@ var text = function(value) {
   }
 
   nextSibling();
-};
-
-
-/** */
-module.exports = {
-  elementOpenStart: elementOpenStart,
-  elementOpenEnd: elementOpenEnd,
-  elementOpen: elementOpen,
-  elementVoid: elementVoid,
-  elementClose: elementClose,
-  text: text,
-  attr: attr
 };
 

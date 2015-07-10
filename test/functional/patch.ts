@@ -14,12 +14,8 @@
  * limitations under the License.
  */
 
-var IncrementalDOM = require('../../index'),
-    patch = IncrementalDOM.patch,
-    elementOpen = IncrementalDOM.elementOpen,
-    elementClose = IncrementalDOM.elementClose,
-    elementVoid = IncrementalDOM.elementVoid,
-    text = IncrementalDOM.text;
+import {patch} from "../../src/patch";
+import {elementOpen, elementClose, elementVoid, text} from "../../src/virtual_elements";
 
 describe('patching an element', () => {
   var container;
@@ -70,7 +66,7 @@ describe('patching an element', () => {
       elementOpen('div');
         patch(containerTwo, renderTwo);
         text('hello');
-      elementClose('div');
+      elementClose();
     }
 
     function renderTwo() {
@@ -91,9 +87,9 @@ describe('patching a documentFragment', function() {
     patch(frag, function() {
       elementOpen('div', null, null,
           'id', 'aDiv');
-      elementClose('div');
+      elementClose();
     });
 
-    expect(frag.children[0].id).to.equal('aDiv');
+    expect(frag.childNodes[0]['id']).to.equal('aDiv');
   });
 });

@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-var traversal = require('./traversal'),
-    firstChild = traversal.firstChild,
-    parentNode = traversal.parentNode;
-var TreeWalker = require('./tree_walker');
-var walker = require('./walker'),
-    getWalker = walker.getWalker,
-    setWalker = walker.setWalker;
+import * as traversal from './traversal';
+var {firstChild,parentNode} = traversal;
+import TreeWalker = require('./tree_walker');
+import * as walker from './walker';
+var {getWalker, setWalker} = walker;
 
 
 /**
@@ -30,7 +28,7 @@ var walker = require('./walker'),
  * @param {!function} fn A function containing elementOpen/elementClose/etc.
  *     calls that describe the DOM.
  */
-var patch = function(el, fn) {
+export var patch = function(el, fn) {
   var prevWalker = getWalker();
   setWalker(new TreeWalker(el));
 
@@ -39,11 +37,5 @@ var patch = function(el, fn) {
   parentNode();
 
   setWalker(prevWalker);
-};
-
-
-/** */
-module.exports = {
-  patch: patch
 };
 

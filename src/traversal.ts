@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-var getWalker = require('./walker').getWalker;
-var getData = require('./node_data').getData;
+import {getWalker} from './walker';
+import {getData} from './node_data';
 
 
 /**
@@ -56,7 +56,7 @@ var exitNode = function(node) {
  * @param {!Element} parent
  * @param {!Node} child
  */
-var markVisited = function(parent, child) {
+export var markVisited = function(parent, child) {
   var data = getData(parent);
   data.lastVisitedChild = child;
 };
@@ -65,7 +65,7 @@ var markVisited = function(parent, child) {
 /**
  * Changes to the first child of the current node.
  */
-var firstChild = function() {
+export var firstChild = function() {
   var walker = getWalker();
   enterNode(walker.currentNode);
   walker.firstChild();
@@ -75,7 +75,7 @@ var firstChild = function() {
 /**
  * Changes to the next sibling of the current node.
  */
-var nextSibling = function() {
+export var nextSibling = function() {
   var walker = getWalker();
   walker.nextSibling();
 };
@@ -84,18 +84,8 @@ var nextSibling = function() {
 /**
  * Changes to the parent of the current node, removing any unvisited children.
  */
-var parentNode = function() {
+export var parentNode = function() {
   var walker = getWalker();
   walker.parentNode();
   exitNode(walker.currentNode);
 };
-
-
-/** */
-module.exports = {
-  firstChild: firstChild,
-  nextSibling: nextSibling,
-  parentNode: parentNode,
-  markVisited: markVisited
-};
-

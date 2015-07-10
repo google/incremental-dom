@@ -14,11 +14,8 @@
  * limitations under the License.
  */
 
-var IncrementalDOM = require('../../index'),
-    patch = IncrementalDOM.patch,
-    elementOpen = IncrementalDOM.elementOpen,
-    elementClose = IncrementalDOM.elementClose,
-    elementVoid = IncrementalDOM.elementVoid;
+import {patch} from "../../src/patch";
+import {elementOpen, elementClose, elementVoid} from "../../src/virtual_elements";
 
 describe('conditional rendering', () => {
   var container;

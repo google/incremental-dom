@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-var getData = require('./node_data').getData;
+import {getData} from './node_data';
 
 
 /**
@@ -77,7 +77,7 @@ var applyStyle = function(el, style) {
  * @param {*} value The attribute's value. If the value is a string, it is set
  *     as an HTML attribute, otherwise, it is set on node.
  */
-var updateAttribute = function(el, name, value) {
+export var updateAttribute = function(el, name, value) {
   switch (name) {
     case 'id':
       el.id = value;
@@ -96,10 +96,3 @@ var updateAttribute = function(el, name, value) {
       break;
   }
 };
-
-
-/** */
-module.exports = {
-  updateAttribute: updateAttribute
-};
-
