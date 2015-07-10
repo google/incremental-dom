@@ -82,9 +82,6 @@ var updateAttribute = function(el, name, value) {
     case 'id':
       el.id = value;
       break;
-    case 'class':
-      el.className = value;
-      break;
     case 'tabindex':
       el.tabIndex = value;
       break;
