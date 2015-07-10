@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {patch, text} from '../../index';
+import {patch, text} from '../../src/index';
 
 describe('text nodes', () => {
   let container;

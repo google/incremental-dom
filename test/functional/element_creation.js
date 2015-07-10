@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {patch, elementOpen, elementClose, elementVoid} from '../../index';
+import {patch, elementOpen, elementClose, elementVoid} from '../../src/index';
 
 describe('element creation', () => {
   let container;

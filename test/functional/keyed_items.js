@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {patch, elementVoid} from '../../index';
+import {patch, elementVoid} from '../../src/index';
 
 describe('rendering with keys', () => {
   let container;

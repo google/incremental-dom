@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {patch, elementOpenStart, elementOpenEnd, elementClose, attr} from '../../index';
+import {patch, elementOpenStart, elementOpenEnd, elementClose, attr} from '../../src/index';
 
 describe('virtual attribute updates', () => {
   let container;

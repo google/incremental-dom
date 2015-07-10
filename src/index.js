@@ -15,4 +15,13 @@
  * limitations under the License.
  */
 
-module.exports = require('./lib/index');
+export {patch} from './patch';
+export {
+  elementVoid,
+  elementOpenStart,
+  elementOpenEnd,
+  elementOpen,
+  elementClose,
+  text,
+  attr,
+} from './virtual_elements';

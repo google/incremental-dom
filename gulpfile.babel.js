@@ -26,14 +26,20 @@ import gulp from 'gulp';
 import gutil from 'gulp-util';
 import {server as karma} from 'karma';
 import path from 'path';
+import file from 'gulp-file';
 import source from 'vinyl-source-stream';
 import sourcemaps from 'gulp-sourcemaps';
 import uglify from 'gulp-uglify';
 import watchify from 'watchify';
 import fs from 'fs';
+import babel from 'gulp-babel';
 
-const jsFileName = 'incremental-dom.js';
-const srcs = [jsFileName, 'src/**/*.js'];
+const exportVarName = 'IncrementalDOM';
+const entryFileName = 'index';
+const exportFileName = 'incremental-dom';
+const destinationFolder = 'dist';
+
+const srcs = ['src/**/*.js'];
 const tests = ['test/functional/**/*.js'];
 
 const customBrowserifyOpts = {
@@ -43,7 +49,7 @@ const customBrowserifyOpts = {
 };
 
 function clean(done) {
-  del(['dist'], done);
+  del([destinationFolder], done);
 }
 
 function unit(done) {
@@ -68,58 +74,53 @@ function lint() {
     .pipe(gjslint.reporter('console'))
 }
 
-function bundle(browserify, env) {
-  return browserify
-    .transform(envify, env)
-    .bundle()
-    .on('error', gutil.log.bind(gutil, 'Browserify Error'))
-    .pipe(source(jsFileName))
-    .pipe(buffer())
-    .pipe(sourcemaps.init({loadMaps: true}))
-      .pipe(uglify({
-        preserveComments: 'some'
-      }))
-      .on('error', gutil.log)
-    .pipe(sourcemaps.write('./'))
-    .pipe(gulp.dest('dist'));
-}
-
-function js() {
-  let b_plain = browserify(customBrowserifyOpts);
-
-  return bundle(b_plain, {});
-}
-
-function jsWatch() {
-  let opts = assign({}, watchify.args, customBrowserifyOpts);
-  let b_watch = watchify(browserify(opts));
-
-  b_watch.on('update', bundle.bind(null, b_watch));
-  b_watch.on('log', gutil.log);
-
-  return bundle(b_watch, {});
-}
-
-function jsDist(done) {
+function bundle(done) {
   esperanto.bundle({
-    entry: 'index.js'
+    base: 'src',
+    entry: entryFileName
   }).then(function(bundle) {
     var res = bundle.toUmd({
-      strict: true,
-      name: 'IncrementalDOM',
       sourceMap: true,
-      sourceMapFile: 'incremental-dom.js',
-      sourceMapSource: 'incremental-dom.js'
+      sourceMapSource: entryFileName + '.js',
+      sourceMapFile: exportFileName + '.js',
+      name: exportVarName,
+      strict: true
     });
 
-    fs.writeFileSync('./dist/incremental-dom.js', res.code.toString());
-    fs.writeFileSync('./dist/incremental-dom.js.map', res.map.toString());
-    done();
+    fs.writeFileSync(path.join(destinationFolder, exportFileName + '.js.map'), res.map.toString());
+
+    file(exportFileName + '.js', res.code, { src: true })
+      .pipe(sourcemaps.init({ loadMaps: true }))
+      .pipe(babel({ blacklist: ['useStrict'], plugins: ['inline-environment-variables'] }))
+      .pipe(uglify())
+      .pipe(sourcemaps.write('./'))
+      .pipe(gulp.dest(destinationFolder))
+      .on('error', done)
+      .on('end', done);
   }).catch(done);
 }
 
+function js(done) {
+  bundle(done);
+}
+
+function jsWatch() {
+  gulp.watch(srcs, ['js']);
+}
+
+function jsDist(done) {
+  process.env.NODE_ENV = 'production';
+  bundle(done);
+}
+
+function jsLib() {
+  return gulp.src(srcs)
+    .pipe(babel())
+    .pipe(gulp.dest('lib'));
+}
+
 function addDist() {
-  return gulp.src('dist')
+  return gulp.src(destinationFolder)
     .pipe(git.add({
       args: '-f'
     }));
@@ -132,6 +133,7 @@ gulp.task('lint', lint);
 gulp.task('js', js);
 gulp.task('js-watch', jsWatch);
 gulp.task('js-dist', jsDist);
+gulp.task('js-lib', jsLib);
 gulp.task('build', ['lint', 'unit', 'js']);
 gulp.task('dist', ['lint', 'unit', 'js-dist'], addDist);
 
