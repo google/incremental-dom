@@ -41,8 +41,14 @@ var ATTRIBUTES_OFFSET = 3;
  */
 var argsBuilder = [];
 
+/**
+ * Verify if the script are running in production.
+ * @type {boolean}
+ * @const
+ */
+var IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
-if (process.env.NODE_ENV !== 'production') {
+if (!IS_PRODUCTION) {
   /**
    * Keeps track whether or not we are in an attributes declaration (after
    * elementOpenStart, but before elementOpenEnd).
@@ -182,7 +188,7 @@ var updateAttributes = function(node, newAttrs) {
  *     for the Element.
  */
 var elementOpen = function(tag, key, statics, var_args) {
-  if (process.env.NODE_ENV !== 'production') {
+  if (!IS_PRODUCTION) {
     assertNotInAttributes();
   }
 
@@ -213,7 +219,7 @@ var elementOpen = function(tag, key, statics, var_args) {
  *     Element is created.
  */
 var elementOpenStart = function(tag, key, statics) {
-  if (process.env.NODE_ENV !== 'production') {
+  if (!IS_PRODUCTION) {
     assertNotInAttributes();
     setInAttributes();
   }
@@ -233,7 +239,7 @@ var elementOpenStart = function(tag, key, statics) {
  * @param {*} value
  */
 var attr = function(name, value) {
-  if (process.env.NODE_ENV !== 'production') {
+  if (!IS_PRODUCTION) {
     assertInAttributes();
   }
 
@@ -245,7 +251,7 @@ var attr = function(name, value) {
  * Closes an open tag started with elementOpenStart.
  */
 var elementOpenEnd = function() {
-  if (process.env.NODE_ENV !== 'production') {
+  if (!IS_PRODUCTION) {
     assertInAttributes();
     setNotInAttributes();
   }
@@ -260,7 +266,7 @@ var elementOpenEnd = function() {
  * @param {string} tag The element's tag.
  */
 var elementClose = function(tag) {
-  if (process.env.NODE_ENV !== 'production') {
+  if (!IS_PRODUCTION) {
     assertNotInAttributes();
   }
 
@@ -284,7 +290,7 @@ var elementClose = function(tag) {
  *     for the Element.
  */
 var elementVoid = function(tag, key, statics, var_args) {
-  if (process.env.NODE_ENV !== 'production') {
+  if (!IS_PRODUCTION) {
     assertNotInAttributes();
   }
 
@@ -299,7 +305,7 @@ var elementVoid = function(tag, key, statics, var_args) {
  * @param {string} value The text of the Text.
  */
 var text = function(value) {
-  if (process.env.NODE_ENV !== 'production') {
+  if (!IS_PRODUCTION) {
     assertNotInAttributes();
   }
 
