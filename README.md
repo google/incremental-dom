@@ -50,9 +50,22 @@ patch(myElement, function() {
 });
 ```
 
+## Templating Languages
+
+We are building a new JavaScript backend for the
+[Closure Templates](https://developers.google.com/closure/templates/) templating
+language. Follow along on [Github](https://github.com/google/closure-templates/).
+
+If you work on a templating language we'd love to see Incremental DOM adopted as
+an alternative backend for it. This isn’t easy, we are still working on ours and
+will for a while, but we're super happy to help with it.
+
+Here's an [example](https://gist.github.com/sparhami/197f3b947712998639eb).
+
 ## Docs
 
-[Docs and demos](http://google.github.io/incremental-dom/)
+- [Introducing Incremental Dom](https://medium.com/google-developers/introducing-incremental-dom-e98f79ce2c5f)
+- [Docs and demos](http://google.github.io/incremental-dom/)
 
 ### Installation
 
