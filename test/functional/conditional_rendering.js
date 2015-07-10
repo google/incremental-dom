@@ -43,7 +43,7 @@ describe('conditional rendering', () => {
         }
 
         elementVoid('span', '', ['id', 'two' ]);
-      elementClose();
+      elementClose('div');
     }
 
     it('should un-render when the condition becomes false', () => {
@@ -84,7 +84,7 @@ describe('conditional rendering', () => {
           elementVoid('div', '', ['id', 'conditional-two' ]);
         }
 
-      elementClose();
+      elementClose('div');
     }
 
     it('should not leave any remaning nodes', () => {
@@ -108,12 +108,12 @@ describe('conditional rendering', () => {
               'id', 'conditional-one',
               'data-foo', 'foo');
             elementVoid('span', '', []);
-          elementClose();
+          elementClose('span');
         }
 
         elementVoid('span', '', [],
             'id', 'two');
-      elementClose();
+      elementClose('div');
     }
 
     it('should strip children when a conflicting node is re-used', () => {
