@@ -22,6 +22,7 @@ var traversal = require('./traversal'),
     firstChild = traversal.firstChild,
     nextSibling = traversal.nextSibling,
     parentNode = traversal.parentNode;
+var namespace = require('./namespace');
 
 
 /**
@@ -194,6 +195,7 @@ var elementOpen = function(tag, key, statics, var_args) {
     updateAttributes(node, newAttrs);
   }
 
+  namespace.enterTag(tag);
   firstChild();
 };
 
@@ -264,6 +266,7 @@ var elementClose = function(tag) {
     assertNotInAttributes();
   }
 
+  namespace.exitTag(tag);
   parentNode();
   nextSibling();
 };

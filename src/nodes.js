@@ -18,6 +18,7 @@ var updateAttribute = require('./attributes').updateAttribute;
 var nodeData = require('./node_data'),
     getData = nodeData.getData,
     initData = nodeData.initData;
+var getNamespaceForTag = require('./namespace').getNamespaceForTag;
 
 
 /**
@@ -30,7 +31,15 @@ var nodeData = require('./node_data'),
  * @return {!Element}
  */
 var createElement = function(doc, tag, key, statics) {
-  var el = doc.createElement(tag);
+  var namespace = getNamespaceForTag(tag);
+  var el;
+
+  if (namespace) {
+    el = doc.createElementNS(namespace, tag);
+  } else {
+    el = doc.createElement(tag);
+  }
+
   initData(el, tag, key);
 
   if (statics) {
