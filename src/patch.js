@@ -27,15 +27,15 @@ var namespace = require('./namespace');
 /**
  * Patches the document starting at el with the provided function. This function
  * may be called during an existing patch operation.
- * @param {!Element} el the element to patch
+ * @param {!Element|!Document} node The Element or Document to patch.
  * @param {!function} fn A function containing elementOpen/elementClose/etc.
  *     calls that describe the DOM.
  */
-var patch = function(el, fn) {
+var patch = function(node, fn) {
   var prevWalker = getWalker();
-  setWalker(new TreeWalker(el));
+  setWalker(new TreeWalker(node));
 
-  namespace.enterTag(el.nodeName.toLowerCase());
+  namespace.enterTag(node.nodeName.toLowerCase());
   firstChild();
   fn();
   parentNode();
