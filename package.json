@@ -9,6 +9,12 @@
     "type": "git",
     "url": "https://github.com/google/incremental-dom.git"
   },
+  "scripts": {
+    "test": "gulp unit",
+    "lint": "gulp lint",
+    "build": "gulp build",
+    "dist": "gulp dist"
+  },
   "devDependencies": {
     "browserify": "^10.2.4",
     "chai": "^3.0.0",
