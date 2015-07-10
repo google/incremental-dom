@@ -35,6 +35,12 @@ function TreeWalker(node) {
 
   /** {!Document} */
   this.doc = node.ownerDocument;
+
+  /**
+   * Keeps track of what namespace to create new Elements in.
+   * @const @private {!Array<string>}
+   */
+  this.nsStack_ = [undefined];
 }
 
 
@@ -43,6 +49,30 @@ function TreeWalker(node) {
  */
 TreeWalker.prototype.getCurrentParent = function() {
   return this.stack_[this.stack_.length - 1];
+};
+
+
+/**
+ * @return {string} The current namespace to create Elements in.
+ */
+TreeWalker.prototype.getCurrentNamespace = function() {
+  return this.nsStack_[this.nsStack_.length - 1];
+};
+
+
+/**
+ * @param {string} namespace The namespace to enter.
+ */
+TreeWalker.prototype.enterNamespace = function(namespace) {
+  this.nsStack_.push(namespace);
+};
+
+
+/**
+ * Exits the current namespace
+ */
+TreeWalker.prototype.exitNamespace = function() {
+  this.nsStack_.pop();
 };
 
 
