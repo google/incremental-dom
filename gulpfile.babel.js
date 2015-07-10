@@ -135,6 +135,6 @@ gulp.task('js-watch', jsWatch);
 gulp.task('js-dist', jsDist);
 gulp.task('js-lib', jsLib);
 gulp.task('build', ['lint', 'unit', 'js']);
-gulp.task('dist', ['lint', 'unit', 'js-dist'], addDist);
+gulp.task('dist', ['lint', 'unit', 'js-dist', 'js-lib'], addDist);
 
 gulp.task('default', ['build']);
