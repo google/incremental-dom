@@ -14,14 +14,10 @@
  * limitations under the License.
  */
 
-var nodes = require('./nodes'),
-    createNode = nodes.createNode,
-    getKey = nodes.getKey,
-    getNodeName = nodes.getNodeName,
-    getChild = nodes.getChild,
-    registerChild = nodes.registerChild;
-var markVisited = require('./traversal').markVisited;
-var getWalker = require('./walker').getWalker;
+import nodes = require('./nodes');
+var {createNode, getKey, getNodeName, getChild, registerChild} = nodes;
+import {markVisited} from './traversal';
+import {getWalker} from './walker';
 
 
 /**
@@ -50,7 +46,7 @@ var matches = function(node, nodeName, key) {
  *     node.
  * @return {!Node} The matching node.
  */
-var alignWithDOM = function(nodeName, key, statics) {
+export var alignWithDOM = function(nodeName, key, statics) {
   var walker = getWalker();
   var currentNode = walker.currentNode;
   var parent = walker.getCurrentParent();
@@ -78,11 +74,5 @@ var alignWithDOM = function(nodeName, key, statics) {
   markVisited(parent, matchingNode);
 
   return matchingNode;
-};
-
-
-/** */
-module.exports = {
-  alignWithDOM: alignWithDOM
 };
 

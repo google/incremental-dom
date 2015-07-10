@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-var updateAttribute = require('./attributes').updateAttribute;
-var nodeData = require('./node_data'),
-    getData = nodeData.getData,
-    initData = nodeData.initData;
-
+import {updateAttribute} from './attributes';
+import * as nodeData from './node_data';
+var {getData, initData } = nodeData;
 
 /**
  * Creates an Element.
@@ -69,7 +67,7 @@ var createTextNode = function(doc, text) {
  *     intial content of the Text.
  * @return {!Node}
  */
-var createNode = function(doc, nodeName, key, statics) {
+export var createNode = function(doc, nodeName, key, statics) {
   if (nodeName === '#text') {
     return createTextNode(doc, statics);
   }
@@ -106,7 +104,7 @@ var createKeyMap = function(el) {
  * @param {?Node} node A node to get the key for.
  * @return {?string} The key for the Node, if applicable.
  */
-var getKey = function(node) {
+export var getKey = function(node) {
   return getData(node).key;
 };
 
@@ -115,7 +113,7 @@ var getKey = function(node) {
  * @param {?Node} node A node to get the node name for.
  * @return {?string} The node name for the Node, if applicable.
  */
-var getNodeName = function(node) {
+export var getNodeName = function(node) {
   return getData(node).nodeName;
 };
 
@@ -143,7 +141,7 @@ var getKeyMap = function(el) {
  * @param {?string} key
  * @return {?Node} The child corresponding to the key.
  */
-var getChild = function(parent, key) {
+export var getChild = function(parent, key) {
   return getKeyMap(parent)[key];
 };
 
@@ -157,19 +155,8 @@ var getChild = function(parent, key) {
  * @param {?string} key A key to identify the child with.
  * @param {!Node} child The child to register.
  */
-var registerChild = function(parent, key, child) {
+export var registerChild = function(parent, key, child) {
   if (key) {
     getKeyMap(parent)[key] = child;
   }
 };
-
-
-/** */
-module.exports = {
-  createNode: createNode,
-  getKey: getKey,
-  getNodeName: getNodeName,
-  getChild: getChild,
-  registerChild: registerChild
-};
-

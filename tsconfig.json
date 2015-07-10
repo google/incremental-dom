@@ -1,0 +1,40 @@
+{
+    "version": "1.5.0-beta",
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "isolatedModules": false,
+        "jsx": "react",
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "declaration": false,
+        "noImplicitAny": false,
+        "removeComments": false,
+        "noLib": false,
+        "preserveConstEnums": true,
+        "suppressImplicitAnyIndexErrors": true
+    },
+    "filesGlob": [
+        "./src/**/*.ts",
+        "./test/**/*.ts"
+    ],
+    "files": [
+        "./src/alignment.ts",
+        "./src/attributes.ts",
+        "./src/node_data.ts",
+        "./src/nodes.ts",
+        "./src/patch.ts",
+        "./src/traversal.ts",
+        "./src/tree_walker.ts",
+        "./src/virtual_elements.ts",
+        "./src/walker.ts",
+        "./test/functional/attributes.ts",
+        "./test/functional/conditional_rendering.ts",
+        "./test/functional/element_creation.ts",
+        "./test/functional/keyed_items.ts",
+        "./test/functional/patch.ts",
+        "./test/functional/text_nodes.ts",
+        "./test/functional/virtual_attributes.ts",
+        "./test/test.d.ts"
+    ]
+}

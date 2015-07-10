@@ -14,12 +14,8 @@
  * limitations under the License.
  */
 
-var IncrementalDOM = require('../../index'),
-    patch = IncrementalDOM.patch,
-    elementOpenStart = IncrementalDOM.elementOpenStart,
-    elementOpenEnd = IncrementalDOM.elementOpenEnd,
-    elementClose = IncrementalDOM.elementClose,
-    attr = IncrementalDOM.attr;
+import {patch} from "../../src/patch";
+import {elementOpenStart, elementOpenEnd, elementClose, attr} from "../../src/virtual_elements";
 
 describe('virtual attribute updates', () => {
   var container;
