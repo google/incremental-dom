@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-var IncrementalDOM = require('../../index'),
-    patch = IncrementalDOM.patch,
-    elementVoid = IncrementalDOM.elementVoid;
+import {patch, elementVoid} from '../../index';
 
 describe('rendering with keys', () => {
-  var container;
+  let container;
 
   beforeEach(() => {
     container = document.createElement('div');
@@ -32,20 +30,20 @@ describe('rendering with keys', () => {
 
   describe('for an array of items', () => {
     function render(items) {
-      for(var i=0; i<items.length; i++) {
+      for(let i=0; i<items.length; i++) {
         elementVoid('div', items[i].key, ['id', items[i].key]);
       }
     }
 
     it('should not modify the DOM nodes when inserting', () => {
-      var items = [
+      let items = [
         { key: 'one' },
         { key: 'two' }
       ];
 
       patch(container, () => render(items));
-      var firstNode = container.childNodes[0];
-      var secondNode = container.childNodes[1];
+      let firstNode = container.childNodes[0];
+      let secondNode = container.childNodes[1];
 
       items.splice(1, 0, { key: 'one-point-five' });
       patch(container, () => render(items));
@@ -59,15 +57,15 @@ describe('rendering with keys', () => {
     });
 
     it('should not modify the DOM nodes when removing', () => {
-      var items = [
+      let items = [
         { key: 'one' },
         { key: 'two' },
         { key: 'three' }
       ];
 
       patch(container, () => render(items));
-      var firstNode = container.childNodes[0];
-      var thirdNode = container.childNodes[2];
+      let firstNode = container.childNodes[0];
+      let thirdNode = container.childNodes[2];
 
       items.splice(1, 1);
       patch(container, () => render(items));
@@ -80,16 +78,16 @@ describe('rendering with keys', () => {
     });
 
     it('should not modify the DOM nodes when re-ordering', () => {
-      var items = [
+      let items = [
         { key: 'one' },
         { key: 'two' },
         { key: 'three' }
       ];
 
       patch(container, () => render(items));
-      var firstNode = container.childNodes[0];
-      var secondNode = container.childNodes[1];
-      var thirdNode = container.childNodes[2];
+      let firstNode = container.childNodes[0];
+      let secondNode = container.childNodes[1];
+      let thirdNode = container.childNodes[2];
 
       items.splice(1, 1);
       items.push({ key: 'two' });

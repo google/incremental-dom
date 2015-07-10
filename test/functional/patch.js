@@ -14,15 +14,10 @@
  * limitations under the License.
  */
 
-var IncrementalDOM = require('../../index'),
-    patch = IncrementalDOM.patch,
-    elementOpen = IncrementalDOM.elementOpen,
-    elementClose = IncrementalDOM.elementClose,
-    elementVoid = IncrementalDOM.elementVoid,
-    text = IncrementalDOM.text;
+import {patch, elementOpen, elementClose, elementVoid, text} from '../../index';
 
 describe('patching an element', () => {
-  var container;
+  let container;
 
   beforeEach(() => {
     container = document.createElement('div');
@@ -34,7 +29,7 @@ describe('patching an element', () => {
   });
 
   describe('with an existing document tree', () => {
-    var div;
+    let div;
 
     function render() {
       elementVoid('div', null, null,
@@ -49,22 +44,22 @@ describe('patching an element', () => {
 
     it('should preserve existing nodes', () => {
       patch(container, render);
-      var child = container.childNodes[0];
+      let child = container.childNodes[0];
 
       expect(child).to.equal(div);
     });
 
     it('should update attributes', () => {
       patch(container, render);
-      var child = container.childNodes[0];
+      let child = container.childNodes[0];
 
       expect(child.getAttribute('tabindex')).to.equal('0');
     });
   });
 
   it('should be re-entrant', function() {
-    var containerOne = document.createElement('div');
-    var containerTwo = document.createElement('div');
+    let containerOne = document.createElement('div');
+    let containerTwo = document.createElement('div');
 
     function renderOne() {
       elementOpen('div');
@@ -86,7 +81,7 @@ describe('patching an element', () => {
 
 describe('patching a documentFragment', function() {
   it('should create the required DOM nodes', function() {
-    var frag = document.createDocumentFragment();
+    let frag = document.createDocumentFragment();
 
     patch(frag, function() {
       elementOpen('div', null, null,

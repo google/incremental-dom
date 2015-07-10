@@ -24,7 +24,7 @@ import git from 'gulp-git';
 import gjslint from 'gulp-gjslint';
 import gulp from 'gulp';
 import gutil from 'gulp-util';
-import {serve} from 'karma';
+import {server as karma} from 'karma';
 import path from 'path';
 import source from 'vinyl-source-stream';
 import sourcemaps from 'gulp-sourcemaps';
