@@ -14,31 +14,29 @@
  * limitations under the License.
  */
 
-var assign = require('lodash.assign');
-var browserify = require('browserify');
-var esperanto = require('esperanto');
-var buffer = require('vinyl-buffer');
-var del = require('del');
-var envify = require('envify');
-var git = require('gulp-git');
-var gjslint = require('gulp-gjslint');
-var gulp = require('gulp');
-var gutil = require('gulp-util');
-var karma = require('karma').server;
-var path = require('path');
-var source = require('vinyl-source-stream');
-var sourcemaps = require('gulp-sourcemaps');
-var uglify = require('gulp-uglify');
-var watchify = require('watchify');
+import assign from 'lodash.assign';
+import browserify from 'browserify';
+import esperanto from 'esperanto';
+import buffer from 'vinyl-buffer';
+import del from 'del';
+import envify from 'envify';
+import git from 'gulp-git';
+import gjslint from 'gulp-gjslint';
+import gulp from 'gulp';
+import gutil from 'gulp-util';
+import {serve} from 'karma';
+import path from 'path';
+import source from 'vinyl-source-stream';
+import sourcemaps from 'gulp-sourcemaps';
+import uglify from 'gulp-uglify';
+import watchify from 'watchify';
+import fs from 'fs';
 
-var path = require('path');
-var fs = require('fs');
+const jsFileName = 'incremental-dom.js';
+const srcs = [jsFileName, 'src/**/*.js'];
+const tests = ['test/functional/**/*.js'];
 
-var jsFileName = 'incremental-dom.js';
-var srcs = [jsFileName, 'src/**/*.js'];
-var tests = ['test/functional/**/*.js'];
-
-var customBrowserifyOpts = {
+const customBrowserifyOpts = {
   entries: './index.js',
   standalone: 'IncrementalDOM',
   debug: true
@@ -87,14 +85,14 @@ function bundle(browserify, env) {
 }
 
 function js() {
-  var b_plain = browserify(customBrowserifyOpts);
+  let b_plain = browserify(customBrowserifyOpts);
 
   return bundle(b_plain, {});
 }
 
 function jsWatch() {
-  var opts = assign({}, watchify.args, customBrowserifyOpts);
-  var b_watch = watchify(browserify(opts));
+  let opts = assign({}, watchify.args, customBrowserifyOpts);
+  let b_watch = watchify(browserify(opts));
 
   b_watch.on('update', bundle.bind(null, b_watch));
   b_watch.on('log', gutil.log);
