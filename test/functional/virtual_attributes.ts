@@ -36,7 +36,7 @@ describe('virtual attribute updates', () => {
           attr('data-expanded', obj.key);
         }
       elementOpenEnd();
-      elementClose('div');
+      elementClose();
     }
 
     it('should be present when specified', () => {

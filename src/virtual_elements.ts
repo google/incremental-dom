@@ -256,10 +256,8 @@ export var elementOpenEnd = function() {
 
 /**
  * Closes an open virtual Element.
- *
- * @param {string} tag The element's tag.
  */
-export var elementClose = function(tag) {
+export var elementClose = function() {
   if (process.env.NODE_ENV !== 'production') {
     assertNotInAttributes();
   }

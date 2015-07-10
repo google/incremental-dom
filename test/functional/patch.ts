@@ -66,7 +66,7 @@ describe('patching an element', () => {
       elementOpen('div');
         patch(containerTwo, renderTwo);
         text('hello');
-      elementClose('div');
+      elementClose();
     }
 
     function renderTwo() {
@@ -87,7 +87,7 @@ describe('patching a documentFragment', function() {
     patch(frag, function() {
       elementOpen('div', null, null,
           'id', 'aDiv');
-      elementClose('div');
+      elementClose();
     });
 
     expect(frag.childNodes[0]['id']).to.equal('aDiv');
