@@ -48,7 +48,7 @@ function exitNode(node) {
   // Invalidate the key map since we removed children. It will get recreated
   // next time we need it.
   data.keyMap = null;
-};
+}
 
 
 /**

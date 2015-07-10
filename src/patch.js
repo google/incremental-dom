@@ -15,7 +15,7 @@
  */
 
 import {firstChild, parentNode} from './traversal';
-import TreeWalker from './tree_walker';
+import {TreeWalker} from './tree_walker';
 import {getWalker, setWalker} from './walker';
 import {enterTag} from './namespace';
 
@@ -37,4 +37,4 @@ export function patch(node, fn) {
   parentNode();
 
   setWalker(prevWalker);
-};
+}

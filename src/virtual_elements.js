@@ -159,7 +159,7 @@ function updateNewAttrs(unused1, unused2, unused3, var_args) {
   }
 
   return newAttrs;
-};
+}
 
 
 /**
@@ -171,7 +171,7 @@ function updateAttributes(node, newAttrs) {
   for (var attr in newAttrs) {
     updateAttribute(node, attr, newAttrs[attr]);
   }
-};
+}
 
 
 /**
@@ -296,7 +296,7 @@ export function elementVoid(tag, key, statics, var_args) {
 
   elementOpen.apply(null, arguments);
   elementClose.apply(null, arguments);
-};
+}
 
 
 /**
