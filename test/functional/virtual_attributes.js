@@ -14,12 +14,7 @@
  * limitations under the License.
  */
 
-var IncrementalDOM = require('../../index'),
-    patch = IncrementalDOM.patch,
-    elementOpenStart = IncrementalDOM.elementOpenStart,
-    elementOpenEnd = IncrementalDOM.elementOpenEnd,
-    elementClose = IncrementalDOM.elementClose,
-    attr = IncrementalDOM.attr;
+import {patch, elementOpenStart, elementOpenEnd, elementClose, attr} from '../../src/index';
 
 describe('virtual attribute updates', () => {
   var container;
@@ -34,7 +29,7 @@ describe('virtual attribute updates', () => {
   });
 
   describe('for conditional attributes', () => {
-    function render(obj) {  
+    function render(obj) {
       elementOpenStart('div', '', []);
         if (obj.key) {
           attr('data-expanded', obj.key);

@@ -1,4 +1,5 @@
 /**
+ * @license
  * Copyright 2015 The Incremental DOM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,31 +15,13 @@
  * limitations under the License.
  */
 
-module.exports = function(config) {
-  config.set({
-    frameworks: ['browserify', 'mocha', 'sinon-chai'],
-
-    preprocessors: {
-      'src/**/*.js': ['browserify'],
-      'test/**/*.js': ['browserify']
-    },
-
-    browserify: {
-      watch: true,
-      debug: true,
-      transform: ['babelify']
-    },
-
-    reporters: ['progress'],
-
-    port: 9876,
-
-    colors: true,
-
-    logLevel: config.LOG_INFO,
-
-    autoWatch: true,
-
-    browsers: ['Chrome', 'Firefox']
-  });
-};
+export {patch} from './patch';
+export {
+  elementVoid,
+  elementOpenStart,
+  elementOpenEnd,
+  elementOpen,
+  elementClose,
+  text,
+  attr,
+} from './virtual_elements';

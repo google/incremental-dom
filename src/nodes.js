@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-var updateAttribute = require('./attributes').updateAttribute;
-var nodeData = require('./node_data'),
-    getData = nodeData.getData,
-    initData = nodeData.initData;
-var getNamespaceForTag = require('./namespace').getNamespaceForTag;
+import {updateAttribute} from './attributes';
+import {getData, initData} from './node_data';
+import {getNamespaceForTag} from './namespace';
 
 
 /**
@@ -30,7 +28,7 @@ var getNamespaceForTag = require('./namespace').getNamespaceForTag;
  *     the static attributes for the Element.
  * @return {!Element}
  */
-var createElement = function(doc, tag, key, statics) {
+function createElement(doc, tag, key, statics) {
   var namespace = getNamespaceForTag(tag);
   var el;
 
@@ -49,7 +47,7 @@ var createElement = function(doc, tag, key, statics) {
   }
 
   return el;
-};
+}
 
 /**
  * Creates a Text.
@@ -57,12 +55,12 @@ var createElement = function(doc, tag, key, statics) {
  * @param {string} text The intial content of the Text.
  * @return {!Text}
  */
-var createTextNode = function(doc, text) {
+function createTextNode(doc, text) {
   var node = doc.createTextNode(text);
   getData(node).text = text;
 
   return node;
-};
+}
 
 
 /**
@@ -78,13 +76,13 @@ var createTextNode = function(doc, text) {
  *     intial content of the Text.
  * @return {!Node}
  */
-var createNode = function(doc, nodeName, key, statics) {
+export function createNode(doc, nodeName, key, statics) {
   if (nodeName === '#text') {
     return createTextNode(doc, statics);
   }
 
   return createElement(doc, nodeName, key, statics);
-};
+}
 
 
 /**
@@ -93,7 +91,7 @@ var createNode = function(doc, nodeName, key, statics) {
  * @return {!Object<string, !Node>} A mapping of keys to the children of the
  *     Element.
  */
-var createKeyMap = function(el) {
+function createKeyMap(el) {
   var map = {};
   var children = el.children;
   var count = children.length;
@@ -108,25 +106,25 @@ var createKeyMap = function(el) {
   }
 
   return map;
-};
+}
 
 
 /**
  * @param {?Node} node A node to get the key for.
  * @return {?string} The key for the Node, if applicable.
  */
-var getKey = function(node) {
+export function getKey(node) {
   return getData(node).key;
-};
+}
 
 
 /**
  * @param {?Node} node A node to get the node name for.
  * @return {?string} The node name for the Node, if applicable.
  */
-var getNodeName = function(node) {
+export function getNodeName(node) {
   return getData(node).nodeName;
-};
+}
 
 
 /**
@@ -135,7 +133,7 @@ var getNodeName = function(node) {
  * @param {!Element} el
  * @return {!Object<string,!Node>} A mapping of keys to child Nodes
  */
-var getKeyMap = function(el) {
+function getKeyMap(el) {
   var data = getData(el);
 
   if (!data.keyMap) {
@@ -143,7 +141,7 @@ var getKeyMap = function(el) {
   }
 
   return data.keyMap;
-};
+}
 
 
 /**
@@ -152,9 +150,9 @@ var getKeyMap = function(el) {
  * @param {?string} key
  * @return {?Node} The child corresponding to the key.
  */
-var getChild = function(parent, key) {
+export function getChild(parent, key) {
   return getKeyMap(parent)[key];
-};
+}
 
 
 /**
@@ -165,17 +163,6 @@ var getChild = function(parent, key) {
  * @param {string} key A key to identify the child with.
  * @param {!Node} child The child to register.
  */
-var registerChild = function(parent, key, child) {
+export function registerChild(parent, key, child) {
   getKeyMap(parent)[key] = child;
-};
-
-
-/** */
-module.exports = {
-  createNode: createNode,
-  getKey: getKey,
-  getNodeName: getNodeName,
-  getChild: getChild,
-  registerChild: registerChild
-};
-
+}

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-var getData = require('./node_data').getData;
+import {getData} from './node_data';
 
 
 /**
@@ -26,7 +26,7 @@ var getData = require('./node_data').getData;
  * @param {*} value The attribute's value. If the value is a string, it is set
  *     as an HTML attribute, otherwise, it is set on node.
  */
-var applyAttr = function(el, name, value) {
+function applyAttr(el, name, value) {
   var data = getData(el);
   var attrs = data.attrs;
 
@@ -45,7 +45,7 @@ var applyAttr = function(el, name, value) {
   }
 
   attrs[name] = value;
-};
+}
 
 
 /**
@@ -55,7 +55,7 @@ var applyAttr = function(el, name, value) {
  * @param {string|Object<string,string>} style The style to set. Either a string
  *     of css or an object containing property-value pairs.
  */
-var applyStyle = function(el, style) {
+function applyStyle(el, style) {
   if (typeof style === 'string' || style instanceof String) {
     el.style.cssText = style;
   } else {
@@ -65,7 +65,7 @@ var applyStyle = function(el, style) {
       el.style[prop] = style[prop];
     }
   }
-};
+}
 
 
 /**
@@ -77,17 +77,10 @@ var applyStyle = function(el, style) {
  * @param {*} value The attribute's value. If the value is a string, it is set
  *     as an HTML attribute, otherwise, it is set on node.
  */
-var updateAttribute = function(el, name, value) {
+export function updateAttribute(el, name, value) {
   if (name === 'style') {
     applyStyle(el, value);
   } else {
     applyAttr(el, name, value);
   }
-};
-
-
-/** */
-module.exports = {
-  updateAttribute: updateAttribute
-};
-
+}

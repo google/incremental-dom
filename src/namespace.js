@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-var getWalker = require('./walker').getWalker;
+import {getWalker} from './walker';
 
 var SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -23,13 +23,13 @@ var SVG_NS = 'http://www.w3.org/2000/svg';
  * updates the current namespace.
  * @param {string} tag The tag to enter.
  */
-var enterTag = function(tag) {
+export function enterTag(tag) {
   if (tag === 'svg') {
     getWalker().enterNamespace(SVG_NS);
   } else if (tag === 'foreignObject') {
     getWalker().enterNamespace(undefined);
   }
-};
+}
 
 
 /**
@@ -37,11 +37,11 @@ var enterTag = function(tag) {
  * updates the current namespace.
  * @param {string} tag The tag to enter.
  */
-var exitTag = function(tag) {
+export function exitTag(tag) {
   if (tag === 'svg' || tag === 'foreignObject') {
     getWalker().exitNamespace();
   }
-};
+}
 
 
 /**
@@ -49,19 +49,10 @@ var exitTag = function(tag) {
  * @param {string} tag The tag to get the namespace for.
  * @return {string} The namespace to create the tag in.
  */
-var getNamespaceForTag = function(tag) {
+export function getNamespaceForTag(tag) {
   if (tag === 'svg') {
     return SVG_NS;
   }
 
   return getWalker().getCurrentNamespace();
-};
-
-
-/** */
-module.exports = {
-  enterTag: enterTag,
-  exitTag: exitTag,
-  getNamespaceForTag: getNamespaceForTag
-};
-
+}

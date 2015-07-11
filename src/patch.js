@@ -14,14 +14,10 @@
  * limitations under the License.
  */
 
-var traversal = require('./traversal'),
-    firstChild = traversal.firstChild,
-    parentNode = traversal.parentNode;
-var TreeWalker = require('./tree_walker');
-var walker = require('./walker'),
-    getWalker = walker.getWalker,
-    setWalker = walker.setWalker;
-var namespace = require('./namespace');
+import {firstChild, parentNode} from './traversal';
+import {TreeWalker} from './tree_walker';
+import {getWalker, setWalker} from './walker';
+import {enterTag} from './namespace';
 
 
 /**
@@ -31,21 +27,14 @@ var namespace = require('./namespace');
  * @param {!function} fn A function containing elementOpen/elementClose/etc.
  *     calls that describe the DOM.
  */
-var patch = function(node, fn) {
+export function patch(node, fn) {
   var prevWalker = getWalker();
   setWalker(new TreeWalker(node));
 
-  namespace.enterTag(node.nodeName.toLowerCase());
+  enterTag(node.nodeName.toLowerCase());
   firstChild();
   fn();
   parentNode();
 
   setWalker(prevWalker);
-};
-
-
-/** */
-module.exports = {
-  patch: patch
-};
-
+}

@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 
-var IncrementalDOM = require('../../index'),
-    patch = IncrementalDOM.patch,
-    elementOpen = IncrementalDOM.elementOpen,
-    elementClose = IncrementalDOM.elementClose,
-    elementVoid = IncrementalDOM.elementVoid;
+import {patch, elementOpen, elementClose, elementVoid} from '../../src/index';
 
 describe('element creation', () => {
   var container;
@@ -114,27 +110,27 @@ describe('element creation', () => {
 
     it('should create svgs in the svg namespace', () => {
       var el = container.querySelector('svg');
-      expect(el.namespaceURI).to.equal('http://www.w3.org/2000/svg'); 
+      expect(el.namespaceURI).to.equal('http://www.w3.org/2000/svg');
     });
 
     it('should create descendants of svgs in the svg namespace', () => {
       var el = container.querySelector('circle');
-      expect(el.namespaceURI).to.equal('http://www.w3.org/2000/svg'); 
+      expect(el.namespaceURI).to.equal('http://www.w3.org/2000/svg');
     });
-    
+
     it('should have the svg namespace for foreignObjects', () => {
       var el = container.querySelector('svg').children[1];
-      expect(el.namespaceURI).to.equal('http://www.w3.org/2000/svg'); 
+      expect(el.namespaceURI).to.equal('http://www.w3.org/2000/svg');
     });
- 
+
     it('should revert to the xhtml namespace when encounering a foreignObject', () => {
       var el = container.querySelector('p');
-      expect(el.namespaceURI).to.equal('http://www.w3.org/1999/xhtml'); 
+      expect(el.namespaceURI).to.equal('http://www.w3.org/1999/xhtml');
     });
 
     it('should reset to the previous namespace after exiting a forignObject', () => {
       var el = container.querySelector('path');
-      expect(el.namespaceURI).to.equal('http://www.w3.org/2000/svg'); 
+      expect(el.namespaceURI).to.equal('http://www.w3.org/2000/svg');
     });
 
     it('should create children in the svg namespace when patching an svg', () => {
@@ -144,7 +140,7 @@ describe('element creation', () => {
       });
 
       var el = svg.querySelector('rect');
-      expect(el.namespaceURI).to.equal('http://www.w3.org/2000/svg'); 
+      expect(el.namespaceURI).to.equal('http://www.w3.org/2000/svg');
     });
   });
 });

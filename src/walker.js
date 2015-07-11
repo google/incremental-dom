@@ -23,23 +23,15 @@ var walker_;
 /**
  * @return {TreeWalker} the current TreeWalker
  */
-var getWalker = function() {
+export function getWalker() {
   return walker_;
-};
+}
 
 
 /**
  * Sets the current TreeWalker
  * @param {TreeWalker} walker
  */
-var setWalker = function(walker) {
+export function setWalker(walker) {
   walker_ = walker;
-};
-
-
-/** */
-module.exports = {
-  getWalker: getWalker,
-  setWalker: setWalker
-};
-
+}

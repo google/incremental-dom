@@ -14,12 +14,7 @@
  * limitations under the License.
  */
 
-var IncrementalDOM = require('../../index'),
-    patch = IncrementalDOM.patch,
-    elementOpen = IncrementalDOM.elementOpen,
-    elementClose = IncrementalDOM.elementClose,
-    elementVoid = IncrementalDOM.elementVoid,
-    text = IncrementalDOM.text;
+import {patch, elementOpen, elementClose, elementVoid, text} from '../../src/index';
 
 describe('patching an element', () => {
   var container;

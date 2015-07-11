@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-var alignWithDOM = require('./alignment').alignWithDOM;
-var updateAttribute = require('./attributes').updateAttribute;
-var getData = require('./node_data').getData;
-var getWalker = require('./walker').getWalker;
-var traversal = require('./traversal'),
-    firstChild = traversal.firstChild,
-    nextSibling = traversal.nextSibling,
-    parentNode = traversal.parentNode;
-var namespace = require('./namespace');
+import {alignWithDOM} from './alignment';
+import {updateAttribute} from './attributes';
+import {getData} from './node_data';
+import {getWalker} from './walker';
+import {firstChild, nextSibling, parentNode} from './traversal';
+import {enterTag, exitTag} from './namespace';
 
 
 /**
@@ -107,7 +104,7 @@ if (!IS_PRODUCTION) {
  * @return {boolean} True if the Element has one or more changed attributes,
  *     false otherwise.
  */
-var hasChangedAttrs = function(unused1, unused2, unused3, var_args) {
+function hasChangedAttrs(unused1, unused2, unused3, var_args) {
   var data = getData(this);
   var attrsArr = data.attrsArr;
   var attrsChanged = false;
@@ -131,7 +128,7 @@ var hasChangedAttrs = function(unused1, unused2, unused3, var_args) {
   }
 
   return attrsChanged;
-};
+}
 
 
 /**
@@ -148,7 +145,7 @@ var hasChangedAttrs = function(unused1, unused2, unused3, var_args) {
  *     for the Element.
  * @return {!Object<string, *>} The updated newAttrs object.
  */
-var updateNewAttrs = function(unused1, unused2, unused3, var_args) {
+function updateNewAttrs(unused1, unused2, unused3, var_args) {
   var node = this;
   var data = getData(node);
   var newAttrs = data.newAttrs;
@@ -162,7 +159,7 @@ var updateNewAttrs = function(unused1, unused2, unused3, var_args) {
   }
 
   return newAttrs;
-};
+}
 
 
 /**
@@ -170,11 +167,11 @@ var updateNewAttrs = function(unused1, unused2, unused3, var_args) {
  * @param {!Element} node
  * @param {!Object<string,*>} newAttrs The new attributes for node
  */
-var updateAttributes = function(node, newAttrs) {
+function updateAttributes(node, newAttrs) {
   for (var attr in newAttrs) {
     updateAttribute(node, attr, newAttrs[attr]);
   }
-};
+}
 
 
 /**
@@ -190,7 +187,7 @@ var updateAttributes = function(node, newAttrs) {
  * @param {...*} var_args Attribute name/value pairs of the dynamic attributes
  *     for the Element.
  */
-var elementOpen = function(tag, key, statics, var_args) {
+export function elementOpen(tag, key, statics, var_args) {
   if (!IS_PRODUCTION) {
     assertNotInAttributes();
   }
@@ -202,9 +199,9 @@ var elementOpen = function(tag, key, statics, var_args) {
     updateAttributes(node, newAttrs);
   }
 
-  namespace.enterTag(tag);
+  enterTag(tag);
   firstChild();
-};
+}
 
 
 /**
@@ -221,7 +218,7 @@ var elementOpen = function(tag, key, statics, var_args) {
  *     static attributes for the Element. These will only be set once when the
  *     Element is created.
  */
-var elementOpenStart = function(tag, key, statics) {
+export function elementOpenStart(tag, key, statics) {
   if (!IS_PRODUCTION) {
     assertNotInAttributes();
     setInAttributes();
@@ -231,7 +228,7 @@ var elementOpenStart = function(tag, key, statics) {
   argsBuilder[1] = key;
   argsBuilder[2] = statics;
   argsBuilder.length = ATTRIBUTES_OFFSET;
-};
+}
 
 
 /***
@@ -241,26 +238,26 @@ var elementOpenStart = function(tag, key, statics) {
  * @param {string} name
  * @param {*} value
  */
-var attr = function(name, value) {
+export function attr(name, value) {
   if (!IS_PRODUCTION) {
     assertInAttributes();
   }
 
   argsBuilder.push(name, value);
-};
+}
 
 
 /**
  * Closes an open tag started with elementOpenStart.
  */
-var elementOpenEnd = function() {
+export function elementOpenEnd() {
   if (!IS_PRODUCTION) {
     assertInAttributes();
     setNotInAttributes();
   }
 
   elementOpen.apply(null, argsBuilder);
-};
+}
 
 
 /**
@@ -268,15 +265,15 @@ var elementOpenEnd = function() {
  *
  * @param {string} tag The element's tag.
  */
-var elementClose = function(tag) {
+export function elementClose(tag) {
   if (!IS_PRODUCTION) {
     assertNotInAttributes();
   }
 
-  namespace.exitTag(tag);
+  exitTag(tag);
   parentNode();
   nextSibling();
-};
+}
 
 
 /**
@@ -292,14 +289,14 @@ var elementClose = function(tag) {
  * @param {...*} var_args Attribute name/value pairs of the dynamic attributes
  *     for the Element.
  */
-var elementVoid = function(tag, key, statics, var_args) {
+export function elementVoid(tag, key, statics, var_args) {
   if (!IS_PRODUCTION) {
     assertNotInAttributes();
   }
 
   elementOpen.apply(null, arguments);
   elementClose.apply(null, arguments);
-};
+}
 
 
 /**
@@ -307,7 +304,7 @@ var elementVoid = function(tag, key, statics, var_args) {
  *
  * @param {string} value The text of the Text.
  */
-var text = function(value) {
+export function text(value) {
   if (!IS_PRODUCTION) {
     assertNotInAttributes();
   }
@@ -321,17 +318,4 @@ var text = function(value) {
   }
 
   nextSibling();
-};
-
-
-/** */
-module.exports = {
-  elementOpenStart: elementOpenStart,
-  elementOpenEnd: elementOpenEnd,
-  elementOpen: elementOpen,
-  elementVoid: elementVoid,
-  elementClose: elementClose,
-  text: text,
-  attr: attr
-};
-
+}
