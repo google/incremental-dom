@@ -9,7 +9,7 @@ https://developers.google.com/open-source/cla/individual
 https://developers.google.com/open-source/cla/corporate
 
 If you or your organization is not listed there already, you should
-add an entry to the AUTHORS file as part of your patch.
+add an entry to the CONTRIBUTORS file as part of your patch.
 
 If you plan to add a significant component or large chunk of code, it
 is recommended to bring it up on the discussion list for a design
