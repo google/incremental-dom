@@ -17,8 +17,8 @@
 import {patch, elementOpen, elementClose, elementVoid} from '../../src/index';
 
 describe('element creation', () => {
-  let container;
-  let sandbox = sinon.sandbox.create();
+  var container;
+  var sandbox = sinon.sandbox.create();
 
   beforeEach(() => {
     container = document.createElement('div');
@@ -31,7 +31,7 @@ describe('element creation', () => {
   });
 
   describe('when creating a single node', () => {
-    let el;
+    var el;
 
     beforeEach(() => {
       patch(container, () => {
@@ -64,7 +64,7 @@ describe('element creation', () => {
       elementVoid('div', '', null,
           'id', 'test');
     });
-    let el = container.childNodes[0];
+    var el = container.childNodes[0];
     expect(el.id).to.equal('test');
   });
 

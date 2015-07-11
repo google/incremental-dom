@@ -17,7 +17,7 @@
 import {patch, elementOpen, elementClose, elementVoid, text} from '../../src/index';
 
 describe('patching an element', () => {
-  let container;
+  var container;
 
   beforeEach(() => {
     container = document.createElement('div');
@@ -29,7 +29,7 @@ describe('patching an element', () => {
   });
 
   describe('with an existing document tree', () => {
-    let div;
+    var div;
 
     function render() {
       elementVoid('div', null, null,
@@ -44,22 +44,22 @@ describe('patching an element', () => {
 
     it('should preserve existing nodes', () => {
       patch(container, render);
-      let child = container.childNodes[0];
+      var child = container.childNodes[0];
 
       expect(child).to.equal(div);
     });
 
     it('should update attributes', () => {
       patch(container, render);
-      let child = container.childNodes[0];
+      var child = container.childNodes[0];
 
       expect(child.getAttribute('tabindex')).to.equal('0');
     });
   });
 
   it('should be re-entrant', function() {
-    let containerOne = document.createElement('div');
-    let containerTwo = document.createElement('div');
+    var containerOne = document.createElement('div');
+    var containerTwo = document.createElement('div');
 
     function renderOne() {
       elementOpen('div');
@@ -81,7 +81,7 @@ describe('patching an element', () => {
 
 describe('patching a documentFragment', function() {
   it('should create the required DOM nodes', function() {
-    let frag = document.createDocumentFragment();
+    var frag = document.createDocumentFragment();
 
     patch(frag, function() {
       elementOpen('div', null, null,

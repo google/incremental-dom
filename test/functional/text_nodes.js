@@ -17,7 +17,7 @@
 import {patch, text} from '../../src/index';
 
 describe('text nodes', () => {
-  let container;
+  var container;
 
   beforeEach(() => {
     container = document.createElement('div');
@@ -33,7 +33,7 @@ describe('text nodes', () => {
       patch(container, () => {
         text('Hello world!');
       });
-      let node = container.childNodes[0];
+      var node = container.childNodes[0];
 
       expect(node.textContent).to.equal('Hello world!');
       expect(node).to.be.instanceof(Text);
@@ -58,7 +58,7 @@ describe('text nodes', () => {
     it('should update the DOM when the text is updated', () => {
       patch(container, () => render('Hello'));
       patch(container, () => render('Hello World!'));
-      let node = container.childNodes[0];
+      var node = container.childNodes[0];
 
       expect(node.textContent).to.equal('Hello World!');
     });

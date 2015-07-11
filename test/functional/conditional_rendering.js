@@ -17,7 +17,7 @@
 import {patch, elementOpen, elementClose, elementVoid} from '../../src/index';
 
 describe('conditional rendering', () => {
-  let container;
+  var container;
 
   beforeEach(() => {
     container = document.createElement('div');
@@ -45,7 +45,7 @@ describe('conditional rendering', () => {
     it('should un-render when the condition becomes false', () => {
       patch(container, () => render(true));
       patch(container, () => render(false));
-      let outer = container.childNodes[0];
+      var outer = container.childNodes[0];
 
       expect(outer.childNodes.length).to.equal(2);
       expect(outer.childNodes[0].id).to.equal('one');
@@ -57,7 +57,7 @@ describe('conditional rendering', () => {
     it('should render when the condition becomes true', () => {
       patch(container, () => render(false));
       patch(container, () => render(true));
-      let outer = container.childNodes[0];
+      var outer = container.childNodes[0];
 
       expect(outer.childNodes.length).to.equal(4);
       expect(outer.childNodes[0].id).to.equal('one');
@@ -86,7 +86,7 @@ describe('conditional rendering', () => {
     it('should not leave any remaning nodes', () => {
       patch(container, () => render(true));
       patch(container, () => render(false));
-      let outer = container.childNodes[0];
+      var outer = container.childNodes[0];
 
       expect(outer.childNodes.length).to.equal(0);
     });
@@ -115,7 +115,7 @@ describe('conditional rendering', () => {
     it('should strip children when a conflicting node is re-used', () => {
       patch(container, () => render(true));
       patch(container, () => render(false));
-      let outer = container.childNodes[0];
+      var outer = container.childNodes[0];
 
       expect(outer.childNodes.length).to.equal(2);
       expect(outer.childNodes[0].id).to.equal('one');
@@ -128,7 +128,7 @@ describe('conditional rendering', () => {
     it('should strip attributes when a conflicting node is re-used', () => {
       patch(container, () => render(true));
       patch(container, () => render(false));
-      let outer = container.childNodes[0];
+      var outer = container.childNodes[0];
 
       expect(outer.childNodes[1].getAttribute('data-foo')).to.be.null;
     });

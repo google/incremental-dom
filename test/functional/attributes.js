@@ -24,7 +24,7 @@ import {
 } from '../../index';
 
 describe('attribute updates', () => {
-  let container;
+  var container;
 
   beforeEach(() => {
     container = document.createElement('div');
@@ -49,7 +49,7 @@ describe('attribute updates', () => {
       patch(container, () => render({
         'data-expanded': 'hello'
       }));
-      let el = container.childNodes[0];
+      var el = container.childNodes[0];
 
       expect(el.getAttribute('data-expanded')).to.equal('hello');
     });
@@ -58,7 +58,7 @@ describe('attribute updates', () => {
       patch(container, () => render({
         'data-expanded': false
       }));
-      let el = container.childNodes[0];
+      var el = container.childNodes[0];
 
       expect(el.getAttribute('data-expanded')).to.equal('false');
     });
@@ -69,7 +69,7 @@ describe('attribute updates', () => {
         tabindex: undefined,
         'data-expanded': undefined
       }));
-      let el = container.childNodes[0];
+      var el = container.childNodes[0];
 
       expect(el.getAttribute('data-expanded')).to.equal(null);
       expect(el.getAttribute('id')).to.equal(null);
@@ -83,7 +83,7 @@ describe('attribute updates', () => {
       patch(container, () => render({
         'data-expanded': 'bar'
       }));
-      let el = container.childNodes[0];
+      var el = container.childNodes[0];
 
       expect(el.getAttribute('data-expanded')).to.equal('bar');
     });
@@ -116,23 +116,23 @@ describe('attribute updates', () => {
 
   describe('for function attributes', () => {
     it('should not be set as attributes', () => {
-      let fn = () =>{};
+      var fn = () =>{};
       patch(container, () => {
         elementVoid('div', '', null,
             'fn', fn);
       });
-      let el = container.childNodes[0];
+      var el = container.childNodes[0];
 
       expect(el.hasAttribute('fn')).to.be.false;
     });
 
     it('should be set on the node', () => {
-      let fn = () =>{};
+      var fn = () =>{};
       patch(container, () => {
         elementVoid('div', '', null,
             'fn', fn);
       });
-      let el = container.childNodes[0];
+      var el = container.childNodes[0];
 
       expect(el.fn).to.equal(fn);
     });
@@ -140,23 +140,23 @@ describe('attribute updates', () => {
 
   describe('for object attributes', () => {
     it('should not be set as attributes', () => {
-      let obj = {};
+      var obj = {};
       patch(container, () => {
         elementVoid('div', '', null,
             'obj', obj);
       });
-      let el = container.childNodes[0];
+      var el = container.childNodes[0];
 
       expect(el.hasAttribute('obj')).to.be.false;
     });
 
     it('should be set on the node', () => {
-      let obj = {};
+      var obj = {};
       patch(container, () => {
         elementVoid('div', '', null,
             'obj', obj);
       });
-      let el = container.childNodes[0];
+      var el = container.childNodes[0];
 
       expect(el.obj).to.equal(obj);
     });
@@ -173,7 +173,7 @@ describe('attribute updates', () => {
         color: 'white',
         backgroundColor: 'red'
       }));
-      let el = container.childNodes[0];
+      var el = container.childNodes[0];
 
       expect(el.style.color).to.equal('white');
       expect(el.style.backgroundColor).to.equal('red');
@@ -186,7 +186,7 @@ describe('attribute updates', () => {
       patch(container, () => render({
         color: 'red'
       }));
-      let el = container.childNodes[0];
+      var el = container.childNodes[0];
 
       expect(el.style.color).to.equal('red');
     });
@@ -198,7 +198,7 @@ describe('attribute updates', () => {
       patch(container, () => render({
         backgroundColor: 'red'
       }));
-      let el = container.childNodes[0];
+      var el = container.childNodes[0];
 
       expect(el.style.color).to.equal('');
       expect(el.style.backgroundColor).to.equal('red');
@@ -206,7 +206,7 @@ describe('attribute updates', () => {
 
     it('should render with the correct style properties for strings', () => {
       patch(container, () => render('color: white; background-color: red;'));
-      let el = container.childNodes[0];
+      var el = container.childNodes[0];
 
       expect(el.style.color).to.equal('white');
       expect(el.style.backgroundColor).to.equal('red');
@@ -214,7 +214,7 @@ describe('attribute updates', () => {
 
     it('should render with the correct style properties for String instances', () => {
       patch(container, () => render(new String('color: white; background-color: red;')));
-      let el = container.childNodes[0];
+      var el = container.childNodes[0];
 
       expect(el.style.color).to.equal('white');
       expect(el.style.backgroundColor).to.equal('red');

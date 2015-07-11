@@ -17,7 +17,7 @@
 import {patch, elementOpenStart, elementOpenEnd, elementClose, attr} from '../../src/index';
 
 describe('virtual attribute updates', () => {
-  let container;
+  var container;
 
   beforeEach(() => {
     container = document.createElement('div');
@@ -42,7 +42,7 @@ describe('virtual attribute updates', () => {
       patch(container, () => render({
         key: 'hello'
       }));
-      let el = container.childNodes[0];
+      var el = container.childNodes[0];
 
       expect(el.getAttribute('data-expanded')).to.equal('hello');
     });
@@ -51,7 +51,7 @@ describe('virtual attribute updates', () => {
       patch(container, () => render({
         key: false
       }));
-      let el = container.childNodes[0];
+      var el = container.childNodes[0];
 
       expect(el.getAttribute('data-expanded')).to.equal(null);
     });
@@ -63,7 +63,7 @@ describe('virtual attribute updates', () => {
       patch(container, () => render({
         key: 'bar'
       }));
-      let el = container.childNodes[0];
+      var el = container.childNodes[0];
 
       expect(el.getAttribute('data-expanded')).to.equal('bar');
     });
