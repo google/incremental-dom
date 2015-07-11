@@ -86,6 +86,19 @@ describe('attribute updates', () => {
 
       expect(el.getAttribute('data-expanded')).to.equal('bar');
     });
+
+    it('should update attribute in different position', () => {
+      patch(container, () => render({
+        'data-foo': 'foo'
+      }));
+      patch(container, () => render({
+        'data-bar': 'foo'
+      }));
+      var el = container.childNodes[0];
+
+      expect(el.getAttribute('data-bar')).to.equal('foo');
+      expect(el.getAttribute('data-foo')).to.equal(null);
+    });
   });
 
   describe('for function attributes', () => {
