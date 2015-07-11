@@ -99,6 +99,18 @@ describe('attribute updates', () => {
       expect(el.getAttribute('data-bar')).to.equal('foo');
       expect(el.getAttribute('data-foo')).to.equal(null);
     });
+
+    it('should remove trailing attributes when missing', function() {
+      patch(container, () => render({
+        'data-foo': 'foo',
+        'data-bar': 'bar'
+      }));
+      patch(container, () => render({}));
+      var el = container.childNodes[0];
+
+      expect(el.getAttribute('data-foo')).to.equal(null);
+      expect(el.getAttribute('data-bar')).to.equal(null);
+    });
   });
 
   describe('for function attributes', () => {

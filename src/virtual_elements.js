@@ -111,17 +111,23 @@ var hasChangedAttrs = function(unused1, unused2, unused3, var_args) {
   var data = getData(this);
   var attrsArr = data.attrsArr;
   var attrsChanged = false;
-  var i;
+  var i = ATTRIBUTES_OFFSET;
+  var j = 0;
 
-  for (i = ATTRIBUTES_OFFSET; i < arguments.length; i += 1) {
-    if (attrsArr[i - ATTRIBUTES_OFFSET] !== arguments[i]) {
+  for (; i < arguments.length; i += 1, j += 1) {
+    if (attrsArr[j] !== arguments[i]) {
       attrsChanged = true;
       break;
     }
   }
 
-  for (; i < arguments.length; i += 1) {
-    attrsArr[i - ATTRIBUTES_OFFSET] = arguments[i];
+  for (; i < arguments.length; i += 1, j += 1) {
+    attrsArr[j] = arguments[i];
+  }
+
+  if (j < attrsArr.length) {
+    attrsChanged = true;
+    attrsArr.length = j;
   }
 
   return attrsChanged;
