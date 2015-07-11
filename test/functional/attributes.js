@@ -16,6 +16,10 @@
 
 var IncrementalDOM = require('../../index'),
     patch = IncrementalDOM.patch,
+    elementOpenStart = IncrementalDOM.elementOpenStart,
+    elementOpenEnd = IncrementalDOM.elementOpenEnd,
+    elementAttr = IncrementalDOM.attr,
+    elementClose = IncrementalDOM.elementClose,
     elementVoid = IncrementalDOM.elementVoid;
 
 describe('attribute updates', () => {
@@ -31,14 +35,18 @@ describe('attribute updates', () => {
   });
 
   describe('for conditional attributes', () => {
-    function render(obj) {
-      elementVoid('div', '', [],
-          'data-expanded', obj.key);
+    function render(attrs) {
+      elementOpenStart('div', '', []);
+      for (var attr in attrs) {
+          elementAttr(attr, attrs[attr]);
+      }
+      elementOpenEnd();
+      elementClose('div');
     }
 
     it('should be present when they have a value', () => {
       patch(container, () => render({
-        key: 'hello'
+        'data-expanded': 'hello'
       }));
       var el = container.childNodes[0];
 
@@ -47,7 +55,7 @@ describe('attribute updates', () => {
 
     it('should be present when falsy', () => {
       patch(container, () => render({
-        key: false
+        'data-expanded': false
       }));
       var el = container.childNodes[0];
 
@@ -56,19 +64,23 @@ describe('attribute updates', () => {
 
     it('should be not present when undefined', () => {
       patch(container, () => render({
-        key: undefined
+        id: undefined,
+        tabindex: undefined,
+        'data-expanded': undefined
       }));
       var el = container.childNodes[0];
 
       expect(el.getAttribute('data-expanded')).to.equal(null);
+      expect(el.getAttribute('id')).to.equal(null);
+      expect(el.getAttribute('tabindex')).to.equal(null);
     });
 
     it('should update the DOM when they change', () => {
       patch(container, () => render({
-        key: 'foo'
+        'data-expanded': 'foo'
       }));
       patch(container, () => render({
-        key: 'bar'
+        'data-expanded': 'bar'
       }));
       var el = container.childNodes[0];
 

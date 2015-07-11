@@ -78,19 +78,10 @@ var applyStyle = function(el, style) {
  *     as an HTML attribute, otherwise, it is set on node.
  */
 var updateAttribute = function(el, name, value) {
-  switch (name) {
-    case 'id':
-      el.id = value;
-      break;
-    case 'tabindex':
-      el.tabIndex = value;
-      break;
-    case 'style':
-      applyStyle(el, value);
-      break;
-    default:
-      applyAttr(el, name, value);
-      break;
+  if (name === 'style') {
+    applyStyle(el, value);
+  } else {
+    applyAttr(el, name, value);
   }
 };
 
