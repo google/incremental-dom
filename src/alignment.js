@@ -115,6 +115,7 @@ var clearUnvisitedDOM = function(node) {
   var data = getData(node);
   var lastChild = node.lastChild;
   var lastVisitedChild = data.lastVisitedChild;
+  var hasKeyMap = !!data.keyMap;
   data.lastVisitedChild = null;
 
   if (lastChild === lastVisitedChild) {
@@ -122,13 +123,14 @@ var clearUnvisitedDOM = function(node) {
   }
 
   while (lastChild !== lastVisitedChild) {
+    var key = hasKeyMap && getData(lastChild).key;
+    if (key) {
+      registerChild(node, key, null);
+    }
+
     node.removeChild(lastChild);
     lastChild = node.lastChild;
   }
-
-  // Invalidate the key map since we removed children. It will get recreated
-  // next time we need it.
-  data.keyMap = null;
 };
 
 
