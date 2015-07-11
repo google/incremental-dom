@@ -158,18 +158,15 @@ var getChild = function(parent, key) {
 
 
 /**
- * Registers a node as being a child. If a key is provided, the parent will
- * keep track of the child using the key. The child can be retrieved using the
- * same key using getKeyMap. The provided key should be unique within the
- * parent Element.
+ * Registers a node as being a child. The parent will keep track of the child
+ * using the key. The child can be retrieved using the same key using
+ * getKeyMap. The provided key should be unique within the parent Element.
  * @param {!Element} parent The parent of child.
- * @param {?string} key A key to identify the child with.
+ * @param {string} key A key to identify the child with.
  * @param {!Node} child The child to register.
  */
 var registerChild = function(parent, key, child) {
-  if (key) {
-    getKeyMap(parent)[key] = child;
-  }
+  getKeyMap(parent)[key] = child;
 };
 
 

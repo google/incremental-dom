@@ -68,7 +68,9 @@ var alignWithDOM = function(nodeName, key, statics) {
       matchingNode = existingNode;
     } else {
       matchingNode = createNode(walker.doc, nodeName, key, statics);
-      registerChild(parent, key, matchingNode);
+      if (key) {
+        registerChild(parent, key, matchingNode);
+      }
     }
 
     parent.insertBefore(matchingNode, currentNode);
