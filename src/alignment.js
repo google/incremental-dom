@@ -17,7 +17,8 @@
 import {
     createNode,
     getChild,
-    registerChild
+    registerChild,
+    removeChild
 } from './nodes';
 import { getData } from './node_data';
 import { getWalker } from './walker';
@@ -125,7 +126,7 @@ var clearUnvisitedDOM = function(node) {
   while (lastChild !== lastVisitedChild) {
     var key = hasKeyMap && getData(lastChild).key;
     if (key) {
-      registerChild(node, key, null);
+      removeChild(node, key);
     }
 
     node.removeChild(lastChild);
