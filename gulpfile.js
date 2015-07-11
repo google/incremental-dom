@@ -34,6 +34,12 @@ var jsFileName = 'incremental-dom.js';
 var srcs = [jsFileName, 'src/**/*.js'];
 var tests = ['test/functional/**/*.js'];
 
+var customBrowserifyOpts = {
+  entries: './index.js',
+  standalone: 'IncrementalDOM',
+  debug: true
+};
+
 function clean(done) {
   del(['dist'], done);
 }
@@ -60,12 +66,6 @@ function lint() {
     .pipe(gjslint.reporter('console'))
 }
 
-var customBrowserifyOpts = {
-  entries: './index.js',
-  standalone: 'IncrementalDOM',
-  debug: true
-};
-
 function bundle(browserify, env) {
   return browserify
     .transform(envify, env)
@@ -75,7 +75,7 @@ function bundle(browserify, env) {
     .pipe(buffer())
     .pipe(sourcemaps.init({loadMaps: true}))
       .pipe(uglify({
-        preserveComments: 'some'    
+        preserveComments: 'some'
       }))
       .on('error', gutil.log)
     .pipe(sourcemaps.write('./'))
@@ -94,7 +94,7 @@ function jsWatch() {
 
   b_watch.on('update', bundle.bind(null, b_watch));
   b_watch.on('log', gutil.log);
-  
+
   return bundle(b_watch, {});
 }
 
@@ -122,8 +122,6 @@ gulp.task('js', js);
 gulp.task('js-watch', jsWatch);
 gulp.task('js-dist', jsDist);
 gulp.task('build', ['lint', 'unit', 'js']);
-gulp.task('dist', ['lint', 'unit', 'js-dist'], function() {
-  return addDist();
-});
+gulp.task('dist', ['lint', 'unit', 'js-dist'], addDist);
 
 gulp.task('default', ['build']);
