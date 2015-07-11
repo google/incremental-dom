@@ -57,13 +57,14 @@ var exitNode = function(node) {
 
 
 /**
- * Marks a parent as having visited a child.
- * @param {!Element} parent
- * @param {!Node} child
+ * Marks node's parent as having visited node.
+ * @param {!Node} node
  */
-var markVisited = function(parent, child) {
+var markVisited = function(node) {
+  var walker = getWalker();
+  var parent = walker.getCurrentParent();
   var data = getData(parent);
-  data.lastVisitedChild = child;
+  data.lastVisitedChild = node;
 };
 
 
@@ -82,6 +83,7 @@ var firstChild = function() {
  */
 var nextSibling = function() {
   var walker = getWalker();
+  markVisited(walker.currentNode);
   walker.nextSibling();
 };
 
@@ -100,7 +102,6 @@ var parentNode = function() {
 module.exports = {
   firstChild: firstChild,
   nextSibling: nextSibling,
-  parentNode: parentNode,
-  markVisited: markVisited
+  parentNode: parentNode
 };
 

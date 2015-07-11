@@ -20,7 +20,6 @@ var nodes = require('./nodes'),
     getNodeName = nodes.getNodeName,
     getChild = nodes.getChild,
     registerChild = nodes.registerChild;
-var markVisited = require('./traversal').markVisited;
 var getWalker = require('./walker').getWalker;
 
 
@@ -76,8 +75,6 @@ var alignWithDOM = function(nodeName, key, statics) {
     parent.insertBefore(matchingNode, currentNode);
     walker.currentNode = matchingNode;
   }
-
-  markVisited(parent, matchingNode);
 
   return matchingNode;
 };
