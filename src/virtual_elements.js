@@ -111,20 +111,23 @@ var hasChangedAttrs = function(unused1, unused2, unused3, var_args) {
   var data = getData(this);
   var attrsArr = data.attrsArr;
   var attrsChanged = false;
-  var i;
+  var i = ATTRIBUTES_OFFSET;
+  var j = 0;
 
-  for (i = ATTRIBUTES_OFFSET; i < arguments.length; i += 2) {
-    // Translate the from the arguments index (for values) to the attribute's
-    // ordinal. The attribute values are at arguments index 3, 5, 7, etc. To get
-    // the ordinal, need to subtract the offset and divide by 2
-    if (attrsArr[(i - ATTRIBUTES_OFFSET) >> 1] !== arguments[i + 1]) {
+  for (; i < arguments.length; i += 1, j += 1) {
+    if (attrsArr[j] !== arguments[i]) {
       attrsChanged = true;
       break;
     }
   }
 
-  for (; i < arguments.length; i += 2) {
-    attrsArr[(i - ATTRIBUTES_OFFSET) >> 1] = arguments[i + 1];
+  for (; i < arguments.length; i += 1, j += 1) {
+    attrsArr[j] = arguments[i];
+  }
+
+  if (j < attrsArr.length) {
+    attrsChanged = true;
+    attrsArr.length = j;
   }
 
   return attrsChanged;
