@@ -27,7 +27,7 @@ var enterTag = function(tag) {
   if (tag === 'svg') {
     getWalker().enterNamespace(SVG_NS);
   } else if (tag === 'foreignObject') {
-    getWalker().enterNamespace(undefined);
+    getWalker().enterNamespace('');
   }
 };
 

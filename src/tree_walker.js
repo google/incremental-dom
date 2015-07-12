@@ -28,7 +28,13 @@ function TreeWalker(node) {
    * back to the parent.
    * @const @private {!Array<!Node>}
    */
-  this.stack_ = [];
+  this.stack_ = [node];
+
+  /**
+   * Keeps a cached copy of the currentNode's parent.
+   * @private {?Node}
+   */
+  this.parent_ = node;
 
   /** {?Node} */
   this.currentNode = node;
@@ -40,7 +46,13 @@ function TreeWalker(node) {
    * Keeps track of what namespace to create new Elements in.
    * @const @private {!Array<string>}
    */
-  this.nsStack_ = [undefined];
+  this.nsStack_ = [''];
+
+  /**
+   * Keeps a cached copy of the namespace.
+   * @private {string}
+   */
+  this.ns_ = '';
 }
 
 
@@ -48,7 +60,7 @@ function TreeWalker(node) {
  * @return {!Node} The current parent of the current location in the subtree.
  */
 TreeWalker.prototype.getCurrentParent = function() {
-  return this.stack_[this.stack_.length - 1];
+  return this.parent_;
 };
 
 
@@ -56,7 +68,7 @@ TreeWalker.prototype.getCurrentParent = function() {
  * @return {string} The current namespace to create Elements in.
  */
 TreeWalker.prototype.getCurrentNamespace = function() {
-  return this.nsStack_[this.nsStack_.length - 1];
+  return this.ns_;
 };
 
 
@@ -64,6 +76,7 @@ TreeWalker.prototype.getCurrentNamespace = function() {
  * @param {string} namespace The namespace to enter.
  */
 TreeWalker.prototype.enterNamespace = function(namespace) {
+  this.ns_ = namespace;
   this.nsStack_.push(namespace);
 };
 
@@ -72,7 +85,9 @@ TreeWalker.prototype.enterNamespace = function(namespace) {
  * Exits the current namespace
  */
 TreeWalker.prototype.exitNamespace = function() {
-  this.nsStack_.pop();
+  var stack = this.nsStack_;
+  stack.pop();
+  this.ns_ = stack[stack.length - 1];
 };
 
 
@@ -80,8 +95,10 @@ TreeWalker.prototype.exitNamespace = function() {
  * Changes the current location the firstChild of the current location.
  */
 TreeWalker.prototype.firstChild = function() {
-  this.stack_.push(this.currentNode);
-  this.currentNode = this.currentNode.firstChild;
+  var currentNode = this.currentNode;
+  this.parent_ = currentNode;
+  this.stack_.push(currentNode);
+  this.currentNode = currentNode.firstChild;
 };
 
 
@@ -97,7 +114,9 @@ TreeWalker.prototype.nextSibling = function() {
  * Changes the current location the parentNode of the current location.
  */
 TreeWalker.prototype.parentNode = function() {
-  this.currentNode = this.stack_.pop();
+  var stack = this.stack_;
+  this.currentNode = stack.pop();
+  this.parent_ = stack[stack.length - 1];
 };
 
 
