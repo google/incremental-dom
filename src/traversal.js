@@ -19,16 +19,6 @@ var getData = require('./node_data').getData;
 
 
 /**
- * Enters a Element, clearing out the last visited child field.
- * @param {!Element} node
- */
-var enterNode = function(node) {
-  var data = getData(node);
-  data.lastVisitedChild = null;
-};
-
-
-/**
  * Clears out any unvisited Nodes, as the corresponding virtual element
  * functions were never called for them.
  * @param {!Element} node
@@ -36,6 +26,7 @@ var enterNode = function(node) {
 var exitNode = function(node) {
   var data = getData(node);
   var lastVisitedChild = data.lastVisitedChild;
+  data.lastVisitedChild = null;
 
   if (node.lastChild === lastVisitedChild) {
     return;
@@ -67,7 +58,6 @@ var markVisited = function(parent, child) {
  */
 var firstChild = function() {
   var walker = getWalker();
-  enterNode(walker.currentNode);
   walker.firstChild();
 };
 
