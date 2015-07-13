@@ -37,6 +37,22 @@ describe('rendering with keys', () => {
       }
     }
 
+    it('should not modify DOM nodes with falsey keys', () => {
+      var slice = Array.prototype.slice;
+      var items = [
+        { key: null },
+        { key: undefined },
+        { key: '' },
+      ];
+
+      patch(container, () => render(items));
+      var nodes = slice.call(container.childNodes);
+
+      patch(container, () => render(items));
+
+      expect(slice.call(container.childNodes)).to.deep.equal(nodes);
+    });
+
     it('should not modify the DOM nodes when inserting', () => {
       var items = [
         { key: 'one' },
