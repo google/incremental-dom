@@ -27,15 +27,16 @@ var getWalker = require('./walker').getWalker;
 /**
  * Checks whether or not a given node matches the specified nodeName and key.
  *
- * @param {?Node} node An HTML node, typically an HTMLElement or Text.
+ * @param {!Node} node An HTML node, typically an HTMLElement or Text.
  * @param {?string} nodeName The nodeName for this node.
  * @param {?string} key An optional key that identifies a node.
  * @return {boolean} True if the node matches, false otherwise.
  */
 var matches = function(node, nodeName, key) {
-  return node &&
-         key === getKey(node) &&
-         nodeName === getNodeName(node);
+  if (key) {
+    return key === getKey(node);
+  }
+  return nodeName === getNodeName(node);
 };
 
 
@@ -57,7 +58,7 @@ var alignWithDOM = function(nodeName, key, statics) {
   var matchingNode;
 
   // Check to see if we have a node to reuse
-  if (matches(currentNode, nodeName, key)) {
+  if (currentNode && matches(currentNode, nodeName, key)) {
     matchingNode = currentNode;
   } else {
     var existingNode = key && getChild(parent, key);
