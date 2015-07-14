@@ -113,9 +113,29 @@ var getData = function(node) {
 };
 
 
+/**
+ * @param {?Node} node A node to get the key for.
+ * @return {?string} The key for the Node, if applicable.
+ */
+var getKey = function(node) {
+  return getData(node).key;
+};
+
+
+/**
+ * @param {?Node} node A node to get the node name for.
+ * @return {?string} The node name for the Node, if applicable.
+ */
+var getNodeName = function(node) {
+  return getData(node).nodeName;
+};
+
+
 /** */
 module.exports = {
   getData: getData,
-  initData: initData
+  initData: initData,
+  getKey: getKey,
+  getNodeName: getNodeName
 };
 

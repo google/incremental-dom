@@ -17,6 +17,7 @@
 var updateAttribute = require('./attributes').updateAttribute;
 var nodeData = require('./node_data'),
     getData = nodeData.getData,
+    getKey = nodeData.getKey,
     initData = nodeData.initData;
 var getNamespaceForTag = require('./namespace').getNamespaceForTag;
 
@@ -112,24 +113,6 @@ var createKeyMap = function(el) {
 
 
 /**
- * @param {?Node} node A node to get the key for.
- * @return {?string} The key for the Node, if applicable.
- */
-var getKey = function(node) {
-  return getData(node).key;
-};
-
-
-/**
- * @param {?Node} node A node to get the node name for.
- * @return {?string} The node name for the Node, if applicable.
- */
-var getNodeName = function(node) {
-  return getData(node).nodeName;
-};
-
-
-/**
  * Retrieves the mapping of key to child node for a given Element, creating it
  * if necessary.
  * @param {!Element} el
@@ -173,8 +156,6 @@ var registerChild = function(parent, key, child) {
 /** */
 module.exports = {
   createNode: createNode,
-  getKey: getKey,
-  getNodeName: getNodeName,
   getChild: getChild,
   registerChild: registerChild
 };
