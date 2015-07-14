@@ -29,13 +29,14 @@ var walker = require('./walker'),
  * @param {!Element|!Document} node The Element or Document to patch.
  * @param {!function} fn A function containing elementOpen/elementClose/etc.
  *     calls that describe the DOM.
+ * @param {*} data An argument passed to fn to represent DOM state.
  */
-var patch = function(node, fn) {
+var patch = function(node, fn, data) {
   var prevWalker = getWalker();
   setWalker(new TreeWalker(node));
 
   firstChild();
-  fn();
+  fn(data);
   parentNode();
 
   setWalker(prevWalker);
