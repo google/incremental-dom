@@ -82,6 +82,16 @@ describe('patching an element', () => {
     expect(containerOne.textContent).to.equal('hello');
     expect(containerTwo.textContent).to.equal('foobar');
   });
+
+  it('should pass third argument to render function', () => {
+    function render(content) {
+      text(content);
+    }
+
+    patch(container, render, 'foobar');
+
+    expect(container.textContent).to.equal('foobar');
+  });
 });
 
 describe('patching a documentFragment', function() {
