@@ -69,9 +69,7 @@ var applyStyle = function(el, style) {
 
 
 /**
- * Updates a single attribute on an Element. For some types (e.g. id or class),
- * the value is applied directly to the Element using the corresponding accessor
- * function.
+ * Updates a single attribute on an Element.
  * @param {!Element} el
  * @param {string} name The attribute's name.
  * @param {*} value The attribute's value. If the value is a string, it is set

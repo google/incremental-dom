@@ -19,7 +19,7 @@ var getWalker = require('./walker').getWalker;
 var SVG_NS = 'http://www.w3.org/2000/svg';
 
 /**
- * Enters a tag, checking to see if it is a namespace boundry, and if so,
+ * Enters a tag, checking to see if it is a namespace boundary, and if so,
  * updates the current namespace.
  * @param {string} tag The tag to enter.
  */
@@ -33,7 +33,7 @@ var enterTag = function(tag) {
 
 
 /**
- * Exits a tag, checking to see if it is a namespace boundry, and if so,
+ * Exits a tag, checking to see if it is a namespace boundary, and if so,
  * updates the current namespace.
  * @param {string} tag The tag to enter.
  */

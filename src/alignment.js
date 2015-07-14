@@ -16,10 +16,11 @@
 
 var nodes = require('./nodes'),
     createNode = nodes.createNode,
-    getKey = nodes.getKey,
-    getNodeName = nodes.getNodeName,
     getChild = nodes.getChild,
     registerChild = nodes.registerChild;
+var nodeData = require('./node_data'),
+    getKey = nodeData.getKey,
+    getNodeName = nodeData.getNodeName;
 var getWalker = require('./walker').getWalker;
 
 

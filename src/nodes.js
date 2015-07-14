@@ -17,6 +17,7 @@
 var updateAttribute = require('./attributes').updateAttribute;
 var nodeData = require('./node_data'),
     getData = nodeData.getData,
+    getKey = nodeData.getKey,
     initData = nodeData.initData;
 var getNamespaceForTag = require('./namespace').getNamespaceForTag;
 
@@ -54,7 +55,7 @@ var createElement = function(doc, tag, key, statics) {
 /**
  * Creates a Text.
  * @param {!Document} doc The document with which to create the Text.
- * @param {string} text The intial content of the Text.
+ * @param {string} text The initial content of the Text.
  * @return {!Text}
  */
 var createTextNode = function(doc, text) {
@@ -75,7 +76,7 @@ var createTextNode = function(doc, text) {
  * @param {?Array<*>|string} statics The static data to initialize the Node
  *     with. For an Element, an array of attribute name/value pairs of
  *     the static attributes for the Element. For a Text, a string with the
- *     intial content of the Text.
+ *     initial content of the Text.
  * @return {!Node}
  */
 var createNode = function(doc, nodeName, key, statics) {
@@ -108,24 +109,6 @@ var createKeyMap = function(el) {
   }
 
   return map;
-};
-
-
-/**
- * @param {?Node} node A node to get the key for.
- * @return {?string} The key for the Node, if applicable.
- */
-var getKey = function(node) {
-  return getData(node).key;
-};
-
-
-/**
- * @param {?Node} node A node to get the node name for.
- * @return {?string} The node name for the Node, if applicable.
- */
-var getNodeName = function(node) {
-  return getData(node).nodeName;
 };
 
 
@@ -173,8 +156,6 @@ var registerChild = function(parent, key, child) {
 /** */
 module.exports = {
   createNode: createNode,
-  getKey: getKey,
-  getNodeName: getNodeName,
   getChild: getChild,
   registerChild: registerChild
 };
