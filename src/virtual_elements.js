@@ -228,7 +228,6 @@ var elementOpenStart = function(tag, key, statics) {
   argsBuilder[0] = tag;
   argsBuilder[1] = key;
   argsBuilder[2] = statics;
-  argsBuilder.length = ATTRIBUTES_OFFSET;
 };
 
 
@@ -258,6 +257,7 @@ var elementOpenEnd = function() {
   }
 
   elementOpen.apply(null, argsBuilder);
+  argsBuilder.length = 0;
 };
 
 
