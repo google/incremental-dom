@@ -77,7 +77,7 @@ function NodeData(nodeName, key) {
 /**
  * Initializes a NodeData object for a Node.
  *
- * @param {!Node} node The node to initialze data for.
+ * @param {!Node} node The node to initialize data for.
  * @param {string} nodeName The node name of node.
  * @param {?string} key The key that identifies the node.
  * @return {!NodeData} The newly initialized data object

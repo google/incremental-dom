@@ -54,7 +54,7 @@ var createElement = function(doc, tag, key, statics) {
 /**
  * Creates a Text.
  * @param {!Document} doc The document with which to create the Text.
- * @param {string} text The intial content of the Text.
+ * @param {string} text The initial content of the Text.
  * @return {!Text}
  */
 var createTextNode = function(doc, text) {
@@ -75,7 +75,7 @@ var createTextNode = function(doc, text) {
  * @param {?Array<*>|string} statics The static data to initialize the Node
  *     with. For an Element, an array of attribute name/value pairs of
  *     the static attributes for the Element. For a Text, a string with the
- *     intial content of the Text.
+ *     initial content of the Text.
  * @return {!Node}
  */
 var createNode = function(doc, nodeName, key, statics) {
