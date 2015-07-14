@@ -39,6 +39,13 @@ module.exports = function(config) {
 
     autoWatch: true,
 
-    browsers: ['Chrome', 'Firefox']
+    browsers: ['Chrome', 'Firefox'],
+
+    // change Karma's debug.html to the mocha web reporter
+    client: {
+      mocha: {
+        reporter: 'html'
+      }
+    }
   });
 };
