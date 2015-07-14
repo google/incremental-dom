@@ -21,7 +21,6 @@ var TreeWalker = require('./tree_walker');
 var walker = require('./walker'),
     getWalker = walker.getWalker,
     setWalker = walker.setWalker;
-var namespace = require('./namespace');
 
 
 /**
@@ -35,7 +34,6 @@ var patch = function(node, fn) {
   var prevWalker = getWalker();
   setWalker(new TreeWalker(node));
 
-  namespace.enterTag(node.nodeName.toLowerCase());
   firstChild();
   fn();
   parentNode();

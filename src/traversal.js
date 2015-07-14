@@ -16,17 +16,31 @@
 
 var getWalker = require('./walker').getWalker;
 var getData = require('./node_data').getData;
+var namespace = require('./namespace');
+
+
+/**
+ * Enters a Element, setting the current namespace for nested elements.
+ * @param {!Element} node
+ */
+var enterNode = function(node) {
+  var data = getData(node);
+  namespace.enterTag(data.nodeName);
+};
 
 
 /**
  * Clears out any unvisited Nodes, as the corresponding virtual element
- * functions were never called for them.
+ * functions were never called for them, and unwinds the current namespace
+ * to the previous value.
  * @param {!Element} node
  */
 var exitNode = function(node) {
   var data = getData(node);
   var lastVisitedChild = data.lastVisitedChild;
   data.lastVisitedChild = null;
+
+  namespace.exitTag(data.nodeName);
 
   if (node.lastChild === lastVisitedChild) {
     return;
@@ -43,13 +57,14 @@ var exitNode = function(node) {
 
 
 /**
- * Marks a parent as having visited a child.
- * @param {!Element} parent
- * @param {!Node} child
+ * Marks node's parent as having visited node.
+ * @param {!Node} node
  */
-var markVisited = function(parent, child) {
+var markVisited = function(node) {
+  var walker = getWalker();
+  var parent = walker.getCurrentParent();
   var data = getData(parent);
-  data.lastVisitedChild = child;
+  data.lastVisitedChild = node;
 };
 
 
@@ -58,6 +73,7 @@ var markVisited = function(parent, child) {
  */
 var firstChild = function() {
   var walker = getWalker();
+  enterNode(walker.currentNode);
   walker.firstChild();
 };
 
@@ -67,6 +83,7 @@ var firstChild = function() {
  */
 var nextSibling = function() {
   var walker = getWalker();
+  markVisited(walker.currentNode);
   walker.nextSibling();
 };
 
@@ -85,7 +102,6 @@ var parentNode = function() {
 module.exports = {
   firstChild: firstChild,
   nextSibling: nextSibling,
-  parentNode: parentNode,
-  markVisited: markVisited
+  parentNode: parentNode
 };
 
