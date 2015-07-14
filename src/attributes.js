@@ -57,7 +57,14 @@ var applyAttr = function(el, name, value) {
  */
 var applyStyle = function(el, style) {
   if (typeof style === 'string' || style instanceof String) {
-    el.style.cssText = style;
+    var data = getData(el);
+    var attrs = data.attrs;
+
+    if (attrs[name] !== value) {
+      el.style.cssText = style;
+
+      attrs[name] = value;
+    }
   } else {
     el.style.cssText = '';
 
