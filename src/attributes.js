@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-var getData = require('./node_data').getData;
+var nodeData = require('./node_data'),
+    getAttrsArr = nodeData.getAttrsArr,
+    getNewAttrs = nodeData.getNewAttrs,
+    getAttrs = nodeData.getAttrs;
 
 
 /**
@@ -35,8 +38,7 @@ var ATTRIBUTES_OFFSET = 3;
  *     as an HTML attribute, otherwise, it is set on node.
  */
 var applyAttr = function(el, name, value) {
-  var data = getData(el);
-  var attrs = data.attrs;
+  var attrs = getAttrs(el);
 
   if (attrs[name] === value) {
     return;
@@ -94,8 +96,7 @@ var applyStyle = function(el, style) {
  * @return {?Array<*>} The changed attributes, if any have changed.
  */
 var changedAttributes = function(unused1, unused2, unused3, var_args) {
-  var data = getData(this);
-  var attrsArr = data.attrsArr;
+  var attrsArr = getAttrsArr(this);
   var attrsChanged = false;
   var i = ATTRIBUTES_OFFSET;
   var j = 0;
@@ -174,8 +175,7 @@ var updateChangedAttributes = function(el, attributes) {
  * @return {!Object<string, *>} The updated newAttrs object.
  */
 var updateNewAttrs = function(el, attributes) {
-  var data = getData(el);
-  var newAttrs = data.newAttrs;
+  var newAttrs = getNewAttrs(el);
 
   for (var attr in newAttrs) {
     newAttrs[attr] = undefined;
