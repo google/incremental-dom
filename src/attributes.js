@@ -18,6 +18,14 @@ var getData = require('./node_data').getData;
 
 
 /**
+ * The offset in the virtual element declaration where the attributes are
+ * specified.
+ * @const {number}
+ */
+var ATTRIBUTES_OFFSET = 3;
+
+
+/**
  * Applies an attribute or property to a given Element. If the value is a object
  * or a function (which includes null), it is set as a property on the Element.
  * Otherwise, the value is set as an attribute.
@@ -69,6 +77,52 @@ var applyStyle = function(el, style) {
 
 
 /**
+ * Checks to see if one or more attributes have changed for a given
+ * Element. When no attributes have changed, this function is much faster than
+ * checking each individual argument. When attributes have changed, the overhead
+ * of this function is minimal.
+ *
+ * This function is called in the context of the Element and the arguments from
+ * elementOpen-like function so that the arguments are not de-optimized.
+ *
+ * @this {Element} The Element to check for changed attributes.
+ * @param {*} unused1
+ * @param {*} unused2
+ * @param {*} unused3
+ * @param {...*} var_args Attribute name/value pairs of the dynamic attributes
+ *     for the Element.
+ * @return {?Array<*>} The changed attributes, if any have changed.
+ */
+var changedAttributes = function(unused1, unused2, unused3, var_args) {
+  var data = getData(this);
+  var attrsArr = data.attrsArr;
+  var attrsChanged = false;
+  var i = ATTRIBUTES_OFFSET;
+  var j = 0;
+
+  for (; i < arguments.length; i += 1, j += 1) {
+    if (attrsArr[j] !== arguments[i]) {
+      attrsChanged = true;
+      break;
+    }
+  }
+
+  for (; i < arguments.length; i += 1, j += 1) {
+    attrsArr[j] = arguments[i];
+  }
+
+  if (j < attrsArr.length) {
+    attrsChanged = true;
+    attrsArr.length = j;
+  }
+
+  if (attrsChanged) {
+    return attrsArr;
+  }
+};
+
+
+/**
  * Updates a single attribute on an Element.
  * @param {!Element} el
  * @param {string} name The attribute's name.
@@ -84,8 +138,61 @@ var updateAttribute = function(el, name, value) {
 };
 
 
+/**
+ * Updates the attributes on an Element.
+ * @param {!Element} el
+ * @param {?Array<*>} attributes An array of attribute name/value pairs of
+ *     the static attributes for the Element.
+ */
+var updateAttributes = function(el, attributes) {
+  for (var i = 0; i < attributes.length; i += 2) {
+    updateAttribute(el, attributes[i], attributes[i + 1]);
+  }
+};
+
+
+/**
+ * Updates changed attributes on an Element.
+ * @param {!Element} el
+ * @param {?Array<*>} attributes An array of attribute name/value pairs of
+ *     the static attributes for the Element.
+ */
+var updateChangedAttributes = function(el, attributes) {
+  var newAttrs = updateNewAttrs(el, attributes);
+
+  for (var attr in newAttrs) {
+    updateAttribute(el, attr, newAttrs[attr]);
+  }
+};
+
+
+/**
+ * Updates the newAttrs object for an Element.
+ * @param {!Element} el
+ * @param {?Array<*>} attributes An array of attribute name/value pairs of
+ *     the static attributes for the Element.
+ * @return {!Object<string, *>} The updated newAttrs object.
+ */
+var updateNewAttrs = function(el, attributes) {
+  var data = getData(el);
+  var newAttrs = data.newAttrs;
+
+  for (var attr in newAttrs) {
+    newAttrs[attr] = undefined;
+  }
+
+  for (var i = 0; i < attributes.length; i += 2) {
+    newAttrs[attributes[i]] = attributes[i + 1];
+  }
+
+  return newAttrs;
+};
+
+
 /** */
 module.exports = {
-  updateAttribute: updateAttribute
+  changedAttributes: changedAttributes,
+  updateAttributes: updateAttributes,
+  updateChangedAttributes: updateChangedAttributes,
 };
 

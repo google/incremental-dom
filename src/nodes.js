@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-var updateAttribute = require('./attributes').updateAttribute;
 var nodeData = require('./node_data'),
     getData = nodeData.getData,
     getKey = nodeData.getKey,
     initData = nodeData.initData;
 var getNamespaceForTag = require('./namespace').getNamespaceForTag;
+var updateAttributes = require('./attributes').updateAttributes;
 
 
 /**
@@ -44,9 +44,7 @@ var createElement = function(doc, tag, key, statics) {
   initData(el, tag, key);
 
   if (statics) {
-    for (var i = 0; i < statics.length; i += 2) {
-      updateAttribute(el, statics[i], statics[i + 1]);
-    }
+    updateAttributes(el, statics);
   }
 
   return el;
