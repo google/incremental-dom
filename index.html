@@ -32,7 +32,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
  * Code distributed by Google as part of the polymer project is also
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
-// @version 0.7.5
+// @version 0.7.6
 window.WebComponents = window.WebComponents || {};
 
 (function(scope) {
@@ -1440,7 +1440,9 @@ window.HTMLImports.addModule(function(scope) {
       script.src = scriptElt.src ? scriptElt.src : generateScriptDataUrl(scriptElt);
       scope.currentScript = scriptElt;
       this.trackElement(script, function(e) {
-        script.parentNode.removeChild(script);
+        if (script.parentNode) {
+          script.parentNode.removeChild(script);
+        }
         scope.currentScript = null;
       });
       this.addElementToDocument(script);
@@ -1757,29 +1759,23 @@ window.CustomElements.addModule(function(scope) {
   var flags = scope.flags;
   var forSubtree = scope.forSubtree;
   var forDocumentTree = scope.forDocumentTree;
-  function addedNode(node) {
-    return added(node) || addedSubtree(node);
+  function addedNode(node, isAttached) {
+    return added(node, isAttached) || addedSubtree(node, isAttached);
   }
-  function added(node) {
-    if (scope.upgrade(node)) {
+  function added(node, isAttached) {
+    if (scope.upgrade(node, isAttached)) {
       return true;
     }
-    attached(node);
+    if (isAttached) {
+      attached(node);
+    }
   }
-  function addedSubtree(node) {
+  function addedSubtree(node, isAttached) {
     forSubtree(node, function(e) {
-      if (added(e)) {
+      if (added(e, isAttached)) {
         return true;
       }
     });
-  }
-  function attachedNode(node) {
-    attached(node);
-    if (inDocument(node)) {
-      forSubtree(node, function(e) {
-        attached(e);
-      });
-    }
   }
   var hasPolyfillMutations = !window.MutationObserver || window.MutationObserver === window.JsMutationObserver;
   scope.hasPolyfillMutations = hasPolyfillMutations;
@@ -1810,12 +1806,10 @@ window.CustomElements.addModule(function(scope) {
     }
   }
   function _attached(element) {
-    if (element.__upgraded__ && (element.attachedCallback || element.detachedCallback)) {
-      if (!element.__attached && inDocument(element)) {
-        element.__attached = true;
-        if (element.attachedCallback) {
-          element.attachedCallback();
-        }
+    if (element.__upgraded__ && !element.__attached) {
+      element.__attached = true;
+      if (element.attachedCallback) {
+        element.attachedCallback();
       }
     }
   }
@@ -1835,18 +1829,16 @@ window.CustomElements.addModule(function(scope) {
     }
   }
   function _detached(element) {
-    if (element.__upgraded__ && (element.attachedCallback || element.detachedCallback)) {
-      if (element.__attached && !inDocument(element)) {
-        element.__attached = false;
-        if (element.detachedCallback) {
-          element.detachedCallback();
-        }
+    if (element.__upgraded__ && element.__attached) {
+      element.__attached = false;
+      if (element.detachedCallback) {
+        element.detachedCallback();
       }
     }
   }
   function inDocument(element) {
     var p = element;
-    var doc = wrap(document);
+    var doc = window.wrap(document);
     while (p) {
       if (p == doc) {
         return true;
@@ -1864,7 +1856,7 @@ window.CustomElements.addModule(function(scope) {
       }
     }
   }
-  function handler(mutations) {
+  function handler(root, mutations) {
     if (flags.dom) {
       var mx = mutations[0];
       if (mx && mx.type === "childList" && mx.addedNodes) {
@@ -1879,13 +1871,14 @@ window.CustomElements.addModule(function(scope) {
       }
       console.group("mutations (%d) [%s]", mutations.length, u || "");
     }
+    var isAttached = inDocument(root);
     mutations.forEach(function(mx) {
       if (mx.type === "childList") {
         forEach(mx.addedNodes, function(n) {
           if (!n.localName) {
             return;
           }
-          addedNode(n);
+          addedNode(n, isAttached);
         });
         forEach(mx.removedNodes, function(n) {
           if (!n.localName) {
@@ -1907,7 +1900,7 @@ window.CustomElements.addModule(function(scope) {
     }
     var observer = node.__observer;
     if (observer) {
-      handler(observer.takeRecords());
+      handler(node, observer.takeRecords());
       takeMutations();
     }
   }
@@ -1916,7 +1909,7 @@ window.CustomElements.addModule(function(scope) {
     if (inRoot.__observer) {
       return;
     }
-    var observer = new MutationObserver(handler);
+    var observer = new MutationObserver(handler.bind(this, inRoot));
     observer.observe(inRoot, {
       childList: true,
       subtree: true
@@ -1926,7 +1919,8 @@ window.CustomElements.addModule(function(scope) {
   function upgradeDocument(doc) {
     doc = window.wrap(doc);
     flags.dom && console.group("upgradeDocument: ", doc.baseURI.split("/").pop());
-    addedNode(doc);
+    var isMainDocument = doc === window.wrap(document);
+    addedNode(doc, isMainDocument);
     observe(doc);
     flags.dom && console.groupEnd();
   }
@@ -1945,26 +1939,26 @@ window.CustomElements.addModule(function(scope) {
   scope.upgradeDocumentTree = upgradeDocumentTree;
   scope.upgradeSubtree = addedSubtree;
   scope.upgradeAll = addedNode;
-  scope.attachedNode = attachedNode;
+  scope.attached = attached;
   scope.takeRecords = takeRecords;
 });
 
 window.CustomElements.addModule(function(scope) {
   var flags = scope.flags;
-  function upgrade(node) {
+  function upgrade(node, isAttached) {
     if (!node.__upgraded__ && node.nodeType === Node.ELEMENT_NODE) {
       var is = node.getAttribute("is");
       var definition = scope.getRegisteredDefinition(is || node.localName);
       if (definition) {
         if (is && definition.tag == node.localName) {
-          return upgradeWithDefinition(node, definition);
+          return upgradeWithDefinition(node, definition, isAttached);
         } else if (!is && !definition.extends) {
-          return upgradeWithDefinition(node, definition);
+          return upgradeWithDefinition(node, definition, isAttached);
         }
       }
     }
   }
-  function upgradeWithDefinition(element, definition) {
+  function upgradeWithDefinition(element, definition, isAttached) {
     flags.upgrade && console.group("upgrade:", element.localName);
     if (definition.is) {
       element.setAttribute("is", definition.is);
@@ -1972,8 +1966,10 @@ window.CustomElements.addModule(function(scope) {
     implementPrototype(element, definition);
     element.__upgraded__ = true;
     created(element);
-    scope.attachedNode(element);
-    scope.upgradeSubtree(element);
+    if (isAttached) {
+      scope.attached(element);
+    }
+    scope.upgradeSubtree(element, isAttached);
     flags.upgrade && console.groupEnd();
     return element;
   }
@@ -2255,7 +2251,7 @@ window.CustomElements.addModule(function(scope) {
     upgradeDocumentTree(window.wrap(document));
     if (window.HTMLImports) {
       window.HTMLImports.__importsParsingHook = function(elt) {
-        upgradeDocumentTree(wrap(elt.import));
+        upgradeDocumentTree(window.wrap(elt.import));
       };
     }
     window.CustomElements.ready = true;
@@ -2837,7 +2833,7 @@ debouncer.stop();
 }
 }
 });
-Polymer.version = '1.0.5';
+Polymer.version = '1.0.6';
 Polymer.Base._addFeature({
 _registerFeatures: function () {
 this._prepIs();
@@ -3276,6 +3272,8 @@ var getInnerHTML = Polymer.domInnerHTML.getInnerHTML;
 var nativeInsertBefore = Element.prototype.insertBefore;
 var nativeRemoveChild = Element.prototype.removeChild;
 var nativeAppendChild = Element.prototype.appendChild;
+var nativeCloneNode = Element.prototype.cloneNode;
+var nativeImportNode = Document.prototype.importNode;
 var dirtyRoots = [];
 var DomApi = function (node) {
 this.node = node;
@@ -3404,8 +3402,8 @@ return parentNeedsDist || hasContent && !wrappedContent;
 },
 _tryRemoveUndistributedNode: function (node) {
 if (this.node.shadyRoot) {
-if (node.parentNode) {
-nativeRemoveChild.call(node.parentNode, node);
+if (node._composedParent) {
+nativeRemoveChild.call(node._composedParent, node);
 }
 return true;
 }
@@ -3414,7 +3412,7 @@ _updateInsertionPoints: function (host) {
 host.shadyRoot._insertionPoints = factory(host.shadyRoot).querySelectorAll(CONTENT);
 },
 _nodeIsInLogicalTree: function (node) {
-return Boolean(node._lightParent || node._isShadyRoot || this._ownerShadyRootForNode(node) || node.shadyRoot);
+return Boolean(node._lightParent !== undefined || node._isShadyRoot || this._ownerShadyRootForNode(node) || node.shadyRoot);
 },
 _parentNeedsDistribution: function (parent) {
 return parent && parent.shadyRoot && hasInsertionPoint(parent.shadyRoot);
@@ -3587,6 +3585,31 @@ _distributeParent: function () {
 if (this._parentNeedsDistribution(this.parentNode)) {
 this._lazyDistribute(this.parentNode);
 }
+},
+cloneNode: function (deep) {
+var n = nativeCloneNode.call(this.node, false);
+if (deep) {
+var c$ = this.childNodes;
+var d = factory(n);
+for (var i = 0, nc; i < c$.length; i++) {
+nc = factory(c$[i]).cloneNode(true);
+d.appendChild(nc);
+}
+}
+return n;
+},
+importNode: function (externalNode, deep) {
+var doc = this.node instanceof HTMLDocument ? this.node : this.node.ownerDocument;
+var n = nativeImportNode.call(doc, externalNode, false);
+if (deep) {
+var c$ = factory(externalNode).childNodes;
+var d = factory(n);
+for (var i = 0, nc; i < c$.length; i++) {
+nc = factory(doc).importNode(c$[i], true);
+d.appendChild(nc);
+}
+}
+return n;
 }
 };
 Object.defineProperty(DomApi.prototype, 'classList', {
@@ -3735,8 +3758,9 @@ if (this.node.nodeType !== Node.TEXT_NODE) {
 this._clear();
 var d = document.createElement('div');
 d.innerHTML = text;
-for (var e = d.firstChild; e; e = e.nextSibling) {
-this.appendChild(e);
+var c$ = Array.prototype.slice.call(d.childNodes);
+for (var i = 0; i < c$.length; i++) {
+this.appendChild(c$[i]);
 }
 }
 },
@@ -3758,6 +3782,13 @@ return n;
 }
 n = n.parentNode;
 }
+};
+DomApi.prototype.cloneNode = function (deep) {
+return this.node.cloneNode(deep);
+};
+DomApi.prototype.importNode = function (externalNode, deep) {
+var doc = this.node instanceof HTMLDocument ? this.node : this.node.ownerDocument;
+return doc.importNode(externalNode, deep);
 };
 DomApi.prototype.getDestinationInsertionPoints = function () {
 var n$ = this.node.getDestinationInsertionPoints();
@@ -4644,6 +4675,7 @@ var MOUSE_EVENTS = [
 'mouseup',
 'click'
 ];
+var IS_TOUCH_ONLY = navigator.userAgent.match(/iP(?:[oa]d|hone)|Android/);
 var mouseCanceller = function (mouseEvent) {
 mouseEvent[HANDLED_OBJ] = { skip: true };
 if (mouseEvent.type === 'click') {
@@ -4668,6 +4700,9 @@ document.removeEventListener(en, mouseCanceller, true);
 }
 }
 function ignoreMouse() {
+if (IS_TOUCH_ONLY) {
+return;
+}
 if (!POINTERSTATE.mouse.mouseIgnoreJob) {
 setupTeardownMouseCanceller(true);
 }
@@ -4715,6 +4750,12 @@ node = next;
 }
 }
 return node;
+},
+findOriginalTarget: function (ev) {
+if (ev.path) {
+return ev.path[0];
+}
+return ev.target;
 },
 handleNative: function (ev) {
 var handled;
@@ -4800,12 +4841,18 @@ node[GESTURE_KEY] = gobj = {};
 }
 for (var i = 0, dep, gd; i < deps.length; i++) {
 dep = deps[i];
+if (IS_TOUCH_ONLY && MOUSE_EVENTS.indexOf(dep) > -1) {
+continue;
+}
 gd = gobj[dep];
 if (!gd) {
-gobj[dep] = gd = {};
+gobj[dep] = gd = { _count: 0 };
+}
+if (gd._count === 0) {
 node.addEventListener(dep, this.handleNative);
 }
 gd[name] = (gd[name] || 0) + 1;
+gd._count = (gd._count || 0) + 1;
 }
 node.addEventListener(evType, handler);
 if (recognizer.touchAction) {
@@ -4823,9 +4870,10 @@ dep = deps[i];
 gd = gobj[dep];
 if (gd && gd[name]) {
 gd[name] = (gd[name] || 1) - 1;
-if (gd[name] === 0) {
-node.removeEventListener(dep, this.handleNative);
+gd._count = (gd._count || 1) - 1;
 }
+if (gd._count === 0) {
+node.removeEventListener(dep, this.handleNative);
 }
 }
 }
@@ -4887,7 +4935,7 @@ emits: [
 'up'
 ],
 mousedown: function (e) {
-var t = e.currentTarget;
+var t = Gestures.findOriginalTarget(e);
 var self = this;
 var upfn = function upfn(e) {
 self.fire('up', t, e);
@@ -4897,10 +4945,10 @@ document.addEventListener('mouseup', upfn);
 this.fire('down', t, e);
 },
 touchstart: function (e) {
-this.fire('down', e.currentTarget, e.changedTouches[0]);
+this.fire('down', Gestures.findOriginalTarget(e), e.changedTouches[0]);
 },
 touchend: function (e) {
-this.fire('up', e.currentTarget, e.changedTouches[0]);
+this.fire('up', Gestures.findOriginalTarget(e), e.changedTouches[0]);
 },
 fire: function (type, target, event) {
 var self = this;
@@ -4956,7 +5004,7 @@ var dy = Math.abs(this.info.y - y);
 return dx >= TRACK_DISTANCE || dy >= TRACK_DISTANCE;
 },
 mousedown: function (e) {
-var t = e.currentTarget;
+var t = Gestures.findOriginalTarget(e);
 var self = this;
 var movefn = function movefn(e) {
 var x = e.clientX, y = e.clientY;
@@ -4990,7 +5038,7 @@ this.info.x = ct.clientX;
 this.info.y = ct.clientY;
 },
 touchmove: function (e) {
-var t = e.currentTarget;
+var t = Gestures.findOriginalTarget(e);
 var ct = e.changedTouches[0];
 var x = ct.clientX, y = ct.clientY;
 if (this.hasMovedEnough(x, y)) {
@@ -5004,7 +5052,7 @@ this.info.started = true;
 }
 },
 touchend: function (e) {
-var t = e.currentTarget;
+var t = Gestures.findOriginalTarget(e);
 var ct = e.changedTouches[0];
 if (this.info.started) {
 Gestures.prevent('tap');
@@ -5080,9 +5128,10 @@ this.forward(e.changedTouches[0]);
 forward: function (e) {
 var dx = Math.abs(e.clientX - this.info.x);
 var dy = Math.abs(e.clientY - this.info.y);
+var t = Gestures.findOriginalTarget(e);
 if (isNaN(dx) || isNaN(dy) || dx <= TAP_DISTANCE && dy <= TAP_DISTANCE) {
 if (!this.info.prevent) {
-Gestures.fire(e.target, 'tap', {
+Gestures.fire(t, 'tap', {
 x: e.clientX,
 y: e.clientY,
 sourceEvent: e
@@ -5329,15 +5378,15 @@ Polymer.Bind = {
 prepareModel: function (model) {
 model._propertyEffects = {};
 model._bindListeners = [];
-var api = this._modelApi;
-for (var n in api) {
-model[n] = api[n];
-}
+Polymer.Base.mixin(model, this._modelApi);
 },
 _modelApi: {
 _notifyChange: function (property) {
 var eventName = Polymer.CaseMap.camelToDashCase(property) + '-changed';
-this.fire(eventName, { value: this[property] }, { bubbles: false });
+Polymer.Base.fire(eventName, { value: this[property] }, {
+bubbles: false,
+node: this
+});
 },
 _propertySetter: function (property, value, effects, fromAbove) {
 var old = this.__data__[property];
@@ -5428,8 +5477,11 @@ return this.__data__[property];
 var setter = function (value) {
 this._propertySetter(property, value, effects);
 };
-if (model.getPropertyInfo && model.getPropertyInfo(property).readOnly) {
+var info = model.getPropertyInfo && model.getPropertyInfo(property);
+if (info && info.readOnly) {
+if (!info.computed) {
 model['_set' + this.upper(property)] = setter;
+}
 } else {
 defun.set = setter;
 }
@@ -5887,6 +5939,7 @@ this._pathEffector(path, value);
 if (!fromAbove) {
 this._notifyPath(path, value);
 }
+return true;
 }
 },
 _getPathParts: function (path) {
@@ -6228,7 +6281,7 @@ var VAR_START = '--';
 var MEDIA_START = '@media';
 var AT_START = '@';
 var rx = {
-comments: /\/\*[^*]*\*+([^/*][^*]*\*+)*\//gim,
+comments: /\/\*[^*]*\*+([^\/*][^*]*\*+)*\//gim,
 port: /@import[^;]*;/gim,
 customProp: /(?:^|[\s;])--[^;{]*?:[^{};]*?(?:[;\n]|$)/gim,
 mixinProp: /(?:^|[\s;])--[^;{]*?:[^{;]*?{[^}]*?}(?:[;\n]|$)?/gim,
@@ -6900,10 +6953,10 @@ props[i] = v;
 }
 },
 rx: {
-VAR_ASSIGN: /(?:^|[;\n]\s*)(--[\w-]*?):\s*?(?:([^;{]*?)|{([^}]*)})(?:(?=[;\n])|$)/gim,
-MIXIN_MATCH: /(?:^|\W+)@apply[\s]*\(([^)]*)\)/im,
-VAR_MATCH: /(^|\W+)var\([\s]*([^,)]*)[\s]*,?[\s]*((?:[^,)]*)|(?:[^;]*\([^;)]*\)))[\s]*?\)/gim,
-VAR_CAPTURE: /\([\s]*(--[^,\s)]*)(?:,[\s]*(--[^,\s)]*))?(?:\)|,)/gim,
+VAR_ASSIGN: /(?:^|[;\n]\s*)(--[\w-]*?):\s*(?:([^;{]*)|{([^}]*)})(?:(?=[;\n])|$)/gi,
+MIXIN_MATCH: /(?:^|\W+)@apply[\s]*\(([^)]*)\)/i,
+VAR_MATCH: /(^|\W+)var\([\s]*([^,)]*)[\s]*,?[\s]*((?:[^,)]*)|(?:[^;]*\([^;)]*\)))[\s]*?\)/gi,
+VAR_CAPTURE: /\([\s]*(--[^,\s)]*)(?:,[\s]*(--[^,\s)]*))?(?:\)|,)/gi,
 IS_VAR: /^--/,
 BRACKETED: /\{[^}]*\}/g,
 HOST_PREFIX: '(?:^|[^.#[:])',
@@ -7242,7 +7295,7 @@ styleTransformer.documentRule(rule);
 });
 }());
 Polymer.Templatizer = {
-properties: { _hideTemplateChildren: { observer: '_showHideChildren' } },
+properties: { __hideTemplateChildren__: { observer: '_showHideChildren' } },
 _templatizerStatic: {
 count: 0,
 callbacks: {},
@@ -7271,6 +7324,7 @@ this._prepParentProperties(archetype, template);
 archetype._notifyPath = this._notifyPathImpl;
 archetype._scopeElementClass = this._scopeElementClassImpl;
 archetype.listen = this._listenImpl;
+archetype._showHideChildren = this._showHideChildrenImpl;
 var _constructor = this._constructorImpl;
 var ctor = function TemplateInstance(model, host) {
 _constructor.call(this, model, host);
@@ -7283,7 +7337,15 @@ this.ctor = ctor;
 _getRootDataHost: function () {
 return this.dataHost && this.dataHost._rootDataHost || this.dataHost;
 },
-_showHideChildren: function (hidden) {
+_showHideChildrenImpl: function (hide) {
+var c = this._children;
+for (var i = 0; i < c.length; i++) {
+var n = c[i];
+if (n.style) {
+n.style.display = hide ? 'none' : '';
+n.__hideTemplateChildren__ = hide;
+}
+}
 },
 _debounceTemplate: function (fn) {
 this._templatizerStatic.callbacks[this._templatizerId] = fn.bind(this);
@@ -7384,6 +7446,8 @@ template._propertySetter(n, val);
 }
 });
 },
+_showHideChildren: function (hidden) {
+},
 _forwardInstancePath: function (inst, path, value) {
 },
 _forwardInstanceProp: function (inst, prop, value) {
@@ -7422,6 +7486,9 @@ children.push(n);
 n._templateInstance = this;
 }
 this._children = children;
+if (host.__hideTemplateChildren__) {
+this._showHideChildren(true);
+}
 this._tryReady();
 },
 _listenImpl: function (node, eventName, methodName) {
@@ -7448,6 +7515,20 @@ model[prop] = this['_parent_' + prop];
 }
 }
 return new this.ctor(model, this);
+},
+modelForElement: function (el) {
+var model;
+while (el) {
+if (model = el._templateInstance) {
+if (model.dataHost != this) {
+el = model.dataHost;
+} else {
+return model;
+}
+} else {
+el = el.parentNode;
+}
+}
 }
 };
 Polymer({
@@ -7494,7 +7575,7 @@ this._removeFromMap(this.store[key]);
 delete this.store[key];
 },
 _removeFromMap: function (item) {
-if (typeof item == 'object') {
+if (item && typeof item == 'object') {
 this.omap.delete(item);
 } else {
 delete this.pmap[item];
@@ -7506,7 +7587,7 @@ this.removeKey(key);
 return key;
 },
 getKey: function (item) {
-if (typeof item == 'object') {
+if (item && typeof item == 'object') {
 return this.omap.get(item);
 } else {
 return this.pmap[item];
@@ -7875,14 +7956,7 @@ return row;
 _showHideChildren: function (hidden) {
 if (this.rows) {
 for (var i = 0; i < this.rows.length; i++) {
-var c$ = this.rows[i]._children;
-for (var j = 0; j < c$.length; j++) {
-var c = c$[j];
-if (c.style) {
-c.style.display = hidden ? 'none' : '';
-}
-c._hideTemplateChildren = hidden;
-}
+this.rows[i]._showHideChildren(hidden);
 }
 }
 },
@@ -7929,20 +8003,6 @@ row.notifyPath(path, value, true);
 } else {
 row.__setProperty(this.as, value, true);
 }
-}
-}
-},
-modelForElement: function (el) {
-var model;
-while (el) {
-if (model = el._templateInstance) {
-if (model.dataHost != this) {
-el = model.dataHost;
-} else {
-return model;
-}
-} else {
-el = el.parentNode;
 }
 }
 },
@@ -8100,7 +8160,7 @@ this._instance = null;
 },
 _wrapTextNodes: function (root) {
 for (var n = root.firstChild; n; n = n.nextSibling) {
-if (n.nodeType === Node.TEXT_NODE) {
+if (n.nodeType === Node.TEXT_NODE && n.textContent.trim()) {
 var s = document.createElement('span');
 root.insertBefore(s, n);
 s.appendChild(n);
@@ -8109,14 +8169,9 @@ n = s;
 }
 },
 _showHideChildren: function () {
-var hidden = this._hideTemplateChildren || !this.if;
+var hidden = this.__hideTemplateChildren__ || !this.if;
 if (this._instance) {
-var c$ = this._instance._children;
-for (var i = 0; i < c$.length; i++) {
-var c = c$[i];
-c.style.display = hidden ? 'none' : '';
-c._hideTemplateChildren = hidden;
-}
+this._instance._showHideChildren(hidden);
 }
 },
 _forwardParentProp: function (prop, value) {
@@ -11323,7 +11378,8 @@ this._removeChildren();
   }
 
 </style>
-<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic,500,500italic,700,700italic">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic,500,500italic,700,700italic">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,700">
 <style is="custom-style">
 
   :root {
@@ -11340,7 +11396,7 @@ this._removeChildren();
     };
 
     --paper-font-common-code: {
-      font-family: 'Inconsolata', 'Consolas', 'Source Code Pro', 'Monaco', 'Menlo', monospace;
+      font-family: 'Roboto Mono', 'Consolas', 'Menlo', monospace;
       -webkit-font-smoothing: antialiased;
     };
 
@@ -11528,7 +11584,7 @@ this._removeChildren();
 
     --paper-font-code2: {
       /* @apply(--paper-font-common-code); */
-      font-family: 'Inconsolata', 'Consolas', 'Source Code Pro', 'Monaco', 'Menlo', monospace;
+      font-family: 'Roboto Mono', 'Consolas', 'Menlo', monospace;
       -webkit-font-smoothing: antialiased;
 
       font-size: 14px;
@@ -11538,7 +11594,7 @@ this._removeChildren();
 
     --paper-font-code1: {
       /* @apply(--paper-font-common-code); */
-      font-family: 'Inconsolata', 'Consolas', 'Source Code Pro', 'Monaco', 'Menlo', monospace;
+      font-family: 'Roboto Mono', 'Consolas', 'Menlo', monospace;
       -webkit-font-smoothing: antialiased;
 
       font-size: 14px;
@@ -12981,8 +13037,8 @@ The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
 The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
 Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
-
 */
+
 :host {
   display: block;
   position: absolute;
@@ -12999,16 +13055,16 @@ iron-selector > #drawer {
   left: 0;
   height: 100%;
   background-color: white;
-  will-change: transform;
-  box-sizing: border-box;
+
   -moz-box-sizing: border-box;
+  box-sizing: border-box;
 
   @apply(--paper-drawer-panel-drawer-container);
 }
 
 .transition > #drawer {
-  transition: -webkit-transform ease-in-out 0.3s, width ease-in-out 0.3s;
-  transition: transform ease-in-out 0.3s, width ease-in-out 0.3s;
+  transition: -webkit-transform ease-in-out 0.3s, width ease-in-out 0.3s, visibility 0.3s;
+  transition: transform ease-in-out 0.3s, width ease-in-out 0.3s, visibility 0.3s;
 }
 
 .left-drawer > #drawer {
@@ -13063,6 +13119,10 @@ iron-selector > #main {
   background-color: rgba(0, 0, 0, 0.3);
 }
 
+.narrow-layout > #drawer {
+  will-change: transform;
+}
+
 .narrow-layout > #drawer.iron-selected {
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.15);
 }
@@ -13082,19 +13142,24 @@ iron-selector > #main {
 
 .right-drawer.narrow-layout > #drawer:not(.iron-selected) {
   left: auto;
+  visibility: hidden;
+
   -webkit-transform: translateX(100%);
   transform: translateX(100%);
 }
 
+.right-drawer.narrow-layout.dragging > #drawer:not(.iron-selected),
+.right-drawer.narrow-layout.peeking > #drawer:not(.iron-selected) {
+  visibility: visible;
+}
+
 .narrow-layout > #main {
-  left: 0 !important;
   padding: 0;
 }
 
 .right-drawer.narrow-layout > #main {
   left: 0;
   right: 0;
-  padding: 0;
 }
 
 .narrow-layout > #main:not(.iron-selected) > #scrim,
@@ -13108,8 +13173,9 @@ iron-selector > #main {
   min-height: 100%;
   left: 0;
   right: 0;
-  box-sizing: border-box;
+
   -moz-box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 iron-selector:not(.narrow-layout) #main ::content [paper-drawer-toggle] {
@@ -13121,7 +13187,7 @@ iron-selector:not(.narrow-layout) #main ::content [paper-drawer-toggle] {
     <iron-media-query id="mq" on-query-matches-changed="_onQueryMatchesChanged" query="[[_computeMediaQuery(forceNarrow, responsiveWidth)]]">
     </iron-media-query>
 
-    <iron-selector attr-for-selected="id" class$="[[_computeIronSelectorClass(narrow, transition, dragging, rightDrawer)]]" activate-event="" selected="[[selected]]">
+    <iron-selector attr-for-selected="id" class$="[[_computeIronSelectorClass(narrow, transition, dragging, rightDrawer, peeking)]]" activate-event="" selected="[[selected]]">
 
       <div id="main" style$="[[_computeMainStyle(narrow, rightDrawer, drawerWidth)]]">
         <content select="[main]"></content>
@@ -13170,17 +13236,24 @@ iron-selector:not(.narrow-layout) #main ::content [paper-drawer-toggle] {
        */
 
       /**
-       * Fired when the selected panel changes.
+       * Fired when the a panel is selected.
        *
        * Listening for this event is an alternative to observing changes in the `selected` attribute.
-       * This event is fired both when a panel is selected and deselected.
-       * The `isSelected` detail property contains the selection state.
+       * This event is fired both when a panel is selected.
        *
-       * @event paper-select {{isSelected: boolean, item: Object}} detail -
-       *     isSelected: True for selection and false for deselection.
+       * @event iron-select {{item: Object}} detail -
        *     item: The panel that the event refers to.
        */
 
+      /**
+       * Fired when a panel is deselected.
+       *
+       * Listening for this event is an alternative to observing changes in the `selected` attribute.
+       * This event is fired both when a panel is deselected.
+       *
+       * @event iron-deselect {{item: Object}} detail -
+       *     item: The panel that the event refers to.
+       */
       properties: {
 
         /**
@@ -13379,13 +13452,14 @@ iron-selector:not(.narrow-layout) #main ::content [paper-drawer-toggle] {
         this.transition = true;
       },
 
-      _computeIronSelectorClass: function(narrow, transition, dragging, rightDrawer) {
+      _computeIronSelectorClass: function(narrow, transition, dragging, rightDrawer, peeking) {
         return classNames({
           dragging: dragging,
           'narrow-layout': narrow,
           'right-drawer': rightDrawer,
           'left-drawer': !rightDrawer,
-          transition: transition
+          transition: transition,
+          peeking: peeking
         });
       },
 
@@ -13400,8 +13474,6 @@ iron-selector:not(.narrow-layout) #main ::content [paper-drawer-toggle] {
 
         if (rightDrawer) {
           style += 'right:' + (narrow ? '' : drawerWidth) + ';';
-        } else {
-          style += 'right:;';
         }
 
         return style;
@@ -13415,19 +13487,19 @@ iron-selector:not(.narrow-layout) #main ::content [paper-drawer-toggle] {
         return !narrow || disableEdgeSwipe;
       },
 
-      _onTrack: function(e) {
+      _onTrack: function(event) {
         if (sharedPanel && this !== sharedPanel) {
           return;
         }
-        switch (e.detail.state) {
+        switch (event.detail.state) {
           case 'start':
-            this._trackStart(e);
+            this._trackStart(event);
             break;
           case 'track':
-            this._trackX(e);
+            this._trackX(event);
             break;
           case 'end':
-            this._trackEnd(e);
+            this._trackEnd(event);
             break;
         }
 
@@ -13444,8 +13516,8 @@ iron-selector:not(.narrow-layout) #main ::content [paper-drawer-toggle] {
         this.fire('paper-responsive-change', {narrow: this.narrow});
       },
 
-      _onQueryMatchesChanged: function(e) {
-        this._responsiveChange(e.detail.value);
+      _onQueryMatchesChanged: function(event) {
+        this._responsiveChange(event.detail.value);
       },
 
       _forceNarrowChanged: function() {
@@ -13475,9 +13547,11 @@ iron-selector:not(.narrow-layout) #main ::content [paper-drawer-toggle] {
         }
       },
 
-      _downHandler: function(e) {
-        if (!this.dragging && this._isMainSelected() && this._isEdgeTouch(e) && !sharedPanel) {
+      _downHandler: function(event) {
+        if (!this.dragging && this._isMainSelected() && this._isEdgeTouch(event) && !sharedPanel) {
           this._startEdgePeek();
+          // cancel selection
+          event.preventDefault();
           // grab this panel
           sharedPanel = this;
         }
@@ -13489,8 +13563,8 @@ iron-selector:not(.narrow-layout) #main ::content [paper-drawer-toggle] {
         sharedPanel = null;
       },
 
-      _onTap: function(e) {
-        var targetElement = Polymer.dom(e).localTarget;
+      _onTap: function(event) {
+        var targetElement = Polymer.dom(event).localTarget;
         var isTargetToggleElement = targetElement &&
           this.drawerToggleAttribute &&
           targetElement.hasAttribute(this.drawerToggleAttribute);
@@ -13500,8 +13574,8 @@ iron-selector:not(.narrow-layout) #main ::content [paper-drawer-toggle] {
         }
       },
 
-      _isEdgeTouch: function(e) {
-        var x = e.detail.x;
+      _isEdgeTouch: function(event) {
+        var x = event.detail.x;
 
         return !this.disableEdgeSwipe && this._swipeAllowed() &&
           (this.rightDrawer ?
@@ -13535,9 +13609,9 @@ iron-selector:not(.narrow-layout) #main ::content [paper-drawer-toggle] {
         }
       },
 
-      _trackX: function(e) {
+      _trackX: function(event) {
         if (this.dragging) {
-          var dx = e.detail.dx;
+          var dx = event.detail.dx;
 
           if (this.peeking) {
             if (Math.abs(dx) <= this.edgeSwipeSensitivity) {
@@ -13551,9 +13625,9 @@ iron-selector:not(.narrow-layout) #main ::content [paper-drawer-toggle] {
         }
       },
 
-      _trackEnd: function(e) {
+      _trackEnd: function(event) {
         if (this.dragging) {
-          var xDirection = e.detail.dx > 0;
+          var xDirection = event.detail.dx > 0;
 
           this._setDragging(false);
           this.transition = true;
@@ -13578,13 +13652,7 @@ iron-selector:not(.narrow-layout) #main ::content [paper-drawer-toggle] {
       },
 
       _moveDrawer: function(translateX) {
-        var s = this.$.drawer.style;
-
-        if (this.hasTransform) {
-          s.transform = this._transformForTranslateX(translateX);
-        } else {
-          s.webkitTransform = this._transformForTranslateX(translateX);
-        }
+        this.transform(this._transformForTranslateX(translateX), this.$.drawer);
       }
 
     });
@@ -14621,6 +14689,7 @@ iron-selector:not(.narrow-layout) #main ::content [paper-drawer-toggle] {
       position: relative;
       padding: 8px;
       outline: none;
+      -webkit-tap-highlight-color: rgba(0,0,0,0);
       -webkit-user-select: none;
       -moz-user-select: none;
       -ms-user-select: none;
@@ -14834,6 +14903,17 @@ iron-selector:not(.narrow-layout) #main ::content [paper-drawer-toggle] {
     .toolbar-tools > ::content[select=".bottom"] paper-icon-button + .title {
       margin-left: 0;
     }
+
+    .toolbar-tools > ::content > .fit {
+      position: absolute;
+      top: auto;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      width: auto;
+      margin: 0;
+    }
+
   </style>
 
   <template>
@@ -14970,9 +15050,9 @@ iron-selector:not(.narrow-layout) #main ::content [paper-drawer-toggle] {
 
       _computeBarClassName: function(barJustify) {
         var classObj = {
-          center: true,
-          horizontal: true,
-          layout: true,
+          'center': true,
+          'horizontal': true,
+          'layout': true,
           'toolbar-tools': true
         };
 
@@ -15083,7 +15163,7 @@ iron-selector:not(.narrow-layout) #main ::content [paper-drawer-toggle] {
       position: relative;
       outline: 0;
 
-      @apply(--paper-menu-colored-focused-item);
+      @apply(--paper-menu-focused-item);
     }
 
     .content > ::content > *:focus:after {
@@ -15093,7 +15173,7 @@ iron-selector:not(.narrow-layout) #main ::content [paper-drawer-toggle] {
       opacity: 0.12;
       content: '';
 
-      @apply(--paper-menu-colored-focused-item-after);
+      @apply(--paper-menu-focused-item-after);
     }
 
     .content > ::content > *[colored]:focus:after {
@@ -15558,7 +15638,7 @@ elementOpen('div', item.key, ['staticAttr', 'staticValue'],
         <div>
           <h4>Description</h4>
           <p>
-            Signifies the end of the element opened with <code><a href="#api/elementOpen">elementOpen</a></code>, correspoding to a closing tag (e.g. <code>&lt;/div&gt;</code> in HTML). Any childNodes of the currently open Element that are in the DOM that have not been encountered in the current render pass are removed by the call to <code>elementClose</code>.
+            Signifies the end of the element opened with <code><a href="#api/elementOpen">elementOpen</a></code>, corresponding to a closing tag (e.g. <code>&lt;/div&gt;</code> in HTML). Any childNodes of the currently open Element that are in the DOM that have not been encountered in the current render pass are removed by the call to <code>elementClose</code>.
           </p>
 
           <h4>Parameters</h4>
@@ -15644,18 +15724,21 @@ text('hello world');
             <dd>The Node to patch. Typically, this will be an HTMLElement or DocumentFragment.</dd>
             <dt><code><em>function</em> description</code></dt>
             <dd>The description of the DOM tree underneath <code>node</code>.</dd>
+            <dt><code><em>any</em> data</code></dt>
+            <dd>Optional data that will be passed to <code>description</code>.</dd>
           </dl>
 
           <h4>Usage</h4>
           <code-prism lang="javascript">
 var patch = IncrementalDOM.patch;
-function render() {
+function render(data) {
   elementOpen('div');
   elementClose('div');
   …
 }
 var myElement = document.getElementById(…);
-patch(myElement, render);
+var someData = {…};
+patch(myElement, render, someData);
           </code-prism>
         </div>
       </section>
