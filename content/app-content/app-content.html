@@ -391,18 +391,21 @@ text('hello world');
             <dd>The Node to patch. Typically, this will be an HTMLElement or DocumentFragment.</dd>
             <dt><code><em>function</em> description</code></dt>
             <dd>The description of the DOM tree underneath <code>node</code>.</dd>
+            <dt><code><em>any</em> data</code></dt>
+            <dd>Optional data that will be passed to <code>description</code>.</dd>
           </dl>
 
           <h4>Usage</h4>
           <code-prism lang="javascript">
 var patch = IncrementalDOM.patch;
-function render() {
+function render(data) {
   elementOpen('div');
   elementClose('div');
   &hellip;
 }
 var myElement = document.getElementById(&hellip;);
-patch(myElement, render);
+var someData = {&hellip;};
+patch(myElement, render, someData);
           </code-prism>
         </div>
       </section>
