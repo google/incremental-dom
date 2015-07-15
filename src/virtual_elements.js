@@ -202,6 +202,7 @@ var elementOpen = function(tag, key, statics, var_args) {
   }
 
   firstChild();
+  return node;
 };
 
 
@@ -256,8 +257,9 @@ var elementOpenEnd = function() {
     setNotInAttributes();
   }
 
-  elementOpen.apply(null, argsBuilder);
+  var node = elementOpen.apply(null, argsBuilder);
   argsBuilder.length = 0;
+  return node;
 };
 
 
@@ -294,8 +296,9 @@ var elementVoid = function(tag, key, statics, var_args) {
     assertNotInAttributes();
   }
 
-  elementOpen.apply(null, arguments);
+  var node = elementOpen.apply(null, arguments);
   elementClose.apply(null, arguments);
+  return node;
 };
 
 
