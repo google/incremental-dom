@@ -19,8 +19,8 @@ var getData = require('./node_data').getData;
 
 /**
  * Applies an attribute or property to a given Element. If the value is a object
- * or a function (which includes null), it is set as a property on the Element.
- * Otherwise, the value is set as an attribute.
+ * or a function, it is set as a property on the Element. Otherwise, the value
+ * is set as an attribute.
  * @param {!Element} el
  * @param {string} name The attribute's name.
  * @param {*} value The attribute's value. If the value is a string, it is set
@@ -36,7 +36,7 @@ var applyAttr = function(el, name, value) {
 
   var type = typeof value;
 
-  if (value === undefined) {
+  if (value == null) {
     el.removeAttribute(name);
   } else if (type === 'object' || type === 'function') {
     el[name] = value;
