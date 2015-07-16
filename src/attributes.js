@@ -25,7 +25,22 @@ var nodeData = require('./node_data'),
  * specified.
  * @const {number}
  */
-var ATTRIBUTES_OFFSET = 3;
+var ATTRIBUTES_OFFSET_INTERNAL = 3;
+
+
+/**
+ * The offset in the update attributes call where the attributes are specified.
+ * @const {number}
+ */
+var ATTRIBUTES_OFFSET_EXTERNAL = 1;
+
+
+/**
+ * A switch to indicate if the current call to changedAttributes is coming from
+ * an internal source (elementOpen), or an external call to updateAttributes.
+ * {boolean}
+ */
+var isInternal = true;
 
 
 /**
@@ -84,13 +99,14 @@ var applyStyle = function(el, style) {
  * checking each individual argument. When attributes have changed, the overhead
  * of this function is minimal.
  *
+ * Depending on the source of the call, that index of the first attribute will
+ * change.
+ *
  * This function is called in the context of the Element and the arguments from
  * elementOpen-like function so that the arguments are not de-optimized.
  *
  * @this {Element} The Element to check for changed attributes.
  * @param {*} unused1
- * @param {*} unused2
- * @param {*} unused3
  * @param {...*} var_args Attribute name/value pairs of the dynamic attributes
  *     for the Element.
  * @return {?Array<*>} The changed attributes, if any have changed.
@@ -98,7 +114,7 @@ var applyStyle = function(el, style) {
 var changedAttributes = function(unused1, unused2, unused3, var_args) {
   var attrsArr = getAttrsArr(this);
   var attrsChanged = false;
-  var i = ATTRIBUTES_OFFSET;
+  var i = isInternal ? ATTRIBUTES_OFFSET_INTERNAL : ATTRIBUTES_OFFSET_EXTERNAL;
   var j = 0;
 
   for (; i < arguments.length; i += 1, j += 1) {
@@ -140,29 +156,14 @@ var updateAttribute = function(el, name, value) {
 
 
 /**
- * Updates the attributes on an Element.
+ * Sets static attributes on an Element.
  * @param {!Element} el
  * @param {?Array<*>} attributes An array of attribute name/value pairs of
  *     the static attributes for the Element.
  */
-var updateAttributes = function(el, attributes) {
+var staticAttributes = function(el, attributes) {
   for (var i = 0; i < attributes.length; i += 2) {
     updateAttribute(el, attributes[i], attributes[i + 1]);
-  }
-};
-
-
-/**
- * Updates changed attributes on an Element.
- * @param {!Element} el
- * @param {?Array<*>} attributes An array of attribute name/value pairs of
- *     the static attributes for the Element.
- */
-var updateChangedAttributes = function(el, attributes) {
-  var newAttrs = updateNewAttrs(el, attributes);
-
-  for (var attr in newAttrs) {
-    updateAttribute(el, attr, newAttrs[attr]);
   }
 };
 
@@ -189,10 +190,73 @@ var updateNewAttrs = function(el, attributes) {
 };
 
 
+/**
+ * Updates changed attributes on an Element.
+ * @param {!Element} el
+ * @param {?Array<*>} attributes An array of attribute name/value pairs of
+ *     the static attributes for the Element.
+ */
+var updateChangedAttributes = function(el, attributes) {
+  var newAttrs = updateNewAttrs(el, attributes);
+
+  for (var attr in newAttrs) {
+    updateAttribute(el, attr, newAttrs[attr]);
+  }
+};
+
+
+/**
+ * Updates the attributes for an Element.
+ *
+ * This function is exposed externally, with attribute name/value pairs starting
+ * at argument index 1, so it primes changedAttributes to the external method
+ * signature.
+ *
+ * @param {Element} el The Element to update attributes for.
+ * @param {...*} var_args Attribute name/value pairs of the dynamic attributes
+ *     for the Element.
+ */
+var updateAttributes = function(el, var_args) {
+  isInternal = false;
+
+  var changed = changedAttributes.apply(el, arguments);
+  if (changed) {
+    updateChangedAttributes(el, changed);
+  }
+};
+
+/**
+ * Updates the attributes for an Element.
+ *
+ * This function is only exposed internally, with attribute name/value pairs
+ * starting at argument index 3, so it primes changedAttributes to the internal
+ * method signature.
+ *
+ * This function is called in the context of the Element and the arguments from
+ * elementOpen-like function so that the arguments are not de-optimized.
+ *
+ * @this {Element} The Element to check for changed attributes.
+ * @param {*} unused1
+ * @param {*} unused2
+ * @param {*} unused3
+ * @param {...*} var_args Attribute name/value pairs of the dynamic attributes
+ *     for the Element.
+ */
+var updateAttributesInternal = function(unused1, unused2, unused3, var_args) {
+  isInternal = true;
+
+  var changed = changedAttributes.apply(this, arguments);
+  if (changed) {
+    updateChangedAttributes(this, changed);
+  }
+};
+
+
+
 /** */
 module.exports = {
-  changedAttributes: changedAttributes,
+  staticAttributes: staticAttributes,
   updateAttributes: updateAttributes,
-  updateChangedAttributes: updateChangedAttributes,
+  updateAttributesInternal: updateAttributesInternal,
 };
 

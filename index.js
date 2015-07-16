@@ -15,8 +15,9 @@
  * limitations under the License.
  */
 
-var patch = require('./src/patch').patch;
 var elements = require('./src/virtual_elements');
+var patch = require('./src/patch').patch;
+var updateAttributes = require('./src/attributes').updateAttributes;
 
 module.exports = {
   patch: patch,
@@ -26,6 +27,7 @@ module.exports = {
   elementOpen: elements.elementOpen,
   elementClose: elements.elementClose,
   text: elements.text,
-  attr: elements.attr
+  attr: elements.attr,
+  updateAttributes: updateAttributes
 };
 

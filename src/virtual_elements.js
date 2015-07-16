@@ -15,11 +15,9 @@
  */
 
 var alignWithDOM = require('./alignment').alignWithDOM;
-var attributes = require('./attributes'),
-    changedAttributes = attributes.changedAttributes,
-    updateChangedAttributes = attributes.updateChangedAttributes;
 var getData = require('./node_data').getData;
 var getWalker = require('./walker').getWalker;
+var updateAttributesInternal = require('./attributes').updateAttributesInternal;
 var traversal = require('./traversal'),
     firstChild = traversal.firstChild,
     nextSibling = traversal.nextSibling,
@@ -102,11 +100,7 @@ var elementOpen = function(tag, key, statics, var_args) {
   }
 
   var node = alignWithDOM(tag, key, statics);
-
-  var changed = changedAttributes.apply(node, arguments);
-  if (changed) {
-    updateChangedAttributes(node, changed);
-  }
+  updateAttributesInternal.apply(node, arguments);
 
   firstChild();
   return node;

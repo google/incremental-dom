@@ -19,7 +19,7 @@ var nodeData = require('./node_data'),
     getKey = nodeData.getKey,
     initData = nodeData.initData;
 var getNamespaceForTag = require('./namespace').getNamespaceForTag;
-var updateAttributes = require('./attributes').updateAttributes;
+var staticAttributes = require('./attributes').staticAttributes;
 
 
 /**
@@ -44,7 +44,7 @@ var createElement = function(doc, tag, key, statics) {
   initData(el, tag, key);
 
   if (statics) {
-    updateAttributes(el, statics);
+    staticAttributes(el, statics);
   }
 
   return el;

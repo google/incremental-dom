@@ -16,9 +16,7 @@
 
 var IncrementalDOM = require('../../index'),
     patch = IncrementalDOM.patch,
-    elementOpenStart = IncrementalDOM.elementOpenStart,
-    elementOpenEnd = IncrementalDOM.elementOpenEnd,
-    elementAttr = IncrementalDOM.attr,
+    elementOpen = IncrementalDOM.elementOpen,
     elementClose = IncrementalDOM.elementClose,
     elementVoid = IncrementalDOM.elementVoid;
 
@@ -34,82 +32,72 @@ describe('attribute updates', () => {
     document.body.removeChild(container);
   });
 
-  describe('for conditional attributes', () => {
-    function render(attrs) {
-      elementOpenStart('div', '', []);
-      for (var attr in attrs) {
-          elementAttr(attr, attrs[attr]);
-      }
-      elementOpenEnd();
+  describe('for regular attributes', () => {
+    var el;
+
+    function render(value) {
+      el = elementOpen('div', '', [], 'data-expanded', value);
       elementClose('div');
     }
 
     it('should be present when they have a value', () => {
-      patch(container, () => render({
-        'data-expanded': 'hello'
-      }));
-      var el = container.childNodes[0];
+      patch(container, render, 'hello');
 
       expect(el.getAttribute('data-expanded')).to.equal('hello');
     });
 
     it('should be present when falsy', () => {
-      patch(container, () => render({
-        'data-expanded': false
-      }));
-      var el = container.childNodes[0];
+      patch(container, render, false);
 
       expect(el.getAttribute('data-expanded')).to.equal('false');
     });
 
     it('should be not present when undefined', () => {
-      patch(container, () => render({
-        id: undefined,
-        tabindex: undefined,
-        'data-expanded': undefined
-      }));
-      var el = container.childNodes[0];
+      patch(container, render, undefined);
 
       expect(el.getAttribute('data-expanded')).to.equal(null);
-      expect(el.getAttribute('id')).to.equal(null);
-      expect(el.getAttribute('tabindex')).to.equal(null);
     });
 
     it('should update the DOM when they change', () => {
-      patch(container, () => render({
-        'data-expanded': 'foo'
-      }));
-      patch(container, () => render({
-        'data-expanded': 'bar'
-      }));
-      var el = container.childNodes[0];
+      patch(container, render, 'foo');
+      patch(container, render, 'bar');
 
       expect(el.getAttribute('data-expanded')).to.equal('bar');
     });
 
-    it('should update attribute in different position', () => {
-      patch(container, () => render({
-        'data-foo': 'foo'
-      }));
-      patch(container, () => render({
-        'data-bar': 'foo'
-      }));
-      var el = container.childNodes[0];
+    it('should be removed when set to undefined', () => {
+      patch(container, render, 'foo');
+      patch(container, render, undefined);
+
+      expect(el.getAttribute('data-expanded')).to.equal(null);
+    });
+
+    it('should update attributes in shuffled positions', () => {
+      var renderAttr = (attrs) => {
+        el = elementOpen('div', '', [], attrs.key, attrs.value);
+        elementClose('div');
+      };
+
+      patch(container, renderAttr, {
+        key: 'data-foo',
+        value: 'foo'
+      });
+      patch(container, renderAttr, {
+        key: 'data-bar',
+        value: 'foo'
+      });
 
       expect(el.getAttribute('data-bar')).to.equal('foo');
       expect(el.getAttribute('data-foo')).to.equal(null);
     });
 
     it('should remove trailing attributes when missing', function() {
-      patch(container, () => render({
-        'data-foo': 'foo',
-        'data-bar': 'bar'
-      }));
-      patch(container, () => render({}));
-      var el = container.childNodes[0];
+      patch(container, render, 'foo');
+      patch(container, () => {
+        el = elementVoid('div', '', []);
+      });
 
-      expect(el.getAttribute('data-foo')).to.equal(null);
-      expect(el.getAttribute('data-bar')).to.equal(null);
+      expect(el.getAttribute('data-expanded')).to.equal(null);
     });
   });
 
