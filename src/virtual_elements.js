@@ -15,21 +15,13 @@
  */
 
 var alignWithDOM = require('./alignment').alignWithDOM;
-var updateAttribute = require('./attributes').updateAttribute;
 var getData = require('./node_data').getData;
 var getWalker = require('./walker').getWalker;
+var updateAttributesInternal = require('./attributes').updateAttributesInternal;
 var traversal = require('./traversal'),
     firstChild = traversal.firstChild,
     nextSibling = traversal.nextSibling,
     parentNode = traversal.parentNode;
-
-
-/**
- * The offset in the virtual element declaration where the attributes are
- * specified.
- * @const
- */
-var ATTRIBUTES_OFFSET = 3;
 
 
 /**
@@ -41,7 +33,7 @@ var ATTRIBUTES_OFFSET = 3;
 var argsBuilder = [];
 
 /**
- * Verify if the script are running in production.
+ * Verify if the script is running in production.
  * @type {boolean}
  * @const
  */
@@ -89,94 +81,6 @@ if (!IS_PRODUCTION) {
 
 
 /**
- * Checks to see if one or more attributes have changed for a given
- * Element. When no attributes have changed, this function is much faster than
- * checking each individual argument. When attributes have changed, the overhead
- * of this function is minimal.
- *
- * This function is called in the context of the Element and the arguments from
- * elementOpen-like function so that the arguments are not de-optimized.
- *
- * @this {Element} The Element to check for changed attributes.
- * @param {*} unused1
- * @param {*} unused2
- * @param {*} unused3
- * @param {...*} var_args Attribute name/value pairs of the dynamic attributes
- *     for the Element.
- * @return {boolean} True if the Element has one or more changed attributes,
- *     false otherwise.
- */
-var hasChangedAttrs = function(unused1, unused2, unused3, var_args) {
-  var data = getData(this);
-  var attrsArr = data.attrsArr;
-  var attrsChanged = false;
-  var i = ATTRIBUTES_OFFSET;
-  var j = 0;
-
-  for (; i < arguments.length; i += 1, j += 1) {
-    if (attrsArr[j] !== arguments[i]) {
-      attrsChanged = true;
-      break;
-    }
-  }
-
-  for (; i < arguments.length; i += 1, j += 1) {
-    attrsArr[j] = arguments[i];
-  }
-
-  if (j < attrsArr.length) {
-    attrsChanged = true;
-    attrsArr.length = j;
-  }
-
-  return attrsChanged;
-};
-
-
-/**
- * Updates the newAttrs object for an Element.
- *
- * This function is called in the context of the Element and the arguments from
- * elementOpen-like function so that the arguments are not de-optimized.
- *
- * @this {Element} The Element to update newAttrs for.
- * @param {*} unused1
- * @param {*} unused2
- * @param {*} unused3
- * @param {...*} var_args Attribute name/value pairs of the dynamic attributes
- *     for the Element.
- * @return {!Object<string, *>} The updated newAttrs object.
- */
-var updateNewAttrs = function(unused1, unused2, unused3, var_args) {
-  var node = this;
-  var data = getData(node);
-  var newAttrs = data.newAttrs;
-
-  for (var attr in newAttrs) {
-    newAttrs[attr] = undefined;
-  }
-
-  for (var i = ATTRIBUTES_OFFSET; i < arguments.length; i += 2) {
-    newAttrs[arguments[i]] = arguments[i + 1];
-  }
-
-  return newAttrs;
-};
-
-
-/**
- * Updates the attributes for a given Element.
- * @param {!Element} node
- * @param {!Object<string,*>} newAttrs The new attributes for node
- */
-var updateAttributes = function(node, newAttrs) {
-  for (var attr in newAttrs) {
-    updateAttribute(node, attr, newAttrs[attr]);
-  }
-};
-
-
-/**
  * Declares a virtual Element at the current location in the document. This
  * corresponds to an opening tag and a elementClose tag is required.
  * @param {string} tag The element's tag.
@@ -196,11 +100,7 @@ var elementOpen = function(tag, key, statics, var_args) {
   }
 
   var node = alignWithDOM(tag, key, statics);
-
-  if (hasChangedAttrs.apply(node, arguments)) {
-    var newAttrs = updateNewAttrs.apply(node, arguments);
-    updateAttributes(node, newAttrs);
-  }
+  updateAttributesInternal.apply(node, arguments);
 
   firstChild();
   return node;

@@ -14,7 +14,56 @@
  * limitations under the License.
  */
 
-var getData = require('./node_data').getData;
+var nodeData = require('./node_data'),
+    getAttrsArr = nodeData.getAttrsArr,
+    getNewAttrs = nodeData.getNewAttrs,
+    getAttrs = nodeData.getAttrs;
+
+
+/**
+ * The offset in the virtual element declaration where the attributes are
+ * specified.
+ * @const {number}
+ */
+var ATTRIBUTES_OFFSET_INTERNAL = 3;
+
+
+/**
+ * The offset in the update attributes call where the attributes are specified.
+ * @const {number}
+ */
+var ATTRIBUTES_OFFSET_EXTERNAL = 1;
+
+
+/**
+ * Verify if the script is running in production.
+ * @type {boolean}
+ * @const
+ */
+var IS_PRODUCTION = process.env.NODE_ENV === 'production';
+
+
+/**
+ * The start index of attribute name/value pairs in the arguments of the
+ * current call to changedAttributes.
+ * {number}
+ */
+var changedAttributesStartIndex;
+
+
+if (!IS_PRODUCTION) {
+  /**
+   * Makes sure that updateAttributes and updateAttributesInternal have matched
+   * sets of attribute name/value pairs.
+   */
+  var assertMatchedPairs = function(startIndex, argsLength) {
+    var total = argsLength - startIndex;
+
+    if (total > startIndex && total % 2 === 1) {
+      throw new Error('Was expecting matched pairs of attribute names and values.');
+    }
+  };
+}
 
 
 /**
@@ -27,8 +76,7 @@ var getData = require('./node_data').getData;
  *     as an HTML attribute, otherwise, it is set on node.
  */
 var applyAttr = function(el, name, value) {
-  var data = getData(el);
-  var attrs = data.attrs;
+  var attrs = getAttrs(el);
 
   if (attrs[name] === value) {
     return;
@@ -69,6 +117,52 @@ var applyStyle = function(el, style) {
 
 
 /**
+ * Checks to see if one or more attributes have changed for a given
+ * Element. When no attributes have changed, this function is much faster than
+ * checking each individual argument. When attributes have changed, the overhead
+ * of this function is minimal.
+ *
+ * Depending on the source of the call, the index of the first attribute will
+ * change.
+ *
+ * This function is called in the context of the Element and the arguments from
+ * elementOpen-like function so that the arguments are not de-optimized.
+ *
+ * @this {Element} The Element to check for changed attributes.
+ * @param {*} unused1
+ * @param {...*} var_args Attribute name/value pairs of the dynamic attributes
+ *     for the Element.
+ * @return {?Array<*>} The changed attributes, if any have changed.
+ */
+var changedAttributes = function(unused1, var_args) {
+  var attrsArr = getAttrsArr(this);
+  var attrsChanged = false;
+  var i = changedAttributesStartIndex;
+  var j = 0;
+
+  for (; i < arguments.length; i += 1, j += 1) {
+    if (attrsArr[j] !== arguments[i]) {
+      attrsChanged = true;
+      break;
+    }
+  }
+
+  for (; i < arguments.length; i += 1, j += 1) {
+    attrsArr[j] = arguments[i];
+  }
+
+  if (j < attrsArr.length) {
+    attrsChanged = true;
+    attrsArr.length = j;
+  }
+
+  if (attrsChanged) {
+    return attrsArr;
+  }
+};
+
+
+/**
  * Updates a single attribute on an Element.
  * @param {!Element} el
  * @param {string} name The attribute's name.
@@ -84,8 +178,120 @@ var updateAttribute = function(el, name, value) {
 };
 
 
+/**
+ * Sets static attributes on an Element.
+ * @param {!Element} el
+ * @param {?Array<*>} attributes An array of attribute name/value pairs of
+ *     the static attributes for the Element.
+ */
+var staticAttributes = function(el, attributes) {
+  if (!IS_PRODUCTION) {
+    assertMatchedPairs(0, attributes.length);
+  }
+
+  for (var i = 0; i < attributes.length; i += 2) {
+    updateAttribute(el, attributes[i], attributes[i + 1]);
+  }
+};
+
+
+/**
+ * Updates the newAttrs object for an Element.
+ * @param {!Element} el
+ * @param {?Array<*>} attributes An array of attribute name/value pairs of
+ *     the static attributes for the Element.
+ * @return {!Object<string, *>} The updated newAttrs object.
+ */
+var updateNewAttrs = function(el, attributes) {
+  var newAttrs = getNewAttrs(el);
+
+  for (var attr in newAttrs) {
+    newAttrs[attr] = undefined;
+  }
+
+  for (var i = 0; i < attributes.length; i += 2) {
+    newAttrs[attributes[i]] = attributes[i + 1];
+  }
+
+  return newAttrs;
+};
+
+
+/**
+ * Updates changed attributes on an Element.
+ * @param {!Element} el
+ * @param {?Array<*>} attributes An array of attribute name/value pairs of
+ *     the static attributes for the Element.
+ */
+var updateChangedAttributes = function(el, attributes) {
+  var newAttrs = updateNewAttrs(el, attributes);
+
+  for (var attr in newAttrs) {
+    updateAttribute(el, attr, newAttrs[attr]);
+  }
+};
+
+
+/**
+ * Updates the attributes for an Element.
+ *
+ * This function is exposed externally, with attribute name/value pairs starting
+ * at argument index 1, so it primes changedAttributes to the external method
+ * signature.
+ *
+ * @param {Element} el The Element to update attributes for.
+ * @param {...*} var_args Attribute name/value pairs of the dynamic attributes
+ *     for the Element.
+ */
+var updateAttributes = function(el, var_args) {
+  if (!IS_PRODUCTION) {
+    assertMatchedPairs(ATTRIBUTES_OFFSET_EXTERNAL, arguments.length);
+  }
+
+  changedAttributesStartIndex = ATTRIBUTES_OFFSET_EXTERNAL;
+
+  var changed = changedAttributes.apply(el, arguments);
+  if (changed) {
+    updateChangedAttributes(el, changed);
+  }
+};
+
+/**
+ * Updates the attributes for an Element.
+ *
+ * This function is only exposed internally, with attribute name/value pairs
+ * starting at argument index 3, so it primes changedAttributes to the internal
+ * method signature.
+ *
+ * This function is called in the context of the Element and the arguments from
+ * elementOpen-like function so that the arguments are not de-optimized.
+ *
+ * @this {Element} The Element to check for changed attributes.
+ * @param {*} unused1
+ * @param {*} unused2
+ * @param {*} unused3
+ * @param {...*} var_args Attribute name/value pairs of the dynamic attributes
+ *     for the Element.
+ */
+var updateAttributesInternal = function(unused1, unused2, unused3, var_args) {
+  if (!IS_PRODUCTION) {
+    assertMatchedPairs(ATTRIBUTES_OFFSET_INTERNAL, arguments.length);
+  }
+
+  changedAttributesStartIndex = ATTRIBUTES_OFFSET_INTERNAL;
+
+  var changed = changedAttributes.apply(this, arguments);
+  if (changed) {
+    updateChangedAttributes(this, changed);
+  }
+};
+
+
+
 /** */
 module.exports = {
-  updateAttribute: updateAttribute
+  staticAttributes: staticAttributes,
+  updateAttributes: updateAttributes,
+  updateAttributesInternal: updateAttributesInternal,
 };
 

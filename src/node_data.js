@@ -24,7 +24,7 @@
 function NodeData(nodeName, key) {
   /**
    * The attributes and their values.
-   * @const
+   * @const {!Object<string, *>}
    */
   this.attrs = {};
 
@@ -45,7 +45,7 @@ function NodeData(nodeName, key) {
   /**
    * The key used to identify this node, used to preserve DOM nodes when they
    * move within their parent.
-   * @const
+   * @const {?string}
    */
   this.key = key || null;
 
@@ -63,12 +63,13 @@ function NodeData(nodeName, key) {
 
   /**
    * The node name for this node.
-   * @const
+   * @const {string}
    */
   this.nodeName = nodeName;
 
   /**
-   * @const {string}
+   * The text content of a Text node.
+   * {string}
    */
   this.text = null;
 }
@@ -114,7 +115,7 @@ var getData = function(node) {
 
 
 /**
- * @param {?Node} node A node to get the key for.
+ * @param {!Node} node A node to get the key for.
  * @return {?string} The key for the Node, if applicable.
  */
 var getKey = function(node) {
@@ -123,11 +124,38 @@ var getKey = function(node) {
 
 
 /**
- * @param {?Node} node A node to get the node name for.
- * @return {?string} The node name for the Node, if applicable.
+ * @param {!Node} node A node to get the node name for.
+ * @return {string} The node name for the Node.
  */
 var getNodeName = function(node) {
   return getData(node).nodeName;
+};
+
+
+/**
+ * @param {!Node} node A node to get the attributes hash for.
+ * @return {!Object<string, *>} The attributes for the Node.
+ */
+var getAttrs = function(node) {
+  return getData(node).attrs;
+};
+
+
+/**
+ * @param {!Node} node A node to get attributes array for.
+ * @return {!Array<*>} The attributes array for the Node.
+ */
+var getAttrsArr = function(node) {
+  return getData(node).attrsArr;
+};
+
+
+/**
+ * @param {!Node} node A node to get the incoming attributes for.
+ * @return {!Object<string, *>} The incoming attributes for the Node.
+ */
+var getNewAttrs = function(node) {
+  return getData(node).newAttrs;
 };
 
 
@@ -136,6 +164,9 @@ module.exports = {
   getData: getData,
   initData: initData,
   getKey: getKey,
-  getNodeName: getNodeName
+  getNodeName: getNodeName,
+  getAttrs: getAttrs,
+  getAttrsArr: getAttrsArr,
+  getNewAttrs: getNewAttrs
 };
 
