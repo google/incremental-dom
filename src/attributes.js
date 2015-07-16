@@ -36,11 +36,34 @@ var ATTRIBUTES_OFFSET_EXTERNAL = 1;
 
 
 /**
- * A switch to indicate if the current call to changedAttributes is coming from
- * an internal source (elementOpen), or an external call to updateAttributes.
- * {boolean}
+ * Verify if the script is running in production.
+ * @type {boolean}
+ * @const
  */
-var isInternal = true;
+var IS_PRODUCTION = process.env.NODE_ENV === 'production';
+
+
+/**
+ * The start index of attribute name/value pairs in the arguments of the
+ * current call to changedAttributes.
+ * {number}
+ */
+var changedAttributesStartIndex;
+
+
+if (!IS_PRODUCTION) {
+  /**
+   * Makes sure that updateAttributes and updateAttributesInternal have matched
+   * sets of attribute name/value pairs.
+   */
+  var assertMatchedPairs = function(startIndex, argsLength) {
+    var total = argsLength - startIndex;
+
+    if (total > startIndex && total % 2 === 1) {
+      throw new Error('Was expecting matched pairs of attribute names and values.');
+    }
+  };
+}
 
 
 /**
@@ -99,7 +122,7 @@ var applyStyle = function(el, style) {
  * checking each individual argument. When attributes have changed, the overhead
  * of this function is minimal.
  *
- * Depending on the source of the call, that index of the first attribute will
+ * Depending on the source of the call, the index of the first attribute will
  * change.
  *
  * This function is called in the context of the Element and the arguments from
@@ -111,10 +134,10 @@ var applyStyle = function(el, style) {
  *     for the Element.
  * @return {?Array<*>} The changed attributes, if any have changed.
  */
-var changedAttributes = function(unused1, unused2, unused3, var_args) {
+var changedAttributes = function(unused1, var_args) {
   var attrsArr = getAttrsArr(this);
   var attrsChanged = false;
-  var i = isInternal ? ATTRIBUTES_OFFSET_INTERNAL : ATTRIBUTES_OFFSET_EXTERNAL;
+  var i = changedAttributesStartIndex;
   var j = 0;
 
   for (; i < arguments.length; i += 1, j += 1) {
@@ -162,6 +185,10 @@ var updateAttribute = function(el, name, value) {
  *     the static attributes for the Element.
  */
 var staticAttributes = function(el, attributes) {
+  if (!IS_PRODUCTION) {
+    assertMatchedPairs(0, attributes.length);
+  }
+
   for (var i = 0; i < attributes.length; i += 2) {
     updateAttribute(el, attributes[i], attributes[i + 1]);
   }
@@ -217,7 +244,11 @@ var updateChangedAttributes = function(el, attributes) {
  *     for the Element.
  */
 var updateAttributes = function(el, var_args) {
-  isInternal = false;
+  if (!IS_PRODUCTION) {
+    assertMatchedPairs(ATTRIBUTES_OFFSET_EXTERNAL, arguments.length);
+  }
+
+  changedAttributesStartIndex = ATTRIBUTES_OFFSET_EXTERNAL;
 
   var changed = changedAttributes.apply(el, arguments);
   if (changed) {
@@ -243,7 +274,11 @@ var updateAttributes = function(el, var_args) {
  *     for the Element.
  */
 var updateAttributesInternal = function(unused1, unused2, unused3, var_args) {
-  isInternal = true;
+  if (!IS_PRODUCTION) {
+    assertMatchedPairs(ATTRIBUTES_OFFSET_INTERNAL, arguments.length);
+  }
+
+  changedAttributesStartIndex = ATTRIBUTES_OFFSET_INTERNAL;
 
   var changed = changedAttributes.apply(this, arguments);
   if (changed) {

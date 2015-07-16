@@ -33,7 +33,7 @@ var traversal = require('./traversal'),
 var argsBuilder = [];
 
 /**
- * Verify if the script are running in production.
+ * Verify if the script is running in production.
  * @type {boolean}
  * @const
  */
