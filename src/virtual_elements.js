@@ -188,6 +188,7 @@ var updateAttributes = function(node, newAttrs) {
  *     Element is created.
  * @param {...*} var_args Attribute name/value pairs of the dynamic attributes
  *     for the Element.
+ * @return {!Element} The corresponding Element
  */
 var elementOpen = function(tag, key, statics, var_args) {
   if (!IS_PRODUCTION) {
@@ -219,6 +220,7 @@ var elementOpen = function(tag, key, statics, var_args) {
  * @param {?Array<*>} statics An array of attribute name/value pairs of the
  *     static attributes for the Element. These will only be set once when the
  *     Element is created.
+ * @return {!Element} The corresponding Element
  */
 var elementOpenStart = function(tag, key, statics) {
   if (!IS_PRODUCTION) {
@@ -290,6 +292,7 @@ var elementClose = function(tag) {
  *     Element is created.
  * @param {...*} var_args Attribute name/value pairs of the dynamic attributes
  *     for the Element.
+ * @return {!Element} The corresponding Element
  */
 var elementVoid = function(tag, key, statics, var_args) {
   if (!IS_PRODUCTION) {
