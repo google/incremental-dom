@@ -33,7 +33,7 @@ var applyAttr = function(el, name, value) {
   if (attrs[name] === value) {
     return;
   }
-
+  /*
   var type = typeof value;
 
   if (value === undefined) {
@@ -45,6 +45,27 @@ var applyAttr = function(el, name, value) {
   }
 
   attrs[name] = value;
+  */
+  if (value === undefined) {
+    value = null; // should be confirmed wether or not null is appropriate here 
+
+  }
+
+  if (el[name] !== undefined) {
+    el[name] = value;
+
+  } else {
+    if (value === null) {
+      el.removeAttribute(name);
+
+    } else {
+      el.setAttribute(name, value);
+
+    }
+  }  
+
+  attrs[name] = value;
+
 };
 
 
