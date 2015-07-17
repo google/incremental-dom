@@ -156,7 +156,7 @@ var updateNewAttrs = function(unused1, unused2, unused3, var_args) {
     newAttrs[attr] = undefined;
   }
 
-  for (var i = ATTRIBUTES_OFFSET; i < arguments.length; i += 2) {
+  for (var i = ATTRIBUTES_OFFSET, l = arguments.length; i < l; i += 2) {
     newAttrs[arguments[i]] = arguments[i + 1];
   }
 
