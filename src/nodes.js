@@ -44,7 +44,7 @@ var createElement = function(doc, tag, key, statics) {
   initData(el, tag, key);
 
   if (statics) {
-    for (var i = 0; i < statics.length; i += 2) {
+    for (var i = 0, l = statics.length; i < l; i += 2) {
       updateAttribute(el, statics[i], statics[i + 1]);
     }
   }
