@@ -230,8 +230,6 @@ describe('attribute updates', () => {
 
       expect(el.getAttribute('class')).to.equal('foo');
     });
-
-
   });
 });
 
