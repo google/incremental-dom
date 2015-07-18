@@ -17,75 +17,75 @@
 var getData = require('./node_data').getData;
 
 
-/**
- * Applies an attribute or property to a given Element. If the value is a object
- * or a function (which includes null), it is set as a property on the Element.
- * Otherwise, the value is set as an attribute.
- * @param {!Element} el
- * @param {string} name The attribute's name.
- * @param {*} value The attribute's value. If the value is a string, it is set
- *     as an HTML attribute, otherwise, it is set on node.
- */
-var applyAttr = function(el, name, value) {
-  var data = getData(el);
-  var attrs = data.attrs;
+var attributes = {
+  /**
+   * Applies an attribute or property to a given Element. If the value is a
+   * object or a function (which includes null), it is set as a property on the
+   * Element. Otherwise, the value is set as an attribute.
+   * @param {!Element} el
+   * @param {string} name The attribute's name.
+   * @param {*} value The attribute's value. If the value is a string, it is set
+   *     as an HTML attribute, otherwise, it is set on node.
+   */
+  applyAttr: function(el, name, value) {
+    var type = typeof value;
 
-  if (attrs[name] === value) {
-    return;
-  }
-
-  var type = typeof value;
-
-  if (value === undefined) {
-    el.removeAttribute(name);
-  } else if (type === 'object' || type === 'function') {
-    el[name] = value;
-  } else {
-    el.setAttribute(name, value);
-  }
-
-  attrs[name] = value;
-};
-
-
-/**
- * Applies a style to an Element. No vendor prefix expansion is done for
- * property names/values.
- * @param {!Element} el
- * @param {string|Object<string,string>} style The style to set. Either a string
- *     of css or an object containing property-value pairs.
- */
-var applyStyle = function(el, style) {
-  if (typeof style === 'string' || style instanceof String) {
-    el.style.cssText = style;
-  } else {
-    el.style.cssText = '';
-
-    for (var prop in style) {
-      el.style[prop] = style[prop];
+    if (type === 'object' || type === 'function') {
+      el[name] = value;
+    } else if (value === undefined) {
+      el.removeAttribute(name);
+    } else {
+      el.setAttribute(name, value);
     }
-  }
-};
+  },
 
 
-/**
- * Updates a single attribute on an Element.
- * @param {!Element} el
- * @param {string} name The attribute's name.
- * @param {*} value The attribute's value. If the value is a string, it is set
- *     as an HTML attribute, otherwise, it is set on node.
- */
-var updateAttribute = function(el, name, value) {
-  if (name === 'style') {
-    applyStyle(el, value);
-  } else {
-    applyAttr(el, name, value);
+  /**
+   * Applies a style to an Element. No vendor prefix expansion is done for
+   * property names/values.
+   * @param {!Element} el
+   * @param {string|Object<string,string>} style The style to set. Either a
+   *     string of css or an object containing property-value pairs.
+   */
+  applyStyle: function(el, style) {
+    if (typeof style === 'string') {
+      el.style.cssText = style;
+    } else {
+      el.style.cssText = '';
+
+      for (var prop in style) {
+        el.style[prop] = style[prop];
+      }
+    }
+  },
+
+
+  /**
+   * Updates a single attribute on an Element.
+   * @param {!Element} el
+   * @param {string} name The attribute's name.
+   * @param {*} value The attribute's value. If the value is a string, it is set
+   *     as an HTML attribute, otherwise, it is set on node.
+   */
+  updateAttribute: function(el, name, value) {
+    var data = getData(el);
+    var attrs = data.attrs;
+
+    if (attrs[name] === value) {
+      return;
+    }
+
+    if (name === 'style') {
+      attributes.applyStyle(el, value);
+    } else {
+      attributes.applyAttr(el, name, value);
+    }
+
+    attrs[name] = value;
   }
 };
 
 
 /** */
-module.exports = {
-  updateAttribute: updateAttribute
-};
+module.exports = attributes;
 
