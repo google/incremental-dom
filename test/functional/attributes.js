@@ -210,14 +210,6 @@ describe('attribute updates', () => {
       expect(el.style.color).to.equal('white');
       expect(el.style.backgroundColor).to.equal('red');
     });
-
-    it('should render with the correct style properties for String instances', () => {
-      patch(container, () => render(new String('color: white; background-color: red;')));
-      var el = container.childNodes[0];
-
-      expect(el.style.color).to.equal('white');
-      expect(el.style.backgroundColor).to.equal('red');
-    });
   });
 
   describe('for svg elements', () => {
