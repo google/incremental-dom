@@ -75,6 +75,18 @@ if (!IS_PRODUCTION) {
   };
 
 
+  /**
+  * Makes sure that the caller provided a key for the placeholder.
+  * @param {string} key The key used to identify this element.
+  */
+  var assertPlaceholderHasKey = function(key) {
+      if (!key) {
+        throw new Error('Was expecting a key to be provided with the ' +
+            'placeholder.');
+      }
+  };
+
+
   /** Updates the state to being in an attribute declaration. */
   var setInAttributes = function() {
     inAttributes = true;
@@ -326,6 +338,35 @@ var text = function(value) {
   nextSibling();
 };
 
+/**
+ * Declares a virtual Element at the current location in the document that
+ * represents a placeholder without specific content.
+ * @param {string} tag The element's tag.
+ * @param {string} key The key used to identify this element.
+ * @param {?Array<*>} statics An array of attribute name/value pairs of the
+ *     static attributes for the Element. These will only be set once when the
+ *     Element is created.
+ * @param {...*} var_args Attribute name/value pairs of the dynamic attributes
+ *     for the Element.
+ * @return {!Element} The corresponding Element.
+ */
+var elementPlaceholder = function(tag, key, statics, var_args) {
+  if (!IS_PRODUCTION) {
+    assertNotInAttributes();
+    assertPlaceholderHasKey(key);
+  }
+
+  var node = alignWithDOM(tag, key, statics);
+
+  if (hasChangedAttrs.apply(node, arguments)) {
+    var newAttrs = updateNewAttrs.apply(node, arguments);
+    updateAttributes(node, newAttrs);
+  }
+
+  nextSibling();
+  return node;
+};
+
 
 /** */
 module.exports = {
@@ -334,6 +375,7 @@ module.exports = {
   elementOpen: elementOpen,
   elementVoid: elementVoid,
   elementClose: elementClose,
+  elementPlaceholder: elementPlaceholder,
   text: text,
   attr: attr
 };

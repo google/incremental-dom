@@ -26,6 +26,7 @@ module.exports = {
   elementOpenEnd: elements.elementOpenEnd,
   elementOpen: elements.elementOpen,
   elementClose: elements.elementClose,
+  elementPlaceholder: elements.elementPlaceholder,
   text: elements.text,
   attr: elements.attr,
   attributes: attributes
