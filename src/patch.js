@@ -28,10 +28,19 @@ var walker = require('./walker'),
 var IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 if (!IS_PRODUCTION) {
-  var assertNoUnclosedTags = function() {
-    if (getWalker().getCurrentParent()) {
-      throw new Error('One or more tags were not closed');
+  var assertNoUnclosedTags = function(root) {
+    var openElement = getWalker().getCurrentParent();
+    if (!openElement) {
+      return;
     }
+
+    var openTags = [];
+    while(openElement && openElement !== root) {
+      openTags.push(openElement.nodeName.toLowerCase());
+      openElement = openElement.parent;
+    }
+
+    throw new Error('One or more tags were not closed:\n' + openTags.join('\n'));
   };
 }
 
@@ -53,7 +62,7 @@ var patch = function(node, fn, data) {
   parentNode();
 
   if (!IS_PRODUCTION) {
-    assertNoUnclosedTags();
+    assertNoUnclosedTags(node);
   }
 
   setWalker(prevWalker);
