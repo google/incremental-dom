@@ -269,6 +269,7 @@ var elementOpenEnd = function() {
  * Closes an open virtual Element.
  *
  * @param {string} tag The element's tag.
+ * @return {!Element} The corresponding Element.
  */
 var elementClose = function(tag) {
   if (!IS_PRODUCTION) {
@@ -276,7 +277,9 @@ var elementClose = function(tag) {
   }
 
   parentNode();
+  var node = getWalker().currentNode;
   nextSibling();
+  return node;
 };
 
 
