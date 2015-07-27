@@ -40,7 +40,8 @@ if (!IS_PRODUCTION) {
       openElement = openElement.parent;
     }
 
-    throw new Error('One or more tags were not closed:\n' + openTags.join('\n'));
+    throw new Error('One or more tags were not closed:\n' +
+        openTags.join('\n'));
   };
 }
 
