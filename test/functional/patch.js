@@ -19,6 +19,8 @@ var IncrementalDOM = require('../../index'),
     elementOpen = IncrementalDOM.elementOpen,
     elementClose = IncrementalDOM.elementClose,
     elementVoid = IncrementalDOM.elementVoid,
+    elementOpenStart = IncrementalDOM.elementOpenStart,
+    elementOpenEnd = IncrementalDOM.elementOpenEnd,
     text = IncrementalDOM.text;
 
 describe('patching an element', () => {
@@ -59,6 +61,46 @@ describe('patching an element', () => {
       var child = container.childNodes[0];
 
       expect(child.getAttribute('tabindex')).to.equal('0');
+    });
+
+    describe('should return DOM node', () => {
+      var node;
+
+      it('from elementOpen', () => {
+        patch(container, () => {
+          node = elementOpen('div');
+          elementClose('div');
+        });
+
+        expect(node).to.equal(div);
+      });
+
+      it('from elementClose', () => {
+        patch(container, () => {
+          elementOpen('div');
+          node = elementClose('div');
+        });
+
+        expect(node).to.equal(div);
+      });
+
+      it('from elementVoid', () => {
+        patch(container, () => {
+          node = elementVoid('div');
+        });
+
+        expect(node).to.equal(div);
+      });
+
+      it('from elementOpenEnd', () => {
+        patch(container, () => {
+          elementOpenStart('div');
+          node = elementOpenEnd('div');
+          elementClose('div');
+        });
+
+        expect(node).to.equal(div);
+      });
     });
   });
 
