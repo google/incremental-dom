@@ -35,9 +35,9 @@ if (!IS_PRODUCTION) {
     }
 
     var openTags = [];
-    while(openElement && openElement !== root) {
+    while (openElement && openElement !== root) {
       openTags.push(openElement.nodeName.toLowerCase());
-      openElement = openElement.parent;
+      openElement = openElement.parentNode;
     }
 
     throw new Error('One or more tags were not closed:\n' +
