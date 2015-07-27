@@ -35,15 +35,12 @@ var ATTRIBUTES_OFFSET = 3;
 /**
  * Builds an array of arguments for use with elementOpenStart, attr and
  * elementOpenEnd.
- * @type {Array<*>}
- * @const
+ * @const {Array<*>}
  */
 var argsBuilder = [];
 
 /**
- * Verify if the script are running in production.
- * @type {boolean}
- * @const
+ * @const {boolean}
  */
 var IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
@@ -71,6 +68,21 @@ if (!IS_PRODUCTION) {
       throw new Error('Was expecting a call to attr or elementOpenEnd. ' +
           'elementOpenStart must be followed by zero or more calls to attr, ' +
           'then one call to elementOpenEnd.');
+    }
+  };
+
+
+  /**
+   * Makes sure that tags are correctly nested.
+   * @param {string} tag
+   */
+  var assertCloseMatchesOpenTag = function(tag) {
+    var closingNode = getWalker().getCurrentParent();
+    var data = getData(closingNode);
+
+    if (tag !== data.nodeName) {
+      throw new Error('Received a call to close ' + tag + ' but ' +
+            data.nodeName + ' was open.');
     }
   };
 
@@ -274,6 +286,7 @@ var elementOpenEnd = function() {
 var elementClose = function(tag) {
   if (!IS_PRODUCTION) {
     assertNotInAttributes();
+    assertCloseMatchesOpenTag(tag);
   }
 
   parentNode();

@@ -22,6 +22,28 @@ var walker = require('./walker'),
     getWalker = walker.getWalker,
     setWalker = walker.setWalker;
 
+/**
+ * @const {boolean}
+ */
+var IS_PRODUCTION = process.env.NODE_ENV === 'production';
+
+if (!IS_PRODUCTION) {
+  var assertNoUnclosedTags = function(root) {
+    var openElement = getWalker().getCurrentParent();
+    if (!openElement) {
+      return;
+    }
+
+    var openTags = [];
+    while(openElement && openElement !== root) {
+      openTags.push(openElement.nodeName.toLowerCase());
+      openElement = openElement.parent;
+    }
+
+    throw new Error('One or more tags were not closed:\n' + openTags.join('\n'));
+  };
+}
+
 
 /**
  * Patches the document starting at el with the provided function. This function
@@ -38,6 +60,10 @@ var patch = function(node, fn, data) {
   firstChild();
   fn(data);
   parentNode();
+
+  if (!IS_PRODUCTION) {
+    assertNoUnclosedTags(node);
+  }
 
   setWalker(prevWalker);
 };
