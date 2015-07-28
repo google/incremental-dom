@@ -102,5 +102,7 @@ TreeWalker.prototype.parentNode = function() {
 
 
 /** */
-module.exports = TreeWalker;
+export {
+  TreeWalker
+};
 

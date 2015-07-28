@@ -15,10 +15,12 @@
  */
 
 var assign = require('lodash.assign');
+var babelify = require('babelify');
 var browserify = require('browserify');
 var buffer = require('vinyl-buffer');
 var del = require('del');
 var envify = require('envify');
+var es6ModuleToClosure = require("gulp-es6-module-to-closure");
 var git = require('gulp-git');
 var gjslint = require('gulp-gjslint');
 var gulp = require('gulp');
@@ -68,6 +70,7 @@ function lint() {
 
 function bundle(browserify, env) {
   return browserify
+    .transform(babelify)
     .transform(envify, env)
     .bundle()
     .on('error', gutil.log.bind(gutil, 'Browserify Error'))
@@ -114,6 +117,15 @@ function addDist() {
     }));
 }
 
+function toClosure() {
+  gulp.src('./src/**/*.js')
+    .pipe(es6ModuleToClosure({
+      root: 'src',
+      namespace: 'incrementaldom'
+    }))
+    .pipe(gulp.dest('./dist/closure'));
+}
+
 gulp.task('clean', clean);
 gulp.task('unit', unit);
 gulp.task('unit-watch', unitWatch);
@@ -123,5 +135,6 @@ gulp.task('js-watch', jsWatch);
 gulp.task('js-dist', jsDist);
 gulp.task('build', ['lint', 'unit', 'js']);
 gulp.task('dist', ['lint', 'unit', 'js-dist'], addDist);
+gulp.task('closure', toClosure);
 
 gulp.task('default', ['build']);

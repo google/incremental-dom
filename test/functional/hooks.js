@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-var IncrementalDOM = require('../../index'),
-    patch = IncrementalDOM.patch,
-    elementVoid = IncrementalDOM.elementVoid,
-    attributes = IncrementalDOM.attributes;
+import {
+    patch,
+    elementVoid,
+    attributes
+} from '../../index';
+
 
 describe('library hooks', () => {
   var container;

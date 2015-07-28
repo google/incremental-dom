@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-var IncrementalDOM = require('../../index'),
-    patch = IncrementalDOM.patch,
-    elementOpenStart = IncrementalDOM.elementOpenStart,
-    elementOpenEnd = IncrementalDOM.elementOpenEnd,
-    elementAttr = IncrementalDOM.attr,
-    elementClose = IncrementalDOM.elementClose,
-    elementVoid = IncrementalDOM.elementVoid;
+import {
+    patch,
+    elementOpenStart,
+    elementOpenEnd,
+    attr,
+    elementClose,
+    elementVoid
+} from '../../index';
 
 describe('attribute updates', () => {
   var container;
@@ -37,8 +38,8 @@ describe('attribute updates', () => {
   describe('for conditional attributes', () => {
     function render(attrs) {
       elementOpenStart('div', '', []);
-      for (var attr in attrs) {
-          elementAttr(attr, attrs[attr]);
+      for (var attrName in attrs) {
+          attr(attrName, attrs[attrName]);
       }
       elementOpenEnd();
       elementClose('div');

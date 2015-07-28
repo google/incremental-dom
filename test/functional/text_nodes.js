@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-var IncrementalDOM = require('../../index'),
-    patch = IncrementalDOM.patch,
-    text = IncrementalDOM.text;
+import {
+    patch,
+    text
+} from '../../index';
+
 
 describe('text nodes', () => {
   var container;

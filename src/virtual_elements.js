@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-var alignWithDOM = require('./alignment').alignWithDOM;
-var updateAttribute = require('./attributes').updateAttribute;
-var getData = require('./node_data').getData;
-var getWalker = require('./walker').getWalker;
-var traversal = require('./traversal'),
-    firstChild = traversal.firstChild,
-    nextSibling = traversal.nextSibling,
-    parentNode = traversal.parentNode;
+import { alignWithDOM } from './alignment';
+import { attributes } from './attributes';
+import { getData } from './node_data';
+import { getWalker } from './walker';
+import {
+    firstChild,
+    nextSibling,
+    parentNode
+} from './traversal';
 
 
 /**
@@ -183,7 +184,7 @@ var updateNewAttrs = function(unused1, unused2, unused3, var_args) {
  */
 var updateAttributes = function(node, newAttrs) {
   for (var attr in newAttrs) {
-    updateAttribute(node, attr, newAttrs[attr]);
+    attributes.updateAttribute(node, attr, newAttrs[attr]);
   }
 };
 
@@ -344,13 +345,13 @@ var text = function(value) {
 
 
 /** */
-module.exports = {
-  elementOpenStart: elementOpenStart,
-  elementOpenEnd: elementOpenEnd,
-  elementOpen: elementOpen,
-  elementVoid: elementVoid,
-  elementClose: elementClose,
-  text: text,
-  attr: attr
+export {
+  elementOpenStart,
+  elementOpenEnd,
+  elementOpen,
+  elementVoid,
+  elementClose,
+  text,
+  attr
 };
 

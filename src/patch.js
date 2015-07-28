@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-var traversal = require('./traversal'),
-    firstChild = traversal.firstChild,
-    parentNode = traversal.parentNode;
-var TreeWalker = require('./tree_walker');
-var walker = require('./walker'),
-    getWalker = walker.getWalker,
-    setWalker = walker.setWalker;
+import {
+    firstChild,
+    parentNode
+} from './traversal';
+import { TreeWalker } from './tree_walker';
+import {
+    getWalker,
+    setWalker
+} from './walker';
+
 
 /**
  * @const {boolean}
@@ -71,7 +74,7 @@ var patch = function(node, fn, data) {
 
 
 /** */
-module.exports = {
-  patch: patch
+export {
+  patch
 };
 

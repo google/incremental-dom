@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-var getWalker = require('./walker').getWalker;
+import { getWalker } from './walker';
 
 var SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -59,9 +59,9 @@ var getNamespaceForTag = function(tag) {
 
 
 /** */
-module.exports = {
-  enterTag: enterTag,
-  exitTag: exitTag,
-  getNamespaceForTag: getNamespaceForTag
+export {
+  enterTag,
+  exitTag,
+  getNamespaceForTag
 };
 

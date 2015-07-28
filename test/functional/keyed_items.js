@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-var IncrementalDOM = require('../../index'),
-    patch = IncrementalDOM.patch,
-    elementVoid = IncrementalDOM.elementVoid;
+import {
+    patch,
+    elementVoid
+} from '../../index';
+
 
 describe('rendering with keys', () => {
   var container;

@@ -132,10 +132,10 @@ var getNodeName = function(node) {
 
 
 /** */
-module.exports = {
-  getData: getData,
-  initData: initData,
-  getKey: getKey,
-  getNodeName: getNodeName
+export {
+  getData,
+  initData,
+  getKey,
+  getNodeName
 };
 

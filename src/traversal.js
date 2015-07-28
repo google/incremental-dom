@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-var getWalker = require('./walker').getWalker;
-var getData = require('./node_data').getData;
-var namespace = require('./namespace');
+import { getWalker } from './walker';
+import { getData } from './node_data';
+import {
+  enterTag,
+  exitTag
+} from './namespace';
 
 
 /**
@@ -25,7 +28,7 @@ var namespace = require('./namespace');
  */
 var enterNode = function(node) {
   var data = getData(node);
-  namespace.enterTag(data.nodeName);
+  enterTag(data.nodeName);
 };
 
 
@@ -40,7 +43,7 @@ var exitNode = function(node) {
   var lastVisitedChild = data.lastVisitedChild;
   data.lastVisitedChild = null;
 
-  namespace.exitTag(data.nodeName);
+  exitTag(data.nodeName);
 
   if (node.lastChild === lastVisitedChild) {
     return;
@@ -99,9 +102,9 @@ var parentNode = function() {
 
 
 /** */
-module.exports = {
-  firstChild: firstChild,
-  nextSibling: nextSibling,
-  parentNode: parentNode
+export {
+  firstChild,
+  nextSibling,
+  parentNode
 };
 
