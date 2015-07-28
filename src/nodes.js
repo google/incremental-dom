@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-var updateAttribute = require('./attributes').updateAttribute;
-var nodeData = require('./node_data'),
-    getData = nodeData.getData,
-    getKey = nodeData.getKey,
-    initData = nodeData.initData;
-var getNamespaceForTag = require('./namespace').getNamespaceForTag;
+import { attributes } from './attributes';
+import {
+    getData,
+    getKey,
+    initData
+} from './node_data';
+import { getNamespaceForTag } from './namespace';
+
 
 
 /**
@@ -45,7 +47,7 @@ var createElement = function(doc, tag, key, statics) {
 
   if (statics) {
     for (var i = 0; i < statics.length; i += 2) {
-      updateAttribute(el, statics[i], statics[i + 1]);
+      attributes.updateAttribute(el, statics[i], statics[i + 1]);
     }
   }
 
@@ -154,9 +156,9 @@ var registerChild = function(parent, key, child) {
 
 
 /** */
-module.exports = {
-  createNode: createNode,
-  getChild: getChild,
-  registerChild: registerChild
+export {
+  createNode,
+  getChild,
+  registerChild
 };
 

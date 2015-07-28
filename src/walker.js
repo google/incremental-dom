@@ -38,8 +38,8 @@ var setWalker = function(walker) {
 
 
 /** */
-module.exports = {
-  getWalker: getWalker,
-  setWalker: setWalker
+export {
+  getWalker,
+  setWalker
 };
 

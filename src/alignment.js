@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-var nodes = require('./nodes'),
-    createNode = nodes.createNode,
-    getChild = nodes.getChild,
-    registerChild = nodes.registerChild;
-var nodeData = require('./node_data'),
-    getKey = nodeData.getKey,
-    getNodeName = nodeData.getNodeName;
-var getWalker = require('./walker').getWalker;
+import {
+    createNode,
+    getChild,
+    registerChild
+} from './nodes';
+import {
+    getKey,
+    getNodeName
+} from './node_data';
+import { getWalker } from './walker';
 
 
 /**
@@ -83,7 +85,7 @@ var alignWithDOM = function(nodeName, key, statics) {
 
 
 /** */
-module.exports = {
-  alignWithDOM: alignWithDOM
+export {
+  alignWithDOM
 };
 

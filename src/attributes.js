@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-var getData = require('./node_data').getData;
+import { getData } from './node_data';
 
 
 var attributes = {
@@ -87,5 +87,7 @@ var attributes = {
 
 
 /** */
-module.exports = attributes;
+export {
+  attributes
+};
 

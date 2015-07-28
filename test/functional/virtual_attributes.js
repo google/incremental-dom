@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-var IncrementalDOM = require('../../index'),
-    patch = IncrementalDOM.patch,
-    elementOpenStart = IncrementalDOM.elementOpenStart,
-    elementOpenEnd = IncrementalDOM.elementOpenEnd,
-    elementClose = IncrementalDOM.elementClose,
-    attr = IncrementalDOM.attr;
+import {
+    patch,
+    elementOpen,
+    elementOpenStart,
+    elementOpenEnd,
+    elementClose,
+    attr
+} from '../../index';
+
 
 describe('virtual attribute updates', () => {
   var container;
