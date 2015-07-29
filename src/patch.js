@@ -25,9 +25,7 @@ var walker = require('./walker'),
 /**
  * @const {boolean}
  */
-var IS_PRODUCTION = process.env.NODE_ENV === 'production';
-
-if (!IS_PRODUCTION) {
+if (process.env.NODE_ENV !== 'production') {
   var assertNoUnclosedTags = function(root) {
     var openElement = getWalker().getCurrentParent();
     if (!openElement) {
@@ -62,7 +60,7 @@ var patch = function(node, fn, data) {
   fn(data);
   parentNode();
 
-  if (!IS_PRODUCTION) {
+  if (process.env.NODE_ENV !== 'production') {
     assertNoUnclosedTags(node);
   }
 
