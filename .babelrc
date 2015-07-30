@@ -1,0 +1,7 @@
+{
+  "loose": ["all"],
+  "whitelist": [
+    "utility.inlineEnvironmentVariables"
+  ],
+  "optional": "utility.inlineEnvironmentVariables"
+}

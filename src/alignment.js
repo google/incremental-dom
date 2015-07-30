@@ -26,6 +26,10 @@ import {
 import { getWalker } from './walker';
 
 
+// For https://github.com/esperantojs/esperanto/issues/187
+var dummy;
+
+
 /**
  * Checks whether or not a given node matches the specified nodeName and key.
  *

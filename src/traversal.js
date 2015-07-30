@@ -22,6 +22,10 @@ import {
 } from './namespace';
 
 
+// For https://github.com/esperantojs/esperanto/issues/187
+var dummy;
+
+
 /**
  * Enters a Element, setting the current namespace for nested elements.
  * @param {!Element} node

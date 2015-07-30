@@ -26,7 +26,7 @@ module.exports = function(config) {
     browserify: {
       watch: true,
       debug: true,
-      transform: ['babelify']
+      transform: ['es6ify']
     },
 
     reporters: ['progress'],
