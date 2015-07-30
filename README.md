@@ -52,9 +52,30 @@ patch(myElement, function() {
 
 ## Templating Languages
 
+### Closure Compiler Templates
+
 We are building a new JavaScript backend for the
 [Closure Templates](https://developers.google.com/closure/templates/) templating
 language. Follow along on [Github](https://github.com/google/closure-templates/).
+
+```
+{template .helloWorld}
+  <h1>Hello World!</h1>
+{/template}
+```
+
+### JSX
+
+You can also use React's [JSX syntax](https://facebook.github.io/jsx/) using this
+[Babel plugin](https://github.com/babel-plugins/babel-plugin-incremental-dom).
+
+```js
+function render() {
+  return <h1>Hello World</h1>
+}
+```
+
+### Create your own
 
 If you work on a templating language we'd love to see Incremental DOM adopted as
 an alternative backend for it. This isn’t easy, we are still working on ours and
