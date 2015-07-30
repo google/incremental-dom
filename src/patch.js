@@ -25,6 +25,10 @@ import {
 } from './walker';
 
 
+// For https://github.com/esperantojs/esperanto/issues/187
+var dummy;
+
+
 /**
  * @const {boolean}
  */

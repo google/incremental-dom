@@ -23,6 +23,9 @@ import {
 import { getNamespaceForTag } from './namespace';
 
 
+// For https://github.com/esperantojs/esperanto/issues/187
+var dummy;
+
 
 /**
  * Creates an Element.

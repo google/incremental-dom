@@ -25,6 +25,10 @@ import {
 } from './traversal';
 
 
+// For https://github.com/esperantojs/esperanto/issues/187
+var dummy;
+
+
 /**
  * The offset in the virtual element declaration where the attributes are
  * specified.
