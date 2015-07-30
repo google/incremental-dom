@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-var assign = require('lodash.assign');
-var babelify = require('babelify');
-var browserify = require('browserify');
-var buffer = require('vinyl-buffer');
+var babel = require('gulp-babel');
 var del = require('del');
-var envify = require('envify');
-var es6ModuleToClosure = require("gulp-es6-module-to-closure");
+var esperanto = require('esperanto');
+var file = require('gulp-file');
 var git = require('gulp-git');
 var gjslint = require('gulp-gjslint');
 var gulp = require('gulp');
@@ -30,17 +27,13 @@ var path = require('path');
 var source = require('vinyl-source-stream');
 var sourcemaps = require('gulp-sourcemaps');
 var uglify = require('gulp-uglify');
-var watchify = require('watchify');
 
+var entryFileName = 'index';
+var artifactName = 'incremental-dom';
+var googModuleName = 'incrementaldom';
 var jsFileName = 'incremental-dom.js';
 var srcs = [jsFileName, 'src/**/*.js'];
 var tests = ['test/functional/**/*.js'];
-
-var customBrowserifyOpts = {
-  entries: './index.js',
-  standalone: 'IncrementalDOM',
-  debug: true
-};
 
 function clean(done) {
   del(['dist'], done);
@@ -68,46 +61,64 @@ function lint() {
     .pipe(gjslint.reporter('console'))
 }
 
-function bundle(browserify, env) {
-  return browserify
-    .transform(babelify)
-    .transform(envify, env)
-    .bundle()
-    .on('error', gutil.log.bind(gutil, 'Browserify Error'))
-    .pipe(source(jsFileName))
-    .pipe(buffer())
-    .pipe(sourcemaps.init({loadMaps: true}))
-      .pipe(uglify({
-        preserveComments: 'some'
-      }))
-      .on('error', gutil.log)
-    .pipe(sourcemaps.write('./'))
-    .pipe(gulp.dest('dist'));
+function bundle(format) {
+  return esperanto.bundle({
+    base: '.',
+    entry: entryFileName,
+  }).then(function(bundle) {
+    return bundle[format]({
+      strict: true,
+      sourceMap: 'inline',
+      name: 'IncrementalDOM'
+    });
+  });
 }
 
-function js() {
-  var b_plain = browserify(customBrowserifyOpts);
-
-  return bundle(b_plain, {});
+function js(done) {
+  bundle('toUmd').then(function(gen) {
+    file(artifactName + '.js', gen.code, {src: true})
+      .pipe(sourcemaps.init({loadMaps: true}))
+      .pipe(babel())
+      .pipe(sourcemaps.write('./'))
+      .pipe(gulp.dest('dist'))
+      .on('error', done)
+      .on('end', done);
+  }).catch(done);
 }
 
 function jsWatch() {
-  var opts = assign({}, watchify.args, customBrowserifyOpts);
-  var b_watch = watchify(browserify(opts));
-
-  b_watch.on('update', bundle.bind(null, b_watch));
-  b_watch.on('log', gutil.log);
-
-  return bundle(b_watch, {});
+  gulp.watch(srcs, ['js']);
 }
 
-function jsDist() {
-  var b_plain = browserify(customBrowserifyOpts);
+function jsDist(done) {
+  process.env.NODE_ENV = 'production';
 
-  return bundle(b_plain, {
-    _: 'purge',
-    NODE_ENV: 'production'
-  });
+  bundle('toUmd').then(function(gen) {
+    file(artifactName + '.js', gen.code, {src: true})
+      .pipe(sourcemaps.init({loadMaps: true}))
+      .pipe(babel())
+      .pipe(uglify({
+        preserveComments: 'some'
+      }))
+      .pipe(sourcemaps.write('./'))
+      .pipe(gulp.dest('dist'))
+      .on('error', done)
+      .on('end', done);
+  }).catch(done);
+}
+
+function jsClosure(done) {
+  bundle('toCjs').then(function(gen) {
+    // Replace the first line, 'use strict';, with a goog.module declaration.
+    var moduleDeclaration = 'goog.module(\'' + googModuleName + '\');';
+    var code = gen.code.replace(/.*/, moduleDeclaration);
+
+    file(artifactName + '-closure.js', code, {src: true})
+      .pipe(gulp.dest('dist'))
+      .pipe(babel())
+      .on('error', done)
+      .on('end', done);
+  }).catch(done);
 }
 
 function addDist() {
@@ -117,15 +128,6 @@ function addDist() {
     }));
 }
 
-function toClosure() {
-  gulp.src('./src/**/*.js')
-    .pipe(es6ModuleToClosure({
-      root: 'src',
-      namespace: 'incrementaldom'
-    }))
-    .pipe(gulp.dest('./dist/closure'));
-}
-
 gulp.task('clean', clean);
 gulp.task('unit', unit);
 gulp.task('unit-watch', unitWatch);
@@ -133,8 +135,8 @@ gulp.task('lint', lint);
 gulp.task('js', js);
 gulp.task('js-watch', jsWatch);
 gulp.task('js-dist', jsDist);
+gulp.task('js-closure', jsClosure);
 gulp.task('build', ['lint', 'unit', 'js']);
 gulp.task('dist', ['lint', 'unit', 'js-dist'], addDist);
-gulp.task('closure', toClosure);
 
 gulp.task('default', ['build']);
