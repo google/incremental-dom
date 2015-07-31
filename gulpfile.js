@@ -108,14 +108,18 @@ function jsDist(done) {
 }
 
 function jsClosure(done) {
+  process.env.NODE_ENV = 'production';
+
   bundle('toCjs').then(function(gen) {
     // Replace the first line, 'use strict';, with a goog.module declaration.
     var moduleDeclaration = 'goog.module(\'' + googModuleName + '\');';
     var code = gen.code.replace(/.*/, moduleDeclaration);
 
     file(artifactName + '-closure.js', code, {src: true})
-      .pipe(gulp.dest('dist'))
+      .pipe(sourcemaps.init({loadMaps: true}))
       .pipe(babel())
+      .pipe(sourcemaps.write('./'))
+      .pipe(gulp.dest('dist'))
       .on('error', done)
       .on('end', done);
   }).catch(done);
