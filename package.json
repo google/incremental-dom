@@ -2,18 +2,22 @@
   "name": "incremental-dom",
   "version": "0.1.0",
   "description": "An in-place virtual DOM library",
-  "main": "index.js",
+  "main": "dist/incremental-dom.js",
   "author": "The Incremental DOM Authors",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/google/incremental-dom.git"
   },
+  "files" : [
+    "dist"
+  ],
   "scripts": {
     "test": "gulp unit",
     "lint": "gulp lint",
     "build": "gulp build",
-    "dist": "gulp dist"
+    "dist": "gulp dist",
+    "prepublish": "npm run dist"
   },
   "devDependencies": {
     "browserify": "^10.2.4",
@@ -24,7 +28,6 @@
     "gulp": "^3.9.0",
     "gulp-babel": "^5.1.0",
     "gulp-file": "^0.2.0",
-    "gulp-git": "~1.2.4",
     "gulp-gjslint": "~0.1.4",
     "gulp-sourcemaps": "~1.5.1",
     "gulp-uglify": "~1.2.0",
