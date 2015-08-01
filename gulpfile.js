@@ -18,7 +18,6 @@ var babel = require('gulp-babel');
 var del = require('del');
 var esperanto = require('esperanto');
 var file = require('gulp-file');
-var git = require('gulp-git');
 var gjslint = require('gulp-gjslint');
 var gulp = require('gulp');
 var gutil = require('gulp-util');
@@ -90,11 +89,11 @@ function jsWatch() {
   gulp.watch(srcs, ['js']);
 }
 
-function jsDist(done) {
+function jsMin(done) {
   process.env.NODE_ENV = 'production';
 
   bundle('toUmd').then(function(gen) {
-    file(artifactName + '.js', gen.code, {src: true})
+    file(artifactName + '-min.js', gen.code, {src: true})
       .pipe(sourcemaps.init({loadMaps: true}))
       .pipe(babel())
       .pipe(uglify({
@@ -125,22 +124,16 @@ function jsClosure(done) {
   }).catch(done);
 }
 
-function addDist() {
-  return gulp.src('dist')
-    .pipe(git.add({
-      args: '-f'
-    }));
-}
-
 gulp.task('clean', clean);
 gulp.task('unit', unit);
 gulp.task('unit-watch', unitWatch);
 gulp.task('lint', lint);
 gulp.task('js', js);
 gulp.task('js-watch', jsWatch);
-gulp.task('js-dist', jsDist);
+gulp.task('js-min', jsMin);
+gulp.task('js-dist', ['js', 'js-min']);
 gulp.task('js-closure', jsClosure);
 gulp.task('build', ['lint', 'unit', 'js']);
-gulp.task('dist', ['lint', 'unit', 'js-dist'], addDist);
+gulp.task('dist', ['clean', 'lint', 'unit', 'js-dist']);
 
 gulp.task('default', ['build']);
