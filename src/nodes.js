@@ -17,7 +17,6 @@
 import { attributes } from './attributes';
 import {
     getData,
-    getKey,
     initData
 } from './node_data';
 import { getNamespaceForTag } from './namespace';
@@ -106,7 +105,7 @@ var createKeyMap = function(el) {
 
   for (var i = 0; i < count; i += 1) {
     var child = children[i];
-    var key = getKey(child);
+    var key = getData(child).key;
 
     if (key) {
       map[key] = child;

@@ -19,10 +19,7 @@ import {
     getChild,
     registerChild
 } from './nodes';
-import {
-    getKey,
-    getNodeName
-} from './node_data';
+import { getData } from './node_data';
 import { getWalker } from './walker';
 
 
@@ -39,10 +36,11 @@ var dummy;
  * @return {boolean} True if the node matches, false otherwise.
  */
 var matches = function(node, nodeName, key) {
+  var data = getData(node);
   if (key) {
-    return key === getKey(node);
+    return key === data.key;
   }
-  return nodeName === getNodeName(node);
+  return nodeName === data.nodeName;
 };
 
 
