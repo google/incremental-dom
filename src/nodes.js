@@ -56,19 +56,6 @@ var createElement = function(doc, tag, key, statics) {
   return el;
 };
 
-/**
- * Creates a Text.
- * @param {!Document} doc The document with which to create the Text.
- * @param {string} text The initial content of the Text.
- * @return {!Text}
- */
-var createTextNode = function(doc, text) {
-  var node = doc.createTextNode(text);
-  getData(node).text = text;
-
-  return node;
-};
-
 
 /**
  * Creates a Node, either a Text or an Element depending on the node name
@@ -77,15 +64,14 @@ var createTextNode = function(doc, text) {
  * @param {string} nodeName The tag if creating an element or #text to create
  *     a Text.
  * @param {?string} key A key to identify the Element.
- * @param {?Array<*>|string} statics The static data to initialize the Node
+ * @param {?Array<*>} statics The static data to initialize the Node
  *     with. For an Element, an array of attribute name/value pairs of
- *     the static attributes for the Element. For a Text, a string with the
- *     initial content of the Text.
+ *     the static attributes for the Element.
  * @return {!Node}
  */
 var createNode = function(doc, nodeName, key, statics) {
   if (nodeName === '#text') {
-    return createTextNode(doc, statics);
+    return doc.createTextNode('');
   }
 
   return createElement(doc, nodeName, key, statics);

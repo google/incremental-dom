@@ -325,19 +325,28 @@ var elementVoid = function(tag, key, statics, var_args) {
 /**
  * Declares a virtual Text at this point in the document.
  *
- * @param {string} value The text of the Text.
+ * @param {string|number|bool} value The value of the Text.
+ * @param {...function(string|number|bool):string|number|bool} var_args
+ *     Functions to format the value which are called only when the value has
+ *     changed.
  */
-var text = function(value) {
+var text = function(value, var_args) {
   if (process.env.NODE_ENV !== 'production') {
     assertNotInAttributes();
   }
 
-  var node = alignWithDOM('#text', null, value);
+  var node = alignWithDOM('#text', null);
   var data = getData(node);
 
   if (data.text !== value) {
-    node.data = value;
     data.text = value;
+
+    var formatted = value;
+    for (var i = 1; i < arguments.length; i += 1) {
+      formatted = arguments[i](formatted);
+    }
+
+    node.data = formatted;
   }
 
   nextSibling();
