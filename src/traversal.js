@@ -27,7 +27,7 @@ var dummy;
 
 
 /**
- * Enters a Element, setting the current namespace for nested elements.
+ * Enters an Element, setting the current namespace for nested elements.
  * @param {!Element} node
  */
 var enterNode = function(node) {
@@ -37,29 +37,12 @@ var enterNode = function(node) {
 
 
 /**
- * Clears out any unvisited Nodes, as the corresponding virtual element
- * functions were never called for them, and unwinds the current namespace
- * to the previous value.
+ * Exits an Element, unwinding the current namespace to the previous value.
  * @param {!Element} node
  */
 var exitNode = function(node) {
   var data = getData(node);
-  var lastVisitedChild = data.lastVisitedChild;
-  data.lastVisitedChild = null;
-
   exitTag(data.nodeName);
-
-  if (node.lastChild === lastVisitedChild) {
-    return;
-  }
-
-  while (node.lastChild !== lastVisitedChild) {
-    node.removeChild(node.lastChild);
-  }
-
-  // Invalidate the key map since we removed children. It will get recreated
-  // next time we need it.
-  data.keyMap = null;
 };
 
 

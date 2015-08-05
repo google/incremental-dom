@@ -23,6 +23,7 @@ import {
     getWalker,
     setWalker
 } from './walker';
+import { clearUnvisitedDOM } from './alignment';
 
 
 // For https://github.com/esperantojs/esperanto/issues/187
@@ -66,6 +67,7 @@ var patch = function(node, fn, data) {
   firstChild();
   fn(data);
   parentNode();
+  clearUnvisitedDOM(node);
 
   if (process.env.NODE_ENV !== 'production') {
     assertNoUnclosedTags(node);

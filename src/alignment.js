@@ -85,8 +85,33 @@ var alignWithDOM = function(nodeName, key, statics) {
 };
 
 
+/**
+ * Clears out any unvisited Nodes, as the corresponding virtual element
+ * functions were never called for them.
+ * @param {!Element} node
+ */
+var clearUnvisitedDOM = function(node) {
+  var data = getData(node);
+  var lastVisitedChild = data.lastVisitedChild;
+  data.lastVisitedChild = null;
+
+  if (node.lastChild === lastVisitedChild) {
+    return;
+  }
+
+  while (node.lastChild !== lastVisitedChild) {
+    node.removeChild(node.lastChild);
+  }
+
+  // Invalidate the key map since we removed children. It will get recreated
+  // next time we need it.
+  data.keyMap = null;
+};
+
+
 /** */
 export {
-  alignWithDOM
+  alignWithDOM,
+  clearUnvisitedDOM
 };
 
