@@ -16,106 +16,75 @@
 
 
 /**
- * Keeps track of information needed to perform diffs for a given DOM node.
- * @param {?string} nodeName
- * @param {?string} key
- * @constructor
- */
-function NodeData(nodeName, key) {
-  /**
-   * The attributes and their values.
-   * @const
-   */
-  this.attrs = {};
-
-  /**
-   * An array of attribute name/value pairs, used for quickly diffing the
-   * incomming attributes to see if the DOM node's attributes need to be
-   * updated.
-   * @const {Array<*>}
-   */
-  this.attrsArr = [];
-
-  /**
-   * The incoming attributes for this Node, before they are updated.
-   * @const {!Object<string, *>}
-   */
-  this.newAttrs = {};
-
-  /**
-   * The key used to identify this node, used to preserve DOM nodes when they
-   * move within their parent.
-   * @const
-   */
-  this.key = key || null;
-
-  /**
-   * Keeps track of children within this node by their key.
-   * {?Object<string, Node>}
-   */
-  this.keyMap = null;
-
-  /**
-   * The last child to have been visited within the current pass.
-   * {?Node}
-   */
-  this.lastVisitedChild = null;
-
-  /**
-   * The node name for this node.
-   * @const
-   */
-  this.nodeName = nodeName;
-
-  /**
-   * @const {string}
-   */
-  this.text = null;
-}
-
-
-/**
- * Initializes a NodeData object for a Node.
+ * Initializes the fields needed for a node.
  *
- * @param {!Node} node The node to initialize data for.
+ * @param {!Document|!Element} node The node to initialize data for.
  * @param {string} nodeName The node name of node.
  * @param {?string} key The key that identifies the node.
- * @return {!NodeData} The newly initialized data object
  */
 var initData = function(node, nodeName, key) {
-  var data = new NodeData(nodeName, key);
-  node['__incrementalDOMData'] = data;
-  return data;
+  node['__incrementalDOMKey'] = key;
+  node['__incrementalDOMNodeName'] = nodeName;
+  node['__incrementalDOMLastVisitedChild'] = null;
+  node['__incrementalDOMAttrsArr'] = [];
+  node['__incrementalDOMAttrs'] = {};
+  node['__incrementalDOMNewAttrs'] = {};
+  node['__incrementalDOMKeyMap'] = null;
 };
 
 
 /**
- * Retrieves the NodeData object for a Node, creating it if necessary.
- *
- * @param {!Node} node The node to retrieve the data for.
- * @return {NodeData} The NodeData for this Node.
+ * @param {!Text} node The Text node to initialize data for.
  */
-var getData = function(node) {
-  var data = node['__incrementalDOMData'];
+var initTextData = function(node) {
+  node['__incrementalDOMKey'] = null;
+  node['__incrementalDOMNodeName'] = '#text';
+  node['__incrementalDOMText'] = null;
+};
 
-  if (!data) {
-    var nodeName = node.nodeName.toLowerCase();
-    var key = null;
 
-    if (node instanceof Element) {
-      key = node.getAttribute('key');
-    }
+/**
+ * Imports a single existing node, initializing the data fields.
+ * @param {!Document|!Element} node
+ */
+var importSingleNode = function(node) {
+  var nodeName = node.nodeName.toLowerCase();
+  var key = null;
 
-    data = initData(node, nodeName, key);
+  if (node instanceof Element) {
+    key = node.getAttribute('key');
   }
 
-  return data;
+  if (nodeName === '#text') {
+    initTextData(node);
+  } else {
+    initData(node, nodeName, key);
+  }
+};
+
+
+/**
+ * Imports a node and its subtree, initializing the data fields.
+ * @param {!Document|!Element} node
+ */
+var importNode = function(node) {
+  if (node['__incrementalDOMNodeName']) {
+    return;
+  }
+
+  var iter = document.createNodeIterator(node);
+  var current;
+
+  while (current = iter.nextNode()) {
+    importSingleNode(current);
+  }
 };
 
 
 /** */
 export {
-  getData,
-  initData
+  initData,
+  initTextData,
+  importNode
 };
 

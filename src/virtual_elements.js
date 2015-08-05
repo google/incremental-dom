@@ -19,7 +19,6 @@ import {
   clearUnvisitedDOM
 } from './alignment';
 import { attributes } from './attributes';
-import { getData } from './node_data';
 import { getWalker } from './walker';
 import {
     firstChild,
@@ -82,11 +81,11 @@ if (process.env.NODE_ENV !== 'production') {
    */
   var assertCloseMatchesOpenTag = function(tag) {
     var closingNode = getWalker().getCurrentParent();
-    var data = getData(closingNode);
+    var nodeName = closingNode['__incrementalDOMNodeName'];
 
-    if (tag !== data.nodeName) {
+    if (tag !== nodeName) {
       throw new Error('Received a call to close ' + tag + ' but ' +
-            data.nodeName + ' was open.');
+            nodeName + ' was open.');
     }
   };
 
@@ -123,8 +122,7 @@ if (process.env.NODE_ENV !== 'production') {
  *     false otherwise.
  */
 var hasChangedAttrs = function(unused1, unused2, unused3, var_args) {
-  var data = getData(this);
-  var attrsArr = data.attrsArr;
+  var attrsArr = this['__incrementalDOMAttrsArr'];
   var attrsChanged = false;
   var i = ATTRIBUTES_OFFSET;
   var j = 0;
@@ -164,9 +162,7 @@ var hasChangedAttrs = function(unused1, unused2, unused3, var_args) {
  * @return {!Object<string, *>} The updated newAttrs object.
  */
 var updateNewAttrs = function(unused1, unused2, unused3, var_args) {
-  var node = this;
-  var data = getData(node);
-  var newAttrs = data.newAttrs;
+  var newAttrs = this['__incrementalDOMNewAttrs'];
 
   for (var attr in newAttrs) {
     newAttrs[attr] = undefined;
@@ -341,11 +337,10 @@ var text = function(value, var_args) {
     assertNotInAttributes();
   }
 
-  var node = alignWithDOM('#text', null);
-  var data = getData(node);
+  var node = alignWithDOM('#text');
 
-  if (data.text !== value) {
-    data.text = value;
+  if (node['__incrementalDOMText'] !== value) {
+    node['__incrementalDOMText'] = value;
 
     var formatted = value;
     for (var i = 1; i < arguments.length; i += 1) {

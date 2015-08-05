@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-import { getData } from './node_data';
-
 
 var attributes = {
   /**
@@ -68,8 +66,7 @@ var attributes = {
    *     as an HTML attribute, otherwise, it is set on node.
    */
   updateAttribute: function(el, name, value) {
-    var data = getData(el);
-    var attrs = data.attrs;
+    var attrs = el['__incrementalDOMAttrs'];
 
     if (attrs[name] === value) {
       return;
