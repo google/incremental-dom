@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-import { alignWithDOM } from './alignment';
+import {
+  alignWithDOM,
+  clearUnvisitedDOM
+} from './alignment';
 import { attributes } from './attributes';
 import { getData } from './node_data';
 import { getWalker } from './walker';
@@ -291,7 +294,10 @@ var elementClose = function(tag) {
   }
 
   parentNode();
+
   var node = getWalker().currentNode;
+  clearUnvisitedDOM(node);
+
   nextSibling();
   return node;
 };
