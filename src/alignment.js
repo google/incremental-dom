@@ -92,15 +92,17 @@ var alignWithDOM = function(nodeName, key, statics) {
  */
 var clearUnvisitedDOM = function(node) {
   var data = getData(node);
+  var lastChild = node.lastChild;
   var lastVisitedChild = data.lastVisitedChild;
   data.lastVisitedChild = null;
 
-  if (node.lastChild === lastVisitedChild) {
+  if (lastChild === lastVisitedChild) {
     return;
   }
 
-  while (node.lastChild !== lastVisitedChild) {
-    node.removeChild(node.lastChild);
+  while (lastChild !== lastVisitedChild) {
+    node.removeChild(lastChild);
+    lastChild = node.lastChild;
   }
 
   // Invalidate the key map since we removed children. It will get recreated
