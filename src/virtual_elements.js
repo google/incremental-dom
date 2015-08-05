@@ -325,8 +325,8 @@ var elementVoid = function(tag, key, statics, var_args) {
 /**
  * Declares a virtual Text at this point in the document.
  *
- * @param {string|number|bool} value The value of the Text.
- * @param {...function(string|number|bool):string|number|bool} var_args
+ * @param {string|number|boolean} value The value of the Text.
+ * @param {...(function(string|number|boolean):string|number|boolean)} var_args
  *     Functions to format the value which are called only when the value has
  *     changed.
  */
