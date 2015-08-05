@@ -131,7 +131,7 @@ gulp.task('lint', lint);
 gulp.task('js', js);
 gulp.task('js-watch', jsWatch);
 gulp.task('js-min', jsMin);
-gulp.task('js-dist', ['js', 'js-min']);
+gulp.task('js-dist', ['js-min']);
 gulp.task('js-closure', jsClosure);
 gulp.task('build', ['lint', 'unit', 'js']);
 gulp.task('dist', ['clean', 'lint', 'unit', 'js-dist']);
