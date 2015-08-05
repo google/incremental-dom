@@ -24,6 +24,7 @@ import {
     setWalker
 } from './walker';
 import { clearUnvisitedDOM } from './alignment';
+import { importNode } from './node_data';
 
 
 // For https://github.com/esperantojs/esperanto/issues/187
@@ -61,6 +62,8 @@ if (process.env.NODE_ENV !== 'production') {
  * @param {*} data An argument passed to fn to represent DOM state.
  */
 var patch = function(node, fn, data) {
+  importNode(node);
+
   var prevWalker = getWalker();
   setWalker(new TreeWalker(node));
 

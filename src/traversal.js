@@ -15,7 +15,6 @@
  */
 
 import { getWalker } from './walker';
-import { getData } from './node_data';
 import {
   enterTag,
   exitTag
@@ -31,8 +30,7 @@ var dummy;
  * @param {!Element} node
  */
 var enterNode = function(node) {
-  var data = getData(node);
-  enterTag(data.nodeName);
+  enterTag(node['__incrementalDOMNodeName']);
 };
 
 
@@ -41,8 +39,7 @@ var enterNode = function(node) {
  * @param {!Element} node
  */
 var exitNode = function(node) {
-  var data = getData(node);
-  exitTag(data.nodeName);
+  exitTag(node['__incrementalDOMNodeName']);
 };
 
 
@@ -53,8 +50,7 @@ var exitNode = function(node) {
 var markVisited = function(node) {
   var walker = getWalker();
   var parent = walker.getCurrentParent();
-  var data = getData(parent);
-  data.lastVisitedChild = node;
+  parent['__incrementalDOMLastVisitedChild'] = node;
 };
 
 

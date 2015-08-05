@@ -16,8 +16,8 @@
 
 import { attributes } from './attributes';
 import {
-    getData,
-    initData
+  initData,
+  initTextData
 } from './node_data';
 import { getNamespaceForTag } from './namespace';
 
@@ -61,8 +61,8 @@ var createElement = function(doc, tag, key, statics) {
  * Creates a Node, either a Text or an Element depending on the node name
  * provided.
  * @param {!Document} doc The document with which to create the Node.
- * @param {string} nodeName The tag if creating an element or #text to create
- *     a Text.
+ * @param {?string} nodeName The tag if creating an element or undefined to
+ *     create a Text.
  * @param {?string} key A key to identify the Element.
  * @param {?Array<*>} statics The static data to initialize the Node
  *     with. For an Element, an array of attribute name/value pairs of
@@ -71,7 +71,9 @@ var createElement = function(doc, tag, key, statics) {
  */
 var createNode = function(doc, nodeName, key, statics) {
   if (nodeName === '#text') {
-    return doc.createTextNode('');
+    var node = doc.createTextNode('');
+    initTextData(node);
+    return node;
   }
 
   return createElement(doc, nodeName, key, statics);
@@ -91,7 +93,7 @@ var createKeyMap = function(el) {
 
   for (var i = 0; i < count; i += 1) {
     var child = children[i];
-    var key = getData(child).key;
+    var key = child['__incrementalDOMKey'];
 
     if (key) {
       map[key] = child;
@@ -109,13 +111,13 @@ var createKeyMap = function(el) {
  * @return {!Object<string,!Node>} A mapping of keys to child Nodes
  */
 var getKeyMap = function(el) {
-  var data = getData(el);
+  var keyMap = el['__incrementalDOMKeyMap'];
 
-  if (!data.keyMap) {
-    data.keyMap = createKeyMap(el);
+  if (!keyMap) {
+    keyMap = el['__incrementalDOMKeyMap'] = createKeyMap(el);
   }
 
-  return data.keyMap;
+  return keyMap;
 };
 
 
