@@ -37,6 +37,7 @@ var dummy;
  */
 var createElement = function(doc, tag, key, statics) {
   var namespace = getNamespaceForTag(tag);
+  var updateAttribute = attributes.updateAttribute;
   var el;
 
   if (namespace) {
@@ -49,7 +50,7 @@ var createElement = function(doc, tag, key, statics) {
 
   if (statics) {
     for (var i = 0; i < statics.length; i += 2) {
-      attributes.updateAttribute(el, statics[i], statics[i + 1]);
+      updateAttribute(el, statics[i], statics[i + 1]);
     }
   }
 

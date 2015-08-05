@@ -119,10 +119,9 @@ if (process.env.NODE_ENV !== 'production') {
  * @param {*} unused3
  * @param {...*} var_args Attribute name/value pairs of the dynamic attributes
  *     for the Element.
- * @return {boolean} True if the Element has one or more changed attributes,
- *     false otherwise.
+ * @return {?Array<*>} The changed attributes, if any have changed.
  */
-var hasChangedAttrs = function(unused1, unused2, unused3, var_args) {
+var changedAttributes = function(unused1, unused2, unused3, var_args) {
   var data = getData(this);
   var attrsArr = data.attrsArr;
   var attrsChanged = false;
@@ -145,49 +144,33 @@ var hasChangedAttrs = function(unused1, unused2, unused3, var_args) {
     attrsArr.length = j;
   }
 
-  return attrsChanged;
-};
-
-
-/**
- * Updates the newAttrs object for an Element.
- *
- * This function is called in the context of the Element and the arguments from
- * elementOpen-like function so that the arguments are not de-optimized.
- *
- * @this {Element} The Element to update newAttrs for.
- * @param {*} unused1
- * @param {*} unused2
- * @param {*} unused3
- * @param {...*} var_args Attribute name/value pairs of the dynamic attributes
- *     for the Element.
- * @return {!Object<string, *>} The updated newAttrs object.
- */
-var updateNewAttrs = function(unused1, unused2, unused3, var_args) {
-  var node = this;
-  var data = getData(node);
-  var newAttrs = data.newAttrs;
-
-  for (var attr in newAttrs) {
-    newAttrs[attr] = undefined;
+  if (attrsChanged) {
+    return attrsArr;
   }
-
-  for (var i = ATTRIBUTES_OFFSET; i < arguments.length; i += 2) {
-    newAttrs[arguments[i]] = arguments[i + 1];
-  }
-
-  return newAttrs;
 };
 
 
 /**
  * Updates the attributes for a given Element.
  * @param {!Element} node
- * @param {!Object<string,*>} newAttrs The new attributes for node.
+ * @param {!Array<*>} attrs The attributes for node.
  */
-var updateAttributes = function(node, newAttrs) {
-  for (var attr in newAttrs) {
-    attributes.updateAttribute(node, attr, newAttrs[attr]);
+var updateAttributes = function(node, attrs) {
+  var data = getData(node);
+  var newAttrs = data.newAttrs;
+  var updateAttribute = attributes.updateAttribute;
+  var attr;
+
+  for (attr in newAttrs) {
+    newAttrs[attr] = undefined;
+  }
+
+  for (var i = 0; i < attrs.length; i += 2) {
+    newAttrs[attrs[i]] = attrs[i + 1];
+  }
+
+  for (attr in newAttrs) {
+    updateAttribute(node, attr, newAttrs[attr]);
   }
 };
 
@@ -212,10 +195,10 @@ var elementOpen = function(tag, key, statics, var_args) {
   }
 
   var node = alignWithDOM(tag, key, statics);
+  var changed = changedAttributes.apply(node, arguments);
 
-  if (hasChangedAttrs.apply(node, arguments)) {
-    var newAttrs = updateNewAttrs.apply(node, arguments);
-    updateAttributes(node, newAttrs);
+  if (changed) {
+    updateAttributes(node, changed);
   }
 
   firstChild();
