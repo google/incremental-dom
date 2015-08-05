@@ -19,7 +19,6 @@ import {
     getChild,
     registerChild
 } from './nodes';
-import { getData } from './node_data';
 import { getWalker } from './walker';
 
 
@@ -36,13 +35,11 @@ var dummy;
  * @return {boolean} True if the node matches, false otherwise.
  */
 var matches = function(node, nodeName, key) {
-  var data = getData(node);
-
   // Key check is done using double equals as we want to treat a null key the
   // same as undefined. This should be okay as the only values allowed are
   // strings, null and undefined so the == semantics are not too weird.
-  return key == data.key &&
-         nodeName === data.nodeName;
+  return key == node['__incrementalDOMKey'] &&
+         nodeName === node['__incrementalDOMNodeName'];
 };
 
 
@@ -93,9 +90,8 @@ var alignWithDOM = function(nodeName, key, statics) {
  * @param {!Element} node
  */
 var clearUnvisitedDOM = function(node) {
-  var data = getData(node);
-  var lastVisitedChild = data.lastVisitedChild;
-  data.lastVisitedChild = null;
+  var lastVisitedChild = node['__incrementalDOMLastVisitedChild'];
+  node['__incrementalDOMLastVisitedChild'] = null;
 
   if (node.lastChild === lastVisitedChild) {
     return;
@@ -107,7 +103,7 @@ var clearUnvisitedDOM = function(node) {
 
   // Invalidate the key map since we removed children. It will get recreated
   // next time we need it.
-  data.keyMap = null;
+  node['__incrementalDOMKeyMap'] = null;
 };
 
 
