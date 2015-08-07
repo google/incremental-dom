@@ -22,6 +22,12 @@ import {
 
 describe('rendering with keys', () => {
   var container;
+    
+  function render(items) {
+    for(var i=0; i<items.length; i++) {
+      elementVoid('div', items[i].key, ['id', items[i].key]);
+    }
+  }
 
   beforeEach(() => {
     container = document.createElement('div');
@@ -32,95 +38,118 @@ describe('rendering with keys', () => {
     document.body.removeChild(container);
   });
 
-  describe('for an array of items', () => {
-    function render(items) {
-      for(var i=0; i<items.length; i++) {
-        elementVoid('div', items[i].key, ['id', items[i].key]);
+  it('should not re-use a node with a non-null key', () => {
+    var items = [
+      { key: 'one' }
+    ];
+
+    patch(container, () => render(items));
+    var keyedNode = container.childNodes[0];
+  
+    items.unshift({ key : null });
+    patch(container, () => render(items));
+   
+    expect(container.childNodes).to.have.length(2);
+    expect(container.childNodes[0]).to.not.equal(keyedNode);
+  });
+
+  it('should not re-use a node with a different tag', () => {
+    function render(condition) {
+      if (condition) {
+        elementVoid('span', 'key');
+      } else {
+        elementVoid('div', 'key');
       }
     }
 
-    it('should not modify DOM nodes with falsey keys', () => {
-      var slice = Array.prototype.slice;
-      var items = [
-        { key: null },
-        { key: undefined },
-        { key: '' },
-      ];
+    patch(container, () => render(true));
+    patch(container, () => render(false));
 
-      patch(container, () => render(items));
-      var nodes = slice.call(container.childNodes);
+    expect(container.childNodes).to.have.length(1);
+    expect(container.childNodes[0].nodeName).to.equal('DIV');
+  });
 
-      patch(container, () => render(items));
+  it('should not modify DOM nodes with falsey keys', () => {
+    var slice = Array.prototype.slice;
+    var items = [
+      { key: null },
+      { key: undefined },
+      { key: '' },
+    ];
 
-      expect(slice.call(container.childNodes)).to.deep.equal(nodes);
-    });
+    patch(container, () => render(items));
+    var nodes = slice.call(container.childNodes);
 
-    it('should not modify the DOM nodes when inserting', () => {
-      var items = [
-        { key: 'one' },
-        { key: 'two' }
-      ];
+    patch(container, () => render(items));
 
-      patch(container, () => render(items));
-      var firstNode = container.childNodes[0];
-      var secondNode = container.childNodes[1];
+    expect(slice.call(container.childNodes)).to.deep.equal(nodes);
+  });
 
-      items.splice(1, 0, { key: 'one-point-five' });
-      patch(container, () => render(items));
+  it('should not modify the DOM nodes when inserting', () => {
+    var items = [
+      { key: 'one' },
+      { key: 'two' }
+    ];
 
-      expect(container.childNodes.length).to.equal(3);
-      expect(container.childNodes[0]).to.equal(firstNode);
-      expect(container.childNodes[0].id).to.equal('one');
-      expect(container.childNodes[1].id).to.equal('one-point-five');
-      expect(container.childNodes[2]).to.equal(secondNode);
-      expect(container.childNodes[2].id).to.equal('two');
-    });
+    patch(container, () => render(items));
+    var firstNode = container.childNodes[0];
+    var secondNode = container.childNodes[1];
 
-    it('should not modify the DOM nodes when removing', () => {
-      var items = [
-        { key: 'one' },
-        { key: 'two' },
-        { key: 'three' }
-      ];
+    items.splice(1, 0, { key: 'one-point-five' });
+    patch(container, () => render(items));
 
-      patch(container, () => render(items));
-      var firstNode = container.childNodes[0];
-      var thirdNode = container.childNodes[2];
+    expect(container.childNodes).to.have.length(3);
+    expect(container.childNodes[0]).to.equal(firstNode);
+    expect(container.childNodes[0].id).to.equal('one');
+    expect(container.childNodes[1].id).to.equal('one-point-five');
+    expect(container.childNodes[2]).to.equal(secondNode);
+    expect(container.childNodes[2].id).to.equal('two');
+  });
 
-      items.splice(1, 1);
-      patch(container, () => render(items));
+  it('should not modify the DOM nodes when removing', () => {
+    var items = [
+      { key: 'one' },
+      { key: 'two' },
+      { key: 'three' }
+    ];
 
-      expect(container.childNodes.length).to.equal(2);
-      expect(container.childNodes[0]).to.equal(firstNode);
-      expect(container.childNodes[0].id).to.equal('one');
-      expect(container.childNodes[1]).to.equal(thirdNode);
-      expect(container.childNodes[1].id).to.equal('three');
-    });
+    patch(container, () => render(items));
+    var firstNode = container.childNodes[0];
+    var thirdNode = container.childNodes[2];
 
-    it('should not modify the DOM nodes when re-ordering', () => {
-      var items = [
-        { key: 'one' },
-        { key: 'two' },
-        { key: 'three' }
-      ];
+    items.splice(1, 1);
+    patch(container, () => render(items));
 
-      patch(container, () => render(items));
-      var firstNode = container.childNodes[0];
-      var secondNode = container.childNodes[1];
-      var thirdNode = container.childNodes[2];
+    expect(container.childNodes).to.have.length(2);
+    expect(container.childNodes[0]).to.equal(firstNode);
+    expect(container.childNodes[0].id).to.equal('one');
+    expect(container.childNodes[1]).to.equal(thirdNode);
+    expect(container.childNodes[1].id).to.equal('three');
+  });
 
-      items.splice(1, 1);
-      items.push({ key: 'two' });
-      patch(container, () => render(items));
+  it('should not modify the DOM nodes when re-ordering', () => {
+    var items = [
+      { key: 'one' },
+      { key: 'two' },
+      { key: 'three' }
+    ];
 
-      expect(container.childNodes.length).to.equal(3);
-      expect(container.childNodes[0]).to.equal(firstNode);
-      expect(container.childNodes[0].id).to.equal('one');
-      expect(container.childNodes[1]).to.equal(thirdNode);
-      expect(container.childNodes[1].id).to.equal('three');
-      expect(container.childNodes[2]).to.equal(secondNode);
-      expect(container.childNodes[2].id).to.equal('two');
-    });
+    patch(container, () => render(items));
+    var firstNode = container.childNodes[0];
+    var secondNode = container.childNodes[1];
+    var thirdNode = container.childNodes[2];
+
+    items.splice(1, 1);
+    items.push({ key: 'two' });
+    patch(container, () => render(items));
+
+    expect(container.childNodes).to.have.length(3);
+    expect(container.childNodes[0]).to.equal(firstNode);
+    expect(container.childNodes[0].id).to.equal('one');
+    expect(container.childNodes[1]).to.equal(thirdNode);
+    expect(container.childNodes[1].id).to.equal('three');
+    expect(container.childNodes[2]).to.equal(secondNode);
+    expect(container.childNodes[2].id).to.equal('two');
   });
 });
 

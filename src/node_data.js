@@ -47,7 +47,7 @@ function NodeData(nodeName, key) {
    * move within their parent.
    * @const
    */
-  this.key = key || null;
+  this.key = key;
 
   /**
    * Keeps track of children within this node by their key.

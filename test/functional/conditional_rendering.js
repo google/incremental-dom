@@ -53,7 +53,7 @@ describe('conditional rendering', () => {
       patch(container, () => render(false));
       var outer = container.childNodes[0];
 
-      expect(outer.childNodes.length).to.equal(2);
+      expect(outer.childNodes).to.have.length(2);
       expect(outer.childNodes[0].id).to.equal('one');
       expect(outer.childNodes[0].tagName).to.equal('DIV');
       expect(outer.childNodes[1].id).to.equal('two');
@@ -65,7 +65,7 @@ describe('conditional rendering', () => {
       patch(container, () => render(true));
       var outer = container.childNodes[0];
 
-      expect(outer.childNodes.length).to.equal(4);
+      expect(outer.childNodes).to.have.length(4);
       expect(outer.childNodes[0].id).to.equal('one');
       expect(outer.childNodes[0].tagName).to.equal('DIV');
       expect(outer.childNodes[1].id).to.equal('conditional-one');
@@ -94,7 +94,7 @@ describe('conditional rendering', () => {
       patch(container, () => render(false));
       var outer = container.childNodes[0];
 
-      expect(outer.childNodes.length).to.equal(0);
+      expect(outer.childNodes).to.have.length(0);
     });
   });
 
@@ -123,7 +123,7 @@ describe('conditional rendering', () => {
       patch(container, () => render(false));
       var outer = container.childNodes[0];
 
-      expect(outer.childNodes.length).to.equal(2);
+      expect(outer.childNodes).to.have.length(2);
       expect(outer.childNodes[0].id).to.equal('one');
       expect(outer.childNodes[0].tagName).to.equal('DIV');
       expect(outer.childNodes[1].id).to.equal('two');

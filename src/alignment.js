@@ -37,10 +37,12 @@ var dummy;
  */
 var matches = function(node, nodeName, key) {
   var data = getData(node);
-  if (key) {
-    return key === data.key;
-  }
-  return nodeName === data.nodeName;
+
+  // Key check is done using double equals as we want to treat a null key the
+  // same as undefined. This should be okay as the only values allowed are
+  // strings, null and undefined so the == semantics are not too weird.
+  return key == data.key &&
+         nodeName === data.nodeName;
 };
 
 
@@ -68,7 +70,7 @@ var alignWithDOM = function(nodeName, key, statics) {
 
     // Check to see if the node has moved within the parent or if a new one
     // should be created
-    if (existingNode) {
+    if (existingNode && matches(existingNode, nodeName, key)) {
       matchingNode = existingNode;
     } else {
       matchingNode = createNode(walker.doc, nodeName, key, statics);
