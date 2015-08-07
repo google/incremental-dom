@@ -104,26 +104,20 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 
-/**
- * Checks to see if one or more attributes have changed for a given
- * Element. When no attributes have changed, this function is much faster than
- * checking each individual argument. When attributes have changed, the overhead
- * of this function is minimal.
- *
- * This function is called in the context of the Element and the arguments from
- * elementOpen-like function so that the arguments are not de-optimized.
- *
- * @this {Element} The Element to check for changed attributes.
- * @param {*} unused1
- * @param {*} unused2
- * @param {*} unused3
- * @param {...*} var_args Attribute name/value pairs of the dynamic attributes
- *     for the Element.
- * @return {boolean} True if the Element has one or more changed attributes,
- *     false otherwise.
- */
-var hasChangedAttrs = function(unused1, unused2, unused3, var_args) {
-  var data = getData(this);
+var elementOpen = function(tag, key, statics, var_args) {
+  if (process.env.NODE_ENV !== 'production') {
+    assertNotInAttributes();
+  }
+
+  var node = alignWithDOM(tag, key, statics);
+  var data = getData(node);
+
+  /*
+   * Checks to see if one or more attributes have changed for a given Element.
+   * When no attributes have changed, this is much faster than checking each
+   * individual argument. When attributes have changed, the overhead of this is
+   * minimal.
+   */
   var attrsArr = data.attrsArr;
   var attrsChanged = false;
   var i = ATTRIBUTES_OFFSET;
@@ -145,77 +139,23 @@ var hasChangedAttrs = function(unused1, unused2, unused3, var_args) {
     attrsArr.length = j;
   }
 
-  return attrsChanged;
-};
+  /*
+   * Actually perform the attribute update.
+   */
+  if (attrsChanged) {
+    var newAttrs = data.newAttrs;
 
+    for (var attr in newAttrs) {
+      newAttrs[attr] = undefined;
+    }
 
-/**
- * Updates the newAttrs object for an Element.
- *
- * This function is called in the context of the Element and the arguments from
- * elementOpen-like function so that the arguments are not de-optimized.
- *
- * @this {Element} The Element to update newAttrs for.
- * @param {*} unused1
- * @param {*} unused2
- * @param {*} unused3
- * @param {...*} var_args Attribute name/value pairs of the dynamic attributes
- *     for the Element.
- * @return {!Object<string, *>} The updated newAttrs object.
- */
-var updateNewAttrs = function(unused1, unused2, unused3, var_args) {
-  var node = this;
-  var data = getData(node);
-  var newAttrs = data.newAttrs;
+    for (var i = ATTRIBUTES_OFFSET; i < arguments.length; i += 2) {
+      newAttrs[arguments[i]] = arguments[i + 1];
+    }
 
-  for (var attr in newAttrs) {
-    newAttrs[attr] = undefined;
-  }
-
-  for (var i = ATTRIBUTES_OFFSET; i < arguments.length; i += 2) {
-    newAttrs[arguments[i]] = arguments[i + 1];
-  }
-
-  return newAttrs;
-};
-
-
-/**
- * Updates the attributes for a given Element.
- * @param {!Element} node
- * @param {!Object<string,*>} newAttrs The new attributes for node.
- */
-var updateAttributes = function(node, newAttrs) {
-  for (var attr in newAttrs) {
-    attributes.updateAttribute(node, attr, newAttrs[attr]);
-  }
-};
-
-
-/**
- * Declares a virtual Element at the current location in the document. This
- * corresponds to an opening tag and a elementClose tag is required.
- * @param {string} tag The element's tag.
- * @param {?string} key The key used to identify this element. This can be an
- *     empty string, but performance may be better if a unique value is used
- *     when iterating over an array of items.
- * @param {?Array<*>} statics An array of attribute name/value pairs of the
- *     static attributes for the Element. These will only be set once when the
- *     Element is created.
- * @param {...*} var_args Attribute name/value pairs of the dynamic attributes
- *     for the Element.
- * @return {!Element} The corresponding Element.
- */
-var elementOpen = function(tag, key, statics, var_args) {
-  if (process.env.NODE_ENV !== 'production') {
-    assertNotInAttributes();
-  }
-
-  var node = alignWithDOM(tag, key, statics);
-
-  if (hasChangedAttrs.apply(node, arguments)) {
-    var newAttrs = updateNewAttrs.apply(node, arguments);
-    updateAttributes(node, newAttrs);
+    for (var attr in newAttrs) {
+      attributes.updateAttribute(node, attr, newAttrs[attr]);
+    }
   }
 
   firstChild();
