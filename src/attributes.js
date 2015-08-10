@@ -17,77 +17,124 @@
 import { getData } from './node_data';
 
 
-var attributes = {
-  /**
-   * Applies an attribute or property to a given Element. If the value is a
-   * object or a function (which includes null), it is set as a property on the
-   * Element. Otherwise, the value is set as an attribute.
-   * @param {!Element} el
-   * @param {string} name The attribute's name.
-   * @param {*} value The attribute's value. If the value is a string, it is set
-   *     as an HTML attribute, otherwise, it is set on Element.
-   */
-  applyAttr: function(el, name, value) {
-    var type = typeof value;
-
-    if (type === 'object' || type === 'function') {
-      el[name] = value;
-    } else if (value === undefined) {
-      el.removeAttribute(name);
-    } else {
-      el.setAttribute(name, value);
-    }
-  },
-
-
-  /**
-   * Applies a style to an Element. No vendor prefix expansion is done for
-   * property names/values.
-   * @param {!Element} el
-   * @param {string|Object<string,string>} style The style to set. Either a
-   *     string of css or an object containing property-value pairs.
-   */
-  applyStyle: function(el, style) {
-    if (typeof style === 'string') {
-      el.style.cssText = style;
-    } else {
-      el.style.cssText = '';
-
-      for (var prop in style) {
-        el.style[prop] = style[prop];
-      }
-    }
-  },
-
-
-  /**
-   * Updates a single attribute on an Element.
-   * @param {!Element} el
-   * @param {string} name The attribute's name.
-   * @param {*} value The attribute's value. If the value is a string, it is set
-   *     as an HTML attribute, otherwise, it is set on Element.
-   */
-  updateAttribute: function(el, name, value) {
-    var data = getData(el);
-    var attrs = data.attrs;
-
-    if (attrs[name] === value) {
-      return;
-    }
-
-    if (name === 'style') {
-      attributes.applyStyle(el, value);
-    } else {
-      attributes.applyAttr(el, name, value);
-    }
-
-    attrs[name] = value;
+/**
+ * Applies an attribute or property to a given Element. If the value is null
+ * or undefined, it is removed from the Element. Otherwise, the value is set
+ * as an attribute.
+ * @param {!Element} el
+ * @param {string} name The attribute's name.
+ * @param {*} value The attribute's value.
+ */
+var applyAttr = function(el, name, value) {
+  if (value == null) {
+    el.removeAttribute(name);
+  } else {
+    el.setAttribute(name, value);
   }
+};
+
+/**
+ * Applies a property to a given Element.
+ * @param {!Element} el
+ * @param {string} name The property's name.
+ * @param {*} value The property's value.
+ */
+var applyProp = function(el, name, value) {
+  el[name] = value;
+};
+
+
+/**
+ * Applies a style to an Element. No vendor prefix expansion is done for
+ * property names/values.
+ * @param {!Element} el
+ * @param {string} name The attribute's name.
+ * @param {string|Object<string,string>} style The style to set. Either a
+ *     string of css or an object containing property-value pairs.
+ */
+var applyStyle = function(el, name, style) {
+  if (typeof style === 'string') {
+    el.style.cssText = style;
+  } else {
+    el.style.cssText = '';
+
+    for (var prop in style) {
+      el.style[prop] = style[prop];
+    }
+  }
+};
+
+
+/**
+ * Updates a single attribute on an Element.
+ * @param {!Element} el
+ * @param {string} name The attribute's name.
+ * @param {*} value The attribute's value. If the value is an object or
+ *     function it is set on the Element, otherwise, it is set as an HTML
+ *     attribute.
+ */
+var applyAttributeTyped = function(el, name, value) {
+  var type = typeof value;
+
+  if (type === 'object' || type === 'function') {
+    applyProp(el, name, value);
+  } else {
+    applyAttr(el, name, value);
+  }
+};
+
+
+/**
+ * Calls the appropriate attribute mutator for this attribute.
+ * @param {!Element} el
+ * @param {string} name The attribute's name.
+ * @param {*} value The attribute's value.
+ */
+var updateAttribute = function(el, name, value) {
+  var data = getData(el);
+  var attrs = data.attrs;
+
+  if (attrs[name] === value) {
+    return;
+  }
+
+  var mutator = mutators[name] || mutators.__all;
+  mutator(el, name, value);
+
+  attrs[name] = value;
+};
+
+
+/**
+ * Exposes our default attribute mutators publicly, so they may be used in
+ * custom mutators.
+ * @const {!Object<string, function(!Element, string, *)>}
+ */
+var defaults = {
+  applyAttr: applyAttr,
+  applyProp: applyProp,
+  applyStyle: applyStyle
+};
+
+
+/**
+ * A publicly mutable object to provide custom mutators for attributes.
+ * @const {!Object<string, function(!Element, string, *)>}
+ */
+var mutators = {
+  // Special generic mutator that's called for any attribute that does not
+  // have a specific mutator.
+  __all: applyAttributeTyped,
+
+  // Special case the style attribute
+  style: applyStyle
 };
 
 
 /** */
 export {
-  attributes
+  updateAttribute,
+  defaults,
+  mutators
 };
 

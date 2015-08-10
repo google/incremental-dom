@@ -25,5 +25,24 @@ export {
   text,
   attr,
 } from './src/virtual_elements';
-export { attributes } from './src/attributes';
+
+
+import {
+  mutators as attrMutators,
+  defaults as attrDefaults
+} from './src/attributes';
+
+
+var mutators = {
+  attributes: attrMutators
+};
+
+var defaults = {
+  attributes: attrDefaults
+};
+
+export {
+  mutators,
+  defaults
+};
 

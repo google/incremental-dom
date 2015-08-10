@@ -44,7 +44,7 @@ describe('library hooks', () => {
     beforeEach(() => {
       sandbox.spy(attributes, 'applyAttr');
     });
-  
+
     it('should be called for static attributes', () => {
       patch(container, render, 'dynamicValue');
       var el = container.childNodes[0];

@@ -18,7 +18,7 @@ import {
   alignWithDOM,
   clearUnvisitedDOM
 } from './alignment';
-import { attributes } from './attributes';
+import { updateAttribute } from './attributes';
 import { getData } from './node_data';
 import { getWalker } from './walker';
 import {
@@ -154,7 +154,7 @@ var elementOpen = function(tag, key, statics, var_args) {
     }
 
     for (var attr in newAttrs) {
-      attributes.updateAttribute(node, attr, newAttrs[attr]);
+      updateAttribute(node, attr, newAttrs[attr]);
     }
   }
 
