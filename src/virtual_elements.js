@@ -104,6 +104,20 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 
+/**
+ * Declares a virtual Element at the current location in the document. This
+ * corresponds to an opening tag and a elementClose tag is required.
+ * @param {string} tag The element's tag.
+ * @param {?string} key The key used to identify this element. This can be an
+ *     empty string, but performance may be better if a unique value is used
+ *     when iterating over an array of items.
+ * @param {?Array<*>} statics An array of attribute name/value pairs of the
+ *     static attributes for the Element. These will only be set once when the
+ *     Element is created.
+ * @param {...*} var_args Attribute name/value pairs of the dynamic attributes
+ *     for the Element.
+ * @return {!Element} The corresponding Element.
+ */
 var elementOpen = function(tag, key, statics, var_args) {
   if (process.env.NODE_ENV !== 'production') {
     assertNotInAttributes();
@@ -111,6 +125,11 @@ var elementOpen = function(tag, key, statics, var_args) {
 
   var node = alignWithDOM(tag, key, statics);
   var data = getData(node);
+  var attrsArr = data.attrsArr;
+  var newAttrs = data.newAttrs;
+  var attrsChanged = false;
+  var length = Math.max(arguments.length - ATTRIBUTES_OFFSET, 0);
+  var i = 0;
 
   /*
    * Checks to see if one or more attributes have changed for a given Element.
@@ -118,43 +137,36 @@ var elementOpen = function(tag, key, statics, var_args) {
    * individual argument. When attributes have changed, the overhead of this is
    * minimal.
    */
-  var attrsArr = data.attrsArr;
-  var attrsChanged = false;
-  var i = ATTRIBUTES_OFFSET;
-  var j = 0;
-
-  for (; i < arguments.length; i += 1, j += 1) {
-    if (attrsArr[j] !== arguments[i]) {
-      attrsChanged = true;
-      break;
+  if (length === attrsArr.length) {
+    for (; i < length; i += 1) {
+      if (attrsArr[i] !== arguments[i + ATTRIBUTES_OFFSET]) {
+        attrsChanged = true;
+        break;
+      }
     }
-  }
-
-  for (; i < arguments.length; i += 1, j += 1) {
-    attrsArr[j] = arguments[i];
-  }
-
-  if (j < attrsArr.length) {
+  } else {
     attrsChanged = true;
-    attrsArr.length = j;
   }
 
   /*
    * Actually perform the attribute update.
    */
   if (attrsChanged) {
-    var newAttrs = data.newAttrs;
-
-    for (var attr in newAttrs) {
-      newAttrs[attr] = undefined;
+    for (i = 0; i < length; i += 2) {
+      var name = arguments[i + ATTRIBUTES_OFFSET];
+      var value = arguments[i + 1 + ATTRIBUTES_OFFSET];
+      attrsArr[i] = name;
+      attrsArr[i + 1] = value;
+      newAttrs[name] = value;
     }
 
-    for (var i = ATTRIBUTES_OFFSET; i < arguments.length; i += 2) {
-      newAttrs[arguments[i]] = arguments[i + 1];
+    if (length < attrsArr.length) {
+      attrsArr.length = length;
     }
 
     for (var attr in newAttrs) {
       attributes.updateAttribute(node, attr, newAttrs[attr]);
+      newAttrs[attr] = undefined;
     }
   }
 
