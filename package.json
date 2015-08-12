@@ -9,7 +9,7 @@
     "type": "git",
     "url": "https://github.com/google/incremental-dom.git"
   },
-  "files" : [
+  "files": [
     "index.js",
     "src",
     "dist"
