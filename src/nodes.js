@@ -26,6 +26,24 @@ import { getNamespaceForTag } from './namespace';
 var dummy;
 
 
+if (process.env.NODE_ENV !== 'production') {
+  /**
+  * Makes sure that node keys are unique in a parent.
+  * @param {!Object<string, !Element>} A mapping of keys to child Elements.
+  * @param {string} key The key of the Element.
+  * @param {!Element} node The Element that is being inserted.
+  */
+  var assertUniqueKey = function(map, key, node) {
+    if (key in map && map[key] !== node) {
+      var tag = getData(node).nodeName;
+      var nodeName = getData(map[key]).nodeName;
+      throw new Error('Was expecting key "' + key + '" to be unique, but both '
+        + nodeName + ' and ' + tag + ' have it.');
+    }
+  }
+}
+
+
 /**
  * Creates an Element.
  * @param {!Document} doc The document with which to create the Element.
@@ -81,7 +99,7 @@ var createNode = function(doc, nodeName, key, statics) {
 /**
  * Creates a mapping that can be used to look up children using a key.
  * @param {!Element} el
- * @return {!Object<string, !Node>} A mapping of keys to the children of the
+ * @return {!Object<string, !Element>} A mapping of keys to the children of the
  *     Element.
  */
 var createKeyMap = function(el) {
@@ -92,6 +110,10 @@ var createKeyMap = function(el) {
   for (var i = 0; i < count; i += 1) {
     var child = children[i];
     var key = getData(child).key;
+
+    if (process.env.NODE_ENV !== 'production') {
+      assertUniqueKey(map, key, child);
+    }
 
     if (key) {
       map[key] = child;
@@ -106,7 +128,7 @@ var createKeyMap = function(el) {
  * Retrieves the mapping of key to child node for a given Element, creating it
  * if necessary.
  * @param {!Element} el
- * @return {!Object<string,!Node>} A mapping of keys to child Nodes
+ * @return {!Object<string, !Element>} A mapping of keys to child Elements
  */
 var getKeyMap = function(el) {
   var data = getData(el);
@@ -123,7 +145,7 @@ var getKeyMap = function(el) {
  * Retrieves a child from the parent with the given key.
  * @param {!Element} parent
  * @param {?string} key
- * @return {?Node} The child corresponding to the key.
+ * @return {?Element} The child corresponding to the key.
  */
 var getChild = function(parent, key) {
   return getKeyMap(parent)[key];
@@ -131,15 +153,21 @@ var getChild = function(parent, key) {
 
 
 /**
- * Registers a node as being a child. The parent will keep track of the child
+ * Registers an element as being a child. The parent will keep track of the child
  * using the key. The child can be retrieved using the same key using
  * getKeyMap. The provided key should be unique within the parent Element.
  * @param {!Element} parent The parent of child.
  * @param {string} key A key to identify the child with.
- * @param {!Node} child The child to register.
+ * @param {!Element} child The child to register.
  */
 var registerChild = function(parent, key, child) {
-  getKeyMap(parent)[key] = child;
+  var map = getKeyMap(parent);
+
+  if (process.env.NODE_ENV !== 'production') {
+    assertUniqueKey(map, key, child);
+  }
+
+  map[key] = child;
 };
 
 

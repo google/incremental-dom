@@ -51,7 +51,7 @@ function NodeData(nodeName, key) {
 
   /**
    * Keeps track of children within this node by their key.
-   * {?Object<string, Node>}
+   * {?Object<string, !Element>}
    */
   this.keyMap = null;
 
