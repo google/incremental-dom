@@ -26,6 +26,24 @@ import { getNamespaceForTag } from './namespace';
 var dummy;
 
 
+if (process.env.NODE_ENV !== 'production') {
+  /**
+  * Makes sure that node keys are unique in a parent.
+  * @param {!Object<string, !Element>} A mapping of keys to child Elements.
+  * @param {string} key The key of the Element.
+  * @param {!Element} node The Element that is being inserted.
+  */
+  var assertUniqueKey = function(map, key, node) {
+    if (key in map && map[key] !== node) {
+      var tag = getData(node).nodeName;
+      var nodeName = getData(map[key]).nodeName;
+      throw new Error('Was expecting key "' + key + '" to be unique, but both '
+        + nodeName + ' and ' + tag + ' have it.');
+    }
+  }
+}
+
+
 /**
  * Creates an Element.
  * @param {!Document} doc The document with which to create the Element.
@@ -93,6 +111,10 @@ var createKeyMap = function(el) {
     var child = children[i];
     var key = getData(child).key;
 
+    if (process.env.NODE_ENV !== 'production') {
+      assertUniqueKey(map, key, child);
+    }
+
     if (key) {
       map[key] = child;
     }
@@ -139,7 +161,13 @@ var getChild = function(parent, key) {
  * @param {!Element} child The child to register.
  */
 var registerChild = function(parent, key, child) {
-  getKeyMap(parent)[key] = child;
+  var map = getKeyMap(parent);
+
+  if (process.env.NODE_ENV !== 'production') {
+    assertUniqueKey(map, key, child);
+  }
+
+  map[key] = child;
 };
 
 
