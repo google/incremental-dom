@@ -15,14 +15,14 @@
  */
 
 import {
-    patch,
-    elementVoid
+  patch,
+  elementVoid
 } from '../../index';
 
 
 describe('rendering with keys', () => {
   var container;
-    
+
   function render(items) {
     for(var i=0; i<items.length; i++) {
       elementVoid('div', items[i].key, ['id', items[i].key]);
@@ -45,28 +45,12 @@ describe('rendering with keys', () => {
 
     patch(container, () => render(items));
     var keyedNode = container.childNodes[0];
-  
+
     items.unshift({ key : null });
     patch(container, () => render(items));
-   
+
     expect(container.childNodes).to.have.length(2);
     expect(container.childNodes[0]).to.not.equal(keyedNode);
-  });
-
-  it('should not re-use a node with a different tag', () => {
-    function render(condition) {
-      if (condition) {
-        elementVoid('span', 'key');
-      } else {
-        elementVoid('div', 'key');
-      }
-    }
-
-    patch(container, () => render(true));
-    patch(container, () => render(false));
-
-    expect(container.childNodes).to.have.length(1);
-    expect(container.childNodes[0].nodeName).to.equal('DIV');
   });
 
   it('should not modify DOM nodes with falsey keys', () => {

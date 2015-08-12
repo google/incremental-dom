@@ -27,6 +27,23 @@ import { getWalker } from './walker';
 var dummy;
 
 
+if (process.env.NODE_ENV !== 'production') {
+  /**
+  * Makes sure that keyed node matches the tag name provided.
+  * @param {!Element} node The node that is being matched.
+  * @param {string} tag The tag name of the Element.
+  * @param {string} key The key of the Element.
+  */
+  var assertKeyedTagMatches = function(node, tag, key) {
+    var nodeName = getData(node).nodeName;
+    if (nodeName !== tag) {
+      throw new Error('Was expecting node with key "' + key + '" to have to be' +
+          'a ' + tag + ', not a ' + nodeName + '.');
+    }
+  };
+}
+
+
 /**
  * Checks whether or not a given node matches the specified nodeName and key.
  *
@@ -41,8 +58,7 @@ var matches = function(node, nodeName, key) {
   // Key check is done using double equals as we want to treat a null key the
   // same as undefined. This should be okay as the only values allowed are
   // strings, null and undefined so the == semantics are not too weird.
-  return key == data.key &&
-         nodeName === data.nodeName;
+  return key == data.key && nodeName === data.nodeName;
 };
 
 
@@ -70,7 +86,10 @@ var alignWithDOM = function(nodeName, key, statics) {
 
     // Check to see if the node has moved within the parent or if a new one
     // should be created
-    if (existingNode && matches(existingNode, nodeName, key)) {
+    if (existingNode) {
+      if (process.env.NODE_ENV !== 'production') {
+        assertKeyedTagMatches(existingNode, nodeName, key);
+      }
       matchingNode = existingNode;
     } else {
       matchingNode = createNode(walker.doc, nodeName, key, statics);
