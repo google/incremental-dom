@@ -90,15 +90,27 @@ var alignWithDOM = function(nodeName, key, statics) {
       if (process.env.NODE_ENV !== 'production') {
         assertKeyedTagMatches(existingNode, nodeName, key);
       }
+
       matchingNode = existingNode;
     } else {
       matchingNode = createNode(walker.doc, nodeName, key, statics);
+
       if (key) {
         registerChild(parent, key, matchingNode);
       }
     }
 
-    parent.insertBefore(matchingNode, currentNode);
+    // If the node has a key, remove it from the DOM to prevent a large number
+    // of re-orders in the case that it moved far or was completely removed.
+    // Since we hold on to a reference through the keyMap, we can always add it
+    // back.
+    if (currentNode && getData(currentNode).key) {
+      parent.replaceChild(matchingNode, currentNode);
+      getData(parent).keyMapValid = false;
+    } else {
+      parent.insertBefore(matchingNode, currentNode);
+    }
+
     walker.currentNode = matchingNode;
   }
 
@@ -113,11 +125,14 @@ var alignWithDOM = function(nodeName, key, statics) {
  */
 var clearUnvisitedDOM = function(node) {
   var data = getData(node);
+  var keyMap = data.keyMap;
+  var keyMapValid = data.keyMapValid;
   var lastChild = node.lastChild;
   var lastVisitedChild = data.lastVisitedChild;
+
   data.lastVisitedChild = null;
 
-  if (lastChild === lastVisitedChild) {
+  if (lastChild === lastVisitedChild && keyMapValid) {
     return;
   }
 
@@ -126,9 +141,14 @@ var clearUnvisitedDOM = function(node) {
     lastChild = node.lastChild;
   }
 
-  // Invalidate the key map since we removed children. It will get recreated
-  // next time we need it.
-  data.keyMap = null;
+  // Clean the keyMap, removing any unusued keys.
+  for (var key in keyMap) {
+    if (!keyMap[key].parentNode) {
+      delete keyMap[key];
+    }
+  }
+
+  data.keyMapValid = true;
 };
 
 
