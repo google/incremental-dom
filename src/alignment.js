@@ -29,7 +29,7 @@ var dummy;
 
 if (process.env.NODE_ENV !== 'production') {
   /**
-  * Makes sure that keyed node matches the tag name provided.
+  * Makes sure that keyed Element matches the tag name provided.
   * @param {!Element} node The node that is being matched.
   * @param {string} tag The tag name of the Element.
   * @param {string} key The key of the Element.
@@ -37,8 +37,8 @@ if (process.env.NODE_ENV !== 'production') {
   var assertKeyedTagMatches = function(node, tag, key) {
     var nodeName = getData(node).nodeName;
     if (nodeName !== tag) {
-      throw new Error('Was expecting node with key "' + key + '" to have to be' +
-          'a ' + tag + ', not a ' + nodeName + '.');
+      throw new Error('Was expecting node with key "' + key + '" to be a '
+          + tag + ', not a ' + nodeName + '.');
     }
   };
 }

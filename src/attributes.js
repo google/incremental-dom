@@ -25,7 +25,7 @@ var attributes = {
    * @param {!Element} el
    * @param {string} name The attribute's name.
    * @param {*} value The attribute's value. If the value is a string, it is set
-   *     as an HTML attribute, otherwise, it is set on node.
+   *     as an HTML attribute, otherwise, it is set on Element.
    */
   applyAttr: function(el, name, value) {
     var type = typeof value;
@@ -65,7 +65,7 @@ var attributes = {
    * @param {!Element} el
    * @param {string} name The attribute's name.
    * @param {*} value The attribute's value. If the value is a string, it is set
-   *     as an HTML attribute, otherwise, it is set on node.
+   *     as an HTML attribute, otherwise, it is set on Element.
    */
   updateAttribute: function(el, name, value) {
     var data = getData(el);

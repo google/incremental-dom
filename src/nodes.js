@@ -81,7 +81,7 @@ var createNode = function(doc, nodeName, key, statics) {
 /**
  * Creates a mapping that can be used to look up children using a key.
  * @param {!Element} el
- * @return {!Object<string, !Node>} A mapping of keys to the children of the
+ * @return {!Object<string, !Element>} A mapping of keys to the children of the
  *     Element.
  */
 var createKeyMap = function(el) {
@@ -106,7 +106,7 @@ var createKeyMap = function(el) {
  * Retrieves the mapping of key to child node for a given Element, creating it
  * if necessary.
  * @param {!Element} el
- * @return {!Object<string,!Node>} A mapping of keys to child Nodes
+ * @return {!Object<string, !Element>} A mapping of keys to child Elements
  */
 var getKeyMap = function(el) {
   var data = getData(el);
@@ -123,7 +123,7 @@ var getKeyMap = function(el) {
  * Retrieves a child from the parent with the given key.
  * @param {!Element} parent
  * @param {?string} key
- * @return {?Node} The child corresponding to the key.
+ * @return {?Element} The child corresponding to the key.
  */
 var getChild = function(parent, key) {
   return getKeyMap(parent)[key];
@@ -131,12 +131,12 @@ var getChild = function(parent, key) {
 
 
 /**
- * Registers a node as being a child. The parent will keep track of the child
+ * Registers an element as being a child. The parent will keep track of the child
  * using the key. The child can be retrieved using the same key using
  * getKeyMap. The provided key should be unique within the parent Element.
  * @param {!Element} parent The parent of child.
  * @param {string} key A key to identify the child with.
- * @param {!Node} child The child to register.
+ * @param {!Element} child The child to register.
  */
 var registerChild = function(parent, key, child) {
   getKeyMap(parent)[key] = child;
