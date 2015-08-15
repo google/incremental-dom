@@ -74,6 +74,8 @@ function bundle(format) {
 }
 
 function js(done) {
+  process.env.NODE_ENV = 'development';
+
   bundle('toUmd').then(function(gen) {
     file(artifactName + '.js', gen.code, {src: true})
       .pipe(sourcemaps.init({loadMaps: true}))
