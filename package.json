@@ -9,7 +9,7 @@
     "type": "git",
     "url": "https://github.com/google/incremental-dom.git"
   },
-  "files" : [
+  "files": [
     "index.js",
     "src",
     "dist"
@@ -26,7 +26,6 @@
     "chai": "^3.0.0",
     "del": "^1.2.0",
     "es6ify": "~1.6.0",
-    "esperanto": "^0.7.3",
     "gulp": "^3.9.0",
     "gulp-babel": "^5.1.0",
     "gulp-file": "^0.2.0",
@@ -41,6 +40,7 @@
     "karma-mocha": "^0.2.0",
     "karma-sinon-chai": "^1.0.0",
     "mocha": "^2.2.5",
+    "rollup": "^0.14.0",
     "sinon": "^1.15.4",
     "sinon-chai": "^2.8.0",
     "vinyl-buffer": "~1.0.0",

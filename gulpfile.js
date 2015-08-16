@@ -16,7 +16,7 @@
 
 var babel = require('gulp-babel');
 var del = require('del');
-var esperanto = require('esperanto');
+var rollup = require('rollup');
 var file = require('gulp-file');
 var gjslint = require('gulp-gjslint');
 var gulp = require('gulp');
@@ -27,7 +27,7 @@ var source = require('vinyl-source-stream');
 var sourcemaps = require('gulp-sourcemaps');
 var uglify = require('gulp-uglify');
 
-var entryFileName = 'index';
+var entryFileName = 'index.js';
 var artifactName = 'incremental-dom';
 var googModuleName = 'incrementaldom';
 var jsFileName = 'incremental-dom.js';
@@ -61,20 +61,19 @@ function lint() {
 }
 
 function bundle(format) {
-  return esperanto.bundle({
-    base: '.',
+  return rollup.rollup({
     entry: entryFileName,
   }).then(function(bundle) {
-    return bundle[format]({
-      strict: true,
+    return bundle.generate({
+      format: format,
       sourceMap: 'inline',
-      name: 'IncrementalDOM'
+      moduleName: 'IncrementalDOM'
     });
   });
 }
 
 function js(done) {
-  bundle('toUmd').then(function(gen) {
+  bundle('umd').then(function(gen) {
     file(artifactName + '.js', gen.code, {src: true})
       .pipe(sourcemaps.init({loadMaps: true}))
       .pipe(babel())
@@ -92,7 +91,7 @@ function jsWatch() {
 function jsMin(done) {
   process.env.NODE_ENV = 'production';
 
-  bundle('toUmd').then(function(gen) {
+  bundle('umd').then(function(gen) {
     file(artifactName + '-min.js', gen.code, {src: true})
       .pipe(sourcemaps.init({loadMaps: true}))
       .pipe(babel())
@@ -109,7 +108,7 @@ function jsMin(done) {
 function jsClosure(done) {
   process.env.NODE_ENV = 'production';
 
-  bundle('toCjs').then(function(gen) {
+  bundle('cjs').then(function(gen) {
     // Replace the first line, 'use strict';, with a goog.module declaration.
     var moduleDeclaration = 'goog.module(\'' + googModuleName + '\');';
     var code = gen.code.replace(/.*/, moduleDeclaration);
