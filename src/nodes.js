@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { attributes } from './attributes';
+import { updateAttribute } from './attributes';
 import {
     getData,
     initData
@@ -49,7 +49,7 @@ var createElement = function(doc, tag, key, statics) {
 
   if (statics) {
     for (var i = 0; i < statics.length; i += 2) {
-      attributes.updateAttribute(el, statics[i], statics[i + 1]);
+      updateAttribute(el, statics[i], statics[i + 1]);
     }
   }
 

@@ -1,5 +1,4 @@
 /**
- * @license
  * Copyright 2015 The Incremental DOM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,15 +14,24 @@
  * limitations under the License.
  */
 
-export { patch } from './src/patch';
+import {
+  mutators as attributes,
+} from './attributes';
+
+
+/**
+ * Publicly exports the mutator hooks from various internal modules.
+ * Note that mutating these objects will alter the behavior of the internal
+ * code.
+ * {Object<string, Object<string, function>>}
+ */
+var mutators = {
+  attributes: attributes
+};
+
+
+/** */
 export {
-  elementVoid,
-  elementOpenStart,
-  elementOpenEnd,
-  elementOpen,
-  elementClose,
-  text,
-  attr,
-} from './src/virtual_elements';
-export { mutators } from './src/mutators';
-export { defaults } from './src/defaults';
+  mutators
+};
+
