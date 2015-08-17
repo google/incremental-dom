@@ -131,6 +131,17 @@ var getChild = function(parent, key) {
 
 
 /**
+ * Removes a child from the parent with the given key.
+ * @param {!Element} parent
+ * @param {?string} key
+ */
+var removeChild = function(parent, key) {
+  var keyMap = getData(parent).keyMap;
+  delete keyMap[key];
+};
+
+
+/**
  * Registers an element as being a child. The parent will keep track of the child
  * using the key. The child can be retrieved using the same key using
  * getKeyMap. The provided key should be unique within the parent Element.
@@ -147,6 +158,7 @@ var registerChild = function(parent, key, child) {
 export {
   createNode,
   getChild,
-  registerChild
+  registerChild,
+  removeChild
 };
 
