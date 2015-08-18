@@ -16,6 +16,14 @@ var defineComponent = (function() {
     this[shadowRoot] = this.createShadowRoot();
     this[firstUpdate] = true;
     this[props] = null;
+
+    // Handle lazy upgrade - take the existing props from the Element and
+    // re-apply them so that they go through (and do not shadow) the setter.
+    var props = this.props;
+    if (props) {
+      delete this.props;
+      this.props = props;
+    }
   };
 
 
