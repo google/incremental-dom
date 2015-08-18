@@ -1,6 +1,7 @@
 <html>
 <head>
   <script src="../dist/incremental-dom.js"></script>
+  <script src="../node_modules/webcomponents.js/webcomponents.js"></script>
   <script src="define_component.js"></script>
   <script src="demo_utils.js"></script>
   <style>
@@ -34,6 +35,12 @@
           elementVoid = IncrementalDOM.elementVoid,
           elementClose = IncrementalDOM.elementClose,
           text = IncrementalDOM.text;
+
+      // The root container needs to be manually created when using the
+      // web components polyfill.
+      var existingContainer = document.getElementById('container');
+      var container = document.createElement('div');
+      existingContainer.parentNode.replaceChild(container, existingContainer);
 
       /**
        * This demo uses a bit of logic in define_component.js to use React-like
