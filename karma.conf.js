@@ -18,6 +18,10 @@ module.exports = function(config) {
   config.set({
     frameworks: ['browserify', 'mocha', 'sinon-chai'],
 
+    files: [
+      'test/**/*.js'
+    ],
+
     preprocessors: {
       'src/**/*.js': ['browserify'],
       'test/**/*.js': ['browserify']
@@ -38,8 +42,6 @@ module.exports = function(config) {
     logLevel: config.LOG_INFO,
 
     autoWatch: true,
-
-    browsers: ['Chrome', 'Firefox'],
 
     // change Karma's debug.html to the mocha web reporter
     client: {

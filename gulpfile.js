@@ -32,7 +32,8 @@ var artifactName = 'incremental-dom';
 var googModuleName = 'incrementaldom';
 var jsFileName = 'incremental-dom.js';
 var srcs = [jsFileName, 'src/**/*.js'];
-var tests = ['test/functional/**/*.js'];
+var tests = ['test/**/*.js'];
+var karmaConfig = path.resolve('karma.conf.js');
 
 function clean(done) {
   del(['dist'], done);
@@ -40,16 +41,23 @@ function clean(done) {
 
 function unit(done) {
   karma.start({
-    configFile: path.resolve('karma.conf.js'),
+    configFile: karmaConfig,
     singleRun: true,
-    files: tests
+    browsers: ['Chrome', 'Firefox']
+  }, done);
+}
+
+function unitPhantom(done) {
+  karma.start({
+    configFile: karmaConfig,
+    singleRun: true,
+    browsers: ['PhantomJS']
   }, done);
 }
 
 function unitWatch(done) {
   karma.start({
-    configFile: path.resolve('karma.conf.js'),
-    files: tests,
+    configFile: karmaConfig,
     browsers: ['Chrome']
   }, done);
 }
@@ -125,6 +133,7 @@ function jsClosure(done) {
 
 gulp.task('clean', clean);
 gulp.task('unit', unit);
+gulp.task('unit-phantom', unitPhantom);
 gulp.task('unit-watch', unitWatch);
 gulp.task('lint', lint);
 gulp.task('js', js);
@@ -133,6 +142,6 @@ gulp.task('js-min', jsMin);
 gulp.task('js-dist', ['js', 'js-min']);
 gulp.task('js-closure', jsClosure);
 gulp.task('build', ['lint', 'unit', 'js']);
-gulp.task('dist', ['clean', 'lint', 'unit', 'js-dist']);
+gulp.task('dist', ['lint', 'unit-phantom', 'js-dist']);
 
 gulp.task('default', ['build']);

@@ -169,7 +169,7 @@ describe('element creation', () => {
     });
 
     it('should have the svg namespace for foreignObjects', () => {
-      var el = container.querySelector('svg').children[1];
+      var el = container.querySelector('svg').childNodes[1];
       expect(el.namespaceURI).to.equal('http://www.w3.org/2000/svg');
     });
 

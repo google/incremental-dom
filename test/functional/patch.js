@@ -148,6 +148,6 @@ describe('patching a documentFragment', function() {
       elementClose('div');
     });
 
-    expect(frag.children[0].id).to.equal('aDiv');
+    expect(frag.childNodes[0].id).to.equal('aDiv');
   });
 });

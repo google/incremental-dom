@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/google/incremental-dom.svg?branch=master)](https://travis-ci.org/google/incremental-dom) 
+
 # Incremental DOM
 
 ## Overview
