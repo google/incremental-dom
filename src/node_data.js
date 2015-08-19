@@ -56,6 +56,12 @@ function NodeData(nodeName, key) {
   this.keyMap = null;
 
   /**
+   * Whether or not the keyMap is currently valid.
+   * {boolean}
+   */
+  this.keyMapValid = true;
+
+  /**
    * The last child to have been visited within the current pass.
    * {?Node}
    */
