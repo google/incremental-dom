@@ -131,8 +131,8 @@ var getChild = function(parent, key) {
 
 
 /**
- * Registers an element as being a child. The parent will keep track of the child
- * using the key. The child can be retrieved using the same key using
+ * Registers an element as being a child. The parent will keep track of the
+ * child using the key. The child can be retrieved using the same key using
  * getKeyMap. The provided key should be unique within the parent Element.
  * @param {!Element} parent The parent of child.
  * @param {string} key A key to identify the child with.

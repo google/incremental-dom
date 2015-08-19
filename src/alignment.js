@@ -37,8 +37,8 @@ if (process.env.NODE_ENV !== 'production') {
   var assertKeyedTagMatches = function(node, tag, key) {
     var nodeName = getData(node).nodeName;
     if (nodeName !== tag) {
-      throw new Error('Was expecting node with key "' + key + '" to be a '
-          + tag + ', not a ' + nodeName + '.');
+      throw new Error('Was expecting node with key "' + key + '" to be a ' +
+          tag + ', not a ' + nodeName + '.');
     }
   };
 }
