@@ -30,8 +30,8 @@ var dummy;
  * Creates an Element.
  * @param {!Document} doc The document with which to create the Element.
  * @param {string} tag The tag for the Element.
- * @param {?string} key A key to identify the Element.
- * @param {?Array<*>} statics An array of attribute name/value pairs of
+ * @param {?string=} key A key to identify the Element.
+ * @param {?Array<*>=} statics An array of attribute name/value pairs of
  *     the static attributes for the Element.
  * @return {!Element}
  */
@@ -49,7 +49,7 @@ var createElement = function(doc, tag, key, statics) {
 
   if (statics) {
     for (var i = 0; i < statics.length; i += 2) {
-      updateAttribute(el, statics[i], statics[i + 1]);
+      updateAttribute(el, /** @type {!string}*/(statics[i]), statics[i + 1]);
     }
   }
 
@@ -63,8 +63,8 @@ var createElement = function(doc, tag, key, statics) {
  * @param {!Document} doc The document with which to create the Node.
  * @param {string} nodeName The tag if creating an element or #text to create
  *     a Text.
- * @param {?string} key A key to identify the Element.
- * @param {?Array<*>} statics The static data to initialize the Node
+ * @param {?string=} key A key to identify the Element.
+ * @param {?Array<*>=} statics The static data to initialize the Node
  *     with. For an Element, an array of attribute name/value pairs of
  *     the static attributes for the Element.
  * @return {!Node}
@@ -80,7 +80,7 @@ var createNode = function(doc, nodeName, key, statics) {
 
 /**
  * Creates a mapping that can be used to look up children using a key.
- * @param {!Element} el
+ * @param {!Node} el
  * @return {!Object<string, !Element>} A mapping of keys to the children of the
  *     Element.
  */
@@ -105,8 +105,8 @@ var createKeyMap = function(el) {
 /**
  * Retrieves the mapping of key to child node for a given Element, creating it
  * if necessary.
- * @param {!Element} el
- * @return {!Object<string, !Element>} A mapping of keys to child Elements
+ * @param {!Node} el
+ * @return {!Object<string, !Node>} A mapping of keys to child Elements
  */
 var getKeyMap = function(el) {
   var data = getData(el);
@@ -121,12 +121,12 @@ var getKeyMap = function(el) {
 
 /**
  * Retrieves a child from the parent with the given key.
- * @param {!Element} parent
+ * @param {!Node} parent
  * @param {?string} key
  * @return {?Element} The child corresponding to the key.
  */
 var getChild = function(parent, key) {
-  return getKeyMap(parent)[key];
+  return /** @type {?Element} */(key && getKeyMap(parent)[key]);
 };
 
 
@@ -134,9 +134,9 @@ var getChild = function(parent, key) {
  * Registers an element as being a child. The parent will keep track of the
  * child using the key. The child can be retrieved using the same key using
  * getKeyMap. The provided key should be unique within the parent Element.
- * @param {!Element} parent The parent of child.
+ * @param {!Node} parent The parent of child.
  * @param {string} key A key to identify the child with.
- * @param {!Element} child The child to register.
+ * @param {!Node} child The child to register.
  */
 var registerChild = function(parent, key, child) {
   getKeyMap(parent)[key] = child;
@@ -149,4 +149,3 @@ export {
   getChild,
   registerChild
 };
-

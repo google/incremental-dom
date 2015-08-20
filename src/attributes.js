@@ -29,7 +29,7 @@ var applyAttr = function(el, name, value) {
   if (value == null) {
     el.removeAttribute(name);
   } else {
-    el.setAttribute(name, value);
+    el.setAttribute(name, /**@type {boolean|number|string}*/(value));
   }
 };
 
@@ -127,7 +127,7 @@ var mutators = {
   __all: applyAttributeTyped,
 
   // Special case the style attribute
-  style: applyStyle
+  'style': applyStyle
 };
 
 
@@ -137,4 +137,3 @@ export {
   defaults,
   mutators
 };
-

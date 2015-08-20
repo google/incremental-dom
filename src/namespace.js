@@ -47,7 +47,7 @@ var exitTag = function(tag) {
 /**
  * Gets the namespace to create an element (of a given tag) in.
  * @param {string} tag The tag to get the namespace for.
- * @return {string} The namespace to create the tag in.
+ * @return {(string|undefined)} The namespace to create the tag in.
  */
 var getNamespaceForTag = function(tag) {
   if (tag === 'svg') {
@@ -64,4 +64,3 @@ export {
   exitTag,
   getNamespaceForTag
 };
-

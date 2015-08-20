@@ -28,7 +28,7 @@ var dummy;
 
 /**
  * Enters an Element, setting the current namespace for nested elements.
- * @param {!Element} node
+ * @param {!Node} node
  */
 var enterNode = function(node) {
   var data = getData(node);
@@ -38,7 +38,7 @@ var enterNode = function(node) {
 
 /**
  * Exits an Element, unwinding the current namespace to the previous value.
- * @param {!Element} node
+ * @param {!Node} node
  */
 var exitNode = function(node) {
   var data = getData(node);
@@ -63,7 +63,7 @@ var markVisited = function(node) {
  */
 var firstChild = function() {
   var walker = getWalker();
-  enterNode(walker.currentNode);
+  enterNode(/** @type {!Node}*/(walker.currentNode));
   walker.firstChild();
 };
 
@@ -73,7 +73,7 @@ var firstChild = function() {
  */
 var nextSibling = function() {
   var walker = getWalker();
-  markVisited(walker.currentNode);
+  markVisited(/** @type {!Node}*/(walker.currentNode));
   walker.nextSibling();
 };
 
@@ -84,7 +84,7 @@ var nextSibling = function() {
 var parentNode = function() {
   var walker = getWalker();
   walker.parentNode();
-  exitNode(walker.currentNode);
+  exitNode(/** @type {!Node}*/(walker.currentNode));
 };
 
 
@@ -94,4 +94,3 @@ export {
   nextSibling,
   parentNode
 };
-
