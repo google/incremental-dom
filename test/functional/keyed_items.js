@@ -135,5 +135,14 @@ describe('rendering with keys', () => {
     expect(container.childNodes[2]).to.equal(secondNode);
     expect(container.childNodes[2].id).to.equal('two');
   });
+
+  it('should avoid collisions with Object.prototype', () => {
+    var items = [
+      { key: 'hasOwnProperty' }
+    ];
+
+    patch(container, () => render(items));
+    expect(container.childNodes).to.have.length(1);
+  });
 });
 

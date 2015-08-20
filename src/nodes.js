@@ -20,6 +20,7 @@ import {
     initData
 } from './node_data';
 import { getNamespaceForTag } from './namespace';
+import { createMap } from './util';
 
 
 // For https://github.com/esperantojs/esperanto/issues/187
@@ -85,7 +86,7 @@ var createNode = function(doc, nodeName, key, statics) {
  *     Element.
  */
 var createKeyMap = function(el) {
-  var map = {};
+  var map = createMap();
   var children = el.children;
   var count = children.length;
 
