@@ -82,7 +82,7 @@ var alignWithDOM = function(nodeName, key, statics) {
   if (currentNode && matches(currentNode, nodeName, key)) {
     matchingNode = currentNode;
   } else {
-    var existingNode = /** @type {Element} */(key && getChild(parent, key));
+    var existingNode = /** @type {Element} */(getChild(parent, key));
 
     // Check to see if the node has moved within the parent or if a new one
     // should be created

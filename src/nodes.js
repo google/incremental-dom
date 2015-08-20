@@ -122,7 +122,7 @@ var getKeyMap = function(el) {
 /**
  * Retrieves a child from the parent with the given key.
  * @param {!Node} parent
- * @param {?string} key
+ * @param {?string=} key
  * @return {?Element} The child corresponding to the key.
  */
 var getChild = function(parent, key) {
