@@ -52,7 +52,7 @@ if (process.env.NODE_ENV !== 'production') {
 /**
  * Patches the document starting at el with the provided function. This function
  * may be called during an existing patch operation.
- * @param {!Element|!Document} node The Element or Document to patch.
+ * @param {!Element|!Document|!DocumentFragment} node The Element or Document to patch.
  * @param {!function(T)} fn A function containing elementOpen/elementClose/etc.
  *     calls that describe the DOM.
  * @param {T=} data An argument passed to fn to represent DOM state.

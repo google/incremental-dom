@@ -23,13 +23,13 @@ import { getData } from './node_data';
  * as an attribute.
  * @param {!Element} el
  * @param {string} name The attribute's name.
- * @param {*} value The attribute's value.
+ * @param {?(boolean|number|string)=} value The attribute's value.
  */
 var applyAttr = function(el, name, value) {
   if (value == null) {
     el.removeAttribute(name);
   } else {
-    el.setAttribute(name, /**@type {boolean|number|string}*/(value));
+    el.setAttribute(name, value);
   }
 };
 
@@ -79,7 +79,7 @@ var applyAttributeTyped = function(el, name, value) {
   if (type === 'object' || type === 'function') {
     applyProp(el, name, value);
   } else {
-    applyAttr(el, name, value);
+    applyAttr(el, name, /** @type {?(boolean|number|string)} */(value));
   }
 };
 
