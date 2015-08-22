@@ -17,8 +17,8 @@
 
 /**
  * Keeps track of information needed to perform diffs for a given DOM node.
- * @param {?string} nodeName
- * @param {?string} key
+ * @param {!string} nodeName
+ * @param {?string=} key
  * @constructor
  */
 function NodeData(nodeName, key) {
@@ -63,18 +63,18 @@ function NodeData(nodeName, key) {
 
   /**
    * The last child to have been visited within the current pass.
-   * {?Node}
+   * @type {?Node}
    */
   this.lastVisitedChild = null;
 
   /**
    * The node name for this node.
-   * @const
+   * @const {string}
    */
   this.nodeName = nodeName;
 
   /**
-   * @const {string}
+   * @type {?string}
    */
   this.text = null;
 }
@@ -85,7 +85,7 @@ function NodeData(nodeName, key) {
  *
  * @param {!Node} node The node to initialize data for.
  * @param {string} nodeName The node name of node.
- * @param {?string} key The key that identifies the node.
+ * @param {?string=} key The key that identifies the node.
  * @return {!NodeData} The newly initialized data object
  */
 var initData = function(node, nodeName, key) {
@@ -124,4 +124,3 @@ export {
   getData,
   initData
 };
-

@@ -30,9 +30,6 @@ import { clearUnvisitedDOM } from './alignment';
 var dummy;
 
 
-/**
- * @const {boolean}
- */
 if (process.env.NODE_ENV !== 'production') {
   var assertNoUnclosedTags = function(root) {
     var openElement = getWalker().getCurrentParent();
@@ -55,10 +52,11 @@ if (process.env.NODE_ENV !== 'production') {
 /**
  * Patches the document starting at el with the provided function. This function
  * may be called during an existing patch operation.
- * @param {!Element|!Document} node The Element or Document to patch.
- * @param {!function} fn A function containing elementOpen/elementClose/etc.
+ * @param {!Element|!Document|!DocumentFragment} node The Element or Document to patch.
+ * @param {!function(T)} fn A function containing elementOpen/elementClose/etc.
  *     calls that describe the DOM.
- * @param {*} data An argument passed to fn to represent DOM state.
+ * @param {T=} data An argument passed to fn to represent DOM state.
+ * @template T
  */
 var patch = function(node, fn, data) {
   var prevWalker = getWalker();
@@ -81,4 +79,3 @@ var patch = function(node, fn, data) {
 export {
   patch
 };
-

@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import { TreeWalker } from './tree_walker';
+
 /**
  * @type {TreeWalker}
  */
@@ -42,4 +44,3 @@ export {
   getWalker,
   setWalker
 };
-

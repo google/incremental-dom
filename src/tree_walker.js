@@ -30,15 +30,20 @@ function TreeWalker(node) {
    */
   this.stack_ = [];
 
-  /** {?Node} */
+  /**
+   * @type {?Node}
+   */
   this.currentNode = node;
 
-  /** {!Document} */
-  this.doc = node.ownerDocument;
+  /**
+   * @const {!Document}
+   */
+  this.doc = /** @type {!Document} */(node.ownerDocument);
 
   /**
    * Keeps track of what namespace to create new Elements in.
-   * @const @private {!Array<string>}
+   * @private
+   * @const {!Array<(string|undefined)>}
    */
   this.nsStack_ = [undefined];
 }
@@ -53,7 +58,7 @@ TreeWalker.prototype.getCurrentParent = function() {
 
 
 /**
- * @return {string} The current namespace to create Elements in.
+ * @return {(string|undefined)} The current namespace to create Elements in.
  */
 TreeWalker.prototype.getCurrentNamespace = function() {
   return this.nsStack_[this.nsStack_.length - 1];
@@ -61,7 +66,7 @@ TreeWalker.prototype.getCurrentNamespace = function() {
 
 
 /**
- * @param {string} namespace The namespace to enter.
+ * @param {string=} namespace The namespace to enter.
  */
 TreeWalker.prototype.enterNamespace = function(namespace) {
   this.nsStack_.push(namespace);
@@ -105,4 +110,3 @@ TreeWalker.prototype.parentNode = function() {
 export {
   TreeWalker
 };
-

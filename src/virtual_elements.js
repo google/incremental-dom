@@ -104,12 +104,25 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 
+/**
+ * @param {string} tag The element's tag.
+ * @param {?string=} key The key used to identify this element. This can be an
+ *     empty string, but performance may be better if a unique value is used
+ *     when iterating over an array of items.
+ * @param {?Array<*>=} statics An array of attribute name/value pairs of the
+ *     static attributes for the Element. These will only be set once when the
+ *     Element is created.
+ * @param {...(string|number|boolean)} var_args
+ *     Functions to format the value which are called only when the value has
+ *     changed.
+ * @return {!Element} The corresponding Element.
+ */
 var elementOpen = function(tag, key, statics, var_args) {
   if (process.env.NODE_ENV !== 'production') {
     assertNotInAttributes();
   }
 
-  var node = alignWithDOM(tag, key, statics);
+  var node = /** @type {!Element}*/(alignWithDOM(tag, key, statics));
   var data = getData(node);
 
   /*
@@ -143,17 +156,17 @@ var elementOpen = function(tag, key, statics, var_args) {
    * Actually perform the attribute update.
    */
   if (attrsChanged) {
-    var newAttrs = data.newAttrs;
+    var attr, newAttrs = data.newAttrs;
 
-    for (var attr in newAttrs) {
+    for (attr in newAttrs) {
       newAttrs[attr] = undefined;
     }
 
-    for (var i = ATTRIBUTES_OFFSET; i < arguments.length; i += 2) {
+    for (i = ATTRIBUTES_OFFSET; i < arguments.length; i += 2) {
       newAttrs[arguments[i]] = arguments[i + 1];
     }
 
-    for (var attr in newAttrs) {
+    for (attr in newAttrs) {
       updateAttribute(node, attr, newAttrs[attr]);
     }
   }
@@ -170,10 +183,10 @@ var elementOpen = function(tag, key, statics, var_args) {
  * rather than being passed as arguments. Must be folllowed by 0 or more calls
  * to attr, then a call to elementOpenEnd.
  * @param {string} tag The element's tag.
- * @param {?string} key The key used to identify this element. This can be an
+ * @param {?string=} key The key used to identify this element. This can be an
  *     empty string, but performance may be better if a unique value is used
  *     when iterating over an array of items.
- * @param {?Array<*>} statics An array of attribute name/value pairs of the
+ * @param {?Array<*>=} statics An array of attribute name/value pairs of the
  *     static attributes for the Element. These will only be set once when the
  *     Element is created.
  */
@@ -235,7 +248,7 @@ var elementClose = function(tag) {
 
   parentNode();
 
-  var node = getWalker().currentNode;
+  var node = /** @type {!Element} */(getWalker().currentNode);
   clearUnvisitedDOM(node);
 
   nextSibling();
@@ -247,10 +260,10 @@ var elementClose = function(tag) {
  * Declares a virtual Element at the current location in the document that has
  * no children.
  * @param {string} tag The element's tag.
- * @param {?string} key The key used to identify this element. This can be an
+ * @param {?string=} key The key used to identify this element. This can be an
  *     empty string, but performance may be better if a unique value is used
  *     when iterating over an array of items.
- * @param {?Array<*>} statics An array of attribute name/value pairs of the
+ * @param {?Array<*>=} statics An array of attribute name/value pairs of the
  *     static attributes for the Element. These will only be set once when the
  *     Element is created.
  * @param {...*} var_args Attribute name/value pairs of the dynamic attributes
@@ -272,20 +285,21 @@ var elementVoid = function(tag, key, statics, var_args) {
  * Declares a virtual Text at this point in the document.
  *
  * @param {string|number|boolean} value The value of the Text.
- * @param {...(function(string|number|boolean):string|number|boolean)} var_args
+ * @param {...function((string|number|boolean)):string} var_args
  *     Functions to format the value which are called only when the value has
  *     changed.
+ * @return {!Text} The corresponding text node.
  */
 var text = function(value, var_args) {
   if (process.env.NODE_ENV !== 'production') {
     assertNotInAttributes();
   }
 
-  var node = alignWithDOM('#text', null);
+  var node = /** @type {!Text}*/(alignWithDOM('#text', null));
   var data = getData(node);
 
   if (data.text !== value) {
-    data.text = value;
+    data.text = /** @type {string} */(value);
 
     var formatted = value;
     for (var i = 1; i < arguments.length; i += 1) {
@@ -296,6 +310,7 @@ var text = function(value, var_args) {
   }
 
   nextSibling();
+  return node
 };
 
 
@@ -309,4 +324,3 @@ export {
   text,
   attr
 };
-
