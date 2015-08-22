@@ -66,6 +66,7 @@ function lint() {
   return gulp.src(srcs, tests)
     .pipe(gjslint())
     .pipe(gjslint.reporter('console'))
+    .pipe(gjslint.reporter('fail'));
 }
 
 function bundle(format) {
