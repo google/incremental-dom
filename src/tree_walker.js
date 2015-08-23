@@ -36,7 +36,7 @@ function TreeWalker(node) {
   this.currentNode = node;
 
   /**
-   * @const {!Document}
+   * @const {Document}
    */
   this.doc = node.ownerDocument;
 

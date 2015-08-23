@@ -83,7 +83,7 @@ function NodeData(nodeName, key) {
 /**
  * Initializes a NodeData object for a Node.
  *
- * @param {!Node} node The node to initialize data for.
+ * @param {Node} node The node to initialize data for.
  * @param {string} nodeName The node name of node.
  * @param {?string=} key The key that identifies the node.
  * @return {!NodeData} The newly initialized data object
@@ -98,8 +98,8 @@ var initData = function(node, nodeName, key) {
 /**
  * Retrieves the NodeData object for a Node, creating it if necessary.
  *
- * @param {!Node} node The node to retrieve the data for.
- * @return {NodeData} The NodeData for this Node.
+ * @param {Node} node The node to retrieve the data for.
+ * @return {!NodeData} The NodeData for this Node.
  */
 var getData = function(node) {
   var data = node['__incrementalDOMData'];
