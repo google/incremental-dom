@@ -17,8 +17,8 @@
 /**
  * Similar to the built-in Treewalker class, but simplified and allows direct
  * access to modify the currentNode property.
- * @param {!Node} node The root Node of the subtree the walker should start
- *     traversing.
+ * @param {!Element|!DocumentFragment} node The root Node of the subtree the
+ *     walker should start traversing.
  * @constructor
  */
 function TreeWalker(node) {
@@ -38,7 +38,7 @@ function TreeWalker(node) {
   /**
    * @const {!Document}
    */
-  this.doc = /** @type {!Document} */(node.ownerDocument);
+  this.doc = node.ownerDocument;
 
   /**
    * Keeps track of what namespace to create new Elements in.
