@@ -68,8 +68,8 @@ var matches = function(node, nodeName, key) {
  * @param {string} nodeName For an Element, this should be a valid tag string.
  *     For a Text, this should be #text.
  * @param {?string=} key The key used to identify this element.
- * @param {?Array<*>=} statics For an Element, this should be an array of
- *     name-value pairs.
+ * @param {?Object<string, *>=} statics For an Element, this should be an object
+ *     of name-value pairs.
  * @return {!Node} The matching node.
  */
 var alignWithDOM = function(nodeName, key, statics) {

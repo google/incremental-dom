@@ -36,15 +36,15 @@ describe('conditional rendering', () => {
 
   describe('nodes', () => {
     function render(condition) {
-      elementOpen('div', '', ['id', 'outer']);
-        elementVoid('div', '', ['id', 'one']);
+      elementOpen('div', null, {id: 'outer'});
+        elementVoid('div', null, {id: 'one'});
 
         if (condition) {
-          elementVoid('div', '', ['id', 'conditional-one']);
-          elementVoid('div', '', ['id', 'conditional-two']);
+          elementVoid('div', null, {id: 'conditional-one'});
+          elementVoid('div', null, {id: 'conditional-two'});
         }
 
-        elementVoid('span', '', ['id', 'two' ]);
+        elementVoid('span', null, {id: 'two' });
       elementClose('div');
     }
 
@@ -79,11 +79,11 @@ describe('conditional rendering', () => {
 
   describe('with only conditional childNodes', () => {
     function render(condition) {
-      elementOpen('div', '', ['id', 'outer']);
+      elementOpen('div', null, {id: 'outer'});
 
         if (condition) {
-          elementVoid('div', '', ['id', 'conditional-one' ]);
-          elementVoid('div', '', ['id', 'conditional-two' ]);
+          elementVoid('div', null, {id: 'conditional-one'});
+          elementVoid('div', null, {id: 'conditional-two'});
         }
 
       elementClose('div');
@@ -100,21 +100,16 @@ describe('conditional rendering', () => {
 
   describe('nodes', () => {
     function render(condition) {
-      elementOpen('div', '', [],
-          'id', 'outer');
-        elementVoid('div', '', [],
-            'id', 'one' );
+      elementOpen('div', null, null, {id: 'outer'});
+        elementVoid('div', null, null, {id: 'one'});
 
         if (condition) {
-          elementOpen('span', '', [],
-              'id', 'conditional-one',
-              'data-foo', 'foo');
-            elementVoid('span', '', []);
+          elementOpen('span', null, null, {id: 'conditional-one', 'data-foo': 'foo'});
+            elementVoid('span', null, null);
           elementClose('span');
         }
 
-        elementVoid('span', '', [],
-            'id', 'two');
+        elementVoid('span', null, null, {id: 'two'});
       elementClose('div');
     }
 

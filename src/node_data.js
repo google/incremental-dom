@@ -24,40 +24,26 @@
 function NodeData(nodeName, key) {
   /**
    * The attributes and their values.
-   * @const
+   * @const {!Object<string, *>}
    */
   this.attrs = {};
 
   /**
-   * An array of attribute name/value pairs, used for quickly diffing the
-   * incomming attributes to see if the DOM node's attributes need to be
-   * updated.
-   * @const {Array<*>}
-   */
-  this.attrsArr = [];
-
-  /**
-   * The incoming attributes for this Node, before they are updated.
-   * @const {!Object<string, *>}
-   */
-  this.newAttrs = {};
-
-  /**
    * The key used to identify this node, used to preserve DOM nodes when they
    * move within their parent.
-   * @const
+   * @const {?string}
    */
   this.key = key;
 
   /**
    * Keeps track of children within this node by their key.
-   * {?Object<string, !Element>}
+   * @type {?Object<string, !Element>}
    */
   this.keyMap = null;
 
   /**
    * Whether or not the keyMap is currently valid.
-   * {boolean}
+   * @type {boolean}
    */
   this.keyMapValid = true;
 

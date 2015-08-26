@@ -37,7 +37,7 @@ describe('attribute updates', () => {
 
   describe('for conditional attributes', () => {
     function render(attrs) {
-      elementOpenStart('div', '', []);
+      elementOpenStart('div', '', {});
       for (var attrName in attrs) {
           attr(attrName, attrs[attrName]);
       }
@@ -118,8 +118,7 @@ describe('attribute updates', () => {
     it('should not be set as attributes', () => {
       var fn = () =>{};
       patch(container, () => {
-        elementVoid('div', '', null,
-            'fn', fn);
+        elementVoid('div', null, null, {fn: fn});
       });
       var el = container.childNodes[0];
 
@@ -129,8 +128,7 @@ describe('attribute updates', () => {
     it('should be set on the node', () => {
       var fn = () =>{};
       patch(container, () => {
-        elementVoid('div', '', null,
-            'fn', fn);
+        elementVoid('div', null, null, {fn: fn});
       });
       var el = container.childNodes[0];
 
@@ -142,8 +140,7 @@ describe('attribute updates', () => {
     it('should not be set as attributes', () => {
       var obj = {};
       patch(container, () => {
-        elementVoid('div', '', null,
-            'obj', obj);
+        elementVoid('div', null, null, {obj: obj});
       });
       var el = container.childNodes[0];
 
@@ -153,8 +150,7 @@ describe('attribute updates', () => {
     it('should be set on the node', () => {
       var obj = {};
       patch(container, () => {
-        elementVoid('div', '', null,
-            'obj', obj);
+        elementVoid('div', null, null, {obj: obj});
       });
       var el = container.childNodes[0];
 
@@ -164,8 +160,7 @@ describe('attribute updates', () => {
 
   describe('for style', () => {
     function render(style) {
-      elementVoid('div', '', [],
-          'style', style);
+      elementVoid('div', null, null, {style: style});
     }
 
     it('should render with the correct style properties for objects', () => {
@@ -216,8 +211,7 @@ describe('attribute updates', () => {
   describe('for svg elements', () => {
     it('should correctly apply the class attribute', function() {
       patch(container, () => {
-        elementVoid('svg', null, null,
-            'class', 'foo');
+        elementVoid('svg', null, null, {class: 'foo'});
       });
       var el = container.childNodes[0];
 

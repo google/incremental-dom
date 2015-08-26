@@ -18,7 +18,7 @@ import {
   alignWithDOM,
   clearUnvisitedDOM
 } from './alignment';
-import { updateAttribute } from './attributes';
+import { updateAttributes } from './attributes';
 import { getData } from './node_data';
 import { getWalker } from './walker';
 import {
@@ -33,19 +33,11 @@ var dummy;
 
 
 /**
- * The offset in the virtual element declaration where the attributes are
- * specified.
- * @const
- */
-var ATTRIBUTES_OFFSET = 3;
-
-
-/**
- * Builds an array of arguments for use with elementOpenStart, attr and
+ * Builds the arguments for use with elementOpenStart, attr and
  * elementOpenEnd.
- * @const {Array<*>}
+ * @type {?Object<string, *>}
  */
-var argsBuilder = [];
+var argsBuilder = null;
 
 
 if (process.env.NODE_ENV !== 'production') {
@@ -109,67 +101,20 @@ if (process.env.NODE_ENV !== 'production') {
  * @param {?string=} key The key used to identify this element. This can be an
  *     empty string, but performance may be better if a unique value is used
  *     when iterating over an array of items.
- * @param {?Array<*>=} statics An array of attribute name/value pairs of the
- *     static attributes for the Element. These will only be set once when the
- *     Element is created.
- * @param {...(string|number|boolean)} var_args
- *     Functions to format the value which are called only when the value has
- *     changed.
+ * @param {?Object<string, *>=} statics An object of attribute name/value pairs
+ *     of the static attributes for the Element. These will only be set once
+ *     when the Element is created.
+ * @param {?Object<string, *>=} attributes An object of attribute name/value
+ *     pairs of the dynamic attributes for the Element.
  * @return {!Element} The corresponding Element.
  */
-var elementOpen = function(tag, key, statics, var_args) {
+var elementOpen = function(tag, key, statics, attributes) {
   if (process.env.NODE_ENV !== 'production') {
     assertNotInAttributes();
   }
 
   var node = /** @type {!Element}*/(alignWithDOM(tag, key, statics));
-  var data = getData(node);
-
-  /*
-   * Checks to see if one or more attributes have changed for a given Element.
-   * When no attributes have changed, this is much faster than checking each
-   * individual argument. When attributes have changed, the overhead of this is
-   * minimal.
-   */
-  var attrsArr = data.attrsArr;
-  var attrsChanged = false;
-  var i = ATTRIBUTES_OFFSET;
-  var j = 0;
-
-  for (; i < arguments.length; i += 1, j += 1) {
-    if (attrsArr[j] !== arguments[i]) {
-      attrsChanged = true;
-      break;
-    }
-  }
-
-  for (; i < arguments.length; i += 1, j += 1) {
-    attrsArr[j] = arguments[i];
-  }
-
-  if (j < attrsArr.length) {
-    attrsChanged = true;
-    attrsArr.length = j;
-  }
-
-  /*
-   * Actually perform the attribute update.
-   */
-  if (attrsChanged) {
-    var attr, newAttrs = data.newAttrs;
-
-    for (attr in newAttrs) {
-      newAttrs[attr] = undefined;
-    }
-
-    for (i = ATTRIBUTES_OFFSET; i < arguments.length; i += 2) {
-      newAttrs[arguments[i]] = arguments[i + 1];
-    }
-
-    for (attr in newAttrs) {
-      updateAttribute(node, attr, newAttrs[attr]);
-    }
-  }
+  updateAttributes(node, attributes);
 
   firstChild();
   return node;
@@ -180,15 +125,15 @@ var elementOpen = function(tag, key, statics, var_args) {
  * Declares a virtual Element at the current location in the document. This
  * corresponds to an opening tag and a elementClose tag is required. This is
  * like elementOpen, but the attributes are defined using the attr function
- * rather than being passed as arguments. Must be folllowed by 0 or more calls
+ * rather than being passed as arguments. Must be followed by 0 or more calls
  * to attr, then a call to elementOpenEnd.
  * @param {string} tag The element's tag.
  * @param {?string=} key The key used to identify this element. This can be an
  *     empty string, but performance may be better if a unique value is used
  *     when iterating over an array of items.
- * @param {?Array<*>=} statics An array of attribute name/value pairs of the
- *     static attributes for the Element. These will only be set once when the
- *     Element is created.
+ * @param {?Object<string, *>=} statics An object of attribute name/value pairs
+ *     of the static attributes for the Element. These will only be set once
+ *     when the Element is created.
  */
 var elementOpenStart = function(tag, key, statics) {
   if (process.env.NODE_ENV !== 'production') {
@@ -196,9 +141,12 @@ var elementOpenStart = function(tag, key, statics) {
     setInAttributes();
   }
 
-  argsBuilder[0] = tag;
-  argsBuilder[1] = key;
-  argsBuilder[2] = statics;
+  argsBuilder = {
+    tag: tag,
+    key: key,
+    statics: statics,
+    attributes: {}
+  };
 };
 
 
@@ -214,7 +162,7 @@ var attr = function(name, value) {
     assertInAttributes();
   }
 
-  argsBuilder.push(name, value);
+  argsBuilder.attributes[name] = value;
 };
 
 
@@ -228,8 +176,14 @@ var elementOpenEnd = function() {
     setNotInAttributes();
   }
 
-  var node = elementOpen.apply(null, argsBuilder);
-  argsBuilder.length = 0;
+  var node = elementOpen(
+    argsBuilder.tag,
+    argsBuilder.key,
+    argsBuilder.statics,
+    argsBuilder.attributes
+  );
+  argsBuilder = null;
+
   return node;
 };
 
@@ -263,21 +217,20 @@ var elementClose = function(tag) {
  * @param {?string=} key The key used to identify this element. This can be an
  *     empty string, but performance may be better if a unique value is used
  *     when iterating over an array of items.
- * @param {?Array<*>=} statics An array of attribute name/value pairs of the
- *     static attributes for the Element. These will only be set once when the
- *     Element is created.
- * @param {...*} var_args Attribute name/value pairs of the dynamic attributes
- *     for the Element.
+ * @param {?Object<string, *>=} statics An object of attribute name/value pairs
+ *     of the static attributes for the Element. These will only be set once
+ *     when the Element is created.
+ * @param {?Object<string, *>=} attributes An object of attribute name/value
+ *     pairs of the dynamic attributes for the Element.
  * @return {!Element} The corresponding Element.
  */
-var elementVoid = function(tag, key, statics, var_args) {
+var elementVoid = function(tag, key, statics, attributes) {
   if (process.env.NODE_ENV !== 'production') {
     assertNotInAttributes();
   }
 
-  var node = elementOpen.apply(null, arguments);
-  elementClose.apply(null, arguments);
-  return node;
+  elementOpen(tag, key, statics, attributes);
+  return elementClose(tag);
 };
 
 
