@@ -112,9 +112,8 @@ if (process.env.NODE_ENV !== 'production') {
  * @param {?Array<*>=} statics An array of attribute name/value pairs of the
  *     static attributes for the Element. These will only be set once when the
  *     Element is created.
- * @param {...(string|number|boolean)} var_args
- *     Functions to format the value which are called only when the value has
- *     changed.
+ * @param {...*} var_args Attribute name/value pairs of the dynamic attributes
+ *     for the Element.
  * @return {!Element} The corresponding Element.
  */
 var elementOpen = function(tag, key, statics, var_args) {
