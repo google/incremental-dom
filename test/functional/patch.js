@@ -41,8 +41,7 @@ describe('patching an element', () => {
     var div;
 
     function render() {
-      elementVoid('div', null, null,
-          'tabindex', '0');
+      elementVoid('div', null, null, {tabindex: '0'});
     }
 
     beforeEach(function() {
@@ -143,8 +142,7 @@ describe('patching a documentFragment', function() {
     var frag = document.createDocumentFragment();
 
     patch(frag, function() {
-      elementOpen('div', null, null,
-          'id', 'aDiv');
+      elementOpen('div', null, null, {id: 'aDiv'});
       elementClose('div');
     });
 

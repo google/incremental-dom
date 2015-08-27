@@ -39,8 +39,7 @@ describe('library hooks', () => {
 
   describe('for deciding how attributes are set', () => {
     function render(dynamicValue) {
-      elementVoid('div', null, ['staticName', 'staticValue'],
-          'dynamicName', dynamicValue);
+      elementVoid('div', null, {staticName: 'staticValue'}, {dynamicName: dynamicValue});
     }
 
     function stubOut(mutator) {

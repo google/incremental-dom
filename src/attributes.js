@@ -88,20 +88,40 @@ var applyAttributeTyped = function(el, name, value) {
  * Calls the appropriate attribute mutator for this attribute.
  * @param {!Element} el
  * @param {string} name The attribute's name.
- * @param {*} value The attribute's value.
+ * @param {*=} value The attribute's value.
  */
 var updateAttribute = function(el, name, value) {
-  var data = getData(el);
-  var attrs = data.attrs;
-
-  if (attrs[name] === value) {
-    return;
-  }
-
   var mutator = mutators[name] || mutators.__all;
   mutator(el, name, value);
+};
 
-  attrs[name] = value;
+
+/**
+ * Mirrors the attributes on an Element to the passed in attributes.
+ * @param {!Element} el
+ * @param {?Object<string, *>=} attributes An object of attribute name/value
+ *     pairs of the dynamic attributes for the Element.
+ */
+var updateAttributes = function(el, attributes) {
+  var data = getData(el);
+  var attrs = data.attrs;
+  var attr;
+
+  for (attr in attrs) {
+    if (!(attributes && attr in attributes)) {
+      updateAttribute(el, attr);
+      delete attrs[attr];
+    }
+  }
+
+  for (attr in attributes) {
+    var value = attributes[attr];
+
+    if (attrs[attr] !== value) {
+      updateAttribute(el, attr, value);
+      attrs[attr] = value;
+    }
+  }
 };
 
 
@@ -133,6 +153,7 @@ var mutators = {
 
 /** */
 export {
+  updateAttributes,
   updateAttribute,
   defaults,
   mutators

@@ -31,8 +31,8 @@ var dummy;
  * @param {!Document} doc The document with which to create the Element.
  * @param {string} tag The tag for the Element.
  * @param {?string=} key A key to identify the Element.
- * @param {?Array<*>=} statics An array of attribute name/value pairs of
- *     the static attributes for the Element.
+ * @param {?Object<string, *>=} statics An object of attribute name/value pairs
+ *     of the static attributes for the Element.
  * @return {!Element}
  */
 var createElement = function(doc, tag, key, statics) {
@@ -47,10 +47,8 @@ var createElement = function(doc, tag, key, statics) {
 
   initData(el, tag, key);
 
-  if (statics) {
-    for (var i = 0; i < statics.length; i += 2) {
-      updateAttribute(el, /** @type {!string}*/(statics[i]), statics[i + 1]);
-    }
+  for (var attr in statics) {
+    updateAttribute(el, attr, statics[attr]);
   }
 
   return el;
@@ -64,9 +62,8 @@ var createElement = function(doc, tag, key, statics) {
  * @param {string} nodeName The tag if creating an element or #text to create
  *     a Text.
  * @param {?string=} key A key to identify the Element.
- * @param {?Array<*>=} statics The static data to initialize the Node
- *     with. For an Element, an array of attribute name/value pairs of
- *     the static attributes for the Element.
+ * @param {?Object<string, *>=} statics For an Element, an object of attribute
+ *     name/value pairs of the static attributes for the Element.
  * @return {!Node}
  */
 var createNode = function(doc, nodeName, key, statics) {
