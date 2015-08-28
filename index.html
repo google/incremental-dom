@@ -32,7 +32,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
  * Code distributed by Google as part of the polymer project is also
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
-// @version 0.7.6
+// @version 0.7.12
 window.WebComponents = window.WebComponents || {};
 
 (function(scope) {
@@ -934,7 +934,7 @@ if (typeof WeakMap === "undefined") {
   };
   global.JsMutationObserver = JsMutationObserver;
   if (!global.MutationObserver) global.MutationObserver = JsMutationObserver;
-})(this);
+})(window);
 
 window.HTMLImports = window.HTMLImports || {
   flags: {}
@@ -1290,7 +1290,7 @@ window.HTMLImports.addModule(function(scope) {
   var IMPORT_SELECTOR = "link[rel=" + IMPORT_LINK_TYPE + "]";
   var importParser = {
     documentSelectors: IMPORT_SELECTOR,
-    importsSelectors: [ IMPORT_SELECTOR, "link[rel=stylesheet]", "style", "script:not([type])", 'script[type="application/javascript"]', 'script[type="text/javascript"]' ].join(","),
+    importsSelectors: [ IMPORT_SELECTOR, "link[rel=stylesheet]:not([type])", "style:not([type])", "script:not([type])", 'script[type="application/javascript"]', 'script[type="text/javascript"]' ].join(","),
     map: {
       link: "parseLink",
       script: "parseScript",
@@ -1341,6 +1341,7 @@ window.HTMLImports.addModule(function(scope) {
       }
     },
     parseImport: function(elt) {
+      elt.import = elt.__doc;
       if (window.HTMLImports.__importsParsingHook) {
         window.HTMLImports.__importsParsingHook(elt);
       }
@@ -1403,6 +1404,8 @@ window.HTMLImports.addModule(function(scope) {
     trackElement: function(elt, callback) {
       var self = this;
       var done = function(e) {
+        elt.removeEventListener("load", done);
+        elt.removeEventListener("error", done);
         if (callback) {
           callback(e);
         }
@@ -1458,7 +1461,7 @@ window.HTMLImports.addModule(function(scope) {
         for (var i = 0, l = nodes.length, p = 0, n; i < l && (n = nodes[i]); i++) {
           if (!this.isParsed(n)) {
             if (this.hasResource(n)) {
-              return nodeIsImport(n) ? this.nextToParseInDoc(n.import, n) : n;
+              return nodeIsImport(n) ? this.nextToParseInDoc(n.__doc, n) : n;
             } else {
               return;
             }
@@ -1481,7 +1484,7 @@ window.HTMLImports.addModule(function(scope) {
       return this.dynamicElements.indexOf(elt) >= 0;
     },
     hasResource: function(node) {
-      if (nodeIsImport(node) && node.import === undefined) {
+      if (nodeIsImport(node) && node.__doc === undefined) {
         return false;
       }
       return true;
@@ -1555,7 +1558,7 @@ window.HTMLImports.addModule(function(scope) {
           }
           this.documents[url] = doc;
         }
-        elt.import = doc;
+        elt.__doc = doc;
       }
       parser.parseNext();
     },
@@ -1697,6 +1700,7 @@ window.CustomElements = window.CustomElements || {
   scope.addModule = addModule;
   scope.initializeModules = initializeModules;
   scope.hasNative = Boolean(document.registerElement);
+  scope.isIE = /Trident/.test(navigator.userAgent);
   scope.useNative = !flags.register && scope.hasNative && !window.ShadowDOMPolyfill && (!window.HTMLImports || window.HTMLImports.useNative);
 })(window.CustomElements);
 
@@ -1937,6 +1941,7 @@ window.CustomElements.addModule(function(scope) {
   }
   scope.watchShadow = watchShadow;
   scope.upgradeDocumentTree = upgradeDocumentTree;
+  scope.upgradeDocument = upgradeDocument;
   scope.upgradeSubtree = addedSubtree;
   scope.upgradeAll = addedNode;
   scope.attached = attached;
@@ -1948,11 +1953,9 @@ window.CustomElements.addModule(function(scope) {
   function upgrade(node, isAttached) {
     if (!node.__upgraded__ && node.nodeType === Node.ELEMENT_NODE) {
       var is = node.getAttribute("is");
-      var definition = scope.getRegisteredDefinition(is || node.localName);
+      var definition = scope.getRegisteredDefinition(node.localName) || scope.getRegisteredDefinition(is);
       if (definition) {
-        if (is && definition.tag == node.localName) {
-          return upgradeWithDefinition(node, definition, isAttached);
-        } else if (!is && !definition.extends) {
+        if (is && definition.tag == node.localName || !is && !definition.extends) {
           return upgradeWithDefinition(node, definition, isAttached);
         }
       }
@@ -2006,7 +2009,7 @@ window.CustomElements.addModule(function(scope) {
 });
 
 window.CustomElements.addModule(function(scope) {
-  var isIE11OrOlder = scope.isIE11OrOlder;
+  var isIE = scope.isIE;
   var upgradeDocumentTree = scope.upgradeDocumentTree;
   var upgradeAll = scope.upgradeAll;
   var upgradeWithDefinition = scope.upgradeWithDefinition;
@@ -2097,16 +2100,22 @@ window.CustomElements.addModule(function(scope) {
       var nativePrototype = HTMLElement.prototype;
       if (definition.is) {
         var inst = document.createElement(definition.tag);
-        var expectedPrototype = Object.getPrototypeOf(inst);
-        if (expectedPrototype === definition.prototype) {
-          nativePrototype = expectedPrototype;
-        }
+        nativePrototype = Object.getPrototypeOf(inst);
       }
       var proto = definition.prototype, ancestor;
-      while (proto && proto !== nativePrototype) {
+      var foundPrototype = false;
+      while (proto) {
+        if (proto == nativePrototype) {
+          foundPrototype = true;
+        }
         ancestor = Object.getPrototypeOf(proto);
-        proto.__proto__ = ancestor;
+        if (ancestor) {
+          proto.__proto__ = ancestor;
+        }
         proto = ancestor;
+      }
+      if (!foundPrototype) {
+        console.warn(definition.tag + " prototype not found in prototype chain for " + definition.is);
       }
       definition.native = nativePrototype;
     }
@@ -2169,6 +2178,9 @@ window.CustomElements.addModule(function(scope) {
   var isInstance;
   if (!Object.__proto__ && !useNative) {
     isInstance = function(obj, ctor) {
+      if (obj instanceof ctor) {
+        return true;
+      }
       var p = obj;
       while (p) {
         if (p === ctor.prototype) {
@@ -2193,7 +2205,7 @@ window.CustomElements.addModule(function(scope) {
   }
   wrapDomMethodToForceUpgrade(Node.prototype, "cloneNode");
   wrapDomMethodToForceUpgrade(document, "importNode");
-  if (isIE11OrOlder) {
+  if (isIE) {
     (function() {
       var importNode = document.importNode;
       document.importNode = function() {
@@ -2221,7 +2233,7 @@ window.CustomElements.addModule(function(scope) {
 (function(scope) {
   var useNative = scope.useNative;
   var initializeModules = scope.initializeModules;
-  var isIE11OrOlder = /Trident/.test(navigator.userAgent);
+  var isIE = scope.isIE;
   if (useNative) {
     var nop = function() {};
     scope.watchShadow = nop;
@@ -2237,6 +2249,7 @@ window.CustomElements.addModule(function(scope) {
     initializeModules();
   }
   var upgradeDocumentTree = scope.upgradeDocumentTree;
+  var upgradeDocument = scope.upgradeDocument;
   if (!window.wrap) {
     if (window.ShadowDOMPolyfill) {
       window.wrap = window.ShadowDOMPolyfill.wrapIfNeeded;
@@ -2247,25 +2260,32 @@ window.CustomElements.addModule(function(scope) {
       };
     }
   }
+  if (window.HTMLImports) {
+    window.HTMLImports.__importsParsingHook = function(elt) {
+      if (elt.import) {
+        upgradeDocument(wrap(elt.import));
+      }
+    };
+  }
   function bootstrap() {
     upgradeDocumentTree(window.wrap(document));
-    if (window.HTMLImports) {
-      window.HTMLImports.__importsParsingHook = function(elt) {
-        upgradeDocumentTree(window.wrap(elt.import));
-      };
-    }
     window.CustomElements.ready = true;
-    setTimeout(function() {
-      window.CustomElements.readyTime = Date.now();
-      if (window.HTMLImports) {
-        window.CustomElements.elapsed = window.CustomElements.readyTime - window.HTMLImports.readyTime;
-      }
-      document.dispatchEvent(new CustomEvent("WebComponentsReady", {
-        bubbles: true
-      }));
+    var requestAnimationFrame = window.requestAnimationFrame || function(f) {
+      setTimeout(f, 16);
+    };
+    requestAnimationFrame(function() {
+      setTimeout(function() {
+        window.CustomElements.readyTime = Date.now();
+        if (window.HTMLImports) {
+          window.CustomElements.elapsed = window.CustomElements.readyTime - window.HTMLImports.readyTime;
+        }
+        document.dispatchEvent(new CustomEvent("WebComponentsReady", {
+          bubbles: true
+        }));
+      });
     });
   }
-  if (isIE11OrOlder && typeof window.CustomEvent !== "function") {
+  if (isIE && typeof window.CustomEvent !== "function") {
     window.CustomEvent = function(inType, params) {
       params = params || {};
       var e = document.createEvent("CustomEvent");
@@ -2289,21 +2309,48 @@ window.CustomElements.addModule(function(scope) {
     var loadEvent = window.HTMLImports && !window.HTMLImports.ready ? "HTMLImportsLoaded" : "DOMContentLoaded";
     window.addEventListener(loadEvent, bootstrap);
   }
-  scope.isIE11OrOlder = isIE11OrOlder;
 })(window.CustomElements);
 
 if (typeof HTMLTemplateElement === "undefined") {
   (function() {
     var TEMPLATE_TAG = "template";
+    var contentDoc = document.implementation.createHTMLDocument("template");
+    var canDecorate = true;
     HTMLTemplateElement = function() {};
     HTMLTemplateElement.prototype = Object.create(HTMLElement.prototype);
     HTMLTemplateElement.decorate = function(template) {
       if (!template.content) {
-        template.content = template.ownerDocument.createDocumentFragment();
+        template.content = contentDoc.createDocumentFragment();
       }
       var child;
       while (child = template.firstChild) {
         template.content.appendChild(child);
+      }
+      if (canDecorate) {
+        try {
+          Object.defineProperty(template, "innerHTML", {
+            get: function() {
+              var o = "";
+              for (var e = this.content.firstChild; e; e = e.nextSibling) {
+                o += e.outerHTML || escapeData(e.data);
+              }
+              return o;
+            },
+            set: function(text) {
+              contentDoc.body.innerHTML = text;
+              HTMLTemplateElement.bootstrap(contentDoc);
+              while (this.content.firstChild) {
+                this.content.removeChild(this.content.firstChild);
+              }
+              while (contentDoc.body.firstChild) {
+                this.content.appendChild(contentDoc.body.firstChild);
+              }
+            },
+            configurable: true
+          });
+        } catch (err) {
+          canDecorate = false;
+        }
       }
     };
     HTMLTemplateElement.bootstrap = function(doc) {
@@ -2324,6 +2371,25 @@ if (typeof HTMLTemplateElement === "undefined") {
       }
       return el;
     };
+    var escapeDataRegExp = /[&\u00A0<>]/g;
+    function escapeReplace(c) {
+      switch (c) {
+       case "&":
+        return "&amp;";
+
+       case "<":
+        return "&lt;";
+
+       case ">":
+        return "&gt;";
+
+       case " ":
+        return "&nbsp;";
+      }
+    }
+    function escapeData(s) {
+      return s.replace(escapeDataRegExp, escapeReplace);
+    }
   })();
 }
 
@@ -2386,7 +2452,11 @@ document.registerElement(prototype.is, options);
 return ctor;
 };
 var desugar = function (prototype) {
-prototype = Polymer.Base.chainObject(prototype, Polymer.Base);
+var base = Polymer.Base;
+if (prototype.extends) {
+base = Polymer.Base._getExtendedPrototype(prototype.extends);
+}
+prototype = Polymer.Base.chainObject(prototype, base);
 prototype.registerCallback();
 return prototype.constructor;
 };
@@ -2418,7 +2488,40 @@ get: function () {
 return (document._currentScript || document.currentScript).ownerDocument;
 }
 });
+Polymer.RenderStatus = {
+_ready: false,
+_callbacks: [],
+whenReady: function (cb) {
+if (this._ready) {
+cb();
+} else {
+this._callbacks.push(cb);
+}
+},
+_makeReady: function () {
+this._ready = true;
+this._callbacks.forEach(function (cb) {
+cb();
+});
+this._callbacks = [];
+},
+_catchFirstRender: function () {
+requestAnimationFrame(function () {
+Polymer.RenderStatus._makeReady();
+});
+}
+};
+if (window.HTMLImports) {
+HTMLImports.whenReady(function () {
+Polymer.RenderStatus._catchFirstRender();
+});
+} else {
+Polymer.RenderStatus._catchFirstRender();
+}
+Polymer.ImportStatus = Polymer.RenderStatus;
+Polymer.ImportStatus.whenLoaded = Polymer.ImportStatus.whenReady;
 Polymer.Base = {
+__isPolymerInstance__: true,
 _addFeature: function (feature) {
 this.extend(this, feature);
 },
@@ -2433,16 +2536,21 @@ this._doBehavior('created');
 this._initFeatures();
 },
 attachedCallback: function () {
+Polymer.RenderStatus.whenReady(function () {
 this.isAttached = true;
 this._doBehavior('attached');
+}.bind(this));
 },
 detachedCallback: function () {
 this.isAttached = false;
 this._doBehavior('detached');
 },
 attributeChangedCallback: function (name) {
-this._setAttributeToProperty(this, name);
+this._attributeChangedImpl(name);
 this._doBehavior('attributeChanged', arguments);
+},
+_attributeChangedImpl: function (name) {
+this._setAttributeToProperty(this, name);
 },
 extend: function (prototype, api) {
 if (prototype && api) {
@@ -2488,46 +2596,61 @@ object.__proto__ = inherited;
 return object;
 };
 Polymer.Base = Polymer.Base.chainObject(Polymer.Base, HTMLElement.prototype);
+if (window.CustomElements) {
+Polymer.instanceof = CustomElements.instanceof;
+} else {
+Polymer.instanceof = function (obj, ctor) {
+return obj instanceof ctor;
+};
+}
+Polymer.isInstance = function (obj) {
+return Boolean(obj && obj.__isPolymerInstance__);
+};
 Polymer.telemetry.instanceCount = 0;
 (function () {
 var modules = {};
+var lcModules = {};
+var findModule = function (id) {
+return modules[id] || lcModules[id.toLowerCase()];
+};
 var DomModule = function () {
 return document.createElement('dom-module');
 };
 DomModule.prototype = Object.create(HTMLElement.prototype);
-DomModule.prototype.constructor = DomModule;
-DomModule.prototype.createdCallback = function () {
-var id = this.id || this.getAttribute('name') || this.getAttribute('is');
+Polymer.Base.extend(DomModule.prototype, {
+constructor: DomModule,
+createdCallback: function () {
+this.register();
+},
+register: function (id) {
+var id = id || this.id || this.getAttribute('name') || this.getAttribute('is');
 if (id) {
 this.id = id;
 modules[id] = this;
+lcModules[id.toLowerCase()] = this;
 }
-};
-DomModule.prototype.import = function (id, slctr) {
-var m = modules[id];
+},
+import: function (id, selector) {
+var m = findModule(id);
 if (!m) {
 forceDocumentUpgrade();
-m = modules[id];
+m = findModule(id);
 }
-if (m && slctr) {
-m = m.querySelector(slctr);
+if (m && selector) {
+m = m.querySelector(selector);
 }
 return m;
-};
+}
+});
 var cePolyfill = window.CustomElements && !CustomElements.useNative;
-if (cePolyfill) {
-var ready = CustomElements.ready;
-CustomElements.ready = true;
-}
 document.registerElement('dom-module', DomModule);
-if (cePolyfill) {
-CustomElements.ready = ready;
-}
 function forceDocumentUpgrade() {
 if (cePolyfill) {
 var script = document._currentScript || document.currentScript;
-if (script) {
-CustomElements.upgradeAll(script.ownerDocument);
+var doc = script && script.ownerDocument;
+if (doc && !doc.__customElementsForceUpgraded) {
+doc.__customElementsForceUpgraded = true;
+CustomElements.upgradeAll(doc);
 }
 }
 }
@@ -2540,6 +2663,9 @@ if (module.localName === 'dom-module') {
 var id = module.id || module.getAttribute('name') || module.getAttribute('is');
 this.is = id;
 }
+}
+if (this.is) {
+this.is = this.is.toLowerCase();
 }
 }
 });
@@ -2616,11 +2742,6 @@ this._marshalBehavior(this);
 }
 });
 Polymer.Base._addFeature({
-_prepExtends: function () {
-if (this.extends) {
-this.__proto__ = this._getExtendedPrototype(this.extends);
-}
-},
 _getExtendedPrototype: function (tag) {
 return this._getExtendedNativePrototype(tag);
 },
@@ -2814,7 +2935,7 @@ _setupDebouncers: function () {
 this._debouncers = {};
 },
 debounce: function (jobName, callback, wait) {
-this._debouncers[jobName] = Polymer.Debounce.call(this, this._debouncers[jobName], callback, wait);
+return this._debouncers[jobName] = Polymer.Debounce.call(this, this._debouncers[jobName], callback, wait);
 },
 isDebouncerActive: function (jobName) {
 var debouncer = this._debouncers[jobName];
@@ -2833,13 +2954,12 @@ debouncer.stop();
 }
 }
 });
-Polymer.version = '1.0.6';
+Polymer.version = '1.1.1';
 Polymer.Base._addFeature({
 _registerFeatures: function () {
 this._prepIs();
 this._prepAttributes();
 this._prepBehaviors();
-this._prepExtends();
 this._prepConstructor();
 },
 _prepBehavior: function (b) {
@@ -2859,6 +2979,10 @@ _prepTemplate: function () {
 this._template = this._template || Polymer.DomModule.import(this.is, 'template');
 if (this._template && this._template.hasAttribute('is')) {
 this._warn(this._logf('_prepTemplate', 'top-level Polymer template ' + 'must not be a type-extension, found', this._template, 'Move inside simple <template>.'));
+}
+if (this._template && !this._template.content && HTMLTemplateElement.bootstrap) {
+HTMLTemplateElement.decorate(this._template);
+HTMLTemplateElement.bootstrap(this._template.content);
 }
 },
 _stampTemplate: function () {
@@ -3274,65 +3398,68 @@ var nativeRemoveChild = Element.prototype.removeChild;
 var nativeAppendChild = Element.prototype.appendChild;
 var nativeCloneNode = Element.prototype.cloneNode;
 var nativeImportNode = Document.prototype.importNode;
-var dirtyRoots = [];
 var DomApi = function (node) {
 this.node = node;
 if (this.patch) {
 this.patch();
 }
 };
+if (window.wrap && Settings.useShadow && !Settings.useNativeShadow) {
+DomApi = function (node) {
+this.node = wrap(node);
+if (this.patch) {
+this.patch();
+}
+};
+}
 DomApi.prototype = {
 flush: function () {
-for (var i = 0, host; i < dirtyRoots.length; i++) {
-host = dirtyRoots[i];
-host.flushDebouncer('_distribute');
-}
-dirtyRoots = [];
+Polymer.dom.flush();
 },
 _lazyDistribute: function (host) {
 if (host.shadyRoot && host.shadyRoot._distributionClean) {
 host.shadyRoot._distributionClean = false;
-host.debounce('_distribute', host._distributeContent);
-dirtyRoots.push(host);
+Polymer.dom.addDebouncer(host.debounce('_distribute', host._distributeContent));
 }
 },
 appendChild: function (node) {
-var handled;
-this._removeNodeFromHost(node, true);
-if (this._nodeIsInLogicalTree(this.node)) {
-this._addLogicalInfo(node, this.node);
-this._addNodeToHost(node);
-handled = this._maybeDistribute(node, this.node);
-}
-if (!handled && !this._tryRemoveUndistributedNode(node)) {
-var container = this.node._isShadyRoot ? this.node.host : this.node;
-addToComposedParent(container, node);
-nativeAppendChild.call(container, node);
-}
-return node;
+return this._addNode(node);
 },
 insertBefore: function (node, ref_node) {
-if (!ref_node) {
-return this.appendChild(node);
-}
-var handled;
+return this._addNode(node, ref_node);
+},
+_addNode: function (node, ref_node) {
 this._removeNodeFromHost(node, true);
-if (this._nodeIsInLogicalTree(this.node)) {
-saveLightChildrenIfNeeded(this.node);
+var addedInsertionPoint;
+var root = this.getOwnerRoot();
+if (root) {
+addedInsertionPoint = this._maybeAddInsertionPoint(node, this.node);
+}
+if (this._nodeHasLogicalChildren(this.node)) {
+if (ref_node) {
 var children = this.childNodes;
 var index = children.indexOf(ref_node);
 if (index < 0) {
 throw Error('The ref_node to be inserted before is not a child ' + 'of this node');
 }
-this._addLogicalInfo(node, this.node, index);
-this._addNodeToHost(node);
-handled = this._maybeDistribute(node, this.node);
 }
-if (!handled && !this._tryRemoveUndistributedNode(node)) {
+this._addLogicalInfo(node, this.node, index);
+}
+this._addNodeToHost(node);
+if (!this._maybeDistribute(node, this.node) && !this._tryRemoveUndistributedNode(node)) {
+if (ref_node) {
 ref_node = ref_node.localName === CONTENT ? this._firstComposedNode(ref_node) : ref_node;
+}
 var container = this.node._isShadyRoot ? this.node.host : this.node;
 addToComposedParent(container, node, ref_node);
+if (ref_node) {
 nativeInsertBefore.call(container, node, ref_node);
+} else {
+nativeAppendChild.call(container, node);
+}
+}
+if (addedInsertionPoint) {
+this._updateInsertionPoints(root.host);
 }
 return node;
 },
@@ -3340,12 +3467,8 @@ removeChild: function (node) {
 if (factory(node).parentNode !== this.node) {
 console.warn('The node to be removed is not a child of this node', node);
 }
-var handled;
-if (this._nodeIsInLogicalTree(this.node)) {
 this._removeNodeFromHost(node);
-handled = this._maybeDistribute(node, this.node);
-}
-if (!handled) {
+if (!this._maybeDistribute(node, this.node)) {
 var container = this.node._isShadyRoot ? this.node.host : this.node;
 if (container === node.parentNode) {
 removeFromComposedParent(container, node);
@@ -3358,6 +3481,9 @@ replaceChild: function (node, ref_node) {
 this.insertBefore(node, ref_node);
 this.removeChild(ref_node);
 return node;
+},
+_hasCachedOwnerRoot: function (node) {
+return Boolean(node._ownerShadyRoot !== undefined);
 },
 getOwnerRoot: function () {
 return this._ownerShadyRootForNode(this.node);
@@ -3390,7 +3516,6 @@ if (hasContent) {
 var root = this._ownerShadyRootForNode(parent);
 if (root) {
 var host = root.host;
-this._updateInsertionPoints(host);
 this._lazyDistribute(host);
 }
 }
@@ -3399,6 +3524,25 @@ if (parentNeedsDist) {
 this._lazyDistribute(parent);
 }
 return parentNeedsDist || hasContent && !wrappedContent;
+},
+_maybeAddInsertionPoint: function (node, parent) {
+var added;
+if (node.nodeType === Node.DOCUMENT_FRAGMENT_NODE && !node.__noContent) {
+var c$ = factory(node).querySelectorAll(CONTENT);
+for (var i = 0, n, np, na; i < c$.length && (n = c$[i]); i++) {
+np = factory(n).parentNode;
+if (np === node) {
+np = parent;
+}
+na = this._maybeAddInsertionPoint(n, np);
+added = added || na;
+}
+} else if (node.localName === CONTENT) {
+saveLightChildrenIfNeeded(parent);
+saveLightChildrenIfNeeded(node);
+added = true;
+}
+return added;
 },
 _tryRemoveUndistributedNode: function (node) {
 if (this.node.shadyRoot) {
@@ -3409,10 +3553,15 @@ return true;
 }
 },
 _updateInsertionPoints: function (host) {
-host.shadyRoot._insertionPoints = factory(host.shadyRoot).querySelectorAll(CONTENT);
+var i$ = host.shadyRoot._insertionPoints = factory(host.shadyRoot).querySelectorAll(CONTENT);
+for (var i = 0, c; i < i$.length; i++) {
+c = i$[i];
+saveLightChildrenIfNeeded(c);
+saveLightChildrenIfNeeded(factory(c).parentNode);
+}
 },
-_nodeIsInLogicalTree: function (node) {
-return Boolean(node._lightParent !== undefined || node._isShadyRoot || this._ownerShadyRootForNode(node) || node.shadyRoot);
+_nodeHasLogicalChildren: function (node) {
+return Boolean(node._lightChildren !== undefined);
 },
 _parentNeedsDistribution: function (parent) {
 return parent && parent.shadyRoot && hasInsertionPoint(parent.shadyRoot);
@@ -3422,6 +3571,7 @@ var hostNeedsDist;
 var root;
 var parent = node._lightParent;
 if (parent) {
+factory(node)._distributeParent();
 root = this._ownerShadyRootForNode(node);
 if (root) {
 root.host._elementRemove(node);
@@ -3434,7 +3584,7 @@ if (root && hostNeedsDist) {
 this._updateInsertionPoints(root.host);
 this._lazyDistribute(root.host);
 } else if (ensureComposedRemoval) {
-removeFromComposedParent(parent || node.parentNode, node);
+removeFromComposedParent(node._composedParent, node);
 }
 },
 _removeDistributedChildren: function (root, container) {
@@ -3466,14 +3616,12 @@ node = factory(node).parentNode;
 }
 },
 _addNodeToHost: function (node) {
-var checkNode = node.nodeType === Node.DOCUMENT_FRAGMENT_NODE ? node.firstChild : node;
-var root = this._ownerShadyRootForNode(checkNode);
+var root = this.getOwnerRoot();
 if (root) {
 root.host._elementAdd(node);
 }
 },
 _addLogicalInfo: function (node, container, index) {
-saveLightChildrenIfNeeded(container);
 var children = factory(container).childNodes;
 index = index === undefined ? children.length : index;
 if (node.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
@@ -3497,8 +3645,7 @@ children.splice(index, 1);
 node._lightParent = null;
 },
 _removeOwnerShadyRoot: function (node) {
-var hasCachedRoot = factory(node).getOwnerRoot() !== undefined;
-if (hasCachedRoot) {
+if (this._hasCachedOwnerRoot(node)) {
 var c$ = factory(node).childNodes;
 for (var i = 0, l = c$.length, n; i < l && (n = c$[i]); i++) {
 this._removeOwnerShadyRoot(n);
@@ -3599,7 +3746,7 @@ d.appendChild(nc);
 return n;
 },
 importNode: function (externalNode, deep) {
-var doc = this.node instanceof HTMLDocument ? this.node : this.node.ownerDocument;
+var doc = this.node instanceof Document ? this.node : this.node.ownerDocument;
 var n = nativeImportNode.call(doc, externalNode, false);
 if (deep) {
 var c$ = factory(externalNode).childNodes;
@@ -3729,32 +3876,44 @@ configurable: true
 },
 textContent: {
 get: function () {
-if (this.node.nodeType === Node.TEXT_NODE) {
+var nt = this.node.nodeType;
+if (nt === Node.TEXT_NODE || nt === Node.COMMENT_NODE) {
 return this.node.textContent;
 } else {
-return Array.prototype.map.call(this.childNodes, function (c) {
-return c.textContent;
-}).join('');
+var tc = [];
+for (var i = 0, cn = this.childNodes, c; c = cn[i]; i++) {
+if (c.nodeType !== Node.COMMENT_NODE) {
+tc.push(c.textContent);
+}
+}
+return tc.join('');
 }
 },
 set: function (text) {
+var nt = this.node.nodeType;
+if (nt === Node.TEXT_NODE || nt === Node.COMMENT_NODE) {
+this.node.textContent = text;
+} else {
 this._clear();
 if (text) {
 this.appendChild(document.createTextNode(text));
+}
 }
 },
 configurable: true
 },
 innerHTML: {
 get: function () {
-if (this.node.nodeType === Node.TEXT_NODE) {
+var nt = this.node.nodeType;
+if (nt === Node.TEXT_NODE || nt === Node.COMMENT_NODE) {
 return null;
 } else {
 return getInnerHTML(this.node);
 }
 },
 set: function (text) {
-if (this.node.nodeType !== Node.TEXT_NODE) {
+var nt = this.node.nodeType;
+if (nt !== Node.TEXT_NODE || nt !== Node.COMMENT_NODE) {
 this._clear();
 var d = document.createElement('div');
 d.innerHTML = text;
@@ -3787,15 +3946,15 @@ DomApi.prototype.cloneNode = function (deep) {
 return this.node.cloneNode(deep);
 };
 DomApi.prototype.importNode = function (externalNode, deep) {
-var doc = this.node instanceof HTMLDocument ? this.node : this.node.ownerDocument;
+var doc = this.node instanceof Document ? this.node : this.node.ownerDocument;
 return doc.importNode(externalNode, deep);
 };
 DomApi.prototype.getDestinationInsertionPoints = function () {
-var n$ = this.node.getDestinationInsertionPoints();
+var n$ = this.node.getDestinationInsertionPoints && this.node.getDestinationInsertionPoints();
 return n$ ? Array.prototype.slice.call(n$) : [];
 };
 DomApi.prototype.getDistributedNodes = function () {
-var n$ = this.node.getDistributedNodes();
+var n$ = this.node.getDistributedNodes && this.node.getDistributedNodes();
 return n$ ? Array.prototype.slice.call(n$) : [];
 };
 DomApi.prototype._distributeParent = function () {
@@ -3867,7 +4026,43 @@ return Polymer.EventApi.factory(obj);
 return factory(obj, patch);
 }
 };
-Polymer.dom.flush = DomApi.prototype.flush;
+Polymer.Base.extend(Polymer.dom, {
+_flushGuard: 0,
+_FLUSH_MAX: 100,
+_needsTakeRecords: !Polymer.Settings.useNativeCustomElements,
+_debouncers: [],
+_finishDebouncer: null,
+flush: function () {
+for (var i = 0; i < this._debouncers.length; i++) {
+this._debouncers[i].complete();
+}
+if (this._finishDebouncer) {
+this._finishDebouncer.complete();
+}
+this._flushPolyfills();
+if (this._debouncers.length && this._flushGuard < this._FLUSH_MAX) {
+this._flushGuard++;
+this.flush();
+} else {
+if (this._flushGuard >= this._FLUSH_MAX) {
+console.warn('Polymer.dom.flush aborted. Flush may not be complete.');
+}
+this._flushGuard = 0;
+}
+},
+_flushPolyfills: function () {
+if (this._needsTakeRecords) {
+CustomElements.takeRecords();
+}
+},
+addDebouncer: function (debouncer) {
+this._debouncers.push(debouncer);
+this._finishDebouncer = Polymer.Debounce(this._finishDebouncer, this._finishFlush);
+},
+_finishFlush: function () {
+Polymer.dom._debouncers = [];
+}
+});
 function getLightChildren(node) {
 var children = node._lightChildren;
 return children ? children : node.childNodes;
@@ -3915,7 +4110,7 @@ node._lightChildren = c$;
 }
 }
 function hasInsertionPoint(root) {
-return Boolean(root._insertionPoints.length);
+return Boolean(root && root._insertionPoints.length);
 }
 var p = Element.prototype;
 var matchesSelector = p.matches || p.matchesSelector || p.mozMatchesSelector || p.msMatchesSelector || p.oMatchesSelector || p.webkitMatchesSelector;
@@ -3953,8 +4148,13 @@ this.shadyRoot = this.root;
 this.shadyRoot._distributionClean = false;
 this.shadyRoot._isShadyRoot = true;
 this.shadyRoot._dirtyRoots = [];
-this.shadyRoot._insertionPoints = !this._notes || this._notes._hasContent ? this.shadyRoot.querySelectorAll('content') : [];
+var i$ = this.shadyRoot._insertionPoints = !this._notes || this._notes._hasContent ? this.shadyRoot.querySelectorAll('content') : [];
 saveLightChildrenIfNeeded(this.shadyRoot);
+for (var i = 0, c; i < i$.length; i++) {
+c = i$[i];
+saveLightChildrenIfNeeded(c);
+saveLightChildrenIfNeeded(c.parentNode);
+}
 this.shadyRoot.host = this;
 },
 get domHost() {
@@ -3993,6 +4193,7 @@ this.shadyRoot._dirtyRoots = [];
 },
 _finishDistribute: function () {
 if (this._useContent) {
+this.shadyRoot._distributionClean = true;
 if (hasInsertionPoint(this.shadyRoot)) {
 this._composeTree();
 } else {
@@ -4006,7 +4207,6 @@ this._updateChildNodes(this, children);
 }
 }
 this.shadyRoot._hasDistributed = true;
-this.shadyRoot._distributionClean = true;
 }
 },
 elementMatches: function (selector, node) {
@@ -4189,14 +4389,12 @@ if (newChildParent !== parentNode) {
 removeFromComposedParent(newChildParent, newChild);
 }
 remove(newChild);
-saveLightChildrenIfNeeded(parentNode);
 nativeInsertBefore.call(parentNode, newChild, refChild || null);
 newChild._composedParent = parentNode;
 }
 function remove(node) {
 var parentNode = getComposedParent(node);
 if (parentNode) {
-saveLightChildrenIfNeeded(parentNode);
 node._composedParent = null;
 nativeRemoveChild.call(parentNode, node);
 }
@@ -4253,7 +4451,6 @@ _registerFeatures: function () {
 this._prepIs();
 this._prepAttributes();
 this._prepBehaviors();
-this._prepExtends();
 this._prepConstructor();
 this._prepTemplate();
 this._prepShady();
@@ -4333,6 +4530,14 @@ if (root.firstChild) {
 for (var i = 0, node = root.firstChild; node; node = node.nextSibling, i++) {
 if (node.localName === 'template' && !node.hasAttribute('preserve-content')) {
 this._parseTemplate(node, i, list, annote);
+}
+if (node.nodeType === Node.TEXT_NODE) {
+var n = node.nextSibling;
+while (n && n.nodeType === Node.TEXT_NODE) {
+node.textContent += n.textContent;
+root.removeChild(n);
+n = n.nextSibling;
+}
 }
 var childAnnotation = this._parseNodeAnnotations(node, list, callback);
 if (childAnnotation) {
@@ -4675,6 +4880,19 @@ var MOUSE_EVENTS = [
 'mouseup',
 'click'
 ];
+var MOUSE_WHICH_TO_BUTTONS = [
+0,
+1,
+4,
+2
+];
+var MOUSE_HAS_BUTTONS = function () {
+try {
+return new MouseEvent('test', { buttons: 1 }).buttons === 1;
+} catch (e) {
+return false;
+}
+}();
 var IS_TOUCH_ONLY = navigator.userAgent.match(/iP(?:[oa]d|hone)|Android/);
 var mouseCanceller = function (mouseEvent) {
 mouseEvent[HANDLED_OBJ] = { skip: true };
@@ -4713,6 +4931,34 @@ POINTERSTATE.mouse.mouseIgnoreJob = null;
 };
 POINTERSTATE.mouse.mouseIgnoreJob = Polymer.Debounce(POINTERSTATE.mouse.mouseIgnoreJob, unset, MOUSE_TIMEOUT);
 }
+function hasLeftMouseButton(ev) {
+var type = ev.type;
+if (MOUSE_EVENTS.indexOf(type) === -1) {
+return false;
+}
+if (type === 'mousemove') {
+var buttons = ev.buttons === undefined ? 1 : ev.buttons;
+if (ev instanceof window.MouseEvent && !MOUSE_HAS_BUTTONS) {
+buttons = MOUSE_WHICH_TO_BUTTONS[ev.which] || 0;
+}
+return Boolean(buttons & 1);
+} else {
+var button = ev.button === undefined ? 0 : ev.button;
+return button === 0;
+}
+}
+function isSyntheticClick(ev) {
+if (ev.type === 'click') {
+if (ev.detail === 0) {
+return true;
+}
+var t = Gestures.findOriginalTarget(ev);
+var bcr = t.getBoundingClientRect();
+var x = ev.pageX, y = ev.pageY;
+return !(x >= bcr.left && x <= bcr.right && (y >= bcr.top && y <= bcr.bottom));
+}
+return false;
+}
 var POINTERSTATE = {
 mouse: {
 target: null,
@@ -4736,6 +4982,16 @@ break;
 }
 }
 return ta;
+}
+function trackDocument(stateObj, movefn, upfn) {
+stateObj.movefn = movefn;
+stateObj.upfn = upfn;
+document.addEventListener('mousemove', movefn);
+document.addEventListener('mouseup', upfn);
+}
+function untrackDocument(stateObj) {
+document.removeEventListener('mousemove', stateObj.movefn);
+document.removeEventListener('mouseup', stateObj.upfn);
 }
 var Gestures = {
 gestures: {},
@@ -4797,6 +5053,16 @@ var recognizers = Gestures.recognizers;
 for (var i = 0, r; i < recognizers.length; i++) {
 r = recognizers[i];
 if (gs[r.name] && !handled[r.name]) {
+if (r.flow && r.flow.start.indexOf(ev.type) > -1) {
+if (r.reset) {
+r.reset();
+}
+}
+}
+}
+for (var i = 0, r; i < recognizers.length; i++) {
+r = recognizers[i];
+if (gs[r.name] && !handled[r.name]) {
 handled[r.name] = true;
 r[type](ev);
 }
@@ -4828,6 +5094,8 @@ prevent = dx > dy;
 }
 if (prevent) {
 ev.preventDefault();
+} else {
+Gestures.prevent('track');
 }
 }
 },
@@ -4930,18 +5198,48 @@ deps: [
 'touchstart',
 'touchend'
 ],
+flow: {
+start: [
+'mousedown',
+'touchstart'
+],
+end: [
+'mouseup',
+'touchend'
+]
+},
 emits: [
 'down',
 'up'
 ],
+info: {
+movefn: function () {
+},
+upfn: function () {
+}
+},
+reset: function () {
+untrackDocument(this.info);
+},
 mousedown: function (e) {
+if (!hasLeftMouseButton(e)) {
+return;
+}
 var t = Gestures.findOriginalTarget(e);
 var self = this;
-var upfn = function upfn(e) {
+var movefn = function movefn(e) {
+if (!hasLeftMouseButton(e)) {
 self.fire('up', t, e);
-document.removeEventListener('mouseup', upfn);
+untrackDocument(self.info);
+}
 };
-document.addEventListener('mouseup', upfn);
+var upfn = function upfn(e) {
+if (hasLeftMouseButton(e)) {
+self.fire('up', t, e);
+}
+untrackDocument(self.info);
+};
+trackDocument(this.info, movefn, upfn);
 this.fire('down', t, e);
 },
 touchstart: function (e) {
@@ -4969,6 +5267,16 @@ deps: [
 'touchmove',
 'touchend'
 ],
+flow: {
+start: [
+'mousedown',
+'touchstart'
+],
+end: [
+'mouseup',
+'touchend'
+]
+},
 emits: ['track'],
 info: {
 x: 0,
@@ -4982,15 +5290,20 @@ this.moves.shift();
 }
 this.moves.push(move);
 },
+movefn: function () {
+},
+upfn: function () {
+},
 prevent: false
 },
-clearInfo: function () {
+reset: function () {
 this.info.state = 'start';
 this.info.started = false;
 this.info.moves = [];
 this.info.x = 0;
 this.info.y = 0;
 this.info.prevent = false;
+untrackDocument(this.info);
 },
 hasMovedEnough: function (x, y) {
 if (this.info.prevent) {
@@ -5004,6 +5317,9 @@ var dy = Math.abs(this.info.y - y);
 return dx >= TRACK_DISTANCE || dy >= TRACK_DISTANCE;
 },
 mousedown: function (e) {
+if (!hasLeftMouseButton(e)) {
+return;
+}
 var t = Gestures.findOriginalTarget(e);
 var self = this;
 var movefn = function movefn(e) {
@@ -5014,6 +5330,10 @@ self.info.addMove({
 x: x,
 y: y
 });
+if (!hasLeftMouseButton(e)) {
+self.info.state = 'end';
+untrackDocument(self.info);
+}
 self.fire(t, e);
 self.info.started = true;
 }
@@ -5023,12 +5343,9 @@ if (self.info.started) {
 Gestures.prevent('tap');
 movefn(e);
 }
-self.clearInfo();
-document.removeEventListener('mousemove', movefn);
-document.removeEventListener('mouseup', upfn);
+untrackDocument(self.info);
 };
-document.addEventListener('mousemove', movefn);
-document.addEventListener('mouseup', upfn);
+trackDocument(this.info, movefn, upfn);
 this.info.x = e.clientX;
 this.info.y = e.clientY;
 },
@@ -5063,7 +5380,6 @@ y: ct.clientY
 });
 this.fire(t, ct);
 }
-this.clearInfo();
 },
 fire: function (target, touch) {
 var secondlast = this.info.moves[this.info.moves.length - 2];
@@ -5098,6 +5414,16 @@ deps: [
 'touchstart',
 'touchend'
 ],
+flow: {
+start: [
+'mousedown',
+'touchstart'
+],
+end: [
+'click',
+'touchend'
+]
+},
 emits: ['tap'],
 info: {
 x: NaN,
@@ -5114,10 +5440,14 @@ this.info.x = e.clientX;
 this.info.y = e.clientY;
 },
 mousedown: function (e) {
+if (hasLeftMouseButton(e)) {
 this.save(e);
+}
 },
 click: function (e) {
+if (hasLeftMouseButton(e)) {
 this.forward(e);
+}
 },
 touchstart: function (e) {
 this.save(e.changedTouches[0]);
@@ -5129,7 +5459,7 @@ forward: function (e) {
 var dx = Math.abs(e.clientX - this.info.x);
 var dy = Math.abs(e.clientY - this.info.y);
 var t = Gestures.findOriginalTarget(e);
-if (isNaN(dx) || isNaN(dy) || dx <= TAP_DISTANCE && dy <= TAP_DISTANCE) {
+if (isNaN(dx) || isNaN(dy) || dx <= TAP_DISTANCE && dy <= TAP_DISTANCE || isSyntheticClick(e)) {
 if (!this.info.prevent) {
 Gestures.fire(t, 'tap', {
 x: e.clientX,
@@ -5138,7 +5468,6 @@ sourceEvent: e
 });
 }
 }
-this.reset();
 }
 });
 var DIRECTION_MAP = {
@@ -5300,7 +5629,8 @@ Polymer.dom(toElement).setAttribute(name, '');
 }
 },
 getContentChildNodes: function (slctr) {
-return Polymer.dom(Polymer.dom(this.root).querySelector(slctr || 'content')).getDistributedNodes();
+var content = Polymer.dom(this.root).querySelector(slctr || 'content');
+return content ? Polymer.dom(content).getDistributedNodes() : [];
 },
 getContentChildren: function (slctr) {
 return this.getContentChildNodes(slctr).filter(function (n) {
@@ -5750,7 +6080,7 @@ trigger: trigger
 });
 },
 _parseMethod: function (expression) {
-var m = expression.match(/(\w*)\((.*)\)/);
+var m = expression.match(/([^\s]+)\((.*)\)/);
 if (m) {
 var sig = {
 method: m[1],
@@ -5782,6 +6112,9 @@ name: arg,
 model: this._modelForPath(arg)
 };
 var fc = arg[0];
+if (fc === '-') {
+fc = arg[1];
+}
 if (fc >= '0' && fc <= '9') {
 fc = '#';
 }
@@ -5834,11 +6167,20 @@ this._effectEffects('__static__', null, this._propertyEffects.__static__);
 });
 Polymer.Base._addFeature({
 _setupConfigure: function (initialConfig) {
-this._config = initialConfig || {};
+this._config = {};
+for (var i in initialConfig) {
+if (initialConfig[i] !== undefined) {
+this._config[i] = initialConfig[i];
+}
+}
 this._handlers = [];
 },
 _marshalAttributes: function () {
 this._takeAttributesToModel(this._config);
+},
+_attributeChangedImpl: function (name) {
+var model = this._clientsReadied ? this : this._config;
+this._setAttributeToProperty(model, name);
 },
 _configValue: function (name, value) {
 this._config[name] = value;
@@ -5963,8 +6305,9 @@ var array;
 var last = parts[parts.length - 1];
 if (parts.length > 1) {
 for (var i = 0; i < parts.length - 1; i++) {
-prop = prop[parts[i]];
-if (array) {
+var part = parts[i];
+prop = prop[part];
+if (array && parseInt(part) == part) {
 parts[i] = Polymer.Collection.get(array).getKey(prop);
 }
 if (!prop) {
@@ -5972,14 +6315,12 @@ return;
 }
 array = Array.isArray(prop) ? prop : null;
 }
-if (array) {
+if (array && parseInt(last) == last) {
 var coll = Polymer.Collection.get(array);
 var old = prop[last];
 var key = coll.getKey(old);
-if (key) {
 parts[i] = key;
 coll.setItem(key, value);
-}
 }
 prop[last] = value;
 if (!root) {
@@ -6120,36 +6461,56 @@ var array = this.get(path);
 var args = Array.prototype.slice.call(arguments, 1);
 var len = array.length;
 var ret = array.push.apply(array, args);
+if (args.length) {
 this._notifySplice(array, path, len, args.length, []);
+}
 return ret;
 },
 pop: function (path) {
 var array = this.get(path);
+var hadLength = Boolean(array.length);
 var args = Array.prototype.slice.call(arguments, 1);
-var rem = array.slice(-1);
 var ret = array.pop.apply(array, args);
-this._notifySplice(array, path, array.length, 0, rem);
+if (hadLength) {
+this._notifySplice(array, path, array.length, 0, [ret]);
+}
 return ret;
 },
 splice: function (path, start, deleteCount) {
 var array = this.get(path);
+if (start < 0) {
+start = array.length - Math.floor(-start);
+} else {
+start = Math.floor(start);
+}
+if (!start) {
+start = 0;
+}
 var args = Array.prototype.slice.call(arguments, 1);
 var ret = array.splice.apply(array, args);
-this._notifySplice(array, path, start, args.length - 2, ret);
+var addedCount = Math.max(args.length - 2, 0);
+if (addedCount || ret.length) {
+this._notifySplice(array, path, start, addedCount, ret);
+}
 return ret;
 },
 shift: function (path) {
 var array = this.get(path);
+var hadLength = Boolean(array.length);
 var args = Array.prototype.slice.call(arguments, 1);
 var ret = array.shift.apply(array, args);
+if (hadLength) {
 this._notifySplice(array, path, 0, 0, [ret]);
+}
 return ret;
 },
 unshift: function (path) {
 var array = this.get(path);
 var args = Array.prototype.slice.call(arguments, 1);
 var ret = array.unshift.apply(array, args);
+if (args.length) {
 this._notifySplice(array, path, 0, args.length, []);
+}
 return ret;
 }
 });
@@ -6172,7 +6533,7 @@ text = this._clean(text);
 return this._parseCss(this._lex(text), text);
 },
 _clean: function (cssText) {
-return cssText.replace(rx.comments, '').replace(rx.port, '');
+return cssText.replace(this._rx.comments, '').replace(this._rx.port, '');
 },
 _lex: function (text) {
 var root = {
@@ -6211,15 +6572,15 @@ var ss = node.previous ? node.previous.end : node.parent.start;
 t = text.substring(ss, node.start - 1);
 t = t.substring(t.lastIndexOf(';') + 1);
 var s = node.parsedSelector = node.selector = t.trim();
-node.atRule = s.indexOf(AT_START) === 0;
+node.atRule = s.indexOf(this.AT_START) === 0;
 if (node.atRule) {
-if (s.indexOf(MEDIA_START) === 0) {
+if (s.indexOf(this.MEDIA_START) === 0) {
 node.type = this.types.MEDIA_RULE;
-} else if (s.match(rx.keyframesRule)) {
+} else if (s.match(this._rx.keyframesRule)) {
 node.type = this.types.KEYFRAMES_RULE;
 }
 } else {
-if (s.indexOf(VAR_START) === 0) {
+if (s.indexOf(this.VAR_START) === 0) {
 node.type = this.types.MIXIN_RULE;
 } else {
 node.type = this.types.STYLE_RULE;
@@ -6239,12 +6600,12 @@ text = text || '';
 var cssText = '';
 if (node.cssText || node.rules) {
 var r$ = node.rules;
-if (r$ && (preserveProperties || !hasMixinRules(r$))) {
+if (r$ && (preserveProperties || !this._hasMixinRules(r$))) {
 for (var i = 0, l = r$.length, r; i < l && (r = r$[i]); i++) {
 cssText = this.stringify(r, preserveProperties, cssText);
 }
 } else {
-cssText = preserveProperties ? node.cssText : removeCustomProps(node.cssText);
+cssText = preserveProperties ? node.cssText : this.removeCustomProps(node.cssText);
 cssText = cssText.trim();
 if (cssText) {
 cssText = '  ' + cssText + '\n';
@@ -6262,6 +6623,19 @@ text += this.CLOSE_BRACE + '\n\n';
 }
 return text;
 },
+_hasMixinRules: function (rules) {
+return rules[0].selector.indexOf(this.VAR_START) >= 0;
+},
+removeCustomProps: function (cssText) {
+cssText = this.removeCustomPropAssignment(cssText);
+return this.removeCustomPropApply(cssText);
+},
+removeCustomPropAssignment: function (cssText) {
+return cssText.replace(this._rx.customProp, '').replace(this._rx.mixinProp, '');
+},
+removeCustomPropApply: function (cssText) {
+return cssText.replace(this._rx.mixinApply, '').replace(this._rx.varApply, '');
+},
 types: {
 STYLE_RULE: 1,
 KEYFRAMES_RULE: 7,
@@ -6269,31 +6643,26 @@ MEDIA_RULE: 4,
 MIXIN_RULE: 1000
 },
 OPEN_BRACE: '{',
-CLOSE_BRACE: '}'
-};
-function hasMixinRules(rules) {
-return rules[0].selector.indexOf(VAR_START) >= 0;
-}
-function removeCustomProps(cssText) {
-return cssText.replace(rx.customProp, '').replace(rx.mixinProp, '').replace(rx.mixinApply, '').replace(rx.varApply, '');
-}
-var VAR_START = '--';
-var MEDIA_START = '@media';
-var AT_START = '@';
-var rx = {
-comments: /\/\*[^*]*\*+([^\/*][^*]*\*+)*\//gim,
+CLOSE_BRACE: '}',
+_rx: {
+comments: /\/\*[^*]*\*+([^/*][^*]*\*+)*\//gim,
 port: /@import[^;]*;/gim,
 customProp: /(?:^|[\s;])--[^;{]*?:[^{};]*?(?:[;\n]|$)/gim,
 mixinProp: /(?:^|[\s;])--[^;{]*?:[^{;]*?{[^}]*?}(?:[;\n]|$)?/gim,
 mixinApply: /@apply[\s]*\([^)]*?\)[\s]*(?:[;\n]|$)?/gim,
 varApply: /[^;:]*?:[^;]*var[^;]*(?:[;\n]|$)?/gim,
 keyframesRule: /^@[^\s]*keyframes/
+},
+VAR_START: '--',
+MEDIA_START: '@media',
+AT_START: '@'
 };
 return api;
 }();
 Polymer.StyleUtil = function () {
 return {
-MODULE_STYLES_SELECTOR: 'style, link[rel=import][type~=css]',
+MODULE_STYLES_SELECTOR: 'style, link[rel=import][type~=css], template',
+INCLUDE_ATTR: 'include',
 toCssText: function (rules, callback, preserveProperties) {
 if (typeof rules === 'string') {
 rules = this.parser.parse(rules);
@@ -6304,8 +6673,10 @@ this.forEachStyleRule(rules, callback);
 return this.parser.stringify(rules, preserveProperties);
 },
 forRulesInStyles: function (styles, callback) {
+if (styles) {
 for (var i = 0, l = styles.length, s; i < l && (s = styles[i]); i++) {
 this.forEachStyleRule(this.rulesForStyle(s), callback);
+}
 }
 },
 rulesForStyle: function (style) {
@@ -6318,7 +6689,7 @@ clearStyleRules: function (style) {
 style.__cssRules = null;
 },
 forEachStyleRule: function (node, callback) {
-var s = node.selector;
+var s = node.parsedSelector;
 var skipRules = false;
 if (node.type === this.ruleTypes.STYLE_RULE) {
 callback(node);
@@ -6346,27 +6717,46 @@ afterNode = n$[n$.length - 1];
 target.insertBefore(style, afterNode && afterNode.nextSibling || target.firstChild);
 return style;
 },
+cssFromModules: function (moduleIds) {
+var modules = moduleIds.trim().split(' ');
+var cssText = '';
+for (var i = 0; i < modules.length; i++) {
+cssText += this.cssFromModule(modules[i]);
+}
+return cssText;
+},
 cssFromModule: function (moduleId) {
 var m = Polymer.DomModule.import(moduleId);
 if (m && !m._cssText) {
-var cssText = '';
-var e$ = Array.prototype.slice.call(m.querySelectorAll(this.MODULE_STYLES_SELECTOR));
-for (var i = 0, e; i < e$.length; i++) {
-e = e$[i];
-if (e.localName === 'style') {
-e = e.__appliedElement || e;
-e.parentNode.removeChild(e);
-} else {
-e = e.import && e.import.body;
-}
-if (e) {
-cssText += Polymer.ResolveUrl.resolveCss(e.textContent, e.ownerDocument);
-}
-}
-m._cssText = cssText;
+m._cssText = this._cssFromElement(m);
 }
 return m && m._cssText || '';
 },
+_cssFromElement: function (element) {
+var cssText = '';
+var content = element.content || element;
+var e$ = Array.prototype.slice.call(content.querySelectorAll(this.MODULE_STYLES_SELECTOR));
+for (var i = 0, e; i < e$.length; i++) {
+e = e$[i];
+if (e.localName === 'template') {
+cssText += this._cssFromElement(e);
+} else {
+if (e.localName === 'style') {
+var include = e.getAttribute(this.INCLUDE_ATTR);
+e = e.__appliedElement || e;
+e.parentNode.removeChild(e);
+cssText += this.resolveCss(e.textContent, element.ownerDocument);
+if (include) {
+cssText += this.cssFromModules(include);
+}
+} else if (e.import && e.import.body) {
+cssText += this.resolveCss(e.import.body.textContent, e.import);
+}
+}
+}
+return cssText;
+},
+resolveCss: Polymer.ResolveUrl.resolveCss,
 parser: Polymer.CssParse,
 ruleTypes: Polymer.CssParse.types
 };
@@ -6458,7 +6848,7 @@ var p$ = rule.selector.split(COMPLEX_SELECTOR_SEP);
 for (var i = 0, l = p$.length, p; i < l && (p = p$[i]); i++) {
 p$[i] = transformer.call(this, p, scope, hostScope);
 }
-rule.selector = p$.join(COMPLEX_SELECTOR_SEP);
+rule.selector = rule.transformedSelector = p$.join(COMPLEX_SELECTOR_SEP);
 },
 _transformComplexSelector: function (selector, scope, hostScope) {
 var stop = false;
@@ -6813,7 +7203,8 @@ return property && property.trim() || '';
 },
 valueForProperties: function (property, props) {
 var parts = property.split(';');
-for (var i = 0, p, m; i < parts.length && (p = parts[i]); i++) {
+for (var i = 0, p, m; i < parts.length; i++) {
+if (p = parts[i]) {
 m = p.match(this.rx.MIXIN_MATCH);
 if (m) {
 p = this.valueForProperty(props[m[1]], props);
@@ -6826,6 +7217,7 @@ pp[1] = this.valueForProperty(pp[1], props) || pp[1];
 p = pp.join(':');
 }
 parts[i] = p && p.lastIndexOf(';') === p.length - 1 ? p.slice(0, -1) : p || '';
+}
 }
 return parts.join(';');
 },
@@ -6846,7 +7238,7 @@ styleUtil.forRulesInStyles(styles, function (rule) {
 if (!rule.propertyInfo) {
 self.decorateRule(rule);
 }
-if (element && rule.propertyInfo.properties && matchesSelector.call(element, rule.selector)) {
+if (element && rule.propertyInfo.properties && matchesSelector.call(element, rule.transformedSelector || rule.parsedSelector)) {
 self.collectProperties(rule, props);
 addToBitMask(i, o);
 }
@@ -7074,6 +7466,7 @@ Polymer.Base._addFeature({
 _prepStyleProperties: function () {
 this._ownStylePropertyNames = this._styles ? propertyUtils.decorateStyles(this._styles) : [];
 },
+customStyle: {},
 _setupStyleProperties: function () {
 this.customStyle = {};
 },
@@ -7085,8 +7478,18 @@ if (!this._scopeSelector && this._needsStyleProperties()) {
 this._updateStyleProperties();
 }
 },
+_findStyleHost: function () {
+var e = this, root;
+while (root = Polymer.dom(e).getOwnerRoot()) {
+if (Polymer.isInstance(root.host)) {
+return root.host;
+}
+e = root.host;
+}
+return styleDefaults;
+},
 _updateStyleProperties: function () {
-var info, scope = this.domHost || styleDefaults;
+var info, scope = this._findStyleHost();
 if (!scope._styleCache) {
 scope._styleCache = new Polymer.StyleCache();
 }
@@ -7121,7 +7524,7 @@ styleCache.store(this.is, Object.create(info), this._ownStyleProperties, this._s
 }
 },
 _computeStyleProperties: function (scopeProps) {
-var scope = this.domHost || styleDefaults;
+var scope = this._findStyleHost();
 if (!scope._styleProperties) {
 scope._computeStyleProperties();
 }
@@ -7154,7 +7557,7 @@ return style;
 },
 serializeValueToAttribute: function (value, attribute, node) {
 node = node || this;
-if (attribute === 'class') {
+if (attribute === 'class' && !nativeShadow) {
 var host = node === this ? this.domHost || this.dataHost : this;
 if (host) {
 value = host._scopeElementClass(node, value);
@@ -7210,7 +7613,6 @@ Polymer.Base._addFeature({
 _registerFeatures: function () {
 this._prepIs();
 this._prepAttributes();
-this._prepExtends();
 this._prepConstructor();
 this._prepTemplate();
 this._prepStyles();
@@ -7234,9 +7636,9 @@ this._pushHost();
 this._stampTemplate();
 this._popHost();
 this._marshalAnnotationReferences();
-this._marshalHostAttributes();
 this._setupDebouncers();
 this._marshalInstanceEffects();
+this._marshalHostAttributes();
 this._marshalBehaviors();
 this._marshalAttributes();
 this._tryReady();
@@ -7249,12 +7651,14 @@ this._listenListeners(b.listeners);
 var nativeShadow = Polymer.Settings.useNativeShadow;
 var propertyUtils = Polymer.StyleProperties;
 var styleUtil = Polymer.StyleUtil;
+var cssParse = Polymer.CssParse;
 var styleDefaults = Polymer.StyleDefaults;
 var styleTransformer = Polymer.StyleTransformer;
 Polymer({
 is: 'custom-style',
 extends: 'style',
-created: function () {
+properties: { include: String },
+ready: function () {
 this._tryApply();
 },
 attached: function () {
@@ -7266,7 +7670,7 @@ if (this.parentNode && this.parentNode.localName !== 'dom-module') {
 this._appliesToDocument = true;
 var e = this.__appliedElement || this;
 styleDefaults.addStyle(e);
-if (e.textContent) {
+if (e.textContent || this.include) {
 this._apply();
 } else {
 var observer = new MutationObserver(function () {
@@ -7280,31 +7684,29 @@ observer.observe(e, { childList: true });
 },
 _apply: function () {
 var e = this.__appliedElement || this;
+if (this.include) {
+e.textContent += styleUtil.cssFromModules(this.include);
+}
+var rules = styleUtil.rulesForStyle(e);
+styleUtil.forEachStyleRule(rules, function (rule) {
+styleTransformer.documentRule(rule);
+});
 this._computeStyleProperties();
 var props = this._styleProperties;
-var self = this;
-e.textContent = styleUtil.toCssText(styleUtil.rulesForStyle(e), function (rule) {
+e.textContent = styleUtil.toCssText(rules, function (rule) {
 var css = rule.cssText = rule.parsedCssText;
 if (rule.propertyInfo && rule.propertyInfo.cssText) {
-css = css.replace(propertyUtils.rx.VAR_ASSIGN, '');
+css = cssParse.removeCustomPropAssignment(css);
 rule.cssText = propertyUtils.valueForProperties(css, props);
 }
-styleTransformer.documentRule(rule);
 });
 }
 });
 }());
 Polymer.Templatizer = {
 properties: { __hideTemplateChildren__: { observer: '_showHideChildren' } },
-_templatizerStatic: {
-count: 0,
-callbacks: {},
-debouncer: null
-},
 _instanceProps: Polymer.nob,
-created: function () {
-this._templatizerId = this._templatizerStatic.count++;
-},
+_parentPropPrefix: '_parent_',
 templatize: function (template) {
 if (!template._content) {
 template._content = template.content;
@@ -7341,27 +7743,31 @@ _showHideChildrenImpl: function (hide) {
 var c = this._children;
 for (var i = 0; i < c.length; i++) {
 var n = c[i];
-if (n.style) {
-n.style.display = hide ? 'none' : '';
-n.__hideTemplateChildren__ = hide;
+if (Boolean(hide) != Boolean(n.__hideTemplateChildren__)) {
+if (n.nodeType === Node.TEXT_NODE) {
+if (hide) {
+n.__polymerTextContent__ = n.textContent;
+n.textContent = '';
+} else {
+n.textContent = n.__polymerTextContent__;
 }
+} else if (n.style) {
+if (hide) {
+n.__polymerDisplay__ = n.style.display;
+n.style.display = 'none';
+} else {
+n.style.display = n.__polymerDisplay__;
+}
+}
+}
+n.__hideTemplateChildren__ = hide;
 }
 },
 _debounceTemplate: function (fn) {
-this._templatizerStatic.callbacks[this._templatizerId] = fn.bind(this);
-this._templatizerStatic.debouncer = Polymer.Debounce(this._templatizerStatic.debouncer, this._flushTemplates.bind(this, true));
+Polymer.dom.addDebouncer(this.debounce('_debounceTemplate', fn));
 },
 _flushTemplates: function (debouncerExpired) {
-var db = this._templatizerStatic.debouncer;
-while (debouncerExpired || db && db.finish) {
-db.stop();
-var cbs = this._templatizerStatic.callbacks;
-this._templatizerStatic.callbacks = {};
-for (var id in cbs) {
-cbs[id]();
-}
-debouncerExpired = false;
-}
+Polymer.dom.flush();
 },
 _customPrepEffects: function (archetype) {
 var parentProps = archetype._parentProps;
@@ -7401,7 +7807,7 @@ if (template != this) {
 Polymer.Bind.prepareModel(proto);
 }
 for (prop in parentProps) {
-var parentProp = '_parent_' + prop;
+var parentProp = this._parentPropPrefix + prop;
 var effects = [
 {
 kind: 'function',
@@ -7425,8 +7831,9 @@ this._forwardParentProp(prop, value);
 };
 },
 _createHostPropEffector: function (prop) {
+var prefix = this._parentPropPrefix;
 return function (source, value) {
-this.dataHost['_parent_' + prop] = value;
+this.dataHost[prefix + prop] = value;
 };
 },
 _createInstancePropEffector: function (prop) {
@@ -7458,12 +7865,12 @@ var dot = path.indexOf('.');
 var root = dot < 0 ? path : path.slice(0, dot);
 dataHost._forwardInstancePath.call(dataHost, this, path, value);
 if (root in dataHost._parentProps) {
-dataHost.notifyPath('_parent_' + path, value);
+dataHost.notifyPath(dataHost._parentPropPrefix + path, value);
 }
 },
 _pathEffector: function (path, value, fromAbove) {
 if (this._forwardParentPath) {
-if (path.indexOf('_parent_') === 0) {
+if (path.indexOf(this._parentPropPrefix) === 0) {
 this._forwardParentPath(path.substring(8), value);
 }
 }
@@ -7511,7 +7918,7 @@ stamp: function (model) {
 model = model || {};
 if (this._parentProps) {
 for (var prop in this._parentProps) {
-model[prop] = this['_parent_' + prop];
+model[prop] = this[this._parentPropPrefix + prop];
 }
 }
 return new this.ctor(model, this);
@@ -7619,29 +8026,36 @@ items.push(store[key]);
 return items;
 },
 _applySplices: function (splices) {
-var keySplices = [];
-for (var i = 0; i < splices.length; i++) {
-var j, o, key, s = splices[i];
+var keyMap = {}, key, i;
+splices.forEach(function (s) {
+s.addedKeys = [];
+for (i = 0; i < s.removed.length; i++) {
+key = this.getKey(s.removed[i]);
+keyMap[key] = keyMap[key] ? null : -1;
+}
+for (i = 0; i < s.addedCount; i++) {
+var item = this.userArray[s.index + i];
+key = this.getKey(item);
+key = key === undefined ? this.add(item) : key;
+keyMap[key] = keyMap[key] ? null : 1;
+s.addedKeys.push(key);
+}
+}, this);
 var removed = [];
-for (j = 0; j < s.removed.length; j++) {
-o = s.removed[j];
-key = this.remove(o);
+var added = [];
+for (var key in keyMap) {
+if (keyMap[key] < 0) {
+this.removeKey(key);
 removed.push(key);
 }
-var added = [];
-for (j = 0; j < s.addedCount; j++) {
-o = this.userArray[s.index + j];
-key = this.add(o);
+if (keyMap[key] > 0) {
 added.push(key);
 }
-keySplices.push({
-index: s.index,
-removed: removed,
-removedItems: s.removed,
-added: added
-});
 }
-return keySplices;
+return [{
+removed: removed,
+added: added
+}];
 }
 };
 Polymer.Collection.get = function (userArray) {
@@ -7680,19 +8094,18 @@ delay: Number
 },
 behaviors: [Polymer.Templatizer],
 observers: ['_itemsChanged(items.*)'],
+created: function () {
+this._instances = [];
+},
 detached: function () {
-if (this.rows) {
-for (var i = 0; i < this.rows.length; i++) {
+for (var i = 0; i < this._instances.length; i++) {
 this._detachRow(i);
-}
 }
 },
 attached: function () {
-if (this.rows) {
 var parentNode = Polymer.dom(this).parentNode;
-for (var i = 0; i < this.rows.length; i++) {
-Polymer.dom(parentNode).insertBefore(this.rows[i].root, this);
-}
+for (var i = 0; i < this._instances.length; i++) {
+Polymer.dom(parentNode).insertBefore(this._instances[i].root, this);
 }
 },
 ready: function () {
@@ -7709,7 +8122,7 @@ var sort = this.sort;
 this._sortFn = sort && (typeof sort == 'function' ? sort : function () {
 return dataHost[sort].apply(dataHost, arguments);
 });
-this._fullRefresh = true;
+this._needFullRefresh = true;
 if (this.items) {
 this._debounceTemplate(this._render);
 }
@@ -7720,7 +8133,7 @@ var filter = this.filter;
 this._filterFn = filter && (typeof filter == 'function' ? filter : function () {
 return dataHost[filter].apply(dataHost, arguments);
 });
-this._fullRefresh = true;
+this._needFullRefresh = true;
 if (this.items) {
 this._debounceTemplate(this._render);
 }
@@ -7737,11 +8150,13 @@ this.collection = null;
 } else {
 this._error(this._logf('dom-repeat', 'expected array for `items`,' + ' found', this.items));
 }
-this._splices = [];
-this._fullRefresh = true;
+this._keySplices = [];
+this._indexSplices = [];
+this._needFullRefresh = true;
 this._debounceTemplate(this._render);
 } else if (change.path == 'items.splices') {
-this._splices = this._splices.concat(change.value.keySplices);
+this._keySplices = this._keySplices.concat(change.value.keySplices);
+this._indexSplices = this._indexSplices.concat(change.value.indexSplices);
 this._debounceTemplate(this._render);
 } else {
 var subpath = change.path.slice(6);
@@ -7755,7 +8170,7 @@ path = path.substring(path.indexOf('.') + 1);
 var paths = this._observePaths;
 for (var i = 0; i < paths.length; i++) {
 if (path.indexOf(paths[i]) === 0) {
-this._fullRefresh = true;
+this._needFullRefresh = true;
 if (this.delay) {
 this.debounce('render', this._render, this.delay);
 } else {
@@ -7767,102 +8182,115 @@ return;
 }
 },
 render: function () {
-this._fullRefresh = true;
+this._needFullRefresh = true;
 this._debounceTemplate(this._render);
 this._flushTemplates();
 },
 _render: function () {
 var c = this.collection;
-if (!this._fullRefresh) {
+if (this._needFullRefresh) {
+this._applyFullRefresh();
+this._needFullRefresh = false;
+} else {
 if (this._sortFn) {
-this._applySplicesViewSort(this._splices);
+this._applySplicesUserSort(this._keySplices);
 } else {
 if (this._filterFn) {
-this._fullRefresh = true;
+this._applyFullRefresh();
 } else {
-this._applySplicesArraySort(this._splices);
+this._applySplicesArrayOrder(this._indexSplices);
 }
 }
 }
-if (this._fullRefresh) {
-this._sortAndFilter();
-this._fullRefresh = false;
+this._keySplices = [];
+this._indexSplices = [];
+var keyToIdx = this._keyToInstIdx = {};
+for (var i = 0; i < this._instances.length; i++) {
+var inst = this._instances[i];
+keyToIdx[inst.__key__] = i;
+inst.__setProperty(this.indexAs, i, true);
 }
-this._splices = [];
-var rowForKey = this._rowForKey = {};
-var keys = this._orderedKeys;
-this.rows = this.rows || [];
-for (var i = 0; i < keys.length; i++) {
-var key = keys[i];
-var item = c.getItem(key);
-var row = this.rows[i];
-rowForKey[key] = i;
-if (!row) {
-this.rows.push(row = this._insertRow(i, null, item));
-}
-row.__setProperty(this.as, item, true);
-row.__setProperty('__key__', key, true);
-row.__setProperty(this.indexAs, i, true);
-}
-for (; i < this.rows.length; i++) {
-this._detachRow(i);
-}
-this.rows.splice(keys.length, this.rows.length - keys.length);
 this.fire('dom-change');
 },
-_sortAndFilter: function () {
+_applyFullRefresh: function () {
 var c = this.collection;
-if (!this._sortFn) {
-this._orderedKeys = [];
+var keys;
+if (this._sortFn) {
+keys = c ? c.getKeys() : [];
+} else {
+keys = [];
 var items = this.items;
 if (items) {
 for (var i = 0; i < items.length; i++) {
-this._orderedKeys.push(c.getKey(items[i]));
+keys.push(c.getKey(items[i]));
 }
 }
-} else {
-this._orderedKeys = c ? c.getKeys() : [];
 }
 if (this._filterFn) {
-this._orderedKeys = this._orderedKeys.filter(function (a) {
+keys = keys.filter(function (a) {
 return this._filterFn(c.getItem(a));
 }, this);
 }
 if (this._sortFn) {
-this._orderedKeys.sort(function (a, b) {
+keys.sort(function (a, b) {
 return this._sortFn(c.getItem(a), c.getItem(b));
 }.bind(this));
 }
+for (var i = 0; i < keys.length; i++) {
+var key = keys[i];
+var inst = this._instances[i];
+if (inst) {
+inst.__setProperty('__key__', key, true);
+inst.__setProperty(this.as, c.getItem(key), true);
+} else {
+this._instances.push(this._insertRow(i, key));
+}
+}
+for (; i < this._instances.length; i++) {
+this._detachRow(i);
+}
+this._instances.splice(keys.length, this._instances.length - keys.length);
 },
 _keySort: function (a, b) {
 return this.collection.getKey(a) - this.collection.getKey(b);
 },
-_applySplicesViewSort: function (splices) {
+_numericSort: function (a, b) {
+return a - b;
+},
+_applySplicesUserSort: function (splices) {
 var c = this.collection;
-var keys = this._orderedKeys;
-var rows = this.rows;
-var removedRows = [];
-var addedKeys = [];
+var instances = this._instances;
+var keyMap = {};
 var pool = [];
 var sortFn = this._sortFn || this._keySort.bind(this);
 splices.forEach(function (s) {
 for (var i = 0; i < s.removed.length; i++) {
-var idx = this._rowForKey[s.removed[i]];
-if (idx != null) {
-removedRows.push(idx);
-}
+var key = s.removed[i];
+keyMap[key] = keyMap[key] ? null : -1;
 }
 for (var i = 0; i < s.added.length; i++) {
-addedKeys.push(s.added[i]);
+var key = s.added[i];
+keyMap[key] = keyMap[key] ? null : 1;
 }
 }, this);
-if (removedRows.length) {
-removedRows.sort();
-for (var i = removedRows.length - 1; i >= 0; i--) {
-var idx = removedRows[i];
+var removedIdxs = [];
+var addedKeys = [];
+for (var key in keyMap) {
+if (keyMap[key] === -1) {
+removedIdxs.push(this._keyToInstIdx[key]);
+}
+if (keyMap[key] === 1) {
+addedKeys.push(key);
+}
+}
+if (removedIdxs.length) {
+removedIdxs.sort(this._numericSort);
+for (var i = removedIdxs.length - 1; i >= 0; i--) {
+var idx = removedIdxs[i];
+if (idx !== undefined) {
 pool.push(this._detachRow(idx));
-rows.splice(idx, 1);
-keys.splice(idx, 1);
+instances.splice(idx, 1);
+}
 }
 }
 if (addedKeys.length) {
@@ -7876,19 +8304,19 @@ return this._sortFn(c.getItem(a), c.getItem(b));
 }.bind(this));
 var start = 0;
 for (var i = 0; i < addedKeys.length; i++) {
-start = this._insertRowIntoViewSort(start, addedKeys[i], pool);
+start = this._insertRowUserSort(start, addedKeys[i], pool);
 }
 }
 },
-_insertRowIntoViewSort: function (start, key, pool) {
+_insertRowUserSort: function (start, key, pool) {
 var c = this.collection;
 var item = c.getItem(key);
-var end = this.rows.length - 1;
+var end = this._instances.length - 1;
 var idx = -1;
 var sortFn = this._sortFn || this._keySort.bind(this);
 while (start <= end) {
 var mid = start + end >> 1;
-var midKey = this._orderedKeys[mid];
+var midKey = this._instances[mid].__key__;
 var cmp = sortFn(c.getItem(midKey), item);
 if (cmp < 0) {
 start = mid + 1;
@@ -7902,106 +8330,110 @@ break;
 if (idx < 0) {
 idx = end + 1;
 }
-this._orderedKeys.splice(idx, 0, key);
-this.rows.splice(idx, 0, this._insertRow(idx, pool, c.getItem(key)));
+this._instances.splice(idx, 0, this._insertRow(idx, key, pool));
 return idx;
 },
-_applySplicesArraySort: function (splices) {
-var keys = this._orderedKeys;
+_applySplicesArrayOrder: function (splices) {
 var pool = [];
-splices.forEach(function (s) {
-for (var i = 0; i < s.removed.length; i++) {
-pool.push(this._detachRow(s.index + i));
-}
-this.rows.splice(s.index, s.removed.length);
-}, this);
 var c = this.collection;
 splices.forEach(function (s) {
-var args = [
-s.index,
-s.removed.length
-].concat(s.added);
-keys.splice.apply(keys, args);
-for (var i = 0; i < s.added.length; i++) {
-var item = c.getItem(s.added[i]);
-var row = this._insertRow(s.index + i, pool, item);
-this.rows.splice(s.index + i, 0, row);
+for (var i = 0; i < s.removed.length; i++) {
+var inst = this._detachRow(s.index + i);
+if (!inst.isPlaceholder) {
+pool.push(inst);
+}
+}
+this._instances.splice(s.index, s.removed.length);
+for (var i = 0; i < s.addedKeys.length; i++) {
+var inst = {
+isPlaceholder: true,
+key: s.addedKeys[i]
+};
+this._instances.splice(s.index + i, 0, inst);
 }
 }, this);
+for (var i = this._instances.length - 1; i >= 0; i--) {
+var inst = this._instances[i];
+if (inst.isPlaceholder) {
+this._instances[i] = this._insertRow(i, inst.key, pool, true);
+}
+}
 },
 _detachRow: function (idx) {
-var row = this.rows[idx];
+var inst = this._instances[idx];
+if (!inst.isPlaceholder) {
 var parentNode = Polymer.dom(this).parentNode;
-for (var i = 0; i < row._children.length; i++) {
-var el = row._children[i];
-Polymer.dom(row.root).appendChild(el);
+for (var i = 0; i < inst._children.length; i++) {
+var el = inst._children[i];
+Polymer.dom(inst.root).appendChild(el);
 }
-return row;
+}
+return inst;
 },
-_insertRow: function (idx, pool, item) {
-var row = pool && pool.pop() || this._generateRow(idx, item);
-var beforeRow = this.rows[idx];
+_insertRow: function (idx, key, pool, replace) {
+var inst;
+if (inst = pool && pool.pop()) {
+inst.__setProperty(this.as, this.collection.getItem(key), true);
+inst.__setProperty('__key__', key, true);
+} else {
+inst = this._generateRow(idx, key);
+}
+var beforeRow = this._instances[replace ? idx + 1 : idx];
 var beforeNode = beforeRow ? beforeRow._children[0] : this;
 var parentNode = Polymer.dom(this).parentNode;
-Polymer.dom(parentNode).insertBefore(row.root, beforeNode);
-return row;
+Polymer.dom(parentNode).insertBefore(inst.root, beforeNode);
+return inst;
 },
-_generateRow: function (idx, item) {
-var model = { __key__: this.collection.getKey(item) };
-model[this.as] = item;
+_generateRow: function (idx, key) {
+var model = { __key__: key };
+model[this.as] = this.collection.getItem(key);
 model[this.indexAs] = idx;
-var row = this.stamp(model);
-return row;
+var inst = this.stamp(model);
+return inst;
 },
 _showHideChildren: function (hidden) {
-if (this.rows) {
-for (var i = 0; i < this.rows.length; i++) {
-this.rows[i]._showHideChildren(hidden);
-}
+for (var i = 0; i < this._instances.length; i++) {
+this._instances[i]._showHideChildren(hidden);
 }
 },
-_forwardInstanceProp: function (row, prop, value) {
+_forwardInstanceProp: function (inst, prop, value) {
 if (prop == this.as) {
 var idx;
 if (this._sortFn || this._filterFn) {
-idx = this.items.indexOf(this.collection.getItem(row.__key__));
+idx = this.items.indexOf(this.collection.getItem(inst.__key__));
 } else {
-idx = row[this.indexAs];
+idx = inst[this.indexAs];
 }
 this.set('items.' + idx, value);
 }
 },
-_forwardInstancePath: function (row, path, value) {
+_forwardInstancePath: function (inst, path, value) {
 if (path.indexOf(this.as + '.') === 0) {
-this.notifyPath('items.' + row.__key__ + '.' + path.slice(this.as.length + 1), value);
+this.notifyPath('items.' + inst.__key__ + '.' + path.slice(this.as.length + 1), value);
 }
 },
 _forwardParentProp: function (prop, value) {
-if (this.rows) {
-this.rows.forEach(function (row) {
-row.__setProperty(prop, value, true);
+this._instances.forEach(function (inst) {
+inst.__setProperty(prop, value, true);
 }, this);
-}
 },
 _forwardParentPath: function (path, value) {
-if (this.rows) {
-this.rows.forEach(function (row) {
-row.notifyPath(path, value, true);
+this._instances.forEach(function (inst) {
+inst.notifyPath(path, value, true);
 }, this);
-}
 },
 _forwardItemPath: function (path, value) {
-if (this._rowForKey) {
+if (this._keyToInstIdx) {
 var dot = path.indexOf('.');
 var key = path.substring(0, dot < 0 ? path.length : dot);
-var idx = this._rowForKey[key];
-var row = this.rows[idx];
-if (row) {
+var idx = this._keyToInstIdx[key];
+var inst = this._instances[idx];
+if (inst) {
 if (dot >= 0) {
 path = this.as + '.' + path.substring(dot + 1);
-row.notifyPath(path, value, true);
+inst.notifyPath(path, value, true);
 } else {
-row.__setProperty(this.as, value, true);
+inst.__setProperty(this.as, value, true);
 }
 }
 }
@@ -8024,16 +8456,27 @@ is: 'array-selector',
 properties: {
 items: {
 type: Array,
-observer: '_itemsChanged'
+observer: 'clearSelection'
+},
+multi: {
+type: Boolean,
+value: false,
+observer: 'clearSelection'
 },
 selected: {
 type: Object,
 notify: true
 },
-toggle: Boolean,
-multi: Boolean
+selectedItem: {
+type: Object,
+notify: true
 },
-_itemsChanged: function () {
+toggle: {
+type: Boolean,
+value: false
+}
+},
+clearSelection: function () {
 if (Array.isArray(this.selected)) {
 for (var i = 0; i < this.selected.length; i++) {
 this.unlinkPaths('selected.' + i);
@@ -8042,49 +8485,58 @@ this.unlinkPaths('selected.' + i);
 this.unlinkPaths('selected');
 }
 if (this.multi) {
+if (!this.selected || this.selected.length) {
 this.selected = [];
+this._selectedColl = Polymer.Collection.get(this.selected);
+}
 } else {
 this.selected = null;
+this._selectedColl = null;
+}
+this.selectedItem = null;
+},
+isSelected: function (item) {
+if (this.multi) {
+return this._selectedColl.getKey(item) !== undefined;
+} else {
+return this.selected == item;
 }
 },
 deselect: function (item) {
 if (this.multi) {
-var scol = Polymer.Collection.get(this.selected);
-var sidx = this.selected.indexOf(item);
-if (sidx >= 0) {
-var skey = scol.getKey(item);
-this.splice('selected', sidx, 1);
+if (this.isSelected(item)) {
+var skey = this._selectedColl.getKey(item);
+this.arrayDelete('selected', item);
 this.unlinkPaths('selected.' + skey);
-return true;
 }
 } else {
 this.selected = null;
+this.selectedItem = null;
 this.unlinkPaths('selected');
+this.unlinkPaths('selectedItem');
 }
 },
 select: function (item) {
 var icol = Polymer.Collection.get(this.items);
 var key = icol.getKey(item);
 if (this.multi) {
-var scol = Polymer.Collection.get(this.selected);
-var skey = scol.getKey(item);
-if (skey >= 0) {
+if (this.isSelected(item)) {
 if (this.toggle) {
 this.deselect(item);
 }
 } else {
 this.push('selected', item);
-this.async(function () {
-skey = scol.getKey(item);
+skey = this._selectedColl.getKey(item);
 this.linkPaths('selected.' + skey, 'items.' + key);
-});
 }
 } else {
 if (this.toggle && item == this.selected) {
 this.deselect();
 } else {
-this.linkPaths('selected', 'items.' + key);
 this.selected = item;
+this.selectedItem = item;
+this.linkPaths('selected', 'items.' + key);
+this.linkPaths('selectedItem', 'items.' + key);
 }
 }
 }
@@ -8122,7 +8574,6 @@ this._flushTemplates();
 _render: function () {
 if (this.if) {
 if (!this.ctor) {
-this._wrapTextNodes(this._content || this.content);
 this.templatize(this);
 }
 this._ensureInstance();
@@ -8158,16 +8609,6 @@ parent.removeChild(n);
 this._instance = null;
 }
 },
-_wrapTextNodes: function (root) {
-for (var n = root.firstChild; n; n = n.nextSibling) {
-if (n.nodeType === Node.TEXT_NODE && n.textContent.trim()) {
-var s = document.createElement('span');
-root.insertBefore(s, n);
-s.appendChild(n);
-n = s;
-}
-}
-},
 _showHideChildren: function () {
 var hidden = this.__hideTemplateChildren__ || !this.if;
 if (this._instance) {
@@ -8185,40 +8626,22 @@ this._instance.notifyPath(path, value, true);
 }
 }
 });
-Polymer.ImportStatus = {
-_ready: false,
-_callbacks: [],
-whenLoaded: function (cb) {
-if (this._ready) {
-cb();
-} else {
-this._callbacks.push(cb);
-}
-},
-_importsLoaded: function () {
-this._ready = true;
-this._callbacks.forEach(function (cb) {
-cb();
-});
-this._callbacks = [];
-}
-};
-window.addEventListener('load', function () {
-Polymer.ImportStatus._importsLoaded();
-});
-if (window.HTMLImports) {
-HTMLImports.whenReady(function () {
-Polymer.ImportStatus._importsLoaded();
-});
-}
 Polymer({
 is: 'dom-bind',
 extends: 'template',
 created: function () {
-Polymer.ImportStatus.whenLoaded(this._readySelf.bind(this));
+Polymer.RenderStatus.whenReady(this._markImportsReady.bind(this));
+},
+_ensureReady: function () {
+if (!this._readied) {
+this._readySelf();
+}
+},
+_markImportsReady: function () {
+this._importsReady = true;
+this._ensureReady();
 },
 _registerFeatures: function () {
-this._prepExtends();
 this._prepConstructor();
 },
 _insertChildren: function () {
@@ -8249,6 +8672,15 @@ config[prop] = this[prop];
 this._setupConfigure = this._setupConfigure.bind(this, config);
 },
 attached: function () {
+if (this._importsReady) {
+this.render();
+}
+},
+detached: function () {
+this._removeChildren();
+},
+render: function () {
+this._ensureReady();
 if (!this._children) {
 this._template = this;
 this._prepAnnotations();
@@ -8261,9 +8693,6 @@ this._children = Array.prototype.slice.call(this.root.childNodes);
 }
 this._insertChildren();
 this.fire('dom-change');
-},
-detached: function () {
-this._removeChildren();
 }
 });</script>
 
@@ -8532,8 +8961,14 @@ this._removeChildren();
 
   })();
 </script>
-<style is="custom-style">
+<style>
+  /* IE 10 support for HTML5 hidden attr */
+  [hidden] {
+    display: none !important;
+  }
+</style>
 
+<style is="custom-style">
   :root {
 
     --layout: {
@@ -8799,32 +9234,29 @@ this._removeChildren();
 
     /* fixed position */
 
-    --layout-fixed-bottom:,
-    --layout-fixed-left:,
-    --layout-fixed-right:,
     --layout-fixed-top: {
       position: fixed;
-    };
-
-    --layout-fixed-top: {
       top: 0;
       left: 0;
       right: 0;
     };
 
     --layout-fixed-right: {
+      position: fixed;
       top: 0;
       right: 0;
       bottom: 0;
     };
 
     --layout-fixed-bottom: {
+      position: fixed;
       right: 0;
       bottom: 0;
       left: 0;
     };
 
     --layout-fixed-left: {
+      position: fixed;
       top: 0;
       bottom: 0;
       left: 0;
@@ -10120,22 +10552,21 @@ this._removeChildren();
     ],
 
     ready: function() {
-      // TODO(sjmiles): ensure read-only property is valued so the compound
-      // observer will fire
-      if (this.focused === undefined) {
-        this._setFocused(false);
-      }
       this.addEventListener('focus', this._boundFocusBlurHandler, true);
       this.addEventListener('blur', this._boundFocusBlurHandler, true);
     },
 
     _focusBlurHandler: function(event) {
-      var target = event.path ? event.path[0] : event.target;
-      if (target === this) {
+      // NOTE(cdata):  if we are in ShadowDOM land, `event.target` will
+      // eventually become `this` due to retargeting; if we are not in
+      // ShadowDOM land, `event.target` will eventually become `this` due
+      // to the second conditional which fires a synthetic event (that is also
+      // handled). In either case, we can disregard `event.path`.
+
+      if (event.target === this) {
         var focused = event.type === 'focus';
         this._setFocused(focused);
       } else if (!this.shadowRoot) {
-        event.stopPropagation();
         this.fire(event.type, {sourceEvent: event}, {
           node: this,
           bubbles: event.bubbles,
@@ -10204,8 +10635,7 @@ this._removeChildren();
         type: Boolean,
         value: false,
         notify: true,
-        reflectToAttribute: true,
-        observer: '_activeChanged'
+        reflectToAttribute: true
       },
 
       /**
@@ -10226,6 +10656,16 @@ this._removeChildren();
       receivedFocusFromKeyboard: {
         type: Boolean,
         readOnly: true
+      },
+
+      /**
+       * The aria attribute to be set if the button is a toggle and in the
+       * active state.
+       */
+      ariaActiveAttribute: {
+        type: String,
+        value: 'aria-pressed',
+        observer: '_ariaActiveAttributeChanged'
       }
     },
 
@@ -10236,7 +10676,8 @@ this._removeChildren();
     },
 
     observers: [
-      '_detectKeyboardFocus(focused)'
+      '_detectKeyboardFocus(focused)',
+      '_activeChanged(active, ariaActiveAttribute)'
     ],
 
     keyBindings: {
@@ -10244,6 +10685,8 @@ this._removeChildren();
       'space:keydown': '_spaceKeyDownHandler',
       'space:keyup': '_spaceKeyUpHandler',
     },
+
+    _mouseEventRe: /^mouse/,
 
     _tapHandler: function() {
       if (this.toggles) {
@@ -10261,11 +10704,39 @@ this._removeChildren();
     // to emulate native checkbox, (de-)activations from a user interaction fire
     // 'change' events
     _userActivate: function(active) {
-      this.active = active;
-      this.fire('change');
+      if (this.active !== active) {
+        this.active = active;
+        this.fire('change');
+      }
     },
 
-    _downHandler: function() {
+    _eventSourceIsPrimaryInput: function(event) {
+      event = event.detail.sourceEvent || event;
+
+      // Always true for non-mouse events....
+      if (!this._mouseEventRe.test(event.type)) {
+        return true;
+      }
+
+      // http://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons
+      if ('buttons' in event) {
+        return event.buttons === 1;
+      }
+
+      // http://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/which
+      if (typeof event.which === 'number') {
+        return event.which < 2;
+      }
+
+      // http://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
+      return event.button < 1;
+    },
+
+    _downHandler: function(event) {
+      if (!this._eventSourceIsPrimaryInput(event)) {
+        return;
+      }
+
       this._setPointerDown(true);
       this._setPressed(true);
       this._setReceivedFocusFromKeyboard(false);
@@ -10304,11 +10775,18 @@ this._removeChildren();
       this._changedButtonState();
     },
 
-    _activeChanged: function(active) {
+    _ariaActiveAttributeChanged: function(value, oldValue) {
+      if (oldValue && oldValue != value && this.hasAttribute(oldValue)) {
+        this.removeAttribute(oldValue);
+      }
+    },
+
+    _activeChanged: function(active, ariaActiveAttribute) {
       if (this.toggles) {
-        this.setAttribute('aria-pressed', active ? 'true' : 'false');
+        this.setAttribute(this.ariaActiveAttribute,
+                          active ? 'true' : 'false');
       } else {
-        this.removeAttribute('aria-pressed');
+        this.removeAttribute(this.ariaActiveAttribute);
       }
       this._changedButtonState();
     },
@@ -11262,9 +11740,9 @@ this._removeChildren();
     --paper-orange-a400: #ff9100;
     --paper-orange-a700: #ff6500;
  
-    --paper-deep-orange-50: #ff5722;
-    --paper-deep-orange-100: #fbe9e7;
-    --paper-deep-orange-200: #ffccbc;
+    --paper-deep-orange-50: #fbe9e7;
+    --paper-deep-orange-100: #ffccbc;
+    --paper-deep-orange-200: #ffab91;
     --paper-deep-orange-300: #ff8a65;
     --paper-deep-orange-400: #ff7043;
     --paper-deep-orange-500: #ff5722;
@@ -11623,9 +12101,6 @@ this._removeChildren();
 
       /**
        * Returns the currently focused item.
-       *
-       * @attribute focusedItem
-       * @type Object
        */
       focusedItem: {
         observer: '_focusedItemChanged',
@@ -11637,9 +12112,6 @@ this._removeChildren();
        * The attribute to use on menu items to look up the item title. Typing the first
        * letter of an item when the menu is open focuses that item. If unset, `textContent`
        * will be used.
-       *
-       * @attribute attrForItemTitle
-       * @type String
        */
       attrForItemTitle: {
         type: String
@@ -11716,6 +12188,7 @@ this._removeChildren();
         this._defaultFocusAsync = null;
       }
       var item = this._valueToItem(value);
+      if (item && item.hasAttribute('disabled')) return;
       this._setFocusedItem(item);
       Polymer.IronMultiSelectableBehaviorImpl.select.apply(this, arguments);
     },
@@ -11816,7 +12289,7 @@ this._removeChildren();
      Begin prism-core.js
 ********************************************** */
 
-self = (typeof window !== 'undefined')
+var _self = (typeof window !== 'undefined')
 	? window   // if in browser
 	: (
 		(typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope)
@@ -11835,7 +12308,7 @@ var Prism = (function(){
 // Private helper vars
 var lang = /\blang(?:uage)?-(?!\*)(\w+)\b/i;
 
-var _ = self.Prism = {
+var _ = _self.Prism = {
 	util: {
 		encode: function (tokens) {
 			if (tokens instanceof Token) {
@@ -11868,7 +12341,8 @@ var _ = self.Prism = {
 					return clone;
 
 				case 'Array':
-					return o.map(function(v) { return _.util.clone(v); });
+					// Check for existence for IE8
+					return o.map && o.map(function(v) { return _.util.clone(v); });
 			}
 
 			return o;
@@ -11979,10 +12453,6 @@ var _ = self.Prism = {
 			grammar = _.languages[language];
 		}
 
-		if (!grammar) {
-			return;
-		}
-
 		// Set language on the element, if not present
 		element.className = element.className.replace(lang, '').replace(/\s+/g, ' ') + ' language-' + language;
 
@@ -11991,6 +12461,10 @@ var _ = self.Prism = {
 
 		if (/pre/i.test(parent.nodeName)) {
 			parent.className = parent.className.replace(lang, '').replace(/\s+/g, ' ') + ' language-' + language;
+		}
+
+		if (!grammar) {
+			return;
 		}
 
 		var code = element.textContent;
@@ -12010,7 +12484,7 @@ var _ = self.Prism = {
 
 		_.hooks.run('before-highlight', env);
 
-		if (async && self.Worker) {
+		if (async && _self.Worker) {
 			var worker = new Worker(_.filename);
 
 			worker.onmessage = function(evt) {
@@ -12204,22 +12678,22 @@ Token.stringify = function(o, language, parent) {
 
 };
 
-if (!self.document) {
-	if (!self.addEventListener) {
+if (!_self.document) {
+	if (!_self.addEventListener) {
 		// in Node.js
-		return self.Prism;
+		return _self.Prism;
 	}
  	// In worker
-	self.addEventListener('message', function(evt) {
+	_self.addEventListener('message', function(evt) {
 		var message = JSON.parse(evt.data),
 		    lang = message.language,
 		    code = message.code;
 
-		self.postMessage(JSON.stringify(_.util.encode(_.tokenize(code, _.languages[lang]))));
-		self.close();
+		_self.postMessage(JSON.stringify(_.util.encode(_.tokenize(code, _.languages[lang]))));
+		_self.close();
 	}, false);
 
-	return self.Prism;
+	return _self.Prism;
 }
 
 // Get current script and highlight
@@ -12235,7 +12709,7 @@ if (script) {
 	}
 }
 
-return self.Prism;
+return _self.Prism;
 
 })();
 
@@ -12250,30 +12724,30 @@ if (typeof module !== 'undefined' && module.exports) {
 
 Prism.languages.markup = {
 	'comment': /<!--[\w\W]*?-->/,
-	'prolog': /<\?.+?\?>/,
-	'doctype': /<!DOCTYPE.+?>/,
+	'prolog': /<\?[\w\W]+?\?>/,
+	'doctype': /<!DOCTYPE[\w\W]+?>/,
 	'cdata': /<!\[CDATA\[[\w\W]*?]]>/i,
 	'tag': {
-		pattern: /<\/?[\w:-]+\s*(?:\s+[\w:-]+(?:=(?:("|')(\\?[\w\W])*?\1|[^\s'">=]+))?\s*)*\/?>/i,
+		pattern: /<\/?[^\s>\/]+(?:\s+[^\s>\/=]+(?:=(?:("|')(?:\\\1|\\?(?!\1)[\w\W])*\1|[^\s'">=]+))?)*\s*\/?>/i,
 		inside: {
 			'tag': {
-				pattern: /^<\/?[\w:-]+/i,
+				pattern: /^<\/?[^\s>\/]+/i,
 				inside: {
 					'punctuation': /^<\/?/,
-					'namespace': /^[\w-]+?:/
+					'namespace': /^[^\s>\/:]+:/
 				}
 			},
 			'attr-value': {
 				pattern: /=(?:('|")[\w\W]*?(\1)|[^\s>]+)/i,
 				inside: {
-					'punctuation': /=|>|"/
+					'punctuation': /[=>"']/
 				}
 			},
 			'punctuation': /\/?>/,
 			'attr-name': {
-				pattern: /[\w:-]+/,
+				pattern: /[^\s>\/]+/,
 				inside: {
-					'namespace': /^[\w-]+?:/
+					'namespace': /^[^\s>\/:]+:/
 				}
 			}
 
@@ -12300,17 +12774,20 @@ Prism.languages.css = {
 	'atrule': {
 		pattern: /@[\w-]+?.*?(;|(?=\s*\{))/i,
 		inside: {
-			'punctuation': /[;:]/
+			'rule': /@[\w-]+/
+			// See rest below
 		}
 	},
-	'url': /url\((?:(["'])(\\\n|\\?.)*?\1|.*?)\)/i,
-	'selector': /[^\{\}\s][^\{\};]*(?=\s*\{)/,
-	'string': /("|')(\\\n|\\?.)*?\1/,
+	'url': /url\((?:(["'])(\\(?:\r\n|[\w\W])|(?!\1)[^\\\r\n])*\1|.*?)\)/i,
+	'selector': /[^\{\}\s][^\{\};]*?(?=\s*\{)/,
+	'string': /("|')(\\(?:\r\n|[\w\W])|(?!\1)[^\\\r\n])*\1/,
 	'property': /(\b|\B)[\w-]+(?=\s*:)/i,
 	'important': /\B!important\b/i,
-	'punctuation': /[\{\};:]/,
-	'function': /[-a-z0-9]+(?=\()/i
+	'function': /[-a-z0-9]+(?=\()/i,
+	'punctuation': /[(){};:]/
 };
+
+Prism.languages.css['atrule'].inside.rest = Prism.util.clone(Prism.languages.css);
 
 if (Prism.languages.markup) {
 	Prism.languages.insertBefore('markup', 'tag', {
@@ -12361,7 +12838,7 @@ Prism.languages.clike = {
 			lookbehind: true
 		}
 	],
-	'string': /("|')(\\\n|\\?.)*?\1/,
+	'string': /("|')(\\(?:\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1/,
 	'class-name': {
 		pattern: /((?:(?:class|interface|extends|implements|trait|instanceof|new)\s+)|(?:catch\s+\())[a-z0-9_\.\\]+/i,
 		lookbehind: true,
@@ -12371,15 +12848,9 @@ Prism.languages.clike = {
 	},
 	'keyword': /\b(if|else|while|do|for|return|in|instanceof|function|new|try|throw|catch|finally|null|break|continue)\b/,
 	'boolean': /\b(true|false)\b/,
-	'function': {
-		pattern: /[a-z0-9_]+\(/i,
-		inside: {
-			punctuation: /\(/
-		}
-	},
+	'function': /[a-z0-9_]+(?=\()/i,
 	'number': /\b-?(0x[\dA-Fa-f]+|\d*\.?\d+([Ee]-?\d+)?)\b/,
 	'operator': /[-+]{1,2}|!|<=?|>=?|={1,3}|&{1,2}|\|?\||\?|\*|\/|~|\^|%/,
-	'ignore': /&(lt|gt|amp);/i,
 	'punctuation': /[{}[\];(),.:]/
 };
 
@@ -12389,15 +12860,34 @@ Prism.languages.clike = {
 ********************************************** */
 
 Prism.languages.javascript = Prism.languages.extend('clike', {
-	'keyword': /\b(break|case|catch|class|const|continue|debugger|default|delete|do|else|enum|export|extends|false|finally|for|function|get|if|implements|import|in|instanceof|interface|let|new|null|package|private|protected|public|return|set|static|super|switch|this|throw|true|try|typeof|var|void|while|with|yield)\b/,
-	'number': /\b-?(0x[\dA-Fa-f]+|\d*\.?\d+([Ee][+-]?\d+)?|NaN|-?Infinity)\b/,
+	'keyword': /\b(as|async|await|break|case|catch|class|const|continue|debugger|default|delete|do|else|enum|export|extends|false|finally|for|from|function|get|if|implements|import|in|instanceof|interface|let|new|null|of|package|private|protected|public|return|set|static|super|switch|this|throw|true|try|typeof|var|void|while|with|yield)\b/,
+	'number': /\b-?(0x[\dA-Fa-f]+|0b[01]+|0o[0-7]+|\d*\.?\d+([Ee][+-]?\d+)?|NaN|Infinity)\b/,
 	'function': /(?!\d)[a-z0-9_$]+(?=\()/i
 });
 
 Prism.languages.insertBefore('javascript', 'keyword', {
 	'regex': {
-		pattern: /(^|[^/])\/(?!\/)(\[.+?]|\\.|[^/\r\n])+\/[gim]{0,3}(?=\s*($|[\r\n,.;})]))/,
+		pattern: /(^|[^/])\/(?!\/)(\[.+?]|\\.|[^/\\\r\n])+\/[gimyu]{0,5}(?=\s*($|[\r\n,.;})]))/,
 		lookbehind: true
+	}
+});
+
+Prism.languages.insertBefore('javascript', 'class-name', {
+	'template-string': {
+		pattern: /`(?:\\`|\\?[^`])*`/,
+		inside: {
+			'interpolation': {
+				pattern: /\$\{[^}]+\}/,
+				inside: {
+					'interpolation-punctuation': {
+						pattern: /^\$\{|\}$/,
+						alias: 'punctuation'
+					},
+					rest: Prism.languages.javascript
+				}
+			},
+			'string': /[\s\S]+/
+		}
 	}
 });
 
@@ -12440,43 +12930,58 @@ if (Prism.languages.markup) {
 			'psm1': 'powershell'
 		};
 
-		Array.prototype.slice.call(document.querySelectorAll('pre[data-src]')).forEach(function(pre) {
-			var src = pre.getAttribute('data-src');
-			var extension = (src.match(/\.(\w+)$/) || [,''])[1];
-			var language = Extensions[extension] || extension;
+		if(Array.prototype.forEach) { // Check to prevent error in IE8
+			Array.prototype.slice.call(document.querySelectorAll('pre[data-src]')).forEach(function (pre) {
+				var src = pre.getAttribute('data-src');
 
-			var code = document.createElement('code');
-			code.className = 'language-' + language;
-
-			pre.textContent = '';
-
-			code.textContent = 'Loading…';
-
-			pre.appendChild(code);
-
-			var xhr = new XMLHttpRequest();
-
-			xhr.open('GET', src, true);
-
-			xhr.onreadystatechange = function() {
-				if (xhr.readyState == 4) {
-
-					if (xhr.status < 400 && xhr.responseText) {
-						code.textContent = xhr.responseText;
-
-						Prism.highlightElement(code);
-					}
-					else if (xhr.status >= 400) {
-						code.textContent = '✖ Error ' + xhr.status + ' while fetching file: ' + xhr.statusText;
-					}
-					else {
-						code.textContent = '✖ Error: File does not exist or is empty';
-					}
+				var language, parent = pre;
+				var lang = /\blang(?:uage)?-(?!\*)(\w+)\b/i;
+				while (parent && !lang.test(parent.className)) {
+					parent = parent.parentNode;
 				}
-			};
 
-			xhr.send(null);
-		});
+				if (parent) {
+					language = (pre.className.match(lang) || [, ''])[1];
+				}
+
+				if (!language) {
+					var extension = (src.match(/\.(\w+)$/) || [, ''])[1];
+					language = Extensions[extension] || extension;
+				}
+
+				var code = document.createElement('code');
+				code.className = 'language-' + language;
+
+				pre.textContent = '';
+
+				code.textContent = 'Loading…';
+
+				pre.appendChild(code);
+
+				var xhr = new XMLHttpRequest();
+
+				xhr.open('GET', src, true);
+
+				xhr.onreadystatechange = function () {
+					if (xhr.readyState == 4) {
+
+						if (xhr.status < 400 && xhr.responseText) {
+							code.textContent = xhr.responseText;
+
+							Prism.highlightElement(code);
+						}
+						else if (xhr.status >= 400) {
+							code.textContent = '✖ Error ' + xhr.status + ' while fetching file: ' + xhr.statusText;
+						}
+						else {
+							code.textContent = '✖ Error: File does not exist or is empty';
+						}
+					}
+				};
+
+				xhr.send(null);
+			});
+		}
 
 	};
 
@@ -12495,7 +13000,7 @@ code[class*="language-"],
 pre[class*="language-"] {
 	color: black;
 	text-shadow: 0 1px white;
-	font-family: Consolas, Monaco, 'Andale Mono', monospace;
+	font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 	direction: ltr;
 	text-align: left;
 	white-space: pre;
@@ -12732,6 +13237,7 @@ pre[class*="language-"] {
         return this.icon || !this.src;
       },
 
+      /** @suppress {visibility} */
       _updateIcon: function() {
         if (this._usesIconset()) {
           if (this._iconsetName) {
@@ -12748,6 +13254,7 @@ pre[class*="language-"] {
             this._img = document.createElement('img');
             this._img.style.width = '100%';
             this._img.style.height = '100%';
+            this._img.draggable = false;
           }
           this._img.src = this.src;
           Polymer.dom(this.root).appendChild(this._img);
@@ -13663,127 +14170,136 @@ iron-selector:not(.narrow-layout) #main ::content [paper-drawer-toggle] {
 <dom-module id="paper-header-panel" assetpath="bower_components/paper-header-panel/">
 
   <style>
-    :host {
-      @apply(--layout);
-      @apply(--layout-vertical);
+/**
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE
+The complete set of authors may be found at http://polymer.github.io/AUTHORS
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS
+*/
 
-      display: block;
-      position: relative;
-      height: 100%;
+:host {
+  --paper-header-panel-shadow: {
+    height: 6px;
+    bottom: -6px;
+    box-shadow: inset 0px 5px 6px -3px rgba(0, 0, 0, 0.4);
+  };
 
-      /* Create a stack context, we will need it for the shadow*/
-      z-index: 0;
-    }
+  @apply(--layout-vertical);
 
-    :root {
-      /**
-       * Default paper header panel shadow
-       */
-      --paper-header-panel-shadow: {
-        height: 6px;
-        bottom: -6px;
-        box-shadow: inset 0px 5px 6px -3px rgba(0, 0, 0, 0.4);
-      };
-    }
+  position: relative;
+  height: 100%;
+}
 
-    #mainContainer {
-      @apply(--layout-flex);
+#mainContainer {
+  @apply(--layout-flex);
 
-      position: relative;
-      overflow-y: auto;
-      overflow-x: hidden;
-      -webkit-overflow-scrolling: touch;
-      flex-basis: 0.0001px;
-    }
+  position: relative;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
 
-    /*
-     * mode: scroll
-     */
-    :host([mode=scroll]) #mainContainer {
-      @apply(--paper-header-panel-scroll-container);
-      overflow: visible;
-    }
+#mainPanel {
+  @apply(--layout-vertical);
+  @apply(--layout-flex);
 
-    :host([mode=scroll]) {
-      overflow-y: auto;
-      overflow-x: hidden;
-      -webkit-overflow-scrolling: touch;
-    }
+  position: relative;
+}
 
-    /*
-     * mode: cover
-     */
-    :host([mode=cover]) #mainContainer {
-      @apply(--paper-header-panel-cover-container);
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
-    }
+/*
+ * mode: scroll
+ */
+:host([mode=scroll]) #mainContainer {
+  @apply(--paper-header-panel-scroll-container);
 
-    /*
-     * mode: standard
-     */
-    :host([mode=standard]) #mainContainer {
-      @apply(--paper-header-panel-standard-container);
-    }
+  overflow: visible;
+}
 
-    /*
-     * mode: waterfall
-     */
-    :host([mode=waterfall]) #mainContainer {
-      @apply(--paper-header-panel-waterfall-container);
-    }
+:host([mode=scroll]) {
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
 
-    /*
-     * mode: waterfall-tall
-     */
-    :host([mode=waterfall-tall]) #mainContainer {
-      @apply(--paper-header-panel-waterfall-tall-container);
-    }
+/*
+ * mode: cover
+ */
+:host([mode=cover]) #mainContainer {
+  @apply(--paper-header-panel-cover-container);
 
-    :host ::content paper-toolbar,
-    :host ::content .paper-header {
-      position: relative;
-      overflow: visible !important;
-    }
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
 
-    :host ::content paper-toolbar:after,
-    :host ::content .paper-header:after {
-      @apply(--paper-header-panel-shadow);
+:host([mode=cover]) #mainPanel {
+  position: static;
+}
 
-      -webkit-transition: opacity 0.5s, -webkit-transform 0.5s;
-      transition: opacity 0.5s, transform 0.5s;
+/*
+ * mode: standard
+ */
+:host([mode=standard]) #mainContainer {
+  @apply(--paper-header-panel-standard-container);
+}
 
-      opacity: 0;
-      content: "";
+/*
+ * mode: seamed
+ */
+:host([mode=seamed]) #mainContainer {
+  @apply(--paper-header-panel-seamed-container);
+}
 
-      width: 100%;
-      position: absolute;
-      left: 0px;
-      right: 0px;
-      z-index: 1;
 
-      -webkit-transform: scale3d(1, 0, 1);
-      -webkit-transform-origin: 0% 0%;
+/*
+ * mode: waterfall
+ */
+:host([mode=waterfall]) #mainContainer {
+  @apply(--paper-header-panel-waterfall-container);
+}
 
-      transform: scale3d(1, 0, 1);
-      transform-origin: 0% 0%;
-    }
+/*
+ * mode: waterfall-tall
+ */
+:host([mode=waterfall-tall]) #mainContainer {
+  @apply(--paper-header-panel-waterfall-tall-container);
+}
 
-    :host ::content paper-toolbar.has-shadow:after,
-    :host ::content .paper-header.has-shadow:after {
-      opacity: 1;
-      -webkit-transform: scale3d(1, 1, 1);
-      transform: scale3d(1, 1, 1);
-    }
-  </style>
+#dropShadow {
+  @apply(--paper-header-panel-shadow);
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  pointer-events: none;
+
+  -webkit-transition: opacity 0.5s;
+  transition: opacity 0.5s;
+
+  opacity: 0;
+}
+
+#dropShadow.has-shadow {
+  opacity: 1;
+}
+
+</style>
 
   <template>
     <content id="headerContent" select="paper-toolbar, .paper-header"></content>
-    <div id="mainContainer" class$="[[_computeMainContainerClass(mode)]]">
-      <content id="mainContent" select="*"></content>
+
+    <div id="mainPanel">
+      <div id="mainContainer" class$="[[_computeMainContainerClass(mode)]]">
+        <content id="mainContent" select="*"></content>
+      </div>
+      <div id="dropShadow"></div>
     </div>
   </template>
 
@@ -13802,12 +14318,12 @@ iron-selector:not(.narrow-layout) #main ::content [paper-drawer-toggle] {
     var MODE_CONFIGS = {
 
       outerScroll: {
-        scroll: true
+        'scroll': true
       },
 
       shadowMode: {
-        standard: SHADOW_ALWAYS,
-        waterfall: SHADOW_WHEN_SCROLLING,
+        'standard': SHADOW_ALWAYS,
+        'waterfall': SHADOW_WHEN_SCROLLING,
         'waterfall-tall': SHADOW_WHEN_SCROLLING
       },
 
@@ -13825,7 +14341,7 @@ iron-selector:not(.narrow-layout) #main ::content [paper-drawer-toggle] {
        * the scrollable element which you can use to access scroll info such as
        * `scrollTop`.
        *
-       *     <paper-header-panel on-content-scroll="{{scrollHandler}}">
+       *     <paper-header-panel on-content-scroll="scrollHandler">
        *       ...
        *     </paper-header-panel>
        *
@@ -13948,7 +14464,7 @@ iron-selector:not(.narrow-layout) #main ::content [paper-drawer-toggle] {
        * @type Boolean
        */
       get visibleShadow() {
-        return this.header.classList.contains('has-shadow');
+        return this.$.dropShadow.classList.contains('has-shadow');
       },
 
       _computeDropShadowHidden: function(atTop, mode, shadow) {
@@ -13956,16 +14472,16 @@ iron-selector:not(.narrow-layout) #main ::content [paper-drawer-toggle] {
         var shadowMode = MODE_CONFIGS.shadowMode[mode];
 
         if (this.shadow) {
-          this.toggleClass('has-shadow', true, this.header);
+          this.toggleClass('has-shadow', true, this.$.dropShadow);
 
         } else if (shadowMode === SHADOW_ALWAYS) {
-          this.toggleClass('has-shadow', true, this.header);
+          this.toggleClass('has-shadow', true, this.$.dropShadow);
 
         } else if (shadowMode === SHADOW_WHEN_SCROLLING && !atTop) {
-          this.toggleClass('has-shadow', true, this.header);
+          this.toggleClass('has-shadow', true, this.$.dropShadow);
 
         } else {
-          this.toggleClass('has-shadow', false, this.header);
+          this.toggleClass('has-shadow', false, this.$.dropShadow);
 
         }
       },
@@ -14012,20 +14528,20 @@ iron-selector:not(.narrow-layout) #main ::content [paper-drawer-toggle] {
         this._keepScrollingState();
       },
 
-      _keepScrollingState: function () {
+      _keepScrollingState: function() {
         var main = this.scroller;
         var header = this.header;
 
         this._setAtTop(main.scrollTop === 0);
 
-        if (header && MODE_CONFIGS.tallMode[this.mode]) {
+        if (header && this.tallClass && MODE_CONFIGS.tallMode[this.mode]) {
           this.toggleClass(this.tallClass, this.atTop ||
               header.classList.contains(this.tallClass) &&
               main.scrollHeight < this.offsetHeight, header);
         }
       },
 
-      _scroll: function(e) {
+      _scroll: function() {
         this._keepScrollingState();
         this.fire('content-scroll', {target: this.scroller}, {bubbles: false});
       },
@@ -15401,7 +15917,7 @@ iron-selector:not(.narrow-layout) #main ::content [paper-drawer-toggle] {
     </article>
 
     <article>
-      <h2 is="h2-with-link" id="about">Installation</h2>
+      <h2 is="h2-with-link" id="installation">Installation</h2>
       <section>
         <p>
           See <a href="http://google.github.io/incremental-dom/">our Github</a>.
