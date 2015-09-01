@@ -17,6 +17,7 @@
 import {
     patch,
     elementVoid,
+    symbols,
     mutators
 } from '../../index';
 
@@ -49,12 +50,12 @@ describe('library hooks', () => {
     }
 
     beforeEach(() => {
-      allSpy = sandbox.spy(mutators.attributes, '__all');
+      allSpy = sandbox.spy(mutators.attributes, symbols.all);
     });
 
     afterEach(() => {
       for (var mutator in mutators.attributes) {
-        if (mutator !== '__all') {
+        if (mutator !== symbols.all) {
           mutators.attributes[mutator] = null;
         }
       }

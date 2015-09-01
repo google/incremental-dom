@@ -1,5 +1,4 @@
 /**
- * @license
  * Copyright 2015 The Incremental DOM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,16 +14,11 @@
  * limitations under the License.
  */
 
-export { patch } from './src/patch';
+var symbols = {
+  all: '__all'
+};
+
+/** */
 export {
-  elementVoid,
-  elementOpenStart,
-  elementOpenEnd,
-  elementOpen,
-  elementClose,
-  text,
-  attr,
-} from './src/virtual_elements';
-export { symbols } from './src/symbols';
-export { mutators } from './src/mutators';
-export { defaults } from './src/defaults';
+  symbols
+};
