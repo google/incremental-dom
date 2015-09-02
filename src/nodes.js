@@ -28,7 +28,7 @@ var dummy;
 
 /**
  * Creates an Element.
- * @param {!Document} doc The document with which to create the Element.
+ * @param {Document} doc The document with which to create the Element.
  * @param {string} tag The tag for the Element.
  * @param {?string=} key A key to identify the Element.
  * @param {?Array<*>=} statics An array of attribute name/value pairs of
@@ -60,7 +60,7 @@ var createElement = function(doc, tag, key, statics) {
 /**
  * Creates a Node, either a Text or an Element depending on the node name
  * provided.
- * @param {!Document} doc The document with which to create the Node.
+ * @param {Document} doc The document with which to create the Node.
  * @param {string} nodeName The tag if creating an element or #text to create
  *     a Text.
  * @param {?string=} key A key to identify the Element.
