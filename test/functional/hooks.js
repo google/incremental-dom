@@ -57,7 +57,8 @@ describe('library hooks', () => {
 
     afterEach(() => {
       for (var mutator in attributes) {
-        if (mutator !== symbols.all) {
+        if (mutator !== symbols.all &&
+            mutator !== symbols.placeholder) {
           attributes[mutator] = null;
         }
       }

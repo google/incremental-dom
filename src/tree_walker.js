@@ -32,6 +32,11 @@ function TreeWalker(node) {
   this.stack_ = [];
 
   /**
+   * @const {!Element|!DocumentFragment}
+   */
+  this.root = node;
+
+  /**
    * @type {?Node}
    */
   this.currentNode = node;

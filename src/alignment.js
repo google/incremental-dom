@@ -21,6 +21,7 @@ import {
 } from './nodes';
 import { getData } from './node_data';
 import { getContext } from './context';
+import { symbols } from './symbols';
 
 // For https://github.com/esperantojs/esperanto/issues/187
 var dummy;
@@ -127,6 +128,7 @@ var alignWithDOM = function(nodeName, key, statics) {
  */
 var clearUnvisitedDOM = function(node) {
   var context = getContext();
+  var walker = context.walker;
   var data = getData(node);
   var keyMap = data.keyMap;
   var keyMapValid = data.keyMapValid;
@@ -137,6 +139,10 @@ var clearUnvisitedDOM = function(node) {
   data.lastVisitedChild = null;
 
   if (child === lastVisitedChild && keyMapValid) {
+    return;
+  }
+
+  if (data.attrs[symbols.placeholder] && walker.currentNode !== walker.root) {
     return;
   }
 

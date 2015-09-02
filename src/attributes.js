@@ -115,6 +115,8 @@ var attributes = {
   // have a specific mutator.
   [symbols.all]: applyAttributeTyped,
 
+  [symbols.placeholder]: function() {},
+
   // Special case the style attribute
   style: applyStyle
 };
