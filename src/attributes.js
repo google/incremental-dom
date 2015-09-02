@@ -15,6 +15,7 @@
  */
 
 import { getData } from './node_data';
+import { symbols } from './symbols';
 
 
 /**
@@ -98,7 +99,7 @@ var updateAttribute = function(el, name, value) {
     return;
   }
 
-  var mutator = mutators[name] || mutators.__all;
+  var mutator = mutators[name] || mutators[symbols.all];
   mutator(el, name, value);
 
   attrs[name] = value;
@@ -124,7 +125,7 @@ var defaults = {
 var mutators = {
   // Special generic mutator that's called for any attribute that does not
   // have a specific mutator.
-  __all: applyAttributeTyped,
+  [symbols.all]: applyAttributeTyped,
 
   // Special case the style attribute
   'style': applyStyle

@@ -1,6 +1,7 @@
 {
   "loose": ["all"],
   "whitelist": [
+    "es6.properties.computed",
     "utility.inlineEnvironmentVariables"
   ],
   "optional": "utility.inlineEnvironmentVariables"
