@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import { notifications } from './notifications';
+
 /**
  * Similar to the built-in Treewalker class, but simplified and allows direct
  * access to modify the currentNode property.
@@ -46,6 +48,16 @@ function TreeWalker(node) {
    * @const {!Array<(string|undefined)>}
    */
   this.nsStack_ = [undefined];
+
+  /**
+   * @type {(Array<!Node>|undefined)}
+   */
+  this.created = notifications.nodesCreated && [];
+
+  /**
+   * @type {(Array<!Node>|undefined)}
+   */
+  this.deleted = notifications.nodesDeleted && [];
 }
 
 
@@ -103,6 +115,18 @@ TreeWalker.prototype.nextSibling = function() {
  */
 TreeWalker.prototype.parentNode = function() {
   this.currentNode = this.stack_.pop();
+};
+
+/**
+ *
+ */
+TreeWalker.prototype.notifyChanges = function() {
+  if (this.created && this.created.length > 0) {
+    notifications.nodesCreated(this.created);
+  }
+  if (this.deleted && this.deleted.length > 0) {
+    notifications.nodesDeleted(this.deleted);
+  }
 };
 
 

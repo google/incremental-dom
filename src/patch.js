@@ -61,7 +61,8 @@ if (process.env.NODE_ENV !== 'production') {
  */
 var patch = function(node, fn, data) {
   var prevWalker = getWalker();
-  setWalker(new TreeWalker(node));
+  var walker = new TreeWalker(node);
+  setWalker(walker);
 
   firstChild();
   fn(data);
@@ -71,6 +72,8 @@ var patch = function(node, fn, data) {
   if (process.env.NODE_ENV !== 'production') {
     assertNoUnclosedTags(node);
   }
+
+  walker.notifyChanges();
 
   setWalker(prevWalker);
 };

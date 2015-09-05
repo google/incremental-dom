@@ -22,7 +22,6 @@ import {
 import { getData } from './node_data';
 import { getWalker } from './walker';
 
-
 // For https://github.com/esperantojs/esperanto/issues/187
 var dummy;
 
@@ -110,6 +109,9 @@ var alignWithDOM = function(nodeName, key, statics) {
     } else {
       parent.insertBefore(matchingNode, currentNode);
     }
+    if (walker.created && !existingNode) {
+      walker.created.push(matchingNode);
+    }
 
     walker.currentNode = matchingNode;
   }
@@ -127,23 +129,36 @@ var clearUnvisitedDOM = function(node) {
   var data = getData(node);
   var keyMap = data.keyMap;
   var keyMapValid = data.keyMapValid;
-  var lastChild = node.lastChild;
   var lastVisitedChild = data.lastVisitedChild;
+  var child = node.lastChild;
+  var key;
 
   data.lastVisitedChild = null;
 
-  if (lastChild === lastVisitedChild && keyMapValid) {
+  if (child === lastVisitedChild && keyMapValid) {
     return;
   }
+  var walker = getWalker();
 
-  while (lastChild !== lastVisitedChild) {
-    node.removeChild(lastChild);
-    lastChild = node.lastChild;
+  while (child !== lastVisitedChild) {
+    node.removeChild(child);
+    if (walker.deleted) {
+      walker.deleted.push(child);
+    }
+    key = getData(child).key;
+    if (key) {
+      delete keyMap[key];
+    }
+    child = node.lastChild;
   }
 
   // Clean the keyMap, removing any unusued keys.
-  for (var key in keyMap) {
-    if (!keyMap[key].parentNode) {
+  for (key in keyMap) {
+    child = keyMap[key];
+    if (!child.parentNode) {
+      if (walker.deleted) {
+        walker.deleted.push(child);
+      }
       delete keyMap[key];
     }
   }
