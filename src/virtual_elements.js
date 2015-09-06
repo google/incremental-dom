@@ -294,7 +294,7 @@ var text = function(value, var_args) {
     assertNotInAttributes();
   }
 
-  var node = alignWithDOM('#text', null);
+  var node = /** @type {!Text}*/(alignWithDOM('#text', null));
   var data = getData(node);
 
   if (data.text !== value) {
