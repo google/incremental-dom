@@ -77,6 +77,16 @@ function render() {
 }
 ```
 
+### superviews.js
+
+[superviews.js](https://github.com/davidjamesstone/superviews.js) is a template language that closely maps to the incremental-dom API.
+
+```html
+<p if="showMe" class="{=cssClass}">
+  <span style="{ color: foo, width: bar }">{name}</span>
+</p>
+```
+
 ### Create your own
 
 If you work on a templating language we'd love to see Incremental DOM adopted as
