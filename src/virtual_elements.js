@@ -20,7 +20,7 @@ import {
 } from './alignment';
 import { updateAttribute } from './attributes';
 import { getData } from './node_data';
-import { getWalker } from './walker';
+import { getContext } from './context';
 import {
     firstChild,
     nextSibling,
@@ -81,7 +81,9 @@ if (process.env.NODE_ENV !== 'production') {
    * @param {string} tag
    */
   var assertCloseMatchesOpenTag = function(tag) {
-    var closingNode = getWalker().getCurrentParent();
+    var context = getContext();
+    var walker = context.walker;
+    var closingNode = walker.getCurrentParent();
     var data = getData(closingNode);
 
     if (tag !== data.nodeName) {
@@ -247,7 +249,8 @@ var elementClose = function(tag) {
 
   parentNode();
 
-  var node = /** @type {!Element} */(getWalker().currentNode);
+  var node = /** @type {!Element} */(getContext().walker.currentNode);
+
   clearUnvisitedDOM(node);
 
   nextSibling();

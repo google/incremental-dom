@@ -20,7 +20,7 @@ import {
     registerChild
 } from './nodes';
 import { getData } from './node_data';
-import { getWalker } from './walker';
+import { getContext } from './context';
 
 // For https://github.com/esperantojs/esperanto/issues/187
 var dummy;
@@ -72,7 +72,8 @@ var matches = function(node, nodeName, key) {
  * @return {!Node} The matching node.
  */
 var alignWithDOM = function(nodeName, key, statics) {
-  var walker = getWalker();
+  var context = getContext();
+  var walker = context.walker;
   var currentNode = walker.currentNode;
   var parent = walker.getCurrentParent();
   var matchingNode;
@@ -92,11 +93,13 @@ var alignWithDOM = function(nodeName, key, statics) {
 
       matchingNode = existingNode;
     } else {
-      matchingNode = createNode(walker.doc, nodeName, key, statics);
+      matchingNode = createNode(context.doc, nodeName, key, statics);
 
       if (key) {
         registerChild(parent, key, matchingNode);
       }
+
+      context.markCreated(matchingNode);
     }
 
     // If the node has a key, remove it from the DOM to prevent a large number
@@ -108,9 +111,6 @@ var alignWithDOM = function(nodeName, key, statics) {
       getData(parent).keyMapValid = false;
     } else {
       parent.insertBefore(matchingNode, currentNode);
-    }
-    if (walker.created && !existingNode) {
-      walker.created.push(matchingNode);
     }
 
     walker.currentNode = matchingNode;
@@ -126,6 +126,7 @@ var alignWithDOM = function(nodeName, key, statics) {
  * @param {Node} node
  */
 var clearUnvisitedDOM = function(node) {
+  var context = getContext();
   var data = getData(node);
   var keyMap = data.keyMap;
   var keyMapValid = data.keyMapValid;
@@ -138,13 +139,11 @@ var clearUnvisitedDOM = function(node) {
   if (child === lastVisitedChild && keyMapValid) {
     return;
   }
-  var walker = getWalker();
 
   while (child !== lastVisitedChild) {
     node.removeChild(child);
-    if (walker.deleted) {
-      walker.deleted.push(child);
-    }
+    context.markDeleted(child);
+
     key = getData(child).key;
     if (key) {
       delete keyMap[key];
@@ -156,9 +155,7 @@ var clearUnvisitedDOM = function(node) {
   for (key in keyMap) {
     child = keyMap[key];
     if (!child.parentNode) {
-      if (walker.deleted) {
-        walker.deleted.push(child);
-      }
+      context.markDeleted(child);
       delete keyMap[key];
     }
   }

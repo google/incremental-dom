@@ -20,10 +20,12 @@ import {
 } from './traversal';
 import { TreeWalker } from './tree_walker';
 import {
-    getWalker,
-    setWalker
-} from './walker';
+    getContext,
+    enterContext,
+    restoreContext
+} from './context';
 import { clearUnvisitedDOM } from './alignment';
+import { notifications } from './notifications';
 
 
 // For https://github.com/esperantojs/esperanto/issues/187
@@ -32,7 +34,7 @@ var dummy;
 
 if (process.env.NODE_ENV !== 'production') {
   var assertNoUnclosedTags = function(root) {
-    var openElement = getWalker().getCurrentParent();
+    var openElement = getContext().walker.getCurrentParent();
     if (!openElement) {
       return;
     }
@@ -60,9 +62,7 @@ if (process.env.NODE_ENV !== 'production') {
  * @template T
  */
 var patch = function(node, fn, data) {
-  var prevWalker = getWalker();
-  var walker = new TreeWalker(node);
-  setWalker(walker);
+  enterContext(node);
 
   firstChild();
   fn(data);
@@ -73,9 +73,8 @@ var patch = function(node, fn, data) {
     assertNoUnclosedTags(node);
   }
 
-  walker.notifyChanges();
-
-  setWalker(prevWalker);
+  getContext().notifyChanges();
+  restoreContext();
 };
 
 

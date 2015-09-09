@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { notifications } from './notifications';
 
 /**
  * Similar to the built-in Treewalker class, but simplified and allows direct
@@ -36,28 +35,6 @@ function TreeWalker(node) {
    * @type {?Node}
    */
   this.currentNode = node;
-
-  /**
-   * @const {Document}
-   */
-  this.doc = node.ownerDocument;
-
-  /**
-   * Keeps track of what namespace to create new Elements in.
-   * @private
-   * @const {!Array<(string|undefined)>}
-   */
-  this.nsStack_ = [undefined];
-
-  /**
-   * @type {(Array<!Node>|undefined)}
-   */
-  this.created = notifications.nodesCreated && [];
-
-  /**
-   * @type {(Array<!Node>|undefined)}
-   */
-  this.deleted = notifications.nodesDeleted && [];
 }
 
 
@@ -66,30 +43,6 @@ function TreeWalker(node) {
  */
 TreeWalker.prototype.getCurrentParent = function() {
   return this.stack_[this.stack_.length - 1];
-};
-
-
-/**
- * @return {(string|undefined)} The current namespace to create Elements in.
- */
-TreeWalker.prototype.getCurrentNamespace = function() {
-  return this.nsStack_[this.nsStack_.length - 1];
-};
-
-
-/**
- * @param {string=} namespace The namespace to enter.
- */
-TreeWalker.prototype.enterNamespace = function(namespace) {
-  this.nsStack_.push(namespace);
-};
-
-
-/**
- * Exits the current namespace
- */
-TreeWalker.prototype.exitNamespace = function() {
-  this.nsStack_.pop();
 };
 
 
@@ -115,18 +68,6 @@ TreeWalker.prototype.nextSibling = function() {
  */
 TreeWalker.prototype.parentNode = function() {
   this.currentNode = this.stack_.pop();
-};
-
-/**
- *
- */
-TreeWalker.prototype.notifyChanges = function() {
-  if (this.created && this.created.length > 0) {
-    notifications.nodesCreated(this.created);
-  }
-  if (this.deleted && this.deleted.length > 0) {
-    notifications.nodesDeleted(this.deleted);
-  }
 };
 
 

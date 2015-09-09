@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { getWalker } from './walker';
+import { getContext } from './context';
 import { getData } from './node_data';
 import {
   enterTag,
@@ -51,7 +51,8 @@ var exitNode = function(node) {
  * @param {Node} node
  */
 var markVisited = function(node) {
-  var walker = getWalker();
+  var context = getContext();
+  var walker = context.walker;
   var parent = walker.getCurrentParent();
   var data = getData(parent);
   data.lastVisitedChild = node;
@@ -62,7 +63,8 @@ var markVisited = function(node) {
  * Changes to the first child of the current node.
  */
 var firstChild = function() {
-  var walker = getWalker();
+  var context = getContext();
+  var walker = context.walker;
   enterNode(walker.currentNode);
   walker.firstChild();
 };
@@ -72,7 +74,8 @@ var firstChild = function() {
  * Changes to the next sibling of the current node.
  */
 var nextSibling = function() {
-  var walker = getWalker();
+  var context = getContext();
+  var walker = context.walker;
   markVisited(walker.currentNode);
   walker.nextSibling();
 };
@@ -82,7 +85,8 @@ var nextSibling = function() {
  * Changes to the parent of the current node, removing any unvisited children.
  */
 var parentNode = function() {
-  var walker = getWalker();
+  var context = getContext();
+  var walker = context.walker;
   walker.parentNode();
   exitNode(walker.currentNode);
 };

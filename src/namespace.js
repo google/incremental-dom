@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { getWalker } from './walker';
+import { getContext } from './context';
 
 var SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -25,9 +25,9 @@ var SVG_NS = 'http://www.w3.org/2000/svg';
  */
 var enterTag = function(tag) {
   if (tag === 'svg') {
-    getWalker().enterNamespace(SVG_NS);
+    getContext().enterNamespace(SVG_NS);
   } else if (tag === 'foreignObject') {
-    getWalker().enterNamespace(undefined);
+    getContext().enterNamespace(undefined);
   }
 };
 
@@ -39,7 +39,7 @@ var enterTag = function(tag) {
  */
 var exitTag = function(tag) {
   if (tag === 'svg' || tag === 'foreignObject') {
-    getWalker().exitNamespace();
+    getContext().exitNamespace();
   }
 };
 
@@ -54,7 +54,7 @@ var getNamespaceForTag = function(tag) {
     return SVG_NS;
   }
 
-  return getWalker().getCurrentNamespace();
+  return getContext().getCurrentNamespace();
 };
 
 
