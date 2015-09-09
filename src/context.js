@@ -42,12 +42,12 @@ function Context(node, prevContext) {
   this.prevContext = prevContext;
 
   /**
-   * @type {(Array<!Node>|undefined)}
+   * @type {?Array<!Node>}
    */
   this.created = notifications.nodesCreated && [];
 
   /**
-   * @type {(Array<!Node>|undefined)}
+   * @type {?Array<!Node>}
    */
   this.deleted = notifications.nodesDeleted && [];
 }

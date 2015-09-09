@@ -80,21 +80,21 @@ var alignWithDOM = function(nodeName, key, statics) {
   if (currentNode && matches(currentNode, nodeName, key)) {
     matchingNode = currentNode;
   } else {
-    var existingNode = getChild(parent, key);
+    if (key) {
+      matchingNode = getChild(parent, key);
+    }
 
     // Check to see if the node has moved within the parent or if a new one
     // should be created
-    if (existingNode) {
+    if (matchingNode) {
       if (process.env.NODE_ENV !== 'production') {
-        assertKeyedTagMatches(existingNode, nodeName, key);
+        assertKeyedTagMatches(matchingNode, nodeName, key);
       }
-
-      matchingNode = existingNode;
     } else {
       matchingNode = createNode(context.doc, nodeName, key, statics);
 
       if (key) {
-        registerChild(parent, key, matchingNode);
+        registerChild(parent, key, /** @type {!Element} **/(matchingNode));
       }
 
       context.markCreated(matchingNode);

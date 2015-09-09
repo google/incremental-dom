@@ -76,7 +76,7 @@ function NodeData(nodeName, key) {
   this.nodeName = nodeName;
 
   /**
-   * @type {?string}
+   * @type {?(string|number|boolean)}
    */
   this.text = null;
 }

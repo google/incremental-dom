@@ -103,7 +103,7 @@ var createKeyMap = function(el) {
  * Retrieves the mapping of key to child node for a given Element, creating it
  * if necessary.
  * @param {!Node} el
- * @return {!Object<string, !Node>} A mapping of keys to child Elements
+ * @return {!Object<string, !Element>} A mapping of keys to child Elements
  */
 var getKeyMap = function(el) {
   var data = getData(el);
@@ -119,11 +119,12 @@ var getKeyMap = function(el) {
 /**
  * Retrieves a child from the parent with the given key.
  * @param {!Node} parent
- * @param {?string=} key
+ * @param {string} key
  * @return {?Element} The child corresponding to the key.
  */
 var getChild = function(parent, key) {
-  return /** @type {?Element} */(key && getKeyMap(parent)[key]);
+  var child = getKeyMap(parent)[key];
+  return child || null;
 };
 
 
@@ -133,7 +134,7 @@ var getChild = function(parent, key) {
  * getKeyMap. The provided key should be unique within the parent Element.
  * @param {!Node} parent The parent of child.
  * @param {string} key A key to identify the child with.
- * @param {!Node} child The child to register.
+ * @param {!Element} child The child to register.
  */
 var registerChild = function(parent, key, child) {
   getKeyMap(parent)[key] = child;
