@@ -1,5 +1,4 @@
 /**
- * @license
  * Copyright 2015 The Incremental DOM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,17 +14,25 @@
  * limitations under the License.
  */
 
-export { patch } from './src/patch';
+/**
+ */
+var notifications = {
+  /**
+   * Called after patch has compleated with any Nodes that have been created
+   * and added to the DOM.
+   * @type {?function(Array.<!Node>)}
+   */
+  nodesCreated: null,
+
+  /**
+   * Called after patch has compleated with any Nodes that have been removed
+   * from the DOM.
+   * Note it's an applications responsibility to handle any childNodes.
+   * @type {?function(Array.<!Node>)}
+   */
+  nodesDeleted: null
+};
+
 export {
-  elementVoid,
-  elementOpenStart,
-  elementOpenEnd,
-  elementOpen,
-  elementClose,
-  text,
-  attr,
-} from './src/virtual_elements';
-export { symbols } from './src/symbols';
-export { mutators } from './src/mutators';
-export { defaults } from './src/defaults';
-export { notifications } from './src/notifications';
+  notifications
+};
