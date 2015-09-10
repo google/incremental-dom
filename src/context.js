@@ -16,6 +16,7 @@
 
 import { TreeWalker } from './tree_walker';
 import { notifications } from './notifications';
+import { testLegacyTextSupport } from './legacy_support';
 
 
 /**
@@ -57,6 +58,11 @@ function Context(node, prevContext) {
    * @type {(Array<!Node>|undefined)}
    */
   this.deleted = notifications.nodesDeleted && [];
+
+  /**
+   * @const {boolean}
+   */
+  this.legacyTextSupport = testLegacyTextSupport(this.doc);
 }
 
 

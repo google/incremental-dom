@@ -15,13 +15,28 @@
  */
 
 
+import { getContext } from './context';
+
 /**
- * Keeps track of information needed to perform diffs for a given DOM node.
+ * Keeps track of information needed to perform diffs for a given DOM Element.
  * @param {!string} nodeName
  * @param {?string=} key
  * @constructor
  */
-function NodeData(nodeName, key) {
+function ElementData(nodeName, key) {
+  /**
+   * The node name for this node.
+   * @const {string}
+   */
+  this.nodeName = nodeName;
+
+  /**
+   * The key used to identify this node, used to preserve DOM nodes when they
+   * move within their parent.
+   * @const
+   */
+  this.key = key;
+
   /**
    * The attributes and their values.
    * @const
@@ -43,13 +58,6 @@ function NodeData(nodeName, key) {
   this.newAttrs = {};
 
   /**
-   * The key used to identify this node, used to preserve DOM nodes when they
-   * move within their parent.
-   * @const
-   */
-  this.key = key;
-
-  /**
    * Keeps track of children within this node by their key.
    * {?Object<string, !Element>}
    */
@@ -66,40 +74,66 @@ function NodeData(nodeName, key) {
    * @type {?Node}
    */
   this.lastVisitedChild = null;
-
-  /**
-   * The node name for this node.
-   * @const {string}
-   */
-  this.nodeName = nodeName;
-
-  /**
-   * @type {?string}
-   */
-  this.text = null;
 }
 
 
 /**
- * Initializes a NodeData object for a Node.
+ * Keeps track of information needed to perform diffs for a given DOM Text.
+ * @constructor
+ */
+function TextData() {
+  /**
+   * The node name for this node.
+   * @const {string}
+   */
+  this.nodeName = '#text';
+
+  /**
+   * The node name for this node.
+   * @const {null}
+   */
+  this.key = null;
+
+  /**
+   * The current text value for this Text.
+   * @type {(string|number|boolean)}
+   */
+  this.text = '';
+}
+
+
+/**
+ * Initializes a Data object for a Node.
  *
  * @param {Node} node The node to initialize data for.
  * @param {string} nodeName The node name of node.
  * @param {?string=} key The key that identifies the node.
- * @return {!NodeData} The newly initialized data object
+ * @return {!(ElementData|TextData)} The newly initialized data object
  */
 var initData = function(node, nodeName, key) {
-  var data = new NodeData(nodeName, key);
+  var data;
+
+  if (node instanceof Text) {
+    data = new TextData();
+
+    // Return before setting in legacy environments.
+    if (getContext().legacyTextSupport) {
+      return data;
+    }
+  } else {
+    data = new ElementData(nodeName, key);
+  }
+
   node['__incrementalDOMData'] = data;
   return data;
 };
 
 
 /**
- * Retrieves the NodeData object for a Node, creating it if necessary.
+ * Retrieves the Data object for a Node, creating it if necessary.
  *
  * @param {Node} node The node to retrieve the data for.
- * @return {!NodeData} The NodeData for this Node.
+ * @return {!(ElementData|TextData)} The Data for this Node.
  */
 var getData = function(node) {
   var data = node['__incrementalDOMData'];

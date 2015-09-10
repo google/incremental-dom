@@ -301,7 +301,7 @@ var text = function(value, var_args) {
   var data = getData(node);
 
   if (data.text !== value) {
-    data.text = /** @type {string} */(value);
+    data.text = value;
 
     var formatted = value;
     for (var i = 1; i < arguments.length; i += 1) {
