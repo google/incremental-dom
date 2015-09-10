@@ -92,13 +92,24 @@ var initData = function(node, nodeName, key) {
 
 
 /**
+ * Retrieves the NodeData object for a Node. Must be called on a Node
+ * with an already created NodeData object.
+ *
+ * @param {Node} node The node to retrieve the data for.
+ * @return {?NodeData} The NodeData for this Node.
+ */
+var getData = function(node) {
+  return node['__incrementalDOMData'];
+};
+
+/**
  * Retrieves the NodeData object for a Node, creating it if necessary.
  *
  * @param {Node} node The node to retrieve the data for.
  * @return {!NodeData} The NodeData for this Node.
  */
-var getData = function(node) {
-  var data = node['__incrementalDOMData'];
+var getOrCreateData = function(node) {
+  var data = getData(node);
 
   if (!data) {
     var nodeName = node.nodeName.toLowerCase();
@@ -118,5 +129,6 @@ var getData = function(node) {
 /** */
 export {
   getData,
+  getOrCreateData,
   initData
 };
