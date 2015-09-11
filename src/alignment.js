@@ -142,7 +142,7 @@ var clearUnvisitedDOM = function(node) {
 
   while (child !== lastVisitedChild) {
     node.removeChild(child);
-    context.markDeleted(child);
+    context.markDeleted(/** @type {!Node}*/(child));
 
     key = getData(child).key;
     if (key) {
