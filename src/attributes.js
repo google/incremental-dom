@@ -99,7 +99,7 @@ var updateAttribute = function(el, name, value) {
     return;
   }
 
-  var mutator = mutators[name] || mutators[symbols.all];
+  var mutator = attributes[name] || attributes[symbols.all];
   mutator(el, name, value);
 
   attrs[name] = value;
@@ -107,34 +107,23 @@ var updateAttribute = function(el, name, value) {
 
 
 /**
- * Exposes our default attribute mutators publicly, so they may be used in
- * custom mutators.
- * @const {!Object<string, function(!Element, string, *)>}
- */
-var defaults = {
-  applyAttr: applyAttr,
-  applyProp: applyProp,
-  applyStyle: applyStyle
-};
-
-
-/**
  * A publicly mutable object to provide custom mutators for attributes.
  * @const {!Object<string, function(!Element, string, *)>}
  */
-var mutators = {
+var attributes = {
   // Special generic mutator that's called for any attribute that does not
   // have a specific mutator.
   [symbols.all]: applyAttributeTyped,
 
   // Special case the style attribute
-  'style': applyStyle
+  style: applyStyle
 };
 
 
 /** */
 export {
   updateAttribute,
-  defaults,
-  mutators
+  applyProp,
+  applyAttr,
+  attributes
 };
