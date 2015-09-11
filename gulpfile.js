@@ -18,6 +18,7 @@ var babel = require('gulp-babel');
 var del = require('del');
 var rollup = require('rollup');
 var file = require('gulp-file');
+var fs = require('fs');
 var gjslint = require('gulp-gjslint');
 var gulp = require('gulp');
 var gutil = require('gulp-util');
@@ -33,7 +34,7 @@ var googModuleName = 'incrementaldom';
 var jsFileName = 'incremental-dom.js';
 var srcs = [jsFileName, 'src/**/*.js'];
 var tests = ['test/**/*.js'];
-var karmaConfig = path.resolve('karma.conf.js');
+var karmaConfig = path.resolve('conf/karma.conf.js');
 
 function clean(done) {
   del(['dist'], done);
@@ -75,9 +76,13 @@ function bundle(format) {
   }).then(function(bundle) {
     return bundle.generate({
       format: format,
-      sourceMap: 'inline',
+      banner: fs.readFileSync('conf/license_header.txt', 'utf8'),
+      sourceMap: true,
       moduleName: 'IncrementalDOM'
     });
+  }).then(function(gen) {
+    gen.code += '\n//# sourceMappingURL=' + gen.map.toUrl();
+    return gen;
   });
 }
 
@@ -118,7 +123,7 @@ function jsClosure(done) {
   process.env.NODE_ENV = 'production';
 
   bundle('cjs').then(function(gen) {
-    // Replace the first line, 'use strict';, with a goog.module declaration.
+    // Replace the first line with a goog.module declaration.
     var moduleDeclaration = 'goog.module(\'' + googModuleName + '\');';
     var code = gen.code.replace(/.*/, moduleDeclaration);
 

@@ -1,4 +1,6 @@
+
 /**
+ * @license
  * Copyright 2015 The Incremental DOM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,41 +15,3 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-module.exports = function(config) {
-  config.set({
-    frameworks: ['browserify', 'mocha', 'sinon-chai'],
-
-    files: [
-      'test/**/*.js'
-    ],
-
-    preprocessors: {
-      'src/**/*.js': ['browserify'],
-      'test/**/*.js': ['browserify']
-    },
-
-    browserify: {
-      watch: true,
-      debug: true,
-      transform: ['es6ify']
-    },
-
-    reporters: ['progress'],
-
-    port: 9876,
-
-    colors: true,
-
-    logLevel: config.LOG_INFO,
-
-    autoWatch: true,
-
-    // change Karma's debug.html to the mocha web reporter
-    client: {
-      mocha: {
-        reporter: 'html'
-      }
-    }
-  });
-};
