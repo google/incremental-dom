@@ -2450,10 +2450,10 @@ prototype = {};
 }
 var factory = desugar(prototype);
 prototype = factory.prototype;
-var options = {
-prototype: prototype,
-extends: prototype.extends
-};
+var options = { prototype: prototype };
+if (prototype.extends) {
+options.extends = prototype.extends;
+}
 Polymer.telemetry._registrate(prototype);
 document.registerElement(prototype.is, options);
 return factory;
@@ -2970,7 +2970,7 @@ debouncer.stop();
 }
 }
 });
-Polymer.version = '1.1.2';
+Polymer.version = '1.1.3';
 Polymer.Base._addFeature({
 _registerFeatures: function () {
 this._prepIs();
@@ -5179,9 +5179,9 @@ gd = gobj[dep];
 if (gd && gd[name]) {
 gd[name] = (gd[name] || 1) - 1;
 gd._count = (gd._count || 1) - 1;
-}
 if (gd._count === 0) {
 node.removeEventListener(dep, this.handleNative);
+}
 }
 }
 }
@@ -9658,6 +9658,27 @@ this.fire('dom-change');
   /** @polymerBehavior */
   Polymer.IronSelectableBehavior = {
 
+      /**
+       *  Fired when iron-selector is activated (selected or deselected).
+       *  It is fired before the selected items are changed.
+       *  Cancel the event to abort selection.
+       *
+       * @event iron-activate
+       *
+       **/
+      /**
+       *  Fired when an item is selected
+       *
+       * @event iron-select
+       *
+       **/
+      /**
+       *  Fired when an item is deselected
+       *
+       * @event iron-deselect
+       *
+       **/
+
     properties: {
 
       /**
@@ -9711,7 +9732,7 @@ this.fire('dom-change');
       },
 
       /**
-       * This is a CSS selector sting.  If this is set, only items that matches the CSS selector
+       * This is a CSS selector string.  If this is set, only items that match the CSS selector
        * are selectable.
        *
        * @attribute selectable
@@ -9739,17 +9760,29 @@ this.fire('dom-change');
       selectedAttribute: {
         type: String,
         value: null
-      }
+      },
 
+      /**
+       * The set of excluded elements where the key is the `localName` 
+       * of the element that will be ignored from the item list.
+       *
+       * @type {object}
+       * @default {template: 1}
+       */
+
+      excludedLocalNames: {
+        type: Object,
+        value: function() {
+          return {
+            'template': 1
+          };
+        }
+      }
     },
 
     observers: [
       '_updateSelected(attrForSelected, selected)'
     ],
-
-    excludedLocalNames: {
-      'template': 1
-    },
 
     created: function() {
       this._bindFilterItem = this._filterItem.bind(this);
@@ -9829,9 +9862,7 @@ this.fire('dom-change');
     },
 
     _removeListener: function(eventName) {
-      // There is no unlisten yet...
-      // https://github.com/Polymer/polymer/issues/1639
-      //this.removeEventListener(eventName, this._bindActivateHandler);
+      this.unlisten(this, eventName, '_activateHandler');
     },
 
     _activateEventChanged: function(eventName, old) {
@@ -9920,11 +9951,6 @@ this.fire('dom-change');
     },
 
     _activateHandler: function(e) {
-      // TODO: remove this when https://github.com/Polymer/polymer/issues/1639 is fixed so we
-      // can just remove the old event listener.
-      if (e.type !== this.activateEvent) {
-        return;
-      }
       var t = e.target;
       var items = this.items;
       while (t && t != this) {
@@ -14615,73 +14641,73 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <dom-module id="paper-ripple" assetpath="bower_components/paper-ripple/">
 
   
-
-  <style>
-    :host {
-      display: block;
-      position: absolute;
-      border-radius: inherit;
-      overflow: hidden;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-    }
-
-    :host([animating]) {
-      /* This resolves a rendering issue in Chrome (as of 40) where the
-         ripple is not properly clipped by its parent (which may have
-         rounded corners). See: http://jsbin.com/temexa/4
-
-         Note: We only apply this style conditionally. Otherwise, the browser
-         will create a new compositing layer for every ripple element on the
-         page, and that would be bad. */
-      -webkit-transform: translate(0, 0);
-      transform: translate3d(0, 0, 0);
-    }
-
-    :host([noink]) {
-      pointer-events: none;
-    }
-
-    #background,
-    #waves,
-    .wave-container,
-    .wave {
-      pointer-events: none;
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-    }
-
-    #background,
-    .wave {
-      opacity: 0;
-    }
-
-    #waves,
-    .wave {
-      overflow: hidden;
-    }
-
-    .wave-container,
-    .wave {
-      border-radius: 50%;
-    }
-
-    :host(.circle) #background,
-    :host(.circle) #waves {
-      border-radius: 50%;
-    }
-
-    :host(.circle) .wave-container {
-      overflow: hidden;
-    }
-
-  </style>
+  
   <template>
+    <style>
+      :host {
+        display: block;
+        position: absolute;
+        border-radius: inherit;
+        overflow: hidden;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+      }
+  
+      :host([animating]) {
+        /* This resolves a rendering issue in Chrome (as of 40) where the
+           ripple is not properly clipped by its parent (which may have
+           rounded corners). See: http://jsbin.com/temexa/4
+  
+           Note: We only apply this style conditionally. Otherwise, the browser
+           will create a new compositing layer for every ripple element on the
+           page, and that would be bad. */
+        -webkit-transform: translate(0, 0);
+        transform: translate3d(0, 0, 0);
+      }
+  
+      :host([noink]) {
+        pointer-events: none;
+      }
+  
+      #background,
+      #waves,
+      .wave-container,
+      .wave {
+        pointer-events: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+  
+      #background,
+      .wave {
+        opacity: 0;
+      }
+  
+      #waves,
+      .wave {
+        overflow: hidden;
+      }
+  
+      .wave-container,
+      .wave {
+        border-radius: 50%;
+      }
+  
+      :host(.circle) #background,
+      :host(.circle) #waves {
+        border-radius: 50%;
+      }
+  
+      :host(.circle) .wave-container {
+        overflow: hidden;
+      }
+    </style>
+    
     <div id="background"></div>
     <div id="waves"></div>
   </template>
@@ -14689,20 +14715,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <script>
   (function() {
     var Utility = {
-      cssColorWithAlpha: function(cssColor, alpha) {
-        var parts = cssColor.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
-
-        if (typeof alpha == 'undefined') {
-          alpha = 1;
-        }
-
-        if (!parts) {
-          return 'rgba(255, 255, 255, ' + alpha + ')';
-        }
-
-        return 'rgba(' + parts[1] + ', ' + parts[2] + ', ' + parts[3] + ', ' + alpha + ')';
-      },
-
       distance: function(x1, y1, x2, y2) {
         var xDelta = (x1 - x2);
         var yDelta = (y1 - y2);
@@ -14710,13 +14722,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return Math.sqrt(xDelta * xDelta + yDelta * yDelta);
       },
 
-      now: (function() {
-        if (window.performance && window.performance.now) {
-          return window.performance.now.bind(window.performance);
-        }
-
-        return Date.now;
-      })()
+      now: window.performance && window.performance.now ?
+          window.performance.now.bind(window.performance) : Date.now
     };
 
     /**
@@ -15972,6 +15979,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </section>
     </article>
 
+
     <article>
       <h2 is="h2-with-link" id="installation">Installation</h2>
       <section>
@@ -15982,6 +15990,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </p>
       </section>
     </article>
+
    
     <article>
       <h2 is="h2-with-link" id="rendering-dom">Rendering DOM</h2>
@@ -16010,6 +16019,8 @@ function renderPart() {
 patch(document.getElementById('someId'), renderPart);
         </code-prism>
       </section>
+ 
+ 
       <section>
         <h3 is="h3-with-link" id="rendering-dom/attributes-and-properties">Attributes and Properties</h3>
         <p>
@@ -16048,6 +16059,7 @@ elementOpen('div', null, null,
 elementClose('div');
         </code-prism>
       </section>
+
 
       <section>
         <h3 is="h3-with-link" id="rendering-dom/statics-array">Statics Array</h3>
@@ -16093,14 +16105,15 @@ elementOpen('div', null, null,
 elementClose('div');
         </code-prism>
       </section>
-   </article>
+    </article>
+
 
     <article>
       <h2 is="h2-with-link" id="conditional-rendering">Conditional Rendering</h2>
       <section>
         <h3 is="h3-with-link" id="conditional-rendering/if-else">If/else</h3>
         <p>
-    As you can mix node declarations and JavaScript, rendering conditional branches is fairly straightforward. Simply place the node declarations inside a branch. This works with switch statements too!
+          As you can mix node declarations and JavaScript, rendering conditional branches is fairly straightforward. Simply place the node declarations inside a branch. This works with switch statements too!
         </p>
         <code-prism lang="javascript">
 function renderGreeting(date, name) {
@@ -16116,10 +16129,12 @@ function renderGreeting(date, name) {
 }
         </code-prism>
       </section>
+
+
       <section>
         <h3 is="h3-with-link" id="conditional-rendering/array-of-items">Array of Items</h3>
         <p>
-        You can use your favorite way to render an array (or any sort of iterable) of items. When rendering an array of items, you will want to specify a 'key' as the second argument to the <code><a href="#api/elementOpen">elementOpen</a></code> function. Incremental DOM uses the key in order to:
+          You can use your favorite way to render an array (or any sort of iterable) of items. When rendering an array of items, you will want to specify a 'key' as the second argument to the <code><a href="#api/elementOpen">elementOpen</a></code> function. Incremental DOM uses the key in order to:
         </p>
         <ol>
           <li>Prevent the treating of newly added or moved items as a diff that needs to be reconciled.</li>
@@ -16138,7 +16153,24 @@ elementOpen('ul');
 elementClose('ul');
         </code-prism>
       </section>
+
+
+      <section>
+        <h3 is="h3-with-link" id="conditional-rendering/logic-in-attributes">Logic in Attributes</h3>
+        <p>
+          Incremental DOM provides some helpers to give some additional control over how attribures are specified. The <code><a href="#api/elementOpenStart">elementOpenStart</a></code>, <code><a href="#api/attr">attr</a></code> and <code><a href="#api/elementOpenEnd">elementOpenEnd</a></code> functions act as a helper for calling <code><a href="#api/elementOpen">elementOpen</a></code>, allowing you to mix logic and attributes or call other functions.
+        </p>
+
+        <code-prism lang="javascript">
+elementOpenStart('div');
+  for (var key in obj) {
+    attr(key, obj[key]);
+  }
+elementOpenEnd('div');
+        </code-prism>
+      </section>
     </article>
+
 
     <article>
       <h2 is="h2-with-link" id="passing-functions">Passing Functions</h2>
@@ -16205,6 +16237,56 @@ elementOpen('div', item.key, ['staticAttr', 'staticValue'],
         </div>
       </section>
 
+
+      <section>
+        <h3 is="h3-with-link" id="api/elementOpenStart">elementOpenStart</h3>
+        <div>
+          <h4>Description</h4>
+          <p>
+            Used with <coode><a href="#api/attr">attr</a> and <code><a href="#api/elementOpenEnd">elementOpenEnd</a></code> to declare an element.
+          </coode></p>
+
+          <h4>Parameters</h4>
+          <dl>
+            <dt><code><em>string</em> tagname</code></dt>
+            <dd>The name of the tag, e.g. 'div' or 'span'. This could also be the tag of a custom element.</dd>
+            <dt><code><em>string</em> key</code></dt>
+            <dd>The key that identifies Element for reuse. See <a href="#conditional-rendering/array-of-items">Arrays of Items</a></dd>
+            <dt><code><em>Array</em> staticPropertyValuePairs</code></dt>
+            <dd>Pairs of property names and values. Depending on the type of the value, these will be set as either attributes or properties on the Element. These are only set on the Element once during creation. These will not be updated during subsequent passes. See <a href="#rendering-dom/statics-array">Statics Array</a>.</dd>
+          </dl>
+        </div>
+      </section>
+      
+      
+      <section>
+        <h3 is="h3-with-link" id="api/attr">attr</h3>
+        <div>
+          <h4>Description</h4>
+          <p>
+            Used with <coode><a href="#api/elementOpenStart">elementOpenStart</a> and <code><a href="#api/elementOpenEnd">elementOpenEnd</a></code> to declare an element.
+          </coode></p>
+
+          <h4>Parameters</h4>
+          <dl>
+            <dt><code><em>string</em> name</code></dt>
+            <dt><code><em>any</em> value</code></dt>
+          </dl>
+        </div>
+      </section>
+
+
+      <section>
+        <h3 is="h3-with-link" id="api/elementOpenEnd">elementOpenEnd</h3>
+        <div>
+          <h4>Description</h4>
+          <p>
+            Used with <coode><a href="#api/elementOpenStart">elementOpenStart</a> and <code><a href="#api/attr">attr</a></code> to declare an element.
+          </coode></p>
+        </div>
+      </section>
+
+
       <section>
         <h3 is="h3-with-link" id="api/elementClose">elementClose</h3>
         <div>
@@ -16227,6 +16309,7 @@ elementClose('div');
           </code-prism>
         </div>
       </section>
+
 
       <section>
         <h3 is="h3-with-link" id="api/elementVoid">elementVoid</h3>
@@ -16259,6 +16342,7 @@ elementVoid('div', item.key, ['staticAttr', 'staticValue'],
         </div>
       </section>
 
+
       <section>
         <h3 is="h3-with-link" id="api/text">text</h3>
         <div>
@@ -16281,6 +16365,7 @@ text('hello world');
           </code-prism>
         </div>  
       </section>
+
 
       <section>
         <h3 is="h3-with-link" id="api/patch">patch</h3>
@@ -16316,6 +16401,7 @@ patch(myElement, render, someData);
       </section>
     </article>
 
+
     <article>
       <h2 is="h2-with-link" id="demos">Demos</h2>
       <section>
@@ -16328,6 +16414,7 @@ patch(myElement, render, someData);
         </p>    
       </section>
 
+
       <section>
         <h3 is="h3-with-link" id="demos/using-with-web-components">Using with Web Components</h3>
         <p>
@@ -16338,6 +16425,7 @@ patch(myElement, render, someData);
         </p>
       </section>
     </article>
+
 
     <article>
       <h2 is="h2-with-link" id="why-incremental-dom">Why Incremental DOM</h2>
