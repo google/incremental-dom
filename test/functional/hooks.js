@@ -19,7 +19,7 @@ import {
     text,
     elementVoid,
     symbols,
-    mutators,
+    attributes,
     notifications
 } from '../../index';
 
@@ -48,17 +48,17 @@ describe('library hooks', () => {
 
     function stubOut(mutator) {
       stub = sandbox.stub();
-      mutators.attributes[mutator] = stub;
+      attributes[mutator] = stub;
     }
 
     beforeEach(() => {
-      allSpy = sandbox.spy(mutators.attributes, symbols.all);
+      allSpy = sandbox.spy(attributes, symbols.all);
     });
 
     afterEach(() => {
-      for (var mutator in mutators.attributes) {
+      for (var mutator in attributes) {
         if (mutator !== symbols.all) {
-          mutators.attributes[mutator] = null;
+          attributes[mutator] = null;
         }
       }
     });
