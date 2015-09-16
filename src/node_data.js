@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import { createMap } from './util';
+
 
 /**
  * Keeps track of information needed to perform diffs for a given DOM node.
@@ -26,7 +28,7 @@ function NodeData(nodeName, key) {
    * The attributes and their values.
    * @const
    */
-  this.attrs = {};
+  this.attrs = createMap();
 
   /**
    * An array of attribute name/value pairs, used for quickly diffing the
@@ -40,7 +42,7 @@ function NodeData(nodeName, key) {
    * The incoming attributes for this Node, before they are updated.
    * @const {!Object<string, *>}
    */
-  this.newAttrs = {};
+  this.newAttrs = createMap();
 
   /**
    * The key used to identify this node, used to preserve DOM nodes when they

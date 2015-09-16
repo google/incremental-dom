@@ -16,6 +16,10 @@
 
 import { getData } from './node_data';
 import { symbols } from './symbols';
+import {
+  createMap,
+  has
+} from './util';
 
 
 /**
@@ -58,9 +62,12 @@ var applyStyle = function(el, name, style) {
     el.style.cssText = style;
   } else {
     el.style.cssText = '';
+    var elStyle = el.style;
 
     for (var prop in style) {
-      el.style[prop] = style[prop];
+      if (has(style, prop)) {
+        elStyle[prop] = style[prop];
+      }
     }
   }
 };
@@ -110,16 +117,15 @@ var updateAttribute = function(el, name, value) {
  * A publicly mutable object to provide custom mutators for attributes.
  * @const {!Object<string, function(!Element, string, *)>}
  */
-var attributes = {
-  // Special generic mutator that's called for any attribute that does not
-  // have a specific mutator.
-  [symbols.all]: applyAttributeTyped,
+var attributes = createMap();
 
-  [symbols.placeholder]: function() {},
+// Special generic mutator that's called for any attribute that does not
+// have a specific mutator.
+attributes[symbols.all] = applyAttributeTyped;
 
-  // Special case the style attribute
-  style: applyStyle
-};
+attributes[symbols.placeholder] = function() {};
+
+attributes['style'] = applyStyle;
 
 
 /** */
