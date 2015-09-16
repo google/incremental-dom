@@ -313,6 +313,11 @@ function renderGreeting(name) {
             <dd>Pairs of property names and values. Depending on the type of the value, these will be set as either attributes or properties on the Element.</dd>
           </dl>
 
+          <h4>Returns</h4>
+          <p>
+            <code>Element</code> The corresponding DOM Element.
+          </p>
+
           <h4>Usage</h4>
           <code-prism lang="javascript">
 var elementOpen = IncrementalDOM.elementOpen;
@@ -371,6 +376,11 @@ elementOpen('div', item.key, ['staticAttr', 'staticValue'],
           <p>
             Used with <coode><a href="#api/elementOpenStart">elementOpenStart</a></code> and <code><a href="#api/attr">attr</a></code> to declare an element.
           </p>
+
+          <h4>Returns</h4>
+          <p>
+            <code>Element</code> The corresponding DOM Element.
+          </p>
         </div>
       </section>
 
@@ -388,6 +398,11 @@ elementOpen('div', item.key, ['staticAttr', 'staticValue'],
             <dt><code><em>string</em> tagname</code></dt>
             <dd>The name of the tag, e.g. 'div' or 'span'. This could also be the tag of a custom element.</dd>
           </dl>
+
+          <h4>Returns</h4>
+          <p>
+            <code>Element</code> The corresponding DOM Element.
+          </p>
 
           <h4>Usage</h4>
           <code-prism lang="javascript">
@@ -419,6 +434,11 @@ elementClose('div');
             <dd>Pairs of property names and values. Depending on the type of the value, these will be set as either attributes or properties on the Element.</dd>
           </dl>
 
+          <h4>Returns</h4>
+          <p>
+            <code>Element</code> The corresponding DOM Element.
+          </p>
+
           <h4>Usage</h4>
           <code-prism lang="javascript">
 var elementClose = IncrementalDOM.elementClose;
@@ -446,6 +466,11 @@ elementVoid('div', item.key, ['staticAttr', 'staticValue'],
             <dt><code><em>...function</em> formatters</code></dt>
             <dd>Optional functions that format the value when it changes.</dd>
           </dl>
+
+          <h4>Returns</h4>
+          <p>
+            <code>Text</code> The corresponding DOM Text Node.
+          </p>
 
           <h4>Usage</h4>
           <code-prism lang="javascript">
