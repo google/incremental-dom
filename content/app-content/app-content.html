@@ -441,15 +441,20 @@ elementVoid('div', item.key, ['staticAttr', 'staticValue'],
 
           <h4>Parameters</h4>
           <dl>
-            <dt><code><em>string</em> text</code></dt>
-            <dd>The text for the Text node.</dd>
+            <dt><code><em>string|boolean|number</em> value</code></dt>
+            <dd>The value for the Text node.</dd>
+            <dt><code><em>...function</em> formatters</code></dt>
+            <dd>Optional functions that format the value when it changes.</dd>
           </dl>
 
           <h4>Usage</h4>
           <code-prism lang="javascript">
 var text = IncrementalDOM.text;
+function toUpperCase(str) {
+  return str.toUpperCase();
+}
 &hellip; 
-text('hello world');
+text('hello world', toUpperCase);
           </code-prism>
         </div>  
       </section>
