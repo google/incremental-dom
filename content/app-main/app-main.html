@@ -41,7 +41,7 @@
         </paper-toolbar>
         <hash-menu></hash-menu>
       </paper-header-panel>
-      <paper-header-panel main on-content-scroll="handleScroll">
+      <paper-header-panel main>
         <paper-toolbar>
           <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
           <span class="title">Incremental DOM</span>
@@ -58,10 +58,6 @@
 
       created: function() {
         location.hash = location.hash || '#about';
-      },
-
-      handleScroll: function(e) {
-        this.$.content.handleScroll(e);
       }
     });
   </script>
