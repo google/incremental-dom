@@ -26,6 +26,7 @@ import {
     nextSibling,
     parentNode
 } from './traversal';
+import { symbols } from './symbols';
 
 
 // For https://github.com/esperantojs/esperanto/issues/187
@@ -72,6 +73,19 @@ if (process.env.NODE_ENV !== 'production') {
       throw new Error('Was expecting a call to attr or elementOpenEnd. ' +
           'elementOpenStart must be followed by zero or more calls to attr, ' +
           'then one call to elementOpenEnd.');
+    }
+  };
+
+
+  /**
+   * Makes sure that placeholders have a key specified. Otherwise, conditional
+   * placeholders and conditional elements next to placeholders will cause
+   * placeholder elements to be re-used as non-placeholders and vice versa.
+   * @param {string} key
+   */
+  var assertPlaceholderKeySpecified = function(key) {
+    if (!key) {
+      throw new Error('Placeholder elements must have a key specified.');
     }
   };
 
@@ -273,11 +287,36 @@ var elementClose = function(tag) {
  * @return {!Element} The corresponding Element.
  */
 var elementVoid = function(tag, key, statics, var_args) {
+  var node = elementOpen.apply(null, arguments);
+  elementClose.apply(null, arguments);
+  return node;
+};
+
+
+/**
+ * Declares a virtual Element at the current location in the document that is a
+ * placeholder element. Children of this Element can be manually managed and
+ * will not be cleared by the library.
+ *
+ * A key must be specified to make sure that this node is correctly preserved
+ * across all conditionals.
+ *
+ * @param {string} tag The element's tag.
+ * @param {string} key The key used to identify this element.
+ * @param {?Array<*>=} statics An array of attribute name/value pairs of the
+ *     static attributes for the Element. These will only be set once when the
+ *     Element is created.
+ * @param {...*} var_args Attribute name/value pairs of the dynamic attributes
+ *     for the Element.
+ * @return {!Element} The corresponding Element.
+ */
+var elementPlaceholder = function(tag, key, statics, var_args) {
   if (process.env.NODE_ENV !== 'production') {
-    assertNotInAttributes();
+    assertPlaceholderKeySpecified(key);
   }
 
   var node = elementOpen.apply(null, arguments);
+  updateAttribute(node, symbols.placeholder, true);
   elementClose.apply(null, arguments);
   return node;
 };
@@ -323,6 +362,7 @@ export {
   elementOpen,
   elementVoid,
   elementClose,
+  elementPlaceholder,
   text,
   attr
 };
