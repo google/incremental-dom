@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-  - 0.10
+  - 0.12
 # This is basically redundant (ends up getting run twice) as this gets called
 # by npm on install due to the prepublish script in package.json.
 script:

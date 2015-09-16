@@ -24,6 +24,7 @@ var gulp = require('gulp');
 var gutil = require('gulp-util');
 var karma = require('karma').server;
 var path = require('path');
+var replace = require('gulp-replace');
 var source = require('vinyl-source-stream');
 var sourcemaps = require('gulp-sourcemaps');
 var uglify = require('gulp-uglify');
@@ -36,8 +37,8 @@ var srcs = [jsFileName, 'src/**/*.js'];
 var tests = ['test/**/*.js'];
 var karmaConfig = path.resolve('conf/karma.conf.js');
 
-function clean(done) {
-  del(['dist'], done);
+function clean() {
+  return del(['dist/']);
 }
 
 function unit(done) {
@@ -70,6 +71,14 @@ function lint() {
     .pipe(gjslint.reporter('fail'));
 }
 
+function inlineEnv() {
+  return babel({
+    whitelist: [
+      'utility.inlineEnvironmentVariables'
+    ]
+  });
+}
+
 function bundle(format) {
   return rollup.rollup({
     entry: entryFileName,
@@ -86,55 +95,73 @@ function bundle(format) {
   });
 }
 
-function js(done) {
-  bundle('umd').then(function(gen) {
-    file(artifactName + '.js', gen.code, {src: true})
+function js() {
+  process.env.NODE_ENV = 'development';
+
+  return bundle('umd').then(function(gen) {
+    return file(artifactName + '.js', gen.code, {src: true})
       .pipe(sourcemaps.init({loadMaps: true}))
+      .pipe(inlineEnv())
       .pipe(babel())
       .pipe(sourcemaps.write('./'))
-      .pipe(gulp.dest('dist'))
-      .on('error', done)
-      .on('end', done);
-  }).catch(done);
+      .pipe(gulp.dest('dist'));
+  });
 }
 
 function jsWatch() {
   gulp.watch(srcs, ['js']);
 }
 
-function jsMin(done) {
+function jsMin() {
   process.env.NODE_ENV = 'production';
 
-  bundle('umd').then(function(gen) {
-    file(artifactName + '-min.js', gen.code, {src: true})
+  return bundle('umd').then(function(gen) {
+    return file(artifactName + '-min.js', gen.code, {src: true})
       .pipe(sourcemaps.init({loadMaps: true}))
+      .pipe(inlineEnv())
       .pipe(babel())
       .pipe(uglify({
         preserveComments: 'some'
       }))
       .pipe(sourcemaps.write('./'))
-      .pipe(gulp.dest('dist'))
-      .on('error', done)
-      .on('end', done);
-  }).catch(done);
+      .pipe(gulp.dest('dist'));
+  });
 }
 
 function jsClosure(done) {
-  process.env.NODE_ENV = 'production';
-
-  bundle('cjs').then(function(gen) {
+  return bundle('cjs').then(function(gen) {
     // Replace the first line with a goog.module declaration.
     var moduleDeclaration = 'goog.module(\'' + googModuleName + '\');';
     var code = gen.code.replace(/.*/, moduleDeclaration);
 
-    file(artifactName + '-closure.js', code, {src: true})
+    return file(artifactName + '-closure.js', code, {src: true})
+      .pipe(sourcemaps.init({loadMaps: true}))
+      .pipe(replace('process.env.NODE_ENV !== \'production\'', 'goog.DEBUG'))
+      .pipe(babel())
+      .pipe(sourcemaps.write('./'))
+      .pipe(gulp.dest('dist'));
+  });
+}
+
+function jsCommonJS() {
+  return bundle('cjs').then(function(gen) {
+    return file(artifactName + '-cjs.js', gen.code, {src: true})
       .pipe(sourcemaps.init({loadMaps: true}))
       .pipe(babel())
       .pipe(sourcemaps.write('./'))
-      .pipe(gulp.dest('dist'))
-      .on('error', done)
-      .on('end', done);
-  }).catch(done);
+      .pipe(gulp.dest('dist'));
+  });
+}
+
+function jsDist() {
+  // These must be run serially: clean must complete before any of the js
+  // targets run. The js and jsMin targets cannot run in parallel as they both
+  // change process.env.NODE_ENV. The CommonJS target could run in parallel
+  // with the js and jsMin targets, but currently is not.
+  return clean()
+    .then(jsCommonJS)
+    .then(js)
+    .then(jsMin);
 }
 
 gulp.task('clean', clean);
@@ -145,7 +172,7 @@ gulp.task('lint', lint);
 gulp.task('js', js);
 gulp.task('js-watch', jsWatch);
 gulp.task('js-min', jsMin);
-gulp.task('js-dist', ['js', 'js-min']);
+gulp.task('js-dist', jsDist);
 gulp.task('js-closure', jsClosure);
 gulp.task('build', ['lint', 'unit', 'js']);
 gulp.task('dist', ['lint', 'unit-phantom', 'js-dist']);
