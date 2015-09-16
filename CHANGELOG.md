@@ -1,6 +1,6 @@
-Change Log
+# Change Log
 
-# 0.2.0
+## 0.2.0
 
 - Added asserts to non-minified build to help ensure proper usage
 - Added support for creating SVG elements
@@ -13,6 +13,6 @@ Change Log
 - Added formatting function variable arguments to the `text` function
 
 
-# 0.1.0
+## 0.1.0
 
 - Initial release
