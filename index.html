@@ -2450,10 +2450,10 @@ prototype = {};
 }
 var factory = desugar(prototype);
 prototype = factory.prototype;
-var options = { prototype: prototype };
-if (prototype.extends) {
-options.extends = prototype.extends;
-}
+var options = {
+prototype: prototype,
+extends: prototype.extends
+};
 Polymer.telemetry._registrate(prototype);
 document.registerElement(prototype.is, options);
 return factory;
@@ -2970,7 +2970,7 @@ debouncer.stop();
 }
 }
 });
-Polymer.version = '1.1.3';
+Polymer.version = '1.1.2';
 Polymer.Base._addFeature({
 _registerFeatures: function () {
 this._prepIs();
@@ -5179,9 +5179,9 @@ gd = gobj[dep];
 if (gd && gd[name]) {
 gd[name] = (gd[name] || 1) - 1;
 gd._count = (gd._count || 1) - 1;
+}
 if (gd._count === 0) {
 node.removeEventListener(dep, this.handleNative);
-}
 }
 }
 }
@@ -9658,27 +9658,6 @@ this.fire('dom-change');
   /** @polymerBehavior */
   Polymer.IronSelectableBehavior = {
 
-      /**
-       *  Fired when iron-selector is activated (selected or deselected).
-       *  It is fired before the selected items are changed.
-       *  Cancel the event to abort selection.
-       *
-       * @event iron-activate
-       *
-       **/
-      /**
-       *  Fired when an item is selected
-       *
-       * @event iron-select
-       *
-       **/
-      /**
-       *  Fired when an item is deselected
-       *
-       * @event iron-deselect
-       *
-       **/
-
     properties: {
 
       /**
@@ -9732,7 +9711,7 @@ this.fire('dom-change');
       },
 
       /**
-       * This is a CSS selector string.  If this is set, only items that match the CSS selector
+       * This is a CSS selector sting.  If this is set, only items that matches the CSS selector
        * are selectable.
        *
        * @attribute selectable
@@ -9760,29 +9739,17 @@ this.fire('dom-change');
       selectedAttribute: {
         type: String,
         value: null
-      },
-
-      /**
-       * The set of excluded elements where the key is the `localName` 
-       * of the element that will be ignored from the item list.
-       *
-       * @type {object}
-       * @default {template: 1}
-       */
-
-      excludedLocalNames: {
-        type: Object,
-        value: function() {
-          return {
-            'template': 1
-          };
-        }
       }
+
     },
 
     observers: [
       '_updateSelected(attrForSelected, selected)'
     ],
+
+    excludedLocalNames: {
+      'template': 1
+    },
 
     created: function() {
       this._bindFilterItem = this._filterItem.bind(this);
@@ -9862,7 +9829,9 @@ this.fire('dom-change');
     },
 
     _removeListener: function(eventName) {
-      this.unlisten(this, eventName, '_activateHandler');
+      // There is no unlisten yet...
+      // https://github.com/Polymer/polymer/issues/1639
+      //this.removeEventListener(eventName, this._bindActivateHandler);
     },
 
     _activateEventChanged: function(eventName, old) {
@@ -9951,6 +9920,11 @@ this.fire('dom-change');
     },
 
     _activateHandler: function(e) {
+      // TODO: remove this when https://github.com/Polymer/polymer/issues/1639 is fixed so we
+      // can just remove the old event listener.
+      if (e.type !== this.activateEvent) {
+        return;
+      }
       var t = e.target;
       var items = this.items;
       while (t && t != this) {
@@ -14641,73 +14615,73 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <dom-module id="paper-ripple" assetpath="bower_components/paper-ripple/">
 
   
-  
+
+  <style>
+    :host {
+      display: block;
+      position: absolute;
+      border-radius: inherit;
+      overflow: hidden;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+
+    :host([animating]) {
+      /* This resolves a rendering issue in Chrome (as of 40) where the
+         ripple is not properly clipped by its parent (which may have
+         rounded corners). See: http://jsbin.com/temexa/4
+
+         Note: We only apply this style conditionally. Otherwise, the browser
+         will create a new compositing layer for every ripple element on the
+         page, and that would be bad. */
+      -webkit-transform: translate(0, 0);
+      transform: translate3d(0, 0, 0);
+    }
+
+    :host([noink]) {
+      pointer-events: none;
+    }
+
+    #background,
+    #waves,
+    .wave-container,
+    .wave {
+      pointer-events: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    #background,
+    .wave {
+      opacity: 0;
+    }
+
+    #waves,
+    .wave {
+      overflow: hidden;
+    }
+
+    .wave-container,
+    .wave {
+      border-radius: 50%;
+    }
+
+    :host(.circle) #background,
+    :host(.circle) #waves {
+      border-radius: 50%;
+    }
+
+    :host(.circle) .wave-container {
+      overflow: hidden;
+    }
+
+  </style>
   <template>
-    <style>
-      :host {
-        display: block;
-        position: absolute;
-        border-radius: inherit;
-        overflow: hidden;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-      }
-  
-      :host([animating]) {
-        /* This resolves a rendering issue in Chrome (as of 40) where the
-           ripple is not properly clipped by its parent (which may have
-           rounded corners). See: http://jsbin.com/temexa/4
-  
-           Note: We only apply this style conditionally. Otherwise, the browser
-           will create a new compositing layer for every ripple element on the
-           page, and that would be bad. */
-        -webkit-transform: translate(0, 0);
-        transform: translate3d(0, 0, 0);
-      }
-  
-      :host([noink]) {
-        pointer-events: none;
-      }
-  
-      #background,
-      #waves,
-      .wave-container,
-      .wave {
-        pointer-events: none;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-      }
-  
-      #background,
-      .wave {
-        opacity: 0;
-      }
-  
-      #waves,
-      .wave {
-        overflow: hidden;
-      }
-  
-      .wave-container,
-      .wave {
-        border-radius: 50%;
-      }
-  
-      :host(.circle) #background,
-      :host(.circle) #waves {
-        border-radius: 50%;
-      }
-  
-      :host(.circle) .wave-container {
-        overflow: hidden;
-      }
-    </style>
-    
     <div id="background"></div>
     <div id="waves"></div>
   </template>
@@ -14715,6 +14689,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <script>
   (function() {
     var Utility = {
+      cssColorWithAlpha: function(cssColor, alpha) {
+        var parts = cssColor.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+
+        if (typeof alpha == 'undefined') {
+          alpha = 1;
+        }
+
+        if (!parts) {
+          return 'rgba(255, 255, 255, ' + alpha + ')';
+        }
+
+        return 'rgba(' + parts[1] + ', ' + parts[2] + ', ' + parts[3] + ', ' + alpha + ')';
+      },
+
       distance: function(x1, y1, x2, y2) {
         var xDelta = (x1 - x2);
         var yDelta = (y1 - y2);
@@ -14722,8 +14710,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return Math.sqrt(xDelta * xDelta + yDelta * yDelta);
       },
 
-      now: window.performance && window.performance.now ?
-          window.performance.now.bind(window.performance) : Date.now
+      now: (function() {
+        if (window.performance && window.performance.now) {
+          return window.performance.now.bind(window.performance);
+        }
+
+        return Date.now;
+      })()
     };
 
     /**
@@ -15849,7 +15842,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         updateHash();
         window.addEventListener('hashchange', updateHash);
-        window.addEventListener('app:replacestate', updateHash);
       },
 
       getHeadings: function getHeadings(node, level) {
@@ -15972,9 +15964,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </p>
         <p>
           Rather than targeting direct usage, Incremental DOM aims to provide a platform for higher level libraries or frameworks. As you might notice from the examples, Incremental DOM-style markup can be somewhat challenging to write and read. See <a href="#why-incremental-dom">Why Incremental DOM</a> for an explanation.
-        </p>
-        <p>
-          
         </p>
       </section>
     </article>
@@ -16203,6 +16192,59 @@ function renderGreeting(name) {
       </section>
     </article>
 
+    <article>
+      <h2 is="h2-with-link" id="hooks">Hooks</h2>
+      <section>
+        <h3 is="h3-with-link" id="hooks/setting-values">Setting Values</h3>
+        <p>
+          Incremental DOM provides hooks to allow customization of how values are set. The <code>attributes</code> object allows you to provide a function to decide what to do when an attribute passed to <code>elementOpen</code> or similar functions changes. The following example makes Incremental DOM always set <code>value</code> as a property.
+        </p>
+        <code-prism lang="javascript">
+import {
+  attributes,
+  applyProp,
+  applyAttr
+} from 'incremental-dom';
+
+attributes.value = applyProp;
+        </code-prism>
+        <p>
+          If you would like to have a bit more control over how the value is set, you can specify your own function for applying the update.
+        </p>
+        <code-prism lang="javascript">
+attributes.value = function(element, name, value) {
+  …
+};
+        </code-prism> 
+        <p>
+          If no function is specified for a given name, a default function is used that applies values as described in <a href="#rendering-dom/attributes-and-properties">Attributes and Properties</a>. This can be changed by specifying the function for <code>symbols.default</code>.
+        </p> 
+        <code-prism lang="javascript">
+import {
+  attributes,
+  symbols
+} from 'incremental-dom';
+
+attributes[symbols.default] = someFunction;
+        </code-prism> 
+      </section>
+
+      <section>
+        <h3 is="h3-with-link" id="hooks/added-removed-nodes">Added/Removed Nodes</h3>
+        <p>
+          You can be notified when Nodes are added or removed by Incremental DOM by specifying functions for <code>notifications.nodesCreated</code> and <code>notifications.nodesDeleted</code>. If there are added or removed nodes during a patch operation, the appropriate function will be called at the end of the patch with the added or removed nodes.
+        </p>
+        <code-prism lang="javascript">
+import { notifications } from 'incremental-dom';
+
+notifications.nodesCreated = function(nodes) {
+  nodes.forEach(function(node) {
+    // node may be an Element or a Text
+  });
+};
+        </code-prism> 
+    </section></article>
+
     <article class="api-article">
       <h2 is="h2-with-link" id="api">API</h2>
       <section>
@@ -16225,9 +16267,15 @@ function renderGreeting(name) {
             <dd>Pairs of property names and values. Depending on the type of the value, these will be set as either attributes or properties on the Element.</dd>
           </dl>
 
+          <h4>Returns</h4>
+          <p>
+            <code>Element</code> The corresponding DOM Element.
+          </p>
+
           <h4>Usage</h4>
           <code-prism lang="javascript">
-var elementOpen = IncrementalDOM.elementOpen;
+import { elementOpen } from 'incremental-dom';
+
 var somefunction = function() { … };
 … 
 elementOpen('div', item.key, ['staticAttr', 'staticValue'],
@@ -16283,6 +16331,11 @@ elementOpen('div', item.key, ['staticAttr', 'staticValue'],
           <p>
             Used with <coode><a href="#api/elementOpenStart">elementOpenStart</a> and <code><a href="#api/attr">attr</a></code> to declare an element.
           </coode></p>
+
+          <h4>Returns</h4>
+          <p>
+            <code>Element</code> The corresponding DOM Element.
+          </p>
         </div>
       </section>
 
@@ -16301,9 +16354,14 @@ elementOpen('div', item.key, ['staticAttr', 'staticValue'],
             <dd>The name of the tag, e.g. 'div' or 'span'. This could also be the tag of a custom element.</dd>
           </dl>
 
+          <h4>Returns</h4>
+          <p>
+            <code>Element</code> The corresponding DOM Element.
+          </p>
+
           <h4>Usage</h4>
           <code-prism lang="javascript">
-var elementClose = IncrementalDOM.elementClose;
+import { elementClose } from 'incremental-dom';
 … 
 elementClose('div');
           </code-prism>
@@ -16331,9 +16389,14 @@ elementClose('div');
             <dd>Pairs of property names and values. Depending on the type of the value, these will be set as either attributes or properties on the Element.</dd>
           </dl>
 
+          <h4>Returns</h4>
+          <p>
+            <code>Element</code> The corresponding DOM Element.
+          </p>
+
           <h4>Usage</h4>
           <code-prism lang="javascript">
-var elementClose = IncrementalDOM.elementClose;
+import { elementClose } from 'incremental-dom';
 … 
 elementVoid('div', item.key, ['staticAttr', 'staticValue'],
     'someAttr', 'someValue',
@@ -16353,15 +16416,26 @@ elementVoid('div', item.key, ['staticAttr', 'staticValue'],
 
           <h4>Parameters</h4>
           <dl>
-            <dt><code><em>string</em> text</code></dt>
-            <dd>The text for the Text node.</dd>
+            <dt><code><em>string|boolean|number</em> value</code></dt>
+            <dd>The value for the Text node.</dd>
+            <dt><code><em>...function</em> formatters</code></dt>
+            <dd>Optional functions that format the value when it changes.</dd>
           </dl>
+
+          <h4>Returns</h4>
+          <p>
+            <code>Text</code> The corresponding DOM Text Node.
+          </p>
 
           <h4>Usage</h4>
           <code-prism lang="javascript">
-var text = IncrementalDOM.text;
+import { text } from 'incremental-dom';
+
+function toUpperCase(str) {
+  return str.toUpperCase();
+}
 … 
-text('hello world');
+text('hello world', toUpperCase);
           </code-prism>
         </div>  
       </section>
@@ -16387,7 +16461,8 @@ text('hello world');
 
           <h4>Usage</h4>
           <code-prism lang="javascript">
-var patch = IncrementalDOM.patch;
+import { patch } from 'incremental-dom';
+
 function render(data) {
   elementOpen('div');
   elementClose('div');
@@ -16450,49 +16525,7 @@ patch(myElement, render, someData);
   </template>
 
   <script>Polymer({
-  is: 'app-content',
-
-  ready: function() {
-    var calculateOffsets = this.calculateOffsets.bind(this);
-
-    window.addEventListener('resize', calculateOffsets);
-    setTimeout(calculateOffsets, 1);
-  },
-
-  calculateOffsets: function() {
-   this.headingInfos = [].slice.call(this.querySelectorAll('h2, h3'))
-      .map(function(heading) {
-        return {
-          top: heading.offsetTop - 10,
-          href: '#' + heading.id
-        };
-      });
-  },
-
-  handleScroll: function(e) {
-    if (!this.headingInfos || !history || !history.replaceState) {
-      return;
-    }
-
-    var target = e.detail.target;
-    var offset = target.scrollTop;
-    var height = target.offsetHeight;
-    var scrollHeight = target.scrollHeight;
-
-    if (scrollHeight - (offset + height) < 5) {
-      return;
-    }
-
-    this.headingInfos
-      .filter(function(headingInfo) {
-        return headingInfo.top < offset;
-      })
-      .slice(-1)
-      .forEach(function(headingInfo) {
-        history.replaceState(null, '', headingInfo.href);
-        window.dispatchEvent(new CustomEvent('app:replacestate'));
-      });
-  }
+  is: 'app-content'
 });
 </script>
 </dom-module>
@@ -16528,7 +16561,7 @@ patch(myElement, render, someData);
         </paper-toolbar>
         <hash-menu></hash-menu>
       </paper-header-panel>
-      <paper-header-panel main="" on-content-scroll="handleScroll">
+      <paper-header-panel main="">
         <paper-toolbar>
           <paper-icon-button icon="menu" paper-drawer-toggle=""></paper-icon-button>
           <span class="title">Incremental DOM</span>
@@ -16545,10 +16578,6 @@ patch(myElement, render, someData);
 
       created: function() {
         location.hash = location.hash || '#about';
-      },
-
-      handleScroll: function(e) {
-        this.$.content.handleScroll(e);
       }
     });
   </script>
