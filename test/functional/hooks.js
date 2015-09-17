@@ -52,12 +52,12 @@ describe('library hooks', () => {
     }
 
     beforeEach(() => {
-      allSpy = sandbox.spy(attributes, symbols.all);
+      allSpy = sandbox.spy(attributes, symbols.default);
     });
 
     afterEach(() => {
       for (var mutator in attributes) {
-        if (mutator !== symbols.all &&
+        if (mutator !== symbols.default &&
             mutator !== symbols.placeholder) {
           attributes[mutator] = null;
         }
