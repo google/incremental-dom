@@ -61,9 +61,6 @@
         <p>
           Rather than targeting direct usage, Incremental DOM aims to provide a platform for higher level libraries or frameworks. As you might notice from the examples, Incremental DOM-style markup can be somewhat challenging to write and read. See <a href="#why-incremental-dom">Why Incremental DOM</a> for an explanation.
         </p>
-        <p>
-          
-        </p>
       </section>
     </article>
 
@@ -291,6 +288,59 @@ function renderGreeting(name) {
       </section>
     </article>
 
+    <article>
+      <h2 is="h2-with-link" id="hooks">Hooks</h2>
+      <section>
+        <h3 is="h3-with-link" id="hooks/setting-values">Setting Values</h3>
+        <p>
+          Incremental DOM provides hooks to allow customization of how values are set. The <code>attributes</code> object allows you to provide a function to decide what to do when an attribute passed to <code>elementOpen</code> or similar functions changes. The following example makes Incremental DOM always set <code>value</code> as a property.
+        </p>
+        <code-prism lang="javascript">
+import {
+  attributes,
+  applyProp,
+  applyAttr
+} from 'incremental-dom';
+
+attributes.value = applyProp;
+        </code-prism>
+        <p>
+          If you would like to have a bit more control over how the value is set, you can specify your own function for applying the update.
+        </p>
+        <code-prism lang="javascript">
+attributes.value = function(element, name, value) {
+  &hellip;
+};
+        </code-prism> 
+        <p>
+          If no function is specified for a given name, a default function is used that applies values as described in <a href="#rendering-dom/attributes-and-properties">Attributes and Properties</a>. This can be changed by specifying the function for <code>symbols.default</code>.
+        </p> 
+        <code-prism lang="javascript">
+import {
+  attributes,
+  symbols
+} from 'incremental-dom';
+
+attributes[symbols.default] = someFunction;
+        </code-prism> 
+      </section>
+
+      <section>
+        <h3 is="h3-with-link" id="hooks/added-removed-nodes">Added/Removed Nodes</h3>
+        <p>
+          You can be notified when Nodes are added or removed by Incremental DOM by specifying functions for <code>notifications.nodesCreated</code> and <code>notifications.nodesDeleted</code>. If there are added or removed nodes during a patch operation, the appropriate function will be called at the end of the patch with the added or removed nodes.
+        </p>
+        <code-prism lang="javascript">
+import { notifications } from 'incremental-dom';
+
+notifications.nodesCreated = function(nodes) {
+  nodes.forEach(function(node) {
+    // node may be an Element or a Text
+  });
+};
+        </code-prism> 
+    </article>
+
     <article class="api-article">
       <h2 is="h2-with-link" id="api">API</h2>
       <section>
@@ -320,7 +370,8 @@ function renderGreeting(name) {
 
           <h4>Usage</h4>
           <code-prism lang="javascript">
-var elementOpen = IncrementalDOM.elementOpen;
+import { elementOpen } from 'incremental-dom';
+
 var somefunction = function() { &hellip; };
 &hellip; 
 elementOpen('div', item.key, ['staticAttr', 'staticValue'],
@@ -406,7 +457,7 @@ elementOpen('div', item.key, ['staticAttr', 'staticValue'],
 
           <h4>Usage</h4>
           <code-prism lang="javascript">
-var elementClose = IncrementalDOM.elementClose;
+import { elementClose } from 'incremental-dom';
 &hellip; 
 elementClose('div');
           </code-prism>
@@ -441,7 +492,7 @@ elementClose('div');
 
           <h4>Usage</h4>
           <code-prism lang="javascript">
-var elementClose = IncrementalDOM.elementClose;
+import { elementClose } from 'incremental-dom';
 &hellip; 
 elementVoid('div', item.key, ['staticAttr', 'staticValue'],
     'someAttr', 'someValue',
@@ -474,7 +525,8 @@ elementVoid('div', item.key, ['staticAttr', 'staticValue'],
 
           <h4>Usage</h4>
           <code-prism lang="javascript">
-var text = IncrementalDOM.text;
+import { text } from 'incremental-dom';
+
 function toUpperCase(str) {
   return str.toUpperCase();
 }
@@ -505,7 +557,8 @@ text('hello world', toUpperCase);
 
           <h4>Usage</h4>
           <code-prism lang="javascript">
-var patch = IncrementalDOM.patch;
+import { patch } from 'incremental-dom';
+
 function render(data) {
   elementOpen('div');
   elementClose('div');
