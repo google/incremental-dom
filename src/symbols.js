@@ -15,7 +15,7 @@
  */
 
 var symbols = {
-  all: '__all',
+  default: '__default',
 
   placeholder: '__placeholder'
 };

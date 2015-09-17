@@ -106,7 +106,7 @@ var updateAttribute = function(el, name, value) {
     return;
   }
 
-  var mutator = attributes[name] || attributes[symbols.all];
+  var mutator = attributes[name] || attributes[symbols.default];
   mutator(el, name, value);
 
   attrs[name] = value;
@@ -121,7 +121,7 @@ var attributes = createMap();
 
 // Special generic mutator that's called for any attribute that does not
 // have a specific mutator.
-attributes[symbols.all] = applyAttributeTyped;
+attributes[symbols.default] = applyAttributeTyped;
 
 attributes[symbols.placeholder] = function() {};
 
