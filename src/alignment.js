@@ -23,9 +23,6 @@ import { getData } from './node_data';
 import { getContext } from './context';
 import { symbols } from './symbols';
 
-// For https://github.com/esperantojs/esperanto/issues/187
-var dummy;
-
 
 if (process.env.NODE_ENV !== 'production') {
   /**

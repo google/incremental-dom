@@ -23,10 +23,6 @@ import { getNamespaceForTag } from './namespace';
 import { createMap } from './util';
 
 
-// For https://github.com/esperantojs/esperanto/issues/187
-var dummy;
-
-
 /**
  * Creates an Element.
  * @param {Document} doc The document with which to create the Element.
