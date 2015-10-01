@@ -98,7 +98,19 @@ if (process.env.NODE_ENV !== 'production') {
 
     if (tag !== data.nodeName) {
       throw new Error('Received a call to close ' + tag + ' but ' +
-            data.nodeName + ' was open.');
+          data.nodeName + ' was open.');
+    }
+  };
+
+
+  /**
+   * Makes sure that the key attribute does not appear in dynamic attributes.
+   * @param {!Object<string, *>} attrs
+   */
+  var assertNoKeyInDynamicAttributes = function(attrs) {
+    if ('key' in attrs) {
+      throw new Error('The `key` attribute may not appear in the dynamic' +
+          'attributes');
     }
   };
 
@@ -175,6 +187,10 @@ var elementOpen = function(tag, key, statics, var_args) {
 
     for (i = ATTRIBUTES_OFFSET; i < arguments.length; i += 2) {
       newAttrs[arguments[i]] = arguments[i + 1];
+    }
+
+    if (process.env.NODE_ENV !== 'production') {
+      assertNoKeyInDynamicAttributes(newAttrs);
     }
 
     for (attr in newAttrs) {
