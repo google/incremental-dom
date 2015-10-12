@@ -131,13 +131,17 @@ describe('element creation', () => {
     it('should use createElement if no namespace has been specified', () => {
       var doc = container.ownerDocument;
       var div = doc.createElement('div');
+      var el;
       sandbox.stub(doc, 'createElement').returns(div);
 
       patch(container, () => {
-        elementVoid('div');
+        elementOpen('svg');
+          elementOpen('foreignObject');
+            el = elementVoid('div');
+          elementClose('foreignObject');
+        elementClose('svg');
       });
 
-      var el = container.childNodes[0];
       expect(el.namespaceURI).to.equal('http://www.w3.org/1999/xhtml');
       expect(doc.createElement).to.have.been.calledOnce;
     });

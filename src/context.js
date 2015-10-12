@@ -37,13 +37,6 @@ function Context(node, prevContext) {
   this.doc = node.ownerDocument;
 
   /**
-   * Keeps track of what namespace to create new Elements in.
-   * @private
-   * @const {!Array<(string|undefined)>}
-   */
-  this.nsStack_ = [undefined];
-
-  /**
    * @const {?Context}
    */
   this.prevContext = prevContext;
@@ -58,30 +51,6 @@ function Context(node, prevContext) {
    */
   this.deleted = notifications.nodesDeleted && [];
 }
-
-
-/**
- * @return {(string|undefined)} The current namespace to create Elements in.
- */
-Context.prototype.getCurrentNamespace = function() {
-  return this.nsStack_[this.nsStack_.length - 1];
-};
-
-
-/**
- * @param {string=} namespace The namespace to enter.
- */
-Context.prototype.enterNamespace = function(namespace) {
-  this.nsStack_.push(namespace);
-};
-
-
-/**
- * Exits the current namespace
- */
-Context.prototype.exitNamespace = function() {
-  this.nsStack_.pop();
-};
 
 
 /**
