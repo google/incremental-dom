@@ -16,30 +16,6 @@
 
 import { getContext } from './context';
 import { getData } from './node_data';
-import {
-  enterTag,
-  exitTag
-} from './namespace';
-
-
-/**
- * Enters an Element, setting the current namespace for nested elements.
- * @param {Node} node
- */
-var enterNode = function(node) {
-  var data = getData(node);
-  enterTag(data.nodeName);
-};
-
-
-/**
- * Exits an Element, unwinding the current namespace to the previous value.
- * @param {Node} node
- */
-var exitNode = function(node) {
-  var data = getData(node);
-  exitTag(data.nodeName);
-};
 
 
 /**
@@ -61,7 +37,6 @@ var markVisited = function(node) {
 var firstChild = function() {
   var context = getContext();
   var walker = context.walker;
-  enterNode(walker.currentNode);
   walker.firstChild();
 };
 
@@ -84,7 +59,6 @@ var parentNode = function() {
   var context = getContext();
   var walker = context.walker;
   walker.parentNode();
-  exitNode(walker.currentNode);
 };
 
 

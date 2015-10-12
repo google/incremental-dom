@@ -15,52 +15,32 @@
  */
 
 import { getContext } from './context';
+import { getData } from './node_data';
 
 var SVG_NS = 'http://www.w3.org/2000/svg';
 
 /**
- * Enters a tag, checking to see if it is a namespace boundary, and if so,
- * updates the current namespace.
- * @param {string} tag The tag to enter.
- */
-var enterTag = function(tag) {
-  if (tag === 'svg') {
-    getContext().enterNamespace(SVG_NS);
-  } else if (tag === 'foreignObject') {
-    getContext().enterNamespace(undefined);
-  }
-};
-
-
-/**
- * Exits a tag, checking to see if it is a namespace boundary, and if so,
- * updates the current namespace.
- * @param {string} tag The tag to enter.
- */
-var exitTag = function(tag) {
-  if (tag === 'svg' || tag === 'foreignObject') {
-    getContext().exitNamespace();
-  }
-};
-
-
-/**
  * Gets the namespace to create an element (of a given tag) in.
  * @param {string} tag The tag to get the namespace for.
- * @return {(string|undefined)} The namespace to create the tag in.
+ * @return {?string} The namespace to create the tag in.
  */
 var getNamespaceForTag = function(tag) {
   if (tag === 'svg') {
     return SVG_NS;
   }
 
-  return getContext().getCurrentNamespace();
+  var walker = getContext().walker;
+  var parent = walker.getCurrentParent();
+
+  if (getData(parent).nodeName === 'foreignObject') {
+    return null;
+  }
+
+  return parent.namespaceURI;
 };
 
 
 /** */
 export {
-  enterTag,
-  exitTag,
   getNamespaceForTag
 };
