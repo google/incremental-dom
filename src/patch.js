@@ -30,8 +30,8 @@ import { notifications } from './notifications';
 
 if (process.env.NODE_ENV !== 'production') {
   var assertNoUnclosedTags = function(root) {
-    var openElement = getContext().walker.getCurrentParent();
-    if (!openElement) {
+    var openElement = getContext().walker.currentNode;
+    if (openElement === root) {
       return;
     }
 

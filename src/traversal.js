@@ -25,7 +25,7 @@ import { getData } from './node_data';
 var markVisited = function(node) {
   var context = getContext();
   var walker = context.walker;
-  var parent = walker.getCurrentParent();
+  var parent = walker.currentParent;
   var data = getData(parent);
   data.lastVisitedChild = node;
 };

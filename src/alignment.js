@@ -73,7 +73,7 @@ var alignWithDOM = function(nodeName, key, statics) {
   var context = getContext();
   var walker = context.walker;
   var currentNode = walker.currentNode;
-  var parent = walker.getCurrentParent();
+  var parent = walker.currentParent;
   var matchingNode;
 
   // Check to see if we have a node to reuse

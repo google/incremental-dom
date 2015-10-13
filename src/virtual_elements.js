@@ -93,7 +93,7 @@ if (process.env.NODE_ENV !== 'production') {
   var assertCloseMatchesOpenTag = function(tag) {
     var context = getContext();
     var walker = context.walker;
-    var closingNode = walker.getCurrentParent();
+    var closingNode = walker.currentParent;
     var data = getData(closingNode);
 
     if (tag !== data.nodeName) {

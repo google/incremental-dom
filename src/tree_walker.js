@@ -24,14 +24,6 @@
  */
 function TreeWalker(node) {
   /**
-   * Keeps track of the current parent node. This is necessary as the traversal
-   * methods may traverse past the last child and we still need a way to get
-   * back to the parent.
-   * @const @private {!Array<!Node>}
-   */
-  this.stack_ = [];
-
-  /**
    * @const {!Element|!DocumentFragment}
    */
   this.root = node;
@@ -40,22 +32,19 @@ function TreeWalker(node) {
    * @type {?Node}
    */
   this.currentNode = node;
+
+  /**
+   * @type {!Node}
+   */
+  this.currentParent = node;
 }
-
-
-/**
- * @return {!Node} The current parent of the current location in the subtree.
- */
-TreeWalker.prototype.getCurrentParent = function() {
-  return this.stack_[this.stack_.length - 1];
-};
 
 
 /**
  * Changes the current location the firstChild of the current location.
  */
 TreeWalker.prototype.firstChild = function() {
-  this.stack_.push(this.currentNode);
+  this.currentParent = this.currentNode;
   this.currentNode = this.currentNode.firstChild;
 };
 
@@ -72,7 +61,8 @@ TreeWalker.prototype.nextSibling = function() {
  * Changes the current location the parentNode of the current location.
  */
 TreeWalker.prototype.parentNode = function() {
-  this.currentNode = this.stack_.pop();
+  this.currentNode = this.currentParent;
+  this.currentParent = this.currentParent.parentNode;
 };
 
 
