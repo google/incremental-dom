@@ -30,7 +30,7 @@ var getNamespaceForTag = function(tag) {
   }
 
   var walker = getContext().walker;
-  var parent = walker.getCurrentParent();
+  var parent = walker.currentParent;
 
   if (getData(parent).nodeName === 'foreignObject') {
     return null;
