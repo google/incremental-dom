@@ -32,7 +32,7 @@ import { createMap } from './util';
  *     the static attributes for the Element.
  * @return {!Element}
  */
-var createElement = function(doc, tag, key, statics) {
+function createElement(doc, tag, key, statics) {
   var namespace = getNamespaceForTag(tag);
   var el;
 
@@ -51,7 +51,7 @@ var createElement = function(doc, tag, key, statics) {
   }
 
   return el;
-};
+}
 
 
 /**
@@ -66,13 +66,13 @@ var createElement = function(doc, tag, key, statics) {
  *     the static attributes for the Element.
  * @return {!Node}
  */
-var createNode = function(doc, nodeName, key, statics) {
+export function createNode(doc, nodeName, key, statics) {
   if (nodeName === '#text') {
     return doc.createTextNode('');
   }
 
   return createElement(doc, nodeName, key, statics);
-};
+}
 
 
 /**
@@ -81,7 +81,7 @@ var createNode = function(doc, nodeName, key, statics) {
  * @return {!Object<string, !Element>} A mapping of keys to the children of the
  *     Element.
  */
-var createKeyMap = function(el) {
+function createKeyMap(el) {
   var map = createMap();
   var children = el.children;
   var count = children.length;
@@ -96,7 +96,7 @@ var createKeyMap = function(el) {
   }
 
   return map;
-};
+}
 
 
 /**
@@ -105,7 +105,7 @@ var createKeyMap = function(el) {
  * @param {!Node} el
  * @return {!Object<string, !Node>} A mapping of keys to child Elements
  */
-var getKeyMap = function(el) {
+function getKeyMap(el) {
   var data = getData(el);
 
   if (!data.keyMap) {
@@ -113,7 +113,7 @@ var getKeyMap = function(el) {
   }
 
   return data.keyMap;
-};
+}
 
 
 /**
@@ -122,9 +122,9 @@ var getKeyMap = function(el) {
  * @param {?string=} key
  * @return {?Element} The child corresponding to the key.
  */
-var getChild = function(parent, key) {
+export function getChild(parent, key) {
   return /** @type {?Element} */(key && getKeyMap(parent)[key]);
-};
+}
 
 
 /**
@@ -135,14 +135,6 @@ var getChild = function(parent, key) {
  * @param {string} key A key to identify the child with.
  * @param {!Node} child The child to register.
  */
-var registerChild = function(parent, key, child) {
+export function registerChild(parent, key, child) {
   getKeyMap(parent)[key] = child;
-};
-
-
-/** */
-export {
-  createNode,
-  getChild,
-  registerChild
-};
+}

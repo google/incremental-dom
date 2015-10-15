@@ -29,7 +29,7 @@ import { notifications } from './notifications';
 
 
 if (process.env.NODE_ENV !== 'production') {
-  var assertNoUnclosedTags = function(root) {
+  function assertNoUnclosedTags(root) {
     var openElement = getContext().walker.getCurrentParent();
     if (!openElement) {
       return;
@@ -43,7 +43,7 @@ if (process.env.NODE_ENV !== 'production') {
 
     throw new Error('One or more tags were not closed:\n' +
         openTags.join('\n'));
-  };
+  }
 }
 
 
@@ -57,7 +57,7 @@ if (process.env.NODE_ENV !== 'production') {
  * @param {T=} data An argument passed to fn to represent DOM state.
  * @template T
  */
-var patch = function(node, fn, data) {
+export function patch(node, fn, data) {
   enterContext(node);
 
   firstChild();
@@ -71,10 +71,4 @@ var patch = function(node, fn, data) {
 
   getContext().notifyChanges();
   restoreContext();
-};
-
-
-/** */
-export {
-  patch
-};
+}

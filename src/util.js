@@ -33,23 +33,15 @@ var create = Object.create;
  * @param {string} property The property to check.
  * @return {boolean} Whether map has property.
  */
-var has = function(map, property) {
+export function has(map, property) {
   return hasOwnProperty.call(map, property);
-};
+}
 
 
 /**
  * Creates an map object without a prototype.
  * @return {!Object}
  */
-var createMap = function() {
+export function createMap() {
   return create(null);
-};
-
-
-/** */
-export {
-  createMap,
-  has
-};
-
+}

@@ -55,22 +55,22 @@ if (process.env.NODE_ENV !== 'production') {
 
 
   /** Makes sure that the caller is not where attributes are expected. */
-  var assertNotInAttributes = function() {
+  function assertNotInAttributes() {
     if (inAttributes) {
       throw new Error('Was not expecting a call to attr or elementOpenEnd, ' +
           'they must follow a call to elementOpenStart.');
     }
-  };
+  }
 
 
   /** Makes sure that the caller is where attributes are expected. */
-  var assertInAttributes = function() {
+  function assertInAttributes() {
     if (!inAttributes) {
       throw new Error('Was expecting a call to attr or elementOpenEnd. ' +
           'elementOpenStart must be followed by zero or more calls to attr, ' +
           'then one call to elementOpenEnd.');
     }
-  };
+  }
 
 
   /**
@@ -79,18 +79,18 @@ if (process.env.NODE_ENV !== 'production') {
    * placeholder elements to be re-used as non-placeholders and vice versa.
    * @param {string} key
    */
-  var assertPlaceholderKeySpecified = function(key) {
+  function assertPlaceholderKeySpecified(key) {
     if (!key) {
       throw new Error('Placeholder elements must have a key specified.');
     }
-  };
+  }
 
 
   /**
    * Makes sure that tags are correctly nested.
    * @param {string} tag
    */
-  var assertCloseMatchesOpenTag = function(tag) {
+  function assertCloseMatchesOpenTag(tag) {
     var context = getContext();
     var walker = context.walker;
     var closingNode = walker.getCurrentParent();
@@ -100,19 +100,19 @@ if (process.env.NODE_ENV !== 'production') {
       throw new Error('Received a call to close ' + tag + ' but ' +
             data.nodeName + ' was open.');
     }
-  };
+  }
 
 
   /** Updates the state to being in an attribute declaration. */
-  var setInAttributes = function() {
+  function setInAttributes() {
     inAttributes = true;
-  };
+  }
 
 
   /** Updates the state to not being in an attribute declaration. */
-  var setNotInAttributes = function() {
+  function setNotInAttributes() {
     inAttributes = false;
-  };
+  }
 }
 
 
@@ -128,7 +128,7 @@ if (process.env.NODE_ENV !== 'production') {
  *     for the Element.
  * @return {!Element} The corresponding Element.
  */
-var elementOpen = function(tag, key, statics, var_args) {
+export function elementOpen(tag, key, statics, var_args) {
   if (process.env.NODE_ENV !== 'production') {
     assertNotInAttributes();
   }
@@ -184,7 +184,7 @@ var elementOpen = function(tag, key, statics, var_args) {
 
   firstChild();
   return node;
-};
+}
 
 
 /**
@@ -201,7 +201,7 @@ var elementOpen = function(tag, key, statics, var_args) {
  *     static attributes for the Element. These will only be set once when the
  *     Element is created.
  */
-var elementOpenStart = function(tag, key, statics) {
+export function elementOpenStart(tag, key, statics) {
   if (process.env.NODE_ENV !== 'production') {
     assertNotInAttributes();
     setInAttributes();
@@ -210,7 +210,7 @@ var elementOpenStart = function(tag, key, statics) {
   argsBuilder[0] = tag;
   argsBuilder[1] = key;
   argsBuilder[2] = statics;
-};
+}
 
 
 /***
@@ -220,20 +220,20 @@ var elementOpenStart = function(tag, key, statics) {
  * @param {string} name
  * @param {*} value
  */
-var attr = function(name, value) {
+export function attr(name, value) {
   if (process.env.NODE_ENV !== 'production') {
     assertInAttributes();
   }
 
   argsBuilder.push(name, value);
-};
+}
 
 
 /**
  * Closes an open tag started with elementOpenStart.
  * @return {!Element} The corresponding Element.
  */
-var elementOpenEnd = function() {
+export function elementOpenEnd() {
   if (process.env.NODE_ENV !== 'production') {
     assertInAttributes();
     setNotInAttributes();
@@ -242,7 +242,7 @@ var elementOpenEnd = function() {
   var node = elementOpen.apply(null, argsBuilder);
   argsBuilder.length = 0;
   return node;
-};
+}
 
 
 /**
@@ -251,7 +251,7 @@ var elementOpenEnd = function() {
  * @param {string} tag The element's tag.
  * @return {!Element} The corresponding Element.
  */
-var elementClose = function(tag) {
+export function elementClose(tag) {
   if (process.env.NODE_ENV !== 'production') {
     assertNotInAttributes();
     assertCloseMatchesOpenTag(tag);
@@ -265,7 +265,7 @@ var elementClose = function(tag) {
 
   nextSibling();
   return node;
-};
+}
 
 
 /**
@@ -282,11 +282,11 @@ var elementClose = function(tag) {
  *     for the Element.
  * @return {!Element} The corresponding Element.
  */
-var elementVoid = function(tag, key, statics, var_args) {
+export function elementVoid(tag, key, statics, var_args) {
   var node = elementOpen.apply(null, arguments);
   elementClose.apply(null, arguments);
   return node;
-};
+}
 
 
 /**
@@ -306,7 +306,7 @@ var elementVoid = function(tag, key, statics, var_args) {
  *     for the Element.
  * @return {!Element} The corresponding Element.
  */
-var elementPlaceholder = function(tag, key, statics, var_args) {
+export function elementPlaceholder(tag, key, statics, var_args) {
   if (process.env.NODE_ENV !== 'production') {
     assertPlaceholderKeySpecified(key);
   }
@@ -315,7 +315,7 @@ var elementPlaceholder = function(tag, key, statics, var_args) {
   updateAttribute(node, symbols.placeholder, true);
   elementClose.apply(null, arguments);
   return node;
-};
+}
 
 
 /**
@@ -327,7 +327,7 @@ var elementPlaceholder = function(tag, key, statics, var_args) {
  *     changed.
  * @return {!Text} The corresponding text node.
  */
-var text = function(value, var_args) {
+export function text(value, var_args) {
   if (process.env.NODE_ENV !== 'production') {
     assertNotInAttributes();
   }
@@ -348,17 +348,4 @@ var text = function(value, var_args) {
 
   nextSibling();
   return node;
-};
-
-
-/** */
-export {
-  elementOpenStart,
-  elementOpenEnd,
-  elementOpen,
-  elementVoid,
-  elementClose,
-  elementPlaceholder,
-  text,
-  attr
-};
+}

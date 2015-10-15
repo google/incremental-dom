@@ -24,7 +24,7 @@ var SVG_NS = 'http://www.w3.org/2000/svg';
  * @param {string} tag The tag to get the namespace for.
  * @return {?string} The namespace to create the tag in.
  */
-var getNamespaceForTag = function(tag) {
+export function getNamespaceForTag(tag) {
   if (tag === 'svg') {
     return SVG_NS;
   }
@@ -37,10 +37,4 @@ var getNamespaceForTag = function(tag) {
   }
 
   return parent.namespaceURI;
-};
-
-
-/** */
-export {
-  getNamespaceForTag
-};
+}

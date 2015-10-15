@@ -22,7 +22,7 @@
  *     walker should start traversing.
  * @constructor
  */
-function TreeWalker(node) {
+export function TreeWalker(node) {
   /**
    * Keeps track of the current parent node. This is necessary as the traversal
    * methods may traverse past the last child and we still need a way to get
@@ -73,10 +73,4 @@ TreeWalker.prototype.nextSibling = function() {
  */
 TreeWalker.prototype.parentNode = function() {
   this.currentNode = this.stack_.pop();
-};
-
-
-/** */
-export {
-  TreeWalker
 };

@@ -90,11 +90,11 @@ function NodeData(nodeName, key) {
  * @param {?string=} key The key that identifies the node.
  * @return {!NodeData} The newly initialized data object
  */
-var initData = function(node, nodeName, key) {
+export function initData(node, nodeName, key) {
   var data = new NodeData(nodeName, key);
   node['__incrementalDOMData'] = data;
   return data;
-};
+}
 
 
 /**
@@ -103,7 +103,7 @@ var initData = function(node, nodeName, key) {
  * @param {Node} node The node to retrieve the data for.
  * @return {!NodeData} The NodeData for this Node.
  */
-var getData = function(node) {
+export function getData(node) {
   var data = node['__incrementalDOMData'];
 
   if (!data) {
@@ -118,11 +118,4 @@ var getData = function(node) {
   }
 
   return data;
-};
-
-
-/** */
-export {
-  getData,
-  initData
-};
+}

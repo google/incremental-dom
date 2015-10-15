@@ -31,13 +31,13 @@ if (process.env.NODE_ENV !== 'production') {
   * @param {string=} tag The tag name of the Element.
   * @param {?string=} key The key of the Element.
   */
-  var assertKeyedTagMatches = function(node, tag, key) {
+  function assertKeyedTagMatches(node, tag, key) {
     var nodeName = getData(node).nodeName;
     if (nodeName !== tag) {
       throw new Error('Was expecting node with key "' + key + '" to be a ' +
           tag + ', not a ' + nodeName + '.');
     }
-  };
+  }
 }
 
 
@@ -49,14 +49,14 @@ if (process.env.NODE_ENV !== 'production') {
  * @param {?string=} key An optional key that identifies a node.
  * @return {boolean} True if the node matches, false otherwise.
  */
-var matches = function(node, nodeName, key) {
+function matches(node, nodeName, key) {
   var data = getData(node);
 
   // Key check is done using double equals as we want to treat a null key the
   // same as undefined. This should be okay as the only values allowed are
   // strings, null and undefined so the == semantics are not too weird.
   return key == data.key && nodeName === data.nodeName;
-};
+}
 
 
 /**
@@ -69,7 +69,7 @@ var matches = function(node, nodeName, key) {
  *     name-value pairs.
  * @return {!Node} The matching node.
  */
-var alignWithDOM = function(nodeName, key, statics) {
+export function alignWithDOM(nodeName, key, statics) {
   var context = getContext();
   var walker = context.walker;
   var currentNode = walker.currentNode;
@@ -115,7 +115,7 @@ var alignWithDOM = function(nodeName, key, statics) {
   }
 
   return matchingNode;
-};
+}
 
 
 /**
@@ -123,7 +123,7 @@ var alignWithDOM = function(nodeName, key, statics) {
  * functions were never called for them.
  * @param {Node} node
  */
-var clearUnvisitedDOM = function(node) {
+export function clearUnvisitedDOM(node) {
   var context = getContext();
   var walker = context.walker;
   var data = getData(node);
@@ -164,11 +164,4 @@ var clearUnvisitedDOM = function(node) {
   }
 
   data.keyMapValid = true;
-};
-
-
-/** */
-export {
-  alignWithDOM,
-  clearUnvisitedDOM
-};
+}

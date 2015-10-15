@@ -98,31 +98,23 @@ var context;
  * Enters a new patch context.
  * @param {!Element|!DocumentFragment} node
  */
-var enterContext = function(node) {
+export function enterContext(node) {
   context = new Context(node, context);
-};
+}
 
 
 /**
  * Restores the previous patch context.
  */
-var restoreContext = function() {
+export function restoreContext() {
   context = context.prevContext;
-};
+}
 
 
 /**
  * Gets the current patch context.
  * @return {?Context}
  */
-var getContext = function() {
+export function getContext() {
   return context;
-};
-
-
-/** */
-export {
-  enterContext,
-  restoreContext,
-  getContext
-};
+}

@@ -14,13 +14,8 @@
  * limitations under the License.
  */
 
-var symbols = {
+export var symbols = {
   default: '__default',
 
   placeholder: '__placeholder'
-};
-
-/** */
-export {
-  symbols
 };

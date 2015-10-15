@@ -22,49 +22,41 @@ import { getData } from './node_data';
  * Marks node's parent as having visited node.
  * @param {Node} node
  */
-var markVisited = function(node) {
+function markVisited(node) {
   var context = getContext();
   var walker = context.walker;
   var parent = walker.getCurrentParent();
   var data = getData(parent);
   data.lastVisitedChild = node;
-};
+}
 
 
 /**
  * Changes to the first child of the current node.
  */
-var firstChild = function() {
+export function firstChild() {
   var context = getContext();
   var walker = context.walker;
   walker.firstChild();
-};
+}
 
 
 /**
  * Changes to the next sibling of the current node.
  */
-var nextSibling = function() {
+export function nextSibling() {
   var context = getContext();
   var walker = context.walker;
   markVisited(walker.currentNode);
   walker.nextSibling();
-};
+}
 
 
 /**
  * Changes to the parent of the current node, removing any unvisited children.
  */
-var parentNode = function() {
+export function parentNode() {
   var context = getContext();
   var walker = context.walker;
   walker.parentNode();
-};
-
-
-/** */
-export {
-  firstChild,
-  nextSibling,
-  parentNode
-};
+}
