@@ -116,7 +116,7 @@ var updateAttribute = function(el, name, value) {
 /**
  * Updates the static attributes of the Element.
  * @param {!Element} el
- * @param {?Array<*>=} statics An array of attribute name/value pairs of the
+ * @param {?Array<*>} statics An array of attribute name/value pairs of the
  *     static attributes for the Element. These will only be set once when the
  *     Element is created.
  */
@@ -143,6 +143,14 @@ var updateStatics = function(el, statics) {
 };
 
 
+/**
+ * Updates each attribute in attributes to the correct value. Clears all values
+ * afterwards, so that only new attributes can be set on the next run.
+ * @param {!Element} el
+ * @param {!Object<string, *>} attributes An array of attribute name/value pairs
+ *     of the static attributes for the Element. These will only be set once
+ *     when the Element is created.
+ */
 var updateAttributes = function(el, attributes) {
   for (var attr in attributes) {
     updateAttribute(el, attr, attributes[attr]);

@@ -20,7 +20,8 @@ import { createMap } from './util';
 /**
  * Keeps track of information needed to perform diffs for a given DOM node.
  * @param {!string} nodeName
- * @param {?string=} key
+ * @param {?string} key
+ * @param {?Array<*>} statics
  * @constructor
  */
 function NodeData(nodeName, key, statics) {
@@ -93,7 +94,9 @@ function NodeData(nodeName, key, statics) {
  *
  * @param {Node} node The node to initialize data for.
  * @param {string} nodeName The node name of node.
- * @param {?string=} key The key that identifies the node.
+ * @param {?string} key The key that identifies the node.
+ * @param {?Array<*>} statics An array of attribute name/value pairs of
+ *     the static attributes for the Element.
  * @return {!NodeData} The newly initialized data object
  */
 var initData = function(node, nodeName, key, statics) {
@@ -120,7 +123,7 @@ var getData = function(node) {
       key = node.getAttribute('key');
     }
 
-    data = initData(node, nodeName, key);
+    data = initData(node, nodeName, key, null);
   }
 
   return data;

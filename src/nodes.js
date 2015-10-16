@@ -50,8 +50,8 @@ var createElement = function(doc, tag, key) {
  * @param {Document} doc The document with which to create the Node.
  * @param {string} nodeName The tag if creating an element or #text to create
  *     a Text.
- * @param {?string=} key A key to identify the Element.
- * @param {?Array<*>=} statics The static data to initialize the Node
+ * @param {?string} key A key to identify the Element.
+ * @param {?Array<*>} statics The static data to initialize the Node
  *     with. For an Element, an array of attribute name/value pairs of
  *     the static attributes for the Element.
  * @return {!Node}
@@ -61,7 +61,7 @@ var createNode = function(doc, nodeName, key, statics) {
   if (nodeName === '#text') {
     node = doc.createTextNode('');
   } else {
-    node = createElement(doc, nodeName, key, statics);
+    node = createElement(doc, nodeName, key);
   }
 
   initData(node, nodeName, key, statics);
