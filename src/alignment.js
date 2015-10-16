@@ -52,10 +52,7 @@ if (process.env.NODE_ENV !== 'production') {
 var matches = function(node, nodeName, key) {
   var data = getData(node);
 
-  // Key check is done using double equals as we want to treat a null key the
-  // same as undefined. This should be okay as the only values allowed are
-  // strings, null and undefined so the == semantics are not too weird.
-  return key == data.key && nodeName === data.nodeName;
+  return key === data.key && nodeName === data.nodeName;
 };
 
 

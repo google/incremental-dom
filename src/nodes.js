@@ -64,7 +64,7 @@ var createNode = function(doc, nodeName, key, statics) {
     node = createElement(doc, nodeName, key, statics);
   }
 
-  initData(node, nodeName, key);
+  initData(node, nodeName, key, statics);
 
   if (statics) {
     for (var i = 0; i < statics.length; i += 2) {

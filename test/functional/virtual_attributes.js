@@ -37,8 +37,8 @@ describe('virtual attribute updates', () => {
   });
 
   describe('for conditional attributes', () => {
-    function render(obj) {  
-      elementOpenStart('div', '', []);
+    function render(obj) {
+      elementOpenStart('div');
         if (obj.key) {
           attr('data-expanded', obj.key);
         }

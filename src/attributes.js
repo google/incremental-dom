@@ -114,6 +114,47 @@ var updateAttribute = function(el, name, value) {
 
 
 /**
+ * Updates the static attributes of the Element.
+ * @param {!Element} el
+ * @param {?Array<*>=} statics An array of attribute name/value pairs of the
+ *     static attributes for the Element. These will only be set once when the
+ *     Element is created.
+ */
+var updateStatics = function(el, statics) {
+  var data = getData(el);
+  var newAttrs = data.statics;
+  var i;
+
+  if (!newAttrs) {
+    var oldStatics = data.staticsArr;
+    newAttrs = data.statics = createMap();
+    if (oldStatics) {
+      for (i = 0; i < oldStatics.length; i += 2) {
+        newAttrs[oldStatics[i]] = undefined;
+      }
+    }
+  }
+
+  if (statics) {
+    for (i = 0; i < statics.length; i += 2) {
+      newAttrs[statics[i]] = statics[i + 1];
+    }
+  }
+
+  updateAttributes(el, newAttrs);
+  data.staticsArr = statics;
+};
+
+
+var updateAttributes = function(el, attributes) {
+  for (var attr in attributes) {
+    updateAttribute(el, attr, attributes[attr]);
+    attributes[attr] = undefined;
+  }
+};
+
+
+/**
  * A publicly mutable object to provide custom mutators for attributes.
  * @const {!Object<string, function(!Element, string, *)>}
  */
@@ -131,7 +172,9 @@ attributes['style'] = applyStyle;
 /** */
 export {
   updateAttribute,
+  updateAttributes,
   applyProp,
   applyAttr,
-  attributes
+  attributes,
+  updateStatics
 };

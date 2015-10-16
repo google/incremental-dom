@@ -37,7 +37,7 @@ describe('attribute updates', () => {
 
   describe('for conditional attributes', () => {
     function render(attrs) {
-      elementOpenStart('div', '', []);
+      elementOpenStart('div');
       for (var attrName in attrs) {
           attr(attrName, attrs[attrName]);
       }
@@ -118,7 +118,7 @@ describe('attribute updates', () => {
     it('should not be set as attributes', () => {
       var fn = () =>{};
       patch(container, () => {
-        elementVoid('div', '', null,
+        elementVoid('div', null, null,
             'fn', fn);
       });
       var el = container.childNodes[0];
@@ -129,7 +129,7 @@ describe('attribute updates', () => {
     it('should be set on the node', () => {
       var fn = () =>{};
       patch(container, () => {
-        elementVoid('div', '', null,
+        elementVoid('div', null, null,
             'fn', fn);
       });
       var el = container.childNodes[0];
@@ -142,7 +142,7 @@ describe('attribute updates', () => {
     it('should not be set as attributes', () => {
       var obj = {};
       patch(container, () => {
-        elementVoid('div', '', null,
+        elementVoid('div', null, null,
             'obj', obj);
       });
       var el = container.childNodes[0];
@@ -153,7 +153,7 @@ describe('attribute updates', () => {
     it('should be set on the node', () => {
       var obj = {};
       patch(container, () => {
-        elementVoid('div', '', null,
+        elementVoid('div', null, null,
             'obj', obj);
       });
       var el = container.childNodes[0];
@@ -164,7 +164,7 @@ describe('attribute updates', () => {
 
   describe('for style', () => {
     function render(style) {
-      elementVoid('div', '', [],
+      elementVoid('div', null, null,
           'style', style);
     }
 

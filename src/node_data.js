@@ -23,10 +23,10 @@ import { createMap } from './util';
  * @param {?string=} key
  * @constructor
  */
-function NodeData(nodeName, key) {
+function NodeData(nodeName, key, staticsArr) {
   /**
    * The attributes and their values.
-   * @const
+   * @const {!Object<string, *>}
    */
   this.attrs = createMap();
 
@@ -47,7 +47,7 @@ function NodeData(nodeName, key) {
   /**
    * The key used to identify this node, used to preserve DOM nodes when they
    * move within their parent.
-   * @const
+   * @const {?string}
    */
   this.key = key;
 
@@ -79,6 +79,18 @@ function NodeData(nodeName, key) {
    * @type {?string}
    */
   this.text = null;
+
+  /**
+   * The static attributes for this Node.
+   * @type {?Object<string, *>}
+   */
+  this.statics = null;
+
+  /**
+   * A reference to the static attributes of the Node.
+   * @type {?Array<*>}
+   */
+  this.staticsArr = staticsArr;
 }
 
 
@@ -90,8 +102,8 @@ function NodeData(nodeName, key) {
  * @param {?string=} key The key that identifies the node.
  * @return {!NodeData} The newly initialized data object
  */
-var initData = function(node, nodeName, key) {
-  var data = new NodeData(nodeName, key);
+var initData = function(node, nodeName, key, statics) {
+  var data = new NodeData(nodeName, key, statics);
   node['__incrementalDOMData'] = data;
   return data;
 };

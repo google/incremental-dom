@@ -18,7 +18,11 @@ import {
   alignWithDOM,
   clearUnvisitedDOM
 } from './alignment';
-import { updateAttribute } from './attributes';
+import {
+  updateAttribute,
+  updateAttributes,
+  updateStatics
+} from './attributes';
 import { getData } from './node_data';
 import { getContext } from './context';
 import {
@@ -98,7 +102,7 @@ if (process.env.NODE_ENV !== 'production') {
 
     if (tag !== data.nodeName) {
       throw new Error('Received a call to close ' + tag + ' but ' +
-            data.nodeName + ' was open.');
+          data.nodeName + ' was open.');
     }
   };
 
@@ -133,8 +137,15 @@ var elementOpen = function(tag, key, statics, var_args) {
     assertNotInAttributes();
   }
 
+  key = key || null;
+  statics = statics || null;
+
   var node = /** @type {!Element}*/(alignWithDOM(tag, key, statics));
   var data = getData(node);
+
+  if (data.staticsArr !== statics) {
+    updateStatics(node, statics);
+  }
 
   /*
    * Checks to see if one or more attributes have changed for a given Element.
@@ -172,10 +183,7 @@ var elementOpen = function(tag, key, statics, var_args) {
       newAttrs[arguments[i]] = arguments[i + 1];
     }
 
-    for (var attr in newAttrs) {
-      updateAttribute(node, attr, newAttrs[attr]);
-      newAttrs[attr] = undefined;
-    }
+    updateAttributes(node, newAttrs);
   }
 
   firstChild();
