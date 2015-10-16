@@ -224,5 +224,65 @@ describe('attribute updates', () => {
       expect(el.getAttribute('class')).to.equal('foo');
     });
   });
+
+  describe('for static attributes', () => {
+    var statics1 = ['id', 'id'];
+    var statics2 = ['class', 'class'];
+
+    it('should handle null to static attributes', () => {
+      function render(condition) {
+        if (condition) {
+          elementVoid('div');
+        }
+        elementVoid('div', null, statics1);
+      }
+
+      patch(container, render, true);
+      patch(container, render, false);
+
+      var el = container.childNodes[0];
+
+      expect(el.id).to.equal('id');
+    });
+
+    it('should handle static attributes to null', () => {
+      function render(condition) {
+        if (condition) {
+          elementVoid('div', null, statics1);
+        }
+        elementVoid('div');
+      }
+
+      patch(container, render, true);
+      patch(container, render, false);
+
+      var el = container.childNodes[0];
+
+      expect(el.id).to.equal('');
+    });
+
+    it('should handle static attributes to another static attributes', () => {
+      function render(condition) {
+        if (condition) {
+          elementVoid('div', null, statics1);
+        }
+        elementVoid('div', null, statics2);
+        if (!condition) {
+          elementVoid('div', null, statics1);
+        }
+      }
+
+      patch(container, render, true);
+      patch(container, render, false);
+
+      var el = container.childNodes[0];
+      var el2 = container.childNodes[1];
+
+      expect(el.id).to.equal('');
+      expect(el.className).to.equal('class');
+      expect(el2.id).to.equal('id');
+      expect(el2.className).to.equal('');
+    });
+  });
 });
 
