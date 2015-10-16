@@ -23,7 +23,7 @@ import { createMap } from './util';
  * @param {?string=} key
  * @constructor
  */
-function NodeData(nodeName, key, staticsArr) {
+function NodeData(nodeName, key, statics) {
   /**
    * The attributes and their values.
    * @const {!Object<string, *>}
@@ -81,16 +81,10 @@ function NodeData(nodeName, key, staticsArr) {
   this.text = null;
 
   /**
-   * The static attributes for this Node.
-   * @type {?Object<string, *>}
-   */
-  this.statics = null;
-
-  /**
    * A reference to the static attributes of the Node.
    * @type {?Array<*>}
    */
-  this.staticsArr = staticsArr;
+  this.statics = statics;
 }
 
 

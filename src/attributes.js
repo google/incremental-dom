@@ -122,16 +122,13 @@ var updateAttribute = function(el, name, value) {
  */
 var updateStatics = function(el, statics) {
   var data = getData(el);
-  var newAttrs = data.statics;
+  var oldStatics = data.statics;
+  var newAttrs = createMap();
   var i;
 
-  if (!newAttrs) {
-    var oldStatics = data.staticsArr;
-    newAttrs = data.statics = createMap();
-    if (oldStatics) {
-      for (i = 0; i < oldStatics.length; i += 2) {
-        newAttrs[oldStatics[i]] = undefined;
-      }
+  if (oldStatics) {
+    for (i = 0; i < oldStatics.length; i += 2) {
+      newAttrs[oldStatics[i]] = undefined;
     }
   }
 
@@ -142,7 +139,7 @@ var updateStatics = function(el, statics) {
   }
 
   updateAttributes(el, newAttrs);
-  data.staticsArr = statics;
+  data.statics = statics;
 };
 
 

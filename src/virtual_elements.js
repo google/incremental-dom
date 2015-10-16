@@ -143,7 +143,7 @@ var elementOpen = function(tag, key, statics, var_args) {
   var node = /** @type {!Element}*/(alignWithDOM(tag, key, statics));
   var data = getData(node);
 
-  if (data.staticsArr !== statics) {
+  if (data.statics !== statics) {
     updateStatics(node, statics);
   }
 
