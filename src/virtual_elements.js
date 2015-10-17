@@ -160,7 +160,9 @@ var elementOpen = function(tag, key, statics, var_args) {
 
   if (j < attrsArr.length) {
     attrsChanged = true;
-    attrsArr.length = j;
+    while (j < attrsArr.length) {
+      attrsArr.pop();
+    }
   }
 
   /*
@@ -169,16 +171,13 @@ var elementOpen = function(tag, key, statics, var_args) {
   if (attrsChanged) {
     var attr, newAttrs = data.newAttrs;
 
-    for (attr in newAttrs) {
-      newAttrs[attr] = undefined;
-    }
-
     for (i = ATTRIBUTES_OFFSET; i < arguments.length; i += 2) {
       newAttrs[arguments[i]] = arguments[i + 1];
     }
 
     for (attr in newAttrs) {
       updateAttribute(node, attr, newAttrs[attr]);
+      newAttrs[attr] = undefined;
     }
   }
 
