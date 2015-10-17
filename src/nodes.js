@@ -28,11 +28,9 @@ import { createMap } from './util';
  * @param {Document} doc The document with which to create the Element.
  * @param {string} tag The tag for the Element.
  * @param {?string=} key A key to identify the Element.
- * @param {?Array<*>=} statics An array of attribute name/value pairs of
- *     the static attributes for the Element.
  * @return {!Element}
  */
-var createElement = function(doc, tag, key, statics) {
+var createElement = function(doc, tag, key) {
   var namespace = getNamespaceForTag(tag);
   var el;
 
@@ -40,14 +38,6 @@ var createElement = function(doc, tag, key, statics) {
     el = doc.createElementNS(namespace, tag);
   } else {
     el = doc.createElement(tag);
-  }
-
-  initData(el, tag, key);
-
-  if (statics) {
-    for (var i = 0; i < statics.length; i += 2) {
-      updateAttribute(el, /** @type {!string}*/(statics[i]), statics[i + 1]);
-    }
   }
 
   return el;
@@ -67,11 +57,22 @@ var createElement = function(doc, tag, key, statics) {
  * @return {!Node}
  */
 var createNode = function(doc, nodeName, key, statics) {
+  var node;
   if (nodeName === '#text') {
-    return doc.createTextNode('');
+    node = doc.createTextNode('');
+  } else {
+    node = createElement(doc, nodeName, key, statics);
   }
 
-  return createElement(doc, nodeName, key, statics);
+  initData(node, nodeName, key);
+
+  if (statics) {
+    for (var i = 0; i < statics.length; i += 2) {
+      updateAttribute(node, /** @type {!string}*/(statics[i]), statics[i + 1]);
+    }
+  }
+
+  return node;
 };
 
 
