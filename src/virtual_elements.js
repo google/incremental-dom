@@ -143,6 +143,7 @@ var elementOpen = function(tag, key, statics, var_args) {
    * minimal.
    */
   var attrsArr = data.attrsArr;
+  var newAttrs = data.newAttrs;
   var attrsChanged = false;
   var i = ATTRIBUTES_OFFSET;
   var j = 0;
@@ -167,18 +168,13 @@ var elementOpen = function(tag, key, statics, var_args) {
    * Actually perform the attribute update.
    */
   if (attrsChanged) {
-    var attr, newAttrs = data.newAttrs;
-
-    for (attr in newAttrs) {
-      newAttrs[attr] = undefined;
-    }
-
     for (i = ATTRIBUTES_OFFSET; i < arguments.length; i += 2) {
       newAttrs[arguments[i]] = arguments[i + 1];
     }
 
-    for (attr in newAttrs) {
+    for (var attr in newAttrs) {
       updateAttribute(node, attr, newAttrs[attr]);
+      newAttrs[attr] = undefined;
     }
   }
 
@@ -336,7 +332,7 @@ var text = function(value, var_args) {
   var data = getData(node);
 
   if (data.text !== value) {
-    data.text = /** @type {string} */(value);
+    data.text = value;
 
     var formatted = value;
     for (var i = 1; i < arguments.length; i += 1) {

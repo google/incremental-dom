@@ -80,21 +80,21 @@ var alignWithDOM = function(nodeName, key, statics) {
   if (currentNode && matches(currentNode, nodeName, key)) {
     matchingNode = currentNode;
   } else {
-    var existingNode = getChild(parent, key);
+    if (key) {
+      matchingNode = getChild(parent, key);
+    }
 
     // Check to see if the node has moved within the parent or if a new one
     // should be created
-    if (existingNode) {
+    if (matchingNode) {
       if (process.env.NODE_ENV !== 'production') {
-        assertKeyedTagMatches(existingNode, nodeName, key);
+        assertKeyedTagMatches(matchingNode, nodeName, key);
       }
-
-      matchingNode = existingNode;
     } else {
       matchingNode = createNode(context.doc, nodeName, key, statics);
 
       if (key) {
-        registerChild(parent, key, matchingNode);
+        registerChild(parent, key, /** @type {!Element} **/(matchingNode));
       }
 
       context.markCreated(matchingNode);
@@ -128,41 +128,32 @@ var clearUnvisitedDOM = function(node) {
   var walker = context.walker;
   var data = getData(node);
   var keyMap = data.keyMap;
-  var keyMapValid = data.keyMapValid;
   var lastVisitedChild = data.lastVisitedChild;
-  var child = node.lastChild;
-  var key;
+  var lastChild = node.lastChild;
 
-  data.lastVisitedChild = null;
-
-  if (child === lastVisitedChild && keyMapValid) {
+  if (data.attrs[symbols.placeholder] && node !== walker.root) {
     return;
-  }
-
-  if (data.attrs[symbols.placeholder] && walker.currentNode !== walker.root) {
-    return;
-  }
-
-  while (child !== lastVisitedChild) {
-    node.removeChild(child);
-    context.markDeleted(/** @type {!Node}*/(child));
-
-    key = getData(child).key;
-    if (key) {
-      delete keyMap[key];
-    }
-    child = node.lastChild;
   }
 
   // Clean the keyMap, removing any unusued keys.
-  for (key in keyMap) {
-    child = keyMap[key];
-    if (!child.parentNode) {
-      context.markDeleted(child);
-      delete keyMap[key];
+  if (!data.keyMapValid) {
+    for (var key in keyMap) {
+      var child = keyMap[key];
+      if (child.parentNode !== node) {
+        context.markDeleted(child);
+        delete keyMap[key];
+      }
     }
   }
 
+  while (lastChild !== lastVisitedChild) {
+    node.removeChild(lastChild);
+    context.markDeleted(/** @type {!Node} **/(lastChild));
+
+    lastChild = node.lastChild;
+  }
+
+  data.lastVisitedChild = null;
   data.keyMapValid = true;
 };
 
