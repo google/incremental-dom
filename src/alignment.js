@@ -127,43 +127,36 @@ var clearUnvisitedDOM = function(node) {
   var context = getContext();
   var walker = context.walker;
   var data = getData(node);
+
+  if (data.attrs[symbols.placeholder] && node !== walker.root) {
+    return;
+  }
+
   var keyMap = data.keyMap;
-  var keyMapValid = data.keyMapValid;
   var lastVisitedChild = data.lastVisitedChild;
-  var child = node.lastChild;
-  var key;
-
-  data.lastVisitedChild = null;
-
-  if (child === lastVisitedChild && keyMapValid) {
-    return;
-  }
-
-  if (data.attrs[symbols.placeholder] && walker.currentNode !== walker.root) {
-    return;
-  }
-
-  while (child !== lastVisitedChild) {
-    node.removeChild(child);
-    context.markDeleted(/** @type {!Node}*/(child));
-
-    key = getData(child).key;
-    if (key) {
-      delete keyMap[key];
-    }
-    child = node.lastChild;
-  }
+  var lastChild = node.lastChild;
 
   // Clean the keyMap, removing any unusued keys.
-  for (key in keyMap) {
-    child = keyMap[key];
-    if (!child.parentNode) {
-      context.markDeleted(child);
-      delete keyMap[key];
+  if (!data.keyMapValid) {
+    for (var key in keyMap) {
+      var child = keyMap[key];
+      if (child.parentNode !== node) {
+        context.markDeleted(child);
+        delete keyMap[key];
+      }
     }
+    data.keyMapValid = true;
   }
 
-  data.keyMapValid = true;
+  if (lastChild !== lastVisitedChild) {
+    while (lastChild !== lastVisitedChild) {
+      node.removeChild(lastChild);
+      context.markDeleted(/** @type {!Node} **/(lastChild));
+
+      lastChild = node.lastChild;
+    }
+    data.lastVisitedChild = null;
+  }
 };
 
 
