@@ -42,7 +42,7 @@ describe('element creation', () => {
 
     beforeEach(() => {
       patch(container, () => {
-        elementVoid('div', '', ['id', 'someId', 'class', 'someClass', 'data-custom', 'custom'],
+        elementVoid('div', 'key', ['id', 'someId', 'class', 'someClass', 'data-custom', 'custom'],
             'data-foo', 'Hello',
             'data-bar', 'World');
       });
@@ -111,7 +111,7 @@ describe('element creation', () => {
 
   it('should allow creation without static attributes', () => {
     patch(container, () => {
-      elementVoid('div', '', null,
+      elementVoid('div', null, null,
           'id', 'test');
     });
     var el = container.childNodes[0];

@@ -25,7 +25,8 @@ describe('rendering with keys', () => {
 
   function render(items) {
     for(var i=0; i<items.length; i++) {
-      elementVoid('div', items[i].key, ['id', items[i].key]);
+      var key = items[i].key;
+      elementVoid('div', key, key ? ['id', key] : null);
     }
   }
 

@@ -37,7 +37,7 @@ describe('attribute updates', () => {
 
   describe('for conditional attributes', () => {
     function render(attrs) {
-      elementOpenStart('div', '', []);
+      elementOpenStart('div');
       for (var attrName in attrs) {
           attr(attrName, attrs[attrName]);
       }
@@ -118,7 +118,7 @@ describe('attribute updates', () => {
     it('should not be set as attributes', () => {
       var fn = () =>{};
       patch(container, () => {
-        elementVoid('div', '', null,
+        elementVoid('div', null, null,
             'fn', fn);
       });
       var el = container.childNodes[0];
@@ -129,7 +129,7 @@ describe('attribute updates', () => {
     it('should be set on the node', () => {
       var fn = () =>{};
       patch(container, () => {
-        elementVoid('div', '', null,
+        elementVoid('div', null, null,
             'fn', fn);
       });
       var el = container.childNodes[0];
@@ -142,7 +142,7 @@ describe('attribute updates', () => {
     it('should not be set as attributes', () => {
       var obj = {};
       patch(container, () => {
-        elementVoid('div', '', null,
+        elementVoid('div', null, null,
             'obj', obj);
       });
       var el = container.childNodes[0];
@@ -153,7 +153,7 @@ describe('attribute updates', () => {
     it('should be set on the node', () => {
       var obj = {};
       patch(container, () => {
-        elementVoid('div', '', null,
+        elementVoid('div', null, null,
             'obj', obj);
       });
       var el = container.childNodes[0];
@@ -164,7 +164,7 @@ describe('attribute updates', () => {
 
   describe('for style', () => {
     function render(style) {
-      elementVoid('div', '', [],
+      elementVoid('div', null, null,
           'style', style);
     }
 
@@ -222,6 +222,66 @@ describe('attribute updates', () => {
       var el = container.childNodes[0];
 
       expect(el.getAttribute('class')).to.equal('foo');
+    });
+  });
+
+  describe('for static attributes', () => {
+    var statics1 = ['id', 'id'];
+    var statics2 = ['class', 'class'];
+
+    it('should handle null to static attributes', () => {
+      function render(condition) {
+        if (condition) {
+          elementVoid('div');
+        }
+        elementVoid('div', null, statics1);
+      }
+
+      patch(container, render, true);
+      patch(container, render, false);
+
+      var el = container.childNodes[0];
+
+      expect(el.id).to.equal('id');
+    });
+
+    it('should handle static attributes to null', () => {
+      function render(condition) {
+        if (condition) {
+          elementVoid('div', null, statics1);
+        }
+        elementVoid('div');
+      }
+
+      patch(container, render, true);
+      patch(container, render, false);
+
+      var el = container.childNodes[0];
+
+      expect(el.id).to.equal('');
+    });
+
+    it('should handle static attributes to another static attributes', () => {
+      function render(condition) {
+        if (condition) {
+          elementVoid('div', null, statics1);
+        }
+        elementVoid('div', null, statics2);
+        if (!condition) {
+          elementVoid('div', null, statics1);
+        }
+      }
+
+      patch(container, render, true);
+      patch(container, render, false);
+
+      var el = container.childNodes[0];
+      var el2 = container.childNodes[1];
+
+      expect(el.id).to.equal('');
+      expect(el.className).to.equal('class');
+      expect(el2.id).to.equal('id');
+      expect(el2.className).to.equal('');
     });
   });
 });

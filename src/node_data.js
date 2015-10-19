@@ -20,13 +20,14 @@ import { createMap } from './util';
 /**
  * Keeps track of information needed to perform diffs for a given DOM node.
  * @param {!string} nodeName
- * @param {?string=} key
+ * @param {?string} key
+ * @param {?Array<*>} statics
  * @constructor
  */
-function NodeData(nodeName, key) {
+function NodeData(nodeName, key, statics) {
   /**
    * The attributes and their values.
-   * @const
+   * @const {!Object<string, *>}
    */
   this.attrs = createMap();
 
@@ -47,7 +48,7 @@ function NodeData(nodeName, key) {
   /**
    * The key used to identify this node, used to preserve DOM nodes when they
    * move within their parent.
-   * @const
+   * @const {?string}
    */
   this.key = key;
 
@@ -79,6 +80,12 @@ function NodeData(nodeName, key) {
    * @type {?string}
    */
   this.text = null;
+
+  /**
+   * A reference to the static attributes of the Node.
+   * @type {?Array<*>}
+   */
+  this.statics = statics;
 }
 
 
@@ -87,11 +94,13 @@ function NodeData(nodeName, key) {
  *
  * @param {Node} node The node to initialize data for.
  * @param {string} nodeName The node name of node.
- * @param {?string=} key The key that identifies the node.
+ * @param {?string} key The key that identifies the node.
+ * @param {?Array<*>} statics An array of attribute name/value pairs of
+ *     the static attributes for the Element.
  * @return {!NodeData} The newly initialized data object
  */
-var initData = function(node, nodeName, key) {
-  var data = new NodeData(nodeName, key);
+var initData = function(node, nodeName, key, statics) {
+  var data = new NodeData(nodeName, key, statics);
   node['__incrementalDOMData'] = data;
   return data;
 };
@@ -114,7 +123,7 @@ var getData = function(node) {
       key = node.getAttribute('key');
     }
 
-    data = initData(node, nodeName, key);
+    data = initData(node, nodeName, key, null);
   }
 
   return data;
