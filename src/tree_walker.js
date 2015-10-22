@@ -44,7 +44,7 @@ function TreeWalker(node) {
  * Changes the current location the firstChild of the current location.
  */
 TreeWalker.prototype.firstChild = function() {
-  this.currentParent = this.currentNode;
+  this.currentParent = /** @type {!Node}*/(this.currentNode);
   this.currentNode = this.currentNode.firstChild;
 };
 
@@ -62,7 +62,7 @@ TreeWalker.prototype.nextSibling = function() {
  */
 TreeWalker.prototype.parentNode = function() {
   this.currentNode = this.currentParent;
-  this.currentParent = this.currentParent.parentNode;
+  this.currentParent = /** @type {!Node}*/(this.currentParent.parentNode);
 };
 
 
