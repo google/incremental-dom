@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { TreeWalker } from './tree_walker';
 import { notifications } from './notifications';
 import { assertInPatch } from './assertions';
 
@@ -28,9 +27,19 @@ import { assertInPatch } from './assertions';
  */
 function Context(node, prevContext) {
   /**
-   * @const {TreeWalker}
+   * @const {!Element|!DocumentFragment}
    */
-  this.walker = new TreeWalker(node);
+  this.root = node;
+
+  /**
+   * @type {?Node}
+   */
+  this.currentNode = node;
+
+  /**
+   * @type {!Node}
+   */
+  this.currentParent = null;
 
   /**
    * @const {Document}
@@ -131,7 +140,7 @@ var currentElement = function() {
   if (process.env.NODE_ENV !== 'production') {
     assertInPatch(context);
   }
-  return context.walker.currentParent;
+  return context.currentParent;
 };
 
 
