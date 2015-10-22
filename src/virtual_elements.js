@@ -17,15 +17,13 @@
 import {
   alignWithDOM,
   clearUnvisitedDOM,
-  currentElement
+  currentElement,
+  firstChild,
+  nextSibling,
+  parentNode
 } from './core';
 import { updateAttribute } from './attributes';
 import { getData } from './node_data';
-import {
-    firstChild,
-    nextSibling,
-    parentNode
-} from './traversal';
 import { symbols } from './symbols';
 import {
   assertNotInAttributes,
