@@ -125,7 +125,7 @@ var getContext = function() {
  */
 var currentElement = function() {
   if (process.env.NODE_ENV !== 'production' && !context) {
-    throw new Error('cannot call getCurrentNode() while not in patch');
+    throw new Error('cannot call currentElement() while not in patch');
   }
   return context.walker.currentParent;
 };
