@@ -15,12 +15,11 @@
  */
 
 import {
-  alignWithDOM,
-  clearUnvisitedDOM,
+  elementOpen as coreElementOpen,
+  elementClose as coreElementClose,
+  text as coreText,
   currentElement,
-  firstChild,
-  nextSibling,
-  parentNode
+  skip
 } from './core';
 import { updateAttribute } from './attributes';
 import { getData } from './node_data';
@@ -51,18 +50,6 @@ var argsBuilder = [];
 
 
 /**
- * Skips the children in a subtree, allowing an Element to be closed without
- * clearing out the children.
- */
-var skip = function() {
-  var openElement = currentElement();
-  var data = getData(openElement);
-
-  data.lastVisitedChild = openElement.lastChild;
-};
-
-
-/**
  * @param {string} tag The element's tag.
  * @param {?string=} key The key used to identify this element. This can be an
  *     empty string, but performance may be better if a unique value is used
@@ -79,7 +66,7 @@ var elementOpen = function(tag, key, statics, var_args) {
     assertNotInAttributes('elementOpen');
   }
 
-  var node = /** @type {!Element}*/(alignWithDOM(tag, key, statics));
+  var node = coreElementOpen(tag, key, statics);
   var data = getData(node);
 
   /*
@@ -124,7 +111,6 @@ var elementOpen = function(tag, key, statics, var_args) {
     }
   }
 
-  firstChild();
   return node;
 };
 
@@ -198,16 +184,12 @@ var elementClose = function(tag) {
     assertNotInAttributes('elementClose');
   }
 
-  var node = /** @type {!Element} */(currentElement());
-  parentNode();
+  var node = coreElementClose();
 
   if (process.env.NODE_ENV !== 'production') {
     assertCloseMatchesOpenTag(getData(node).nodeName, tag);
   }
 
-  clearUnvisitedDOM(node);
-
-  nextSibling();
   return node;
 };
 
@@ -275,7 +257,7 @@ var text = function(value, var_args) {
     assertNotInAttributes('text');
   }
 
-  var node = /** @type {!Text}*/(alignWithDOM('#text', null));
+  var node = coreText();
   var data = getData(node);
 
   if (data.text !== value) {
@@ -289,7 +271,6 @@ var text = function(value, var_args) {
     node.data = formatted;
   }
 
-  nextSibling();
   return node;
 };
 
@@ -302,7 +283,6 @@ export {
   elementVoid,
   elementClose,
   elementPlaceholder,
-  skip,
   text,
   attr
 };

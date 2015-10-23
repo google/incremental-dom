@@ -64,12 +64,6 @@ function NodeData(nodeName, key) {
   this.keyMapValid = true;
 
   /**
-   * The last child to have been visited within the current pass.
-   * @type {?Node}
-   */
-  this.lastVisitedChild = null;
-
-  /**
    * The node name for this node.
    * @const {string}
    */

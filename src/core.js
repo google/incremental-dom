@@ -34,6 +34,15 @@ import { notifications } from './notifications';
 /** @type {?Context} */
 var context = null;
 
+/** @type {?Node} */
+var currentNode;
+
+/** @type {?Node} */
+var currentParent;
+
+/** @type {?Node} */
+var previousNode;
+
 
 /**
  * Patches the document starting at el with the provided function. This function
@@ -47,41 +56,51 @@ var context = null;
  */
 var patch = function(node, fn, data) {
   var prevContext = context;
+  var prevCurrentNode = currentNode;
+  var prevCurrentParent = currentParent;
+  var prevPreviousNode = previousNode;
+
   context = new Context(node);
+  currentNode = node;
+  currentParent = null;
+  previousNode = null;
 
   if (process.env.NODE_ENV !== 'production') {
     setInAttributes(false);
   }
 
-  firstChild();
+  enterNode();
   fn(data);
-  parentNode();
-  clearUnvisitedDOM(node);
+  exitNode();
 
   if (process.env.NODE_ENV !== 'production') {
-    assertNoUnclosedTags(context.currentNode, node);
+    assertNoUnclosedTags(previousNode, node);
   }
 
   context.notifyChanges();
+
   context = prevContext;
+  currentNode = prevCurrentNode;
+  currentParent = prevCurrentParent;
+  previousNode = prevPreviousNode;
 };
 
 
 /**
- * Checks whether or not a given node matches the specified nodeName and key.
+ * Checks whether or not the current node matches the specified nodeName and
+ * key.
  *
- * @param {!Node} node An HTML node, typically an HTMLElement or Text.
  * @param {?string} nodeName The nodeName for this node.
  * @param {?string=} key An optional key that identifies a node.
  * @return {boolean} True if the node matches, false otherwise.
  */
-var matches = function(node, nodeName, key) {
-  var data = getData(node);
+var matches = function(nodeName, key) {
+  var data = getData(currentNode);
 
   // Key check is done using double equals as we want to treat a null key the
   // same as undefined. This should be okay as the only values allowed are
   // strings, null and undefined so the == semantics are not too weird.
-  return key == data.key && nodeName === data.nodeName;
+  return nodeName === data.nodeName && key == data.key;
 };
 
 
@@ -93,79 +112,74 @@ var matches = function(node, nodeName, key) {
  * @param {?string=} key The key used to identify this element.
  * @param {?Array<*>=} statics For an Element, this should be an array of
  *     name-value pairs.
- * @return {!Node} The matching node.
  */
 var alignWithDOM = function(nodeName, key, statics) {
-  var currentNode = context.currentNode;
-  var parent = context.currentParent;
-  var matchingNode;
-
-  // Check to see if we have a node to reuse
-  if (currentNode && matches(currentNode, nodeName, key)) {
-    matchingNode = currentNode;
-  } else {
-    var existingNode = getChild(parent, key);
-
-    // Check to see if the node has moved within the parent or if a new one
-    // should be created
-    if (existingNode) {
-      if (process.env.NODE_ENV !== 'production') {
-        assertKeyedTagMatches(getData(existingNode).nodeName, nodeName, key);
-      }
-
-      matchingNode = existingNode;
-    } else {
-      matchingNode = createNode(context.doc, nodeName, key, statics, parent);
-
-      if (key) {
-        registerChild(parent, key, matchingNode);
-      }
-
-      context.markCreated(matchingNode);
-    }
-
-    // If the node has a key, remove it from the DOM to prevent a large number
-    // of re-orders in the case that it moved far or was completely removed.
-    // Since we hold on to a reference through the keyMap, we can always add it
-    // back.
-    if (currentNode && getData(currentNode).key) {
-      parent.replaceChild(matchingNode, currentNode);
-      getData(parent).keyMapValid = false;
-    } else {
-      parent.insertBefore(matchingNode, currentNode);
-    }
-
-    context.currentNode = matchingNode;
+  if (currentNode && matches(nodeName, key)) {
+    return;
   }
 
-  return matchingNode;
+  var existingNode = getChild(currentParent, key);
+  var matchingNode;
+
+  // Check to see if the node has moved within the parent or if a new one
+  // should be created
+  if (existingNode) {
+    if (process.env.NODE_ENV !== 'production') {
+      assertKeyedTagMatches(getData(existingNode).nodeName, nodeName, key);
+    }
+
+    matchingNode = existingNode;
+  } else {
+    matchingNode = createNode(
+        context.doc,
+        nodeName,
+        key,
+        statics,
+        currentParent);
+
+    if (key) {
+      registerChild(currentParent, key, matchingNode);
+    }
+
+    context.markCreated(matchingNode);
+  }
+
+  // If the node has a key, remove it from the DOM to prevent a large number
+  // of re-orders in the case that it moved far or was completely removed.
+  // Since we hold on to a reference through the keyMap, we can always add it
+  // back.
+  if (currentNode && getData(currentNode).key) {
+    currentParent.replaceChild(matchingNode, currentNode);
+    getData(currentParent).keyMapValid = false;
+  } else {
+    currentParent.insertBefore(matchingNode, currentNode);
+  }
+
+  currentNode = matchingNode;
 };
 
 
 /**
  * Clears out any unvisited Nodes, as the corresponding virtual element
  * functions were never called for them.
- * @param {Node} node
  */
-var clearUnvisitedDOM = function(node) {
+var clearUnvisitedDOM = function() {
+  var node = currentParent;
   var data = getData(node);
   var keyMap = data.keyMap;
   var keyMapValid = data.keyMapValid;
-  var lastVisitedChild = data.lastVisitedChild;
   var child = node.lastChild;
   var key;
 
-  data.lastVisitedChild = null;
-
-  if (child === lastVisitedChild && keyMapValid) {
+  if (child === previousNode && keyMapValid) {
     return;
   }
 
-  if (data.attrs[symbols.placeholder] && context.currentNode !== context.root) {
+  if (data.attrs[symbols.placeholder] && node !== context.root) {
     return;
   }
 
-  while (child !== lastVisitedChild) {
+  while (child !== previousNode) {
     node.removeChild(child);
     context.markDeleted(/** @type {!Node}*/(child));
 
@@ -190,62 +204,108 @@ var clearUnvisitedDOM = function(node) {
 
 
 /**
- * Marks node's parent as having visited node.
- * @param {Node} node
- */
-var markVisited = function(node) {
-  var parent = context.currentParent;
-  var data = getData(parent);
-  data.lastVisitedChild = node;
-};
-
-
-/**
  * Changes to the first child of the current node.
  */
-var firstChild = function() {
-  context.currentParent = context.currentNode;
-  context.currentNode = context.currentNode.firstChild;
+var enterNode = function() {
+  currentParent = currentNode;
+  currentNode = currentNode.firstChild;
+  previousNode = null;
 };
 
 
 /**
  * Changes to the next sibling of the current node.
  */
-var nextSibling = function() {
-  markVisited(context.currentNode);
-  context.currentNode = context.currentNode.nextSibling;
+var nextNode = function() {
+  previousNode = currentNode;
+  currentNode = currentNode.nextSibling;
 };
 
 
 /**
  * Changes to the parent of the current node, removing any unvisited children.
  */
-var parentNode = function() {
-  context.currentNode = context.currentParent;
-  context.currentParent = context.currentNode.parentNode;
+var exitNode = function() {
+  clearUnvisitedDOM();
+
+  previousNode = currentParent;
+  currentNode = currentParent.nextSibling;
+  currentParent = currentParent.parentNode;
+};
+
+
+/**
+ * Makes sure that the current node is an Element with a matching tagName and
+ * key.
+ *
+ * @param {string} tag The element's tag.
+ * @param {?string=} key The key used to identify this element. This can be an
+ *     empty string, but performance may be better if a unique value is used
+ *     when iterating over an array of items.
+ * @param {?Array<*>=} statics An array of attribute name/value pairs of the
+ *     static attributes for the Element. These will only be set once when the
+ *     Element is created.
+ * @return {!Element} The corresponding Element.
+ */
+var elementOpen = function(tag, key, statics) {
+  alignWithDOM(tag, key, statics);
+  enterNode();
+  return /** @type {!Element} */(currentParent);
+};
+
+
+/**
+ * Closes the currently open Element, removing any unvisited children if
+ * necessary.
+ *
+ * @return {!Element} The corresponding Element.
+ */
+var elementClose = function() {
+  exitNode();
+  return /** @type {!Element} */(previousNode);
+};
+
+
+/**
+ * Makes sure the current node is a Text node and creates a Text node if it is
+ * not.
+ *
+ * @return {!Text} The corresponding Text Node.
+ */
+var text = function() {
+  alignWithDOM('#text', null, null);
+  nextNode();
+  return /** @type {!Text} */(previousNode);
 };
 
 
 /**
  * Gets the current Element being patched.
- * @return {!Node}
+ * @return {!Element}
  */
 var currentElement = function() {
   if (process.env.NODE_ENV !== 'production') {
     assertInPatch(context);
   }
-  return context.currentParent;
+  return /** @type {!Element} */(currentParent);
+};
+
+
+/**
+ * Skips the children in a subtree, allowing an Element to be closed without
+ * clearing out the children.
+ */
+var skip = function() {
+  previousNode = currentParent.lastChild;
 };
 
 
 /** */
 export {
-  alignWithDOM,
-  clearUnvisitedDOM,
+  elementOpen,
+  elementClose,
+  text,
   patch,
-  firstChild,
-  nextSibling,
-  parentNode,
-  currentElement
+  currentElement,
+  skip
 };
