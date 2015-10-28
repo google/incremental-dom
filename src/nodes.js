@@ -61,14 +61,16 @@ var createNode = function(doc, nodeName, key, statics) {
   if (nodeName === '#text') {
     node = doc.createTextNode('');
   } else {
-    node = createElement(doc, nodeName, key, statics);
+    node = createElement(doc, nodeName, key);
   }
 
   initData(node, nodeName, key);
 
   if (statics) {
     for (var i = 0; i < statics.length; i += 2) {
-      updateAttribute(node, /** @type {!string}*/(statics[i]), statics[i + 1]);
+      updateAttribute(/** @type {!Element}*/(node),
+                      /** @type {!string}*/(statics[i]),
+                      statics[i + 1]);
     }
   }
 
