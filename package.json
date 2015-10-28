@@ -22,10 +22,10 @@
     "prepublish": "npm run dist"
   },
   "devDependencies": {
+    "babelify": "^6.4.0",
     "browserify": "^10.2.4",
     "chai": "^3.0.0",
     "del": "^2.0.2",
-    "es6ify": "~1.6.0",
     "gulp": "^3.9.0",
     "gulp-babel": "^5.1.0",
     "gulp-file": "^0.2.0",
