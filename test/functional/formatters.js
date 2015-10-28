@@ -15,8 +15,8 @@
  */
 
 import {
-    patch,
-    text
+  patch,
+  text
 } from '../../index';
 
 
@@ -36,7 +36,7 @@ describe('formatters', () => {
     function sliceOne(str) {
       return str.slice(1);
     }
-  
+
     function prefixQuote(str) {
       return '\'' + str;
     }

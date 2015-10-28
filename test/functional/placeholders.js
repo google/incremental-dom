@@ -15,11 +15,11 @@
  */
 
 import {
-    patch,
-    elementVoid,
-    elementPlaceholder,
-    text,
-    symbols
+  patch,
+  elementVoid,
+  elementPlaceholder,
+  text,
+  symbols
 } from '../../index';
 
 
@@ -51,7 +51,7 @@ describe('placeholders', () => {
       var child = document.createElement('div');
 
       patch(container, render, { key: 'key' });
-      var el = container.firstChild;      
+      var el = container.firstChild;
       el.appendChild(child);
       patch(container, render, { key: 'key' });
 
@@ -66,9 +66,9 @@ describe('placeholders', () => {
           elementVoid('p');
         }
       }
-  
+
       patch(container, render, { key: 'key' });
-      var el = container.firstChild;      
+      var el = container.firstChild;
       patch(el, innerRender, true);
       patch(el, innerRender, false);
 
@@ -89,7 +89,7 @@ describe('placeholders', () => {
 
     it('should render with specified static attributes', () => {
       patch(container, render, { key: 'key' });
-      var el = container.firstChild;      
+      var el = container.firstChild;
 
       expect(el.getAttribute('staticName')).to.equal('staticValue');
     });
@@ -99,14 +99,14 @@ describe('placeholders', () => {
         key: 'key',
         val: 'dynamicValue'
       });
-      var el = container.firstChild;      
+      var el = container.firstChild;
 
       expect(el.getAttribute('dynamicName')).to.equal('dynamicValue');
     });
 
     it('should reuse the same node', () => {
       patch(container, render, { key: 'key' });
-      var el = container.firstChild;      
+      var el = container.firstChild;
       patch(container, render, { key: 'key' });
 
       expect(container.firstChild).to.equal(el);
@@ -116,7 +116,7 @@ describe('placeholders', () => {
       var child = document.createElement('div');
 
       patch(container, render, { key: 'key' });
-      var el = container.firstChild;      
+      var el = container.firstChild;
       el.appendChild(child);
       patch(container, render, { key: 'key' });
 
@@ -131,9 +131,9 @@ describe('placeholders', () => {
           elementVoid('p');
         }
       }
-  
+
       patch(container, render, { key: 'key' });
-      var el = container.firstChild;      
+      var el = container.firstChild;
       patch(el, innerRender, true);
       patch(el, innerRender, false);
 

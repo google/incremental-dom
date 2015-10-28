@@ -15,12 +15,12 @@
  */
 
 import {
-    patch,
-    elementOpen,
-    elementOpenStart,
-    elementOpenEnd,
-    elementClose,
-    elementVoid
+  patch,
+  elementOpen,
+  elementOpenStart,
+  elementOpenEnd,
+  elementClose,
+  elementVoid
 } from '../../index';
 
 describe('element creation', () => {

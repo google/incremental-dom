@@ -15,11 +15,11 @@
  */
 
 import {
-    patchOuter,
-    elementOpen,
-    elementClose,
-    elementVoid,
-    text
+  patchOuter,
+  elementOpen,
+  elementClose,
+  elementVoid,
+  text
 } from '../../index';
 
 
@@ -40,7 +40,7 @@ describe('patching an element', () => {
       elementVoid('div', null, null,
           'tabindex', '0');
     }
-  
+
     patchOuter(container, render);
 
     expect(container.getAttribute('tabindex')).to.equal('0');
@@ -52,7 +52,7 @@ describe('patching an element', () => {
         elementVoid('span');
       elementClose('div');
     }
-  
+
     patchOuter(container, render);
 
     expect(container.firstChild.tagName).to.equal('SPAN');
@@ -95,7 +95,7 @@ describe('patching an element', () => {
 
   it('should throw an error on an empty patch', () => {
     function render() {}
-  
+
     expect(() => patchOuter(container, render)).to.throw('There must be ' +
         'exactly one top level call corresponding to the patched element.');
   });
@@ -104,7 +104,7 @@ describe('patching an element', () => {
     function render() {
       elementVoid('span');
     }
-  
+
     expect(() => patchOuter(container, render)).to.throw('There must be ' +
         'exactly one top level call corresponding to the patched element.');
   });
@@ -114,7 +114,7 @@ describe('patching an element', () => {
       elementVoid('div');
       elementVoid('div');
     }
-  
+
     expect(() => patchOuter(container, render)).to.throw('There must be ' +
         'exactly one top level call corresponding to the patched element.');
   });

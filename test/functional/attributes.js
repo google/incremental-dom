@@ -15,12 +15,12 @@
  */
 
 import {
-    patch,
-    elementOpenStart,
-    elementOpenEnd,
-    attr,
-    elementClose,
-    elementVoid
+  patch,
+  elementOpenStart,
+  elementOpenEnd,
+  attr,
+  elementClose,
+  elementVoid
 } from '../../index';
 
 describe('attribute updates', () => {
@@ -39,7 +39,7 @@ describe('attribute updates', () => {
     function render(attrs) {
       elementOpenStart('div');
       for (var attrName in attrs) {
-          attr(attrName, attrs[attrName]);
+        attr(attrName, attrs[attrName]);
       }
       elementOpenEnd();
       elementClose('div');
