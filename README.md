@@ -87,6 +87,19 @@ function render() {
 </p>
 ```
 
+### starplate
+
+[starplate](https://github.com/littlstar/starplate) is a fast template and view engine built on top of the incremental-dom API. It makes use of ES6 template strings for interpolation, [parse5](https://github.com/inikulin/parse5) for DOM travserval, and incremental-dom for DOM patches.
+
+Consider the following rudimentary example for rendering and updating a clock.
+
+```js
+import {View} from 'starplate';
+const clock = new View('<section>Time <span class="time">${time}</span></section>')
+clock.render(document.body);
+setInterval(_ => clock.update({time: Date()}, 1000);
+```
+
 ### Create your own
 
 If you work on a templating language we'd love to see Incremental DOM adopted as
