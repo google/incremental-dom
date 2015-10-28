@@ -117,31 +117,16 @@ if (process.env.NODE_ENV !== 'production') {
 
 
 /**
- * @param {string} tag The element's tag.
- * @param {?string=} key The key used to identify this element. This can be an
- *     empty string, but performance may be better if a unique value is used
- *     when iterating over an array of items.
- * @param {?Array<*>=} statics An array of attribute name/value pairs of the
- *     static attributes for the Element. These will only be set once when the
- *     Element is created.
+ * @this {!Element} The Element to check for changed attributes.
+ * @param {*} unused1
+ * @param {*} unused2
+ * @param {*} unused3
  * @param {...*} var_args Attribute name/value pairs of the dynamic attributes
  *     for the Element.
- * @return {!Element} The corresponding Element.
+ * @return {?Array<*>} The changed attributes, if any have changed.
  */
-var elementOpen = function(tag, key, statics, var_args) {
-  if (process.env.NODE_ENV !== 'production') {
-    assertNotInAttributes();
-  }
-
-  var node = /** @type {!Element}*/(alignWithDOM(tag, key, statics));
-  var data = getData(node);
-
-  /*
-   * Checks to see if one or more attributes have changed for a given Element.
-   * When no attributes have changed, this is much faster than checking each
-   * individual argument. When attributes have changed, the overhead of this is
-   * minimal.
-   */
+var changedAttributes = function(unused1, unused2, unused3, var_args) {
+  var data = getData(this);
   var attrsArr = data.attrsArr;
   var newAttrs = data.newAttrs;
   var attrsChanged = false;
@@ -164,18 +149,53 @@ var elementOpen = function(tag, key, statics, var_args) {
     attrsArr.length = j;
   }
 
-  /*
-   * Actually perform the attribute update.
-   */
   if (attrsChanged) {
-    for (i = ATTRIBUTES_OFFSET; i < arguments.length; i += 2) {
-      newAttrs[arguments[i]] = arguments[i + 1];
-    }
+    return attrsArr;
+  }
+};
 
-    for (var attr in newAttrs) {
-      updateAttribute(node, attr, newAttrs[attr]);
-      newAttrs[attr] = undefined;
-    }
+/**
+ * Updates the attributes for a given Element.
+ * @param {!Element} node
+ * @param {!Array<*>} attrs The attributes for node.
+ */
+var updateAttributes = function(node, attrs) {
+  var data = getData(node);
+  var newAttrs = data.newAttrs;
+
+  for (var i = 0; i < attrs.length; i += 2) {
+    newAttrs[attrs[i]] = attrs[i + 1];
+  }
+
+  for (var attr in newAttrs) {
+    updateAttribute(node, attr, newAttrs[attr]);
+    newAttrs[attr] = undefined;
+  }
+};
+
+
+/**
+ * @param {string} tag The element's tag.
+ * @param {?string=} key The key used to identify this element. This can be an
+ *     empty string, but performance may be better if a unique value is used
+ *     when iterating over an array of items.
+ * @param {?Array<*>=} statics An array of attribute name/value pairs of the
+ *     static attributes for the Element. These will only be set once when the
+ *     Element is created.
+ * @param {...*} var_args Attribute name/value pairs of the dynamic attributes
+ *     for the Element.
+ * @return {!Element} The corresponding Element.
+ */
+var elementOpen = function(tag, key, statics, var_args) {
+  if (process.env.NODE_ENV !== 'production') {
+    assertNotInAttributes();
+  }
+
+  var node = /** @type {!Element}*/(alignWithDOM(tag, key, statics));
+  var attrs = changedAttributes.apply(node, arguments);
+
+  if (attrs) {
+    updateAttributes(node, attrs);
   }
 
   firstChild();
@@ -279,9 +299,8 @@ var elementClose = function(tag) {
  * @return {!Element} The corresponding Element.
  */
 var elementVoid = function(tag, key, statics, var_args) {
-  var node = elementOpen.apply(null, arguments);
-  elementClose.apply(null, arguments);
-  return node;
+  elementOpen.apply(null, arguments);
+  return elementClose.apply(null, arguments);
 };
 
 
@@ -307,9 +326,15 @@ var elementPlaceholder = function(tag, key, statics, var_args) {
     assertPlaceholderKeySpecified(key);
   }
 
-  var node = elementOpen.apply(null, arguments);
+  var node = /** @type {!Element}*/(alignWithDOM(tag, key, statics));
+  var attrs = changedAttributes.apply(node, arguments);
+
+  if (attrs) {
+    updateAttributes(node, attrs);
+  }
   updateAttribute(node, symbols.placeholder, true);
-  elementClose.apply(null, arguments);
+
+  nextSibling();
   return node;
 };
 
