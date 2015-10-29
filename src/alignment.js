@@ -22,23 +22,7 @@ import {
 import { getData } from './node_data';
 import { getContext } from './context';
 import { symbols } from './symbols';
-
-
-if (process.env.NODE_ENV !== 'production') {
-  /**
-  * Makes sure that keyed Element matches the tag name provided.
-  * @param {!Element} node The node that is being matched.
-  * @param {string=} tag The tag name of the Element.
-  * @param {?string=} key The key of the Element.
-  */
-  var assertKeyedTagMatches = function(node, tag, key) {
-    var nodeName = getData(node).nodeName;
-    if (nodeName !== tag) {
-      throw new Error('Was expecting node with key "' + key + '" to be a ' +
-          tag + ', not a ' + nodeName + '.');
-    }
-  };
-}
+import { assertKeyedTagMatches } from './assertions';
 
 
 /**
@@ -86,7 +70,7 @@ var alignWithDOM = function(nodeName, key, statics) {
     // should be created
     if (existingNode) {
       if (process.env.NODE_ENV !== 'production') {
-        assertKeyedTagMatches(existingNode, nodeName, key);
+        assertKeyedTagMatches(getData(existingNode).nodeName, nodeName, key);
       }
 
       matchingNode = existingNode;

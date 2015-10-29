@@ -16,6 +16,7 @@
 
 import { TreeWalker } from './tree_walker';
 import { notifications } from './notifications';
+import { assertInPatch } from './assertions';
 
 
 /**
@@ -97,9 +98,11 @@ var context;
 /**
  * Enters a new patch context.
  * @param {!Element|!DocumentFragment} node
+ * @return {!Context}
  */
 var enterContext = function(node) {
   context = new Context(node, context);
+  return context;
 };
 
 
@@ -125,8 +128,8 @@ var getContext = function() {
  * @return {!Node}
  */
 var currentElement = function() {
-  if (process.env.NODE_ENV !== 'production' && !context) {
-    throw new Error('Cannot call currentElement() while not in patch.');
+  if (process.env.NODE_ENV !== 'production') {
+    assertInPatch(context);
   }
   return context.walker.currentParent;
 };
