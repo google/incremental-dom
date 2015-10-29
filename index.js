@@ -17,7 +17,8 @@
 
 export {
   patch,
-  currentElement
+  currentElement,
+  skip
 } from './src/core';
 export {
   elementVoid,
@@ -26,9 +27,8 @@ export {
   elementOpen,
   elementClose,
   elementPlaceholder,
-  skip,
   text,
-  attr,
+  attr
 } from './src/virtual_elements';
 export { symbols } from './src/symbols';
 export {

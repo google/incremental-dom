@@ -31,16 +31,6 @@ function Context(node, prevContext) {
   this.root = node;
 
   /**
-   * @type {?Node}
-   */
-  this.currentNode = node;
-
-  /**
-   * @type {!Node}
-   */
-  this.currentParent = null;
-
-  /**
    * @const {Document}
    */
   this.doc = node.ownerDocument;
