@@ -20,18 +20,19 @@ import {
   registerChild
 } from './nodes';
 import { getData } from './node_data';
-import {
-  getContext,
-  enterContext,
-  restoreContext
-} from './context';
+import { Context } from './context';
 import { symbols } from './symbols';
 import {
+  assertInPatch,
   assertKeyedTagMatches,
   assertNoUnclosedTags,
   setInAttributes
 } from './assertions';
 import { notifications } from './notifications';
+
+
+/** @type {?Context} */
+var context = null;
 
 
 /**
@@ -45,7 +46,9 @@ import { notifications } from './notifications';
  * @template T
  */
 var patch = function(node, fn, data) {
-  var context = enterContext(node);
+  var prevContext = context;
+  context = new Context(node);
+
   if (process.env.NODE_ENV !== 'production') {
     setInAttributes(false);
   }
@@ -60,7 +63,7 @@ var patch = function(node, fn, data) {
   }
 
   context.notifyChanges();
-  restoreContext();
+  context = prevContext;
 };
 
 
@@ -93,7 +96,6 @@ var matches = function(node, nodeName, key) {
  * @return {!Node} The matching node.
  */
 var alignWithDOM = function(nodeName, key, statics) {
-  var context = getContext();
   var currentNode = context.currentNode;
   var parent = context.currentParent;
   var matchingNode;
@@ -146,7 +148,6 @@ var alignWithDOM = function(nodeName, key, statics) {
  * @param {Node} node
  */
 var clearUnvisitedDOM = function(node) {
-  var context = getContext();
   var data = getData(node);
   var keyMap = data.keyMap;
   var keyMapValid = data.keyMapValid;
@@ -193,7 +194,6 @@ var clearUnvisitedDOM = function(node) {
  * @param {Node} node
  */
 var markVisited = function(node) {
-  var context = getContext();
   var parent = context.currentParent;
   var data = getData(parent);
   data.lastVisitedChild = node;
@@ -204,7 +204,6 @@ var markVisited = function(node) {
  * Changes to the first child of the current node.
  */
 var firstChild = function() {
-  var context = getContext();
   context.currentParent = context.currentNode;
   context.currentNode = context.currentNode.firstChild;
 };
@@ -214,7 +213,6 @@ var firstChild = function() {
  * Changes to the next sibling of the current node.
  */
 var nextSibling = function() {
-  var context = getContext();
   markVisited(context.currentNode);
   context.currentNode = context.currentNode.nextSibling;
 };
@@ -224,9 +222,20 @@ var nextSibling = function() {
  * Changes to the parent of the current node, removing any unvisited children.
  */
 var parentNode = function() {
-  var context = getContext();
   context.currentNode = context.currentParent;
   context.currentParent = context.currentNode.parentNode;
+};
+
+
+/**
+ * Gets the current Element being patched.
+ * @return {!Node}
+ */
+var currentElement = function() {
+  if (process.env.NODE_ENV !== 'production') {
+    assertInPatch(context);
+  }
+  return context.currentParent;
 };
 
 
@@ -237,6 +246,6 @@ export {
   patch,
   firstChild,
   nextSibling,
-  parentNode
+  parentNode,
+  currentElement
 };
-export { currentElement } from './context';

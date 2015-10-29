@@ -15,7 +15,6 @@
  */
 
 import { notifications } from './notifications';
-import { assertInPatch } from './assertions';
 
 
 /**
@@ -45,11 +44,6 @@ function Context(node, prevContext) {
    * @const {Document}
    */
   this.doc = node.ownerDocument;
-
-  /**
-   * @const {?Context}
-   */
-  this.prevContext = prevContext;
 
   /**
    * @type {(Array<!Node>|undefined)}
@@ -97,57 +91,7 @@ Context.prototype.notifyChanges = function() {
 };
 
 
-/**
- * The current context.
- * @type {?Context}
- */
-var context;
-
-
-/**
- * Enters a new patch context.
- * @param {!Element|!DocumentFragment} node
- * @return {!Context}
- */
-var enterContext = function(node) {
-  context = new Context(node, context);
-  return context;
-};
-
-
-/**
- * Restores the previous patch context.
- */
-var restoreContext = function() {
-  context = context.prevContext;
-};
-
-
-/**
- * Gets the current patch context.
- * @return {?Context}
- */
-var getContext = function() {
-  return context;
-};
-
-
-/**
- * Gets the current Element being patched.
- * @return {!Node}
- */
-var currentElement = function() {
-  if (process.env.NODE_ENV !== 'production') {
-    assertInPatch(context);
-  }
-  return context.currentParent;
-};
-
-
 /** */
 export {
-  enterContext,
-  restoreContext,
-  getContext,
-  currentElement
+  Context,
 };

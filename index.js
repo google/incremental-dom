@@ -15,7 +15,10 @@
  * limitations under the License.
  */
 
-export { patch } from './src/core';
+export {
+  patch,
+  currentElement
+} from './src/core';
 export {
   elementVoid,
   elementOpenStart,
@@ -34,4 +37,3 @@ export {
   applyProp
 } from './src/attributes';
 export { notifications } from './src/notifications';
-export { currentElement } from './src/context';
