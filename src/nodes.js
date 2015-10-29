@@ -20,6 +20,7 @@ import {
     initData
 } from './node_data';
 import { createMap } from './util';
+import { assertUniqueKey } from './assertions';
 
 
 /**
@@ -150,10 +151,48 @@ const registerChild = function(parent, key, child) {
 };
 
 
+/**
+ * Asserts that the key has not yet been used for this parent in this patch.
+ * @param {!Node} parent the parent node which contains the keyed element.
+ * @param {string} key the key to use.
+ */
+const useKey = function(parent, key) {
+  const usedKeys = getData(parent).usedKeys;
+  const patchKeys = usedKeys[usedKeys.length - 1];
+
+  assertUniqueKey(key, patchKeys);
+  patchKeys[key] = true;
+};
+
+
+/**
+ * Adds a new usedKeys map for the current patch context.
+ * @param {!Node} node the node to add keys.
+ */
+const trackUsedKeys = function(node) {
+  const keys = createMap();
+  const data = getData(node);
+  data.usedKeys.push(keys);
+};
+
+
+/**
+ * Pops the currently used keys for this patch context.
+ * @param {!Node} node the node to clear keys from.
+ */
+const clearUsedKeys = function(node) {
+  const data = getData(node);
+  data.usedKeys.pop();
+};
+
+
 /** */
 export {
   createElement,
   createText,
   getChild,
-  registerChild
+  registerChild,
+  useKey,
+  clearUsedKeys,
+  trackUsedKeys
 };
