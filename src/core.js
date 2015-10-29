@@ -56,7 +56,7 @@ var patch = function(node, fn, data) {
   clearUnvisitedDOM(node);
 
   if (process.env.NODE_ENV !== 'production') {
-    assertNoUnclosedTags(context.walker.currentNode, node);
+    assertNoUnclosedTags(context.currentNode, node);
   }
 
   context.notifyChanges();
@@ -94,9 +94,8 @@ var matches = function(node, nodeName, key) {
  */
 var alignWithDOM = function(nodeName, key, statics) {
   var context = getContext();
-  var walker = context.walker;
-  var currentNode = walker.currentNode;
-  var parent = walker.currentParent;
+  var currentNode = context.currentNode;
+  var parent = context.currentParent;
   var matchingNode;
 
   // Check to see if we have a node to reuse
@@ -134,7 +133,7 @@ var alignWithDOM = function(nodeName, key, statics) {
       parent.insertBefore(matchingNode, currentNode);
     }
 
-    walker.currentNode = matchingNode;
+    context.currentNode = matchingNode;
   }
 
   return matchingNode;
@@ -148,7 +147,6 @@ var alignWithDOM = function(nodeName, key, statics) {
  */
 var clearUnvisitedDOM = function(node) {
   var context = getContext();
-  var walker = context.walker;
   var data = getData(node);
   var keyMap = data.keyMap;
   var keyMapValid = data.keyMapValid;
@@ -162,7 +160,7 @@ var clearUnvisitedDOM = function(node) {
     return;
   }
 
-  if (data.attrs[symbols.placeholder] && walker.currentNode !== walker.root) {
+  if (data.attrs[symbols.placeholder] && context.currentNode !== context.root) {
     return;
   }
 
@@ -196,8 +194,7 @@ var clearUnvisitedDOM = function(node) {
  */
 var markVisited = function(node) {
   var context = getContext();
-  var walker = context.walker;
-  var parent = walker.currentParent;
+  var parent = context.currentParent;
   var data = getData(parent);
   data.lastVisitedChild = node;
 };
@@ -208,8 +205,8 @@ var markVisited = function(node) {
  */
 var firstChild = function() {
   var context = getContext();
-  var walker = context.walker;
-  walker.firstChild();
+  context.currentParent = context.currentNode;
+  context.currentNode = context.currentNode.firstChild;
 };
 
 
@@ -218,9 +215,8 @@ var firstChild = function() {
  */
 var nextSibling = function() {
   var context = getContext();
-  var walker = context.walker;
-  markVisited(walker.currentNode);
-  walker.nextSibling();
+  markVisited(context.currentNode);
+  context.currentNode = context.currentNode.nextSibling;
 };
 
 
@@ -229,8 +225,8 @@ var nextSibling = function() {
  */
 var parentNode = function() {
   var context = getContext();
-  var walker = context.walker;
-  walker.parentNode();
+  context.currentNode = context.currentParent;
+  context.currentParent = context.currentNode.parentNode;
 };
 
 
