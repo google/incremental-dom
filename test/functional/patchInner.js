@@ -137,6 +137,14 @@ describe('patching an element\'s children', () => {
 
     expect(container.textContent).to.equal('foobar');
   });
+
+  it('should throw when an element is unclosed', function() {
+    expect(() => {
+      patch(container, () => {
+        elementOpen('div');
+      });
+    }).to.throw('One or more tags were not closed:\ndiv');
+  });
 });
 
 describe('patching a documentFragment', function() {

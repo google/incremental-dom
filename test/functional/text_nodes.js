@@ -16,7 +16,8 @@
 
 import {
   patch,
-  text
+  text,
+  elementOpenStart
 } from '../../index';
 
 
@@ -51,6 +52,15 @@ describe('text nodes', () => {
       });
 
       expect(container.textContent).to.equal('Hello World!');
+    });
+
+    it('should throw when inside virtual attributes element', () => {
+      expect(() => {
+        patch(container, () => {
+          elementOpenStart('div');
+          text('Hello');
+        });
+      }).to.throw('text() can not be called between elementOpenStart() and elementOpenEnd().');
     });
   });
 

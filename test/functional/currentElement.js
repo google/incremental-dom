@@ -78,10 +78,10 @@ describe('currentElement', () => {
   });
 
   it('should throw an error if not patching', () => {
-    expect(currentElement).to.throw(Error);
+    expect(currentElement).to.throw('Cannot call currentElement() unless in patch');
   });
 
-  it('should throw an error if inside virtual element', () => {
+  it('should throw an error if inside virtual attributes element', () => {
     expect(() => {
       patch(container, () => {
         elementOpenStart('div');
@@ -89,6 +89,6 @@ describe('currentElement', () => {
         elementOpenEnd('div');
         elementClose('div');
       });
-    }).to.throw(Error);
+    }).to.throw('currentElement() can not be called between elementOpenStart() and elementOpenEnd().');
   });
 })

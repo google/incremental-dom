@@ -84,7 +84,7 @@ describe('placeholders', () => {
 
     it('should warn about a missing key', () => {
       var fn = () => patch(container, render, {});
-      expect(fn).to.throw('Placeholder elements must have a key specified.');
+      expect(fn).to.throw('elementPlaceholder() requires a key.');
     });
 
     it('should render with specified static attributes', () => {
