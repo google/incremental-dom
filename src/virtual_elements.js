@@ -17,7 +17,7 @@
 import {
   alignWithDOM,
   clearUnvisitedDOM
-} from './alignment';
+} from './core';
 import { updateAttribute } from './attributes';
 import { getData } from './node_data';
 import {
