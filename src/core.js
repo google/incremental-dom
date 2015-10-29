@@ -31,10 +31,6 @@ import {
   assertNoUnclosedTags,
   setInAttributes
 } from './assertions';
-import {
-  firstChild,
-  parentNode
-} from './traversal';
 import { notifications } from './notifications';
 
 
@@ -194,10 +190,57 @@ var clearUnvisitedDOM = function(node) {
 };
 
 
+/**
+ * Marks node's parent as having visited node.
+ * @param {Node} node
+ */
+var markVisited = function(node) {
+  var context = getContext();
+  var walker = context.walker;
+  var parent = walker.currentParent;
+  var data = getData(parent);
+  data.lastVisitedChild = node;
+};
+
+
+/**
+ * Changes to the first child of the current node.
+ */
+var firstChild = function() {
+  var context = getContext();
+  var walker = context.walker;
+  walker.firstChild();
+};
+
+
+/**
+ * Changes to the next sibling of the current node.
+ */
+var nextSibling = function() {
+  var context = getContext();
+  var walker = context.walker;
+  markVisited(walker.currentNode);
+  walker.nextSibling();
+};
+
+
+/**
+ * Changes to the parent of the current node, removing any unvisited children.
+ */
+var parentNode = function() {
+  var context = getContext();
+  var walker = context.walker;
+  walker.parentNode();
+};
+
+
 /** */
 export {
   alignWithDOM,
   clearUnvisitedDOM,
-  patch
+  patch,
+  firstChild,
+  nextSibling,
+  parentNode
 };
 export { currentElement } from './context';
