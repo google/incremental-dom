@@ -20,7 +20,6 @@ import {
 } from './traversal';
 import { TreeWalker } from './tree_walker';
 import {
-    getContext,
     enterContext,
     restoreContext
 } from './context';
@@ -58,7 +57,7 @@ if (process.env.NODE_ENV !== 'production') {
  * @template T
  */
 var patch = function(node, fn, data) {
-  enterContext(node);
+  var context = enterContext(node);
 
   firstChild();
   fn(data);
@@ -69,7 +68,7 @@ var patch = function(node, fn, data) {
     assertNoUnclosedTags(node);
   }
 
-  getContext().notifyChanges();
+  context.notifyChanges();
   restoreContext();
 };
 

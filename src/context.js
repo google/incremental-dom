@@ -97,9 +97,11 @@ var context;
 /**
  * Enters a new patch context.
  * @param {!Element|!DocumentFragment} node
+ * @return {!Context}
  */
 var enterContext = function(node) {
   context = new Context(node, context);
+  return context;
 };
 
 
