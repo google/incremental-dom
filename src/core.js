@@ -118,7 +118,7 @@ var alignWithDOM = function(nodeName, key, statics) {
 
       matchingNode = existingNode;
     } else {
-      matchingNode = createNode(context.doc, nodeName, key, statics);
+      matchingNode = createNode(context.doc, nodeName, key, statics, parent);
 
       if (key) {
         registerChild(parent, key, matchingNode);
@@ -200,3 +200,4 @@ export {
   clearUnvisitedDOM,
   patch
 };
+export { currentElement } from './context';
