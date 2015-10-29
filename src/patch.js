@@ -25,25 +25,7 @@ import {
 } from './context';
 import { clearUnvisitedDOM } from './alignment';
 import { notifications } from './notifications';
-
-
-if (process.env.NODE_ENV !== 'production') {
-  var assertNoUnclosedTags = function(root) {
-    var openElement = getContext().walker.currentNode;
-    if (openElement === root) {
-      return;
-    }
-
-    var openTags = [];
-    while (openElement && openElement !== root) {
-      openTags.push(openElement.nodeName.toLowerCase());
-      openElement = openElement.parentNode;
-    }
-
-    throw new Error('One or more tags were not closed:\n' +
-        openTags.join('\n'));
-  };
-}
+import { assertNoUnclosedTags } from './assertions';
 
 
 /**
@@ -65,7 +47,7 @@ var patch = function(node, fn, data) {
   clearUnvisitedDOM(node);
 
   if (process.env.NODE_ENV !== 'production') {
-    assertNoUnclosedTags(node);
+    assertNoUnclosedTags(context.walker.currentNode, node);
   }
 
   context.notifyChanges();
