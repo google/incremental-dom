@@ -15,14 +15,57 @@
  */
 
 import {
-    createNode,
-    getChild,
-    registerChild
+  createNode,
+  getChild,
+  registerChild
 } from './nodes';
 import { getData } from './node_data';
-import { getContext } from './context';
+import {
+  getContext,
+  enterContext,
+  restoreContext
+} from './context';
 import { symbols } from './symbols';
-import { assertKeyedTagMatches } from './assertions';
+import {
+  assertKeyedTagMatches,
+  assertNoUnclosedTags,
+  setInAttributes
+} from './assertions';
+import {
+  firstChild,
+  parentNode
+} from './traversal';
+import { notifications } from './notifications';
+
+
+/**
+ * Patches the document starting at el with the provided function. This function
+ * may be called during an existing patch operation.
+ * @param {!Element|!DocumentFragment} node The Element or Document
+ *     to patch.
+ * @param {!function(T)} fn A function containing elementOpen/elementClose/etc.
+ *     calls that describe the DOM.
+ * @param {T=} data An argument passed to fn to represent DOM state.
+ * @template T
+ */
+var patch = function(node, fn, data) {
+  var context = enterContext(node);
+  if (process.env.NODE_ENV !== 'production') {
+    setInAttributes(false);
+  }
+
+  firstChild();
+  fn(data);
+  parentNode();
+  clearUnvisitedDOM(node);
+
+  if (process.env.NODE_ENV !== 'production') {
+    assertNoUnclosedTags(context.walker.currentNode, node);
+  }
+
+  context.notifyChanges();
+  restoreContext();
+};
 
 
 /**
@@ -154,5 +197,6 @@ var clearUnvisitedDOM = function(node) {
 /** */
 export {
   alignWithDOM,
-  clearUnvisitedDOM
+  clearUnvisitedDOM,
+  patch
 };

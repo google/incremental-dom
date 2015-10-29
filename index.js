@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-export { patch } from './src/patch';
+export { patch } from './src/core';
 export {
   elementVoid,
   elementOpenStart,
