@@ -26,7 +26,8 @@ import {
   assertInPatch,
   assertKeyedTagMatches,
   assertNoUnclosedTags,
-  setInAttributes
+  setInAttributes,
+  assertNotInAttributes
 } from './assertions';
 import { notifications } from './notifications';
 
@@ -286,6 +287,7 @@ var text = function() {
 var currentElement = function() {
   if (process.env.NODE_ENV !== 'production') {
     assertInPatch(context);
+    assertNotInAttributes('currentElement');
   }
   return /** @type {!Element} */(currentParent);
 };

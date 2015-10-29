@@ -26,19 +26,16 @@ import {
 
 describe('currentElement', () => {
   var container;
-  var sandbox = sinon.sandbox.create();
   var el
 
   beforeEach(() => {
     container = document.createElement('div');
     document.body.appendChild(container);
-    patch(container, () => {});
-    el = null;
   });
 
   afterEach(() => {
-    sandbox.restore();
     document.body.removeChild(container);
+    el = null;
   });
 
   it('should return the element from elementOpen', () => {
@@ -82,5 +79,16 @@ describe('currentElement', () => {
 
   it('should throw an error if not patching', () => {
     expect(currentElement).to.throw(Error);
+  });
+
+  it('should throw an error if inside virtual element', () => {
+    expect(() => {
+      patch(container, () => {
+        elementOpenStart('div');
+        el = currentElement();
+        elementOpenEnd('div');
+        elementClose('div');
+      });
+    }).to.throw(Error);
   });
 })
