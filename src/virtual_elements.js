@@ -20,7 +20,10 @@ import {
 } from './alignment';
 import { updateAttribute } from './attributes';
 import { getData } from './node_data';
-import { getContext } from './context';
+import {
+  getContext,
+  currentElement
+} from './context';
 import {
     firstChild,
     nextSibling,
@@ -114,6 +117,18 @@ if (process.env.NODE_ENV !== 'production') {
     inAttributes = false;
   };
 }
+
+
+/**
+ * Skips the children in a subtree, allowing an Element to be closed without
+ * clearing out the children.
+ */
+var skip = function() {
+  var openElement = currentElement();
+  var data = getData(openElement);
+
+  data.lastVisitedChild = openElement.lastChild;
+};
 
 
 /**
@@ -307,10 +322,9 @@ var elementPlaceholder = function(tag, key, statics, var_args) {
     assertPlaceholderKeySpecified(key);
   }
 
-  var node = elementOpen.apply(null, arguments);
-  updateAttribute(node, symbols.placeholder, true);
-  elementClose.apply(null, arguments);
-  return node;
+  elementOpen.apply(null, arguments);
+  skip();
+  return elementClose.apply(null, arguments);
 };
 
 
@@ -355,6 +369,7 @@ export {
   elementVoid,
   elementClose,
   elementPlaceholder,
+  skip,
   text,
   attr
 };

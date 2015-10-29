@@ -119,13 +119,14 @@ var getContext = function() {
   return context;
 };
 
+
 /**
  * Gets the current Element being patched.
  * @return {!Node}
  */
 var currentElement = function() {
   if (process.env.NODE_ENV !== 'production' && !context) {
-    throw new Error('cannot call currentElement() while not in patch');
+    throw new Error('Cannot call currentElement() while not in patch.');
   }
   return context.walker.currentParent;
 };

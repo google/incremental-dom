@@ -23,6 +23,7 @@ export {
   elementOpen,
   elementClose,
   elementPlaceholder,
+  skip,
   text,
   attr,
 } from './src/virtual_elements';
