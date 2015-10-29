@@ -19,8 +19,26 @@ import {
     getData,
     initData
 } from './node_data';
-import { getNamespaceForTag } from './namespace';
 import { createMap } from './util';
+
+
+/**
+ * Gets the namespace to create an element (of a given tag) in.
+ * @param {string} tag The tag to get the namespace for.
+ * @param {!Node} parent
+ * @return {?string} The namespace to create the tag in.
+ */
+var getNamespaceForTag = function(tag, parent) {
+  if (tag === 'svg') {
+    return 'http://www.w3.org/2000/svg';
+  }
+
+  if (getData(parent).nodeName === 'foreignObject') {
+    return null;
+  }
+
+  return parent.namespaceURI;
+};
 
 
 /**
@@ -28,10 +46,11 @@ import { createMap } from './util';
  * @param {Document} doc The document with which to create the Element.
  * @param {string} tag The tag for the Element.
  * @param {?string=} key A key to identify the Element.
+ * @param {!Node} parent
  * @return {!Element}
  */
-var createElement = function(doc, tag, key) {
-  var namespace = getNamespaceForTag(tag);
+var createElement = function(doc, tag, key, parent) {
+  var namespace = getNamespaceForTag(tag, parent);
   var el;
 
   if (namespace) {
@@ -54,14 +73,15 @@ var createElement = function(doc, tag, key) {
  * @param {?Array<*>=} statics The static data to initialize the Node
  *     with. For an Element, an array of attribute name/value pairs of
  *     the static attributes for the Element.
+ * @param {!Node} parent
  * @return {!Node}
  */
-var createNode = function(doc, nodeName, key, statics) {
+var createNode = function(doc, nodeName, key, statics, parent) {
   var node;
   if (nodeName === '#text') {
     node = doc.createTextNode('');
   } else {
-    node = createElement(doc, nodeName, key);
+    node = createElement(doc, nodeName, key, parent);
   }
 
   initData(node, nodeName, key);

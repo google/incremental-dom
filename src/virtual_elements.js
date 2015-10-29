@@ -16,14 +16,11 @@
 
 import {
   alignWithDOM,
-  clearUnvisitedDOM
+  clearUnvisitedDOM,
+  currentElement
 } from './core';
 import { updateAttribute } from './attributes';
 import { getData } from './node_data';
-import {
-  getContext,
-  currentElement
-} from './context';
 import {
     firstChild,
     nextSibling,
@@ -203,8 +200,8 @@ var elementClose = function(tag) {
     assertNotInAttributes('elementClose');
   }
 
+  var node = /** @type {!Element} */(currentElement());
   parentNode();
-  var node = /** @type {!Element} */(getContext().walker.currentNode);
 
   if (process.env.NODE_ENV !== 'production') {
     assertCloseMatchesOpenTag(getData(node).nodeName, tag);
