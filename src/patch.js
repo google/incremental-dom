@@ -25,7 +25,10 @@ import {
 } from './context';
 import { clearUnvisitedDOM } from './alignment';
 import { notifications } from './notifications';
-import { assertNoUnclosedTags } from './assertions';
+import {
+  assertNoUnclosedTags,
+  setInAttributes
+} from './assertions';
 
 
 /**
@@ -40,6 +43,9 @@ import { assertNoUnclosedTags } from './assertions';
  */
 var patch = function(node, fn, data) {
   var context = enterContext(node);
+  if (process.env.NODE_ENV !== 'production') {
+    setInAttributes(false);
+  }
 
   firstChild();
   fn(data);
