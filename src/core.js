@@ -28,7 +28,8 @@ import {
   assertNoUnclosedTags,
   assertNotInAttributes,
   assertVirtualAttributesClosed,
-  setInAttributes
+  setInAttributes,
+  getInAttributes
 } from './assertions';
 import { notifications } from './notifications';
 
@@ -78,6 +79,7 @@ var patch = function(node, fn, data) {
   previousNode = null;
 
   if (process.env.NODE_ENV !== 'production') {
+    var prevInAttributes = getInAttributes();
     setInAttributes(false);
   }
 
@@ -88,6 +90,7 @@ var patch = function(node, fn, data) {
   if (process.env.NODE_ENV !== 'production') {
     assertVirtualAttributesClosed();
     assertNoUnclosedTags(previousNode, node);
+    setInAttributes(prevInAttributes);
   }
 
   context.notifyChanges();

@@ -131,11 +131,20 @@ var assertCloseMatchesOpenTag = function(nodeName, tag) {
 
 
 /**
- * Updates the state to being in an attribute declaration.
+ * Updates the state of being in an attribute declaration.
  * @param {boolean} value
  */
 var setInAttributes = function(value) {
   inAttributes = value;
+};
+
+
+/**
+ * Returns the state of being in an attribute declaration.
+ * @return {boolean}
+ */
+var getInAttributes = function() {
+  return inAttributes;
 };
 
 
@@ -149,5 +158,6 @@ export {
   assertPlaceholderKeySpecified,
   assertCloseMatchesOpenTag,
   assertVirtualAttributesClosed,
-  setInAttributes
+  setInAttributes,
+  getInAttributes
 };
