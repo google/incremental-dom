@@ -71,6 +71,7 @@ var patch = function(node, fn, data) {
 
   enterNode();
   fn(data);
+  clearUnvisitedDOM();
   exitNode();
 
   if (process.env.NODE_ENV !== 'production') {
@@ -226,11 +227,9 @@ var nextNode = function() {
  * Changes to the parent of the current node, removing any unvisited children.
  */
 var exitNode = function() {
-  clearUnvisitedDOM();
-
-  previousNode = currentParent;
-  currentNode = currentParent.nextSibling;
+  currentNode = currentParent;
   currentParent = currentParent.parentNode;
+  nextNode();
 };
 
 
@@ -261,6 +260,7 @@ var elementOpen = function(tag, key, statics) {
  * @return {!Element} The corresponding Element.
  */
 var elementClose = function() {
+  clearUnvisitedDOM();
   exitNode();
   return /** @type {!Element} */(previousNode);
 };
