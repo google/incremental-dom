@@ -44,6 +44,9 @@ var currentParent;
 /** @type {?Node} */
 var previousNode;
 
+/** @type {?Element|?DocumentFragment} */
+var root;
+
 /** @type {?Document} */
 var doc;
 
@@ -60,12 +63,14 @@ var doc;
  */
 var patch = function(node, fn, data) {
   var prevContext = context;
+  var prevRoot = root;
   var prevDoc = doc;
   var prevCurrentNode = currentNode;
   var prevCurrentParent = currentParent;
   var prevPreviousNode = previousNode;
 
   context = new Context(node);
+  root = node;
   doc = node.ownerDocument;
   currentNode = node;
   currentParent = null;
@@ -86,6 +91,7 @@ var patch = function(node, fn, data) {
   context.notifyChanges();
 
   context = prevContext;
+  root = prevRoot;
   doc = prevDoc;
   currentNode = prevCurrentNode;
   currentParent = prevCurrentParent;
@@ -177,7 +183,7 @@ var clearUnvisitedDOM = function() {
     return;
   }
 
-  if (data.attrs[symbols.placeholder] && node !== context.root) {
+  if (data.attrs[symbols.placeholder] && node !== root) {
     return;
   }
 

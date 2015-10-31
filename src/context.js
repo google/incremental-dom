@@ -26,11 +26,6 @@ import { notifications } from './notifications';
  */
 function Context(node, prevContext) {
   /**
-   * @const {!Element|!DocumentFragment}
-   */
-  this.root = node;
-
-  /**
    * @type {(Array<!Node>|undefined)}
    */
   this.created = notifications.nodesCreated && [];
