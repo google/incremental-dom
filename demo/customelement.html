@@ -32,7 +32,7 @@
     (function() {
       var patch = IncrementalDOM.patch,
           elementOpen = IncrementalDOM.elementOpen,
-          elementVoid = IncrementalDOM.elementVoid,
+          elementPlaceholder = IncrementalDOM.elementPlaceholder,
           elementClose = IncrementalDOM.elementClose,
           text = IncrementalDOM.text;
 
@@ -80,12 +80,11 @@
       function update(data) {
         patch(container, function() {
           data.items.forEach(function(item, index) {
-            elementOpen('x-item', index, null,
+            elementPlaceholder('x-item', 'item' + index, null,
                 'data-selected', index === data.selectedIndex,
                 'props', {
                   text: item
                 });
-            elementClose('x-item');
           });
 
           elementOpen('div', null, null,
