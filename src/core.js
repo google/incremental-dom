@@ -44,6 +44,9 @@ var currentParent;
 /** @type {?Node} */
 var previousNode;
 
+/** @type {?Document} */
+var doc;
+
 
 /**
  * Patches the document starting at el with the provided function. This function
@@ -57,11 +60,13 @@ var previousNode;
  */
 var patch = function(node, fn, data) {
   var prevContext = context;
+  var prevDoc = doc;
   var prevCurrentNode = currentNode;
   var prevCurrentParent = currentParent;
   var prevPreviousNode = previousNode;
 
   context = new Context(node);
+  doc = node.ownerDocument;
   currentNode = node;
   currentParent = null;
   previousNode = null;
@@ -81,6 +86,7 @@ var patch = function(node, fn, data) {
   context.notifyChanges();
 
   context = prevContext;
+  doc = prevDoc;
   currentNode = prevCurrentNode;
   currentParent = prevCurrentParent;
   previousNode = prevPreviousNode;
@@ -131,12 +137,7 @@ var alignWithDOM = function(nodeName, key, statics) {
 
     matchingNode = existingNode;
   } else {
-    matchingNode = createNode(
-        context.doc,
-        nodeName,
-        key,
-        statics,
-        currentParent);
+    matchingNode = createNode(doc, nodeName, key, statics, currentParent);
 
     if (key) {
       registerChild(currentParent, key, matchingNode);

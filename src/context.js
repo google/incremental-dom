@@ -31,11 +31,6 @@ function Context(node, prevContext) {
   this.root = node;
 
   /**
-   * @const {Document}
-   */
-  this.doc = node.ownerDocument;
-
-  /**
    * @type {(Array<!Node>|undefined)}
    */
   this.created = notifications.nodesCreated && [];
