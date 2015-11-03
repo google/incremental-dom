@@ -199,15 +199,17 @@ var clearUnvisitedDOM = function() {
   }
 
   // Clean the keyMap, removing any unusued keys.
-  for (key in keyMap) {
-    child = keyMap[key];
-    if (!child.parentNode) {
-      context.markDeleted(child);
-      delete keyMap[key];
+  if (!keyMapValid) {
+    for (key in keyMap) {
+      child = keyMap[key];
+      if (child.parentNode !== node) {
+        context.markDeleted(child);
+        delete keyMap[key];
+      }
     }
-  }
 
-  data.keyMapValid = true;
+    data.keyMapValid = true;
+  }
 };
 
 
