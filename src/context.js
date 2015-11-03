@@ -19,12 +19,9 @@ import { notifications } from './notifications';
 
 /**
  * Keeps track of the state of a patch.
- * @param {!Element|!DocumentFragment} node The root Node of the subtree the
- *     is for.
- * @param {?Context} prevContext The previous context.
  * @constructor
  */
-function Context(node, prevContext) {
+function Context() {
   /**
    * @type {(Array<!Node>|undefined)}
    */
@@ -73,5 +70,5 @@ Context.prototype.notifyChanges = function() {
 
 /** */
 export {
-  Context,
+  Context
 };
