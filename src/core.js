@@ -19,7 +19,10 @@ import {
   getChild,
   registerChild
 } from './nodes';
-import { getData } from './node_data';
+import {
+  getData,
+  getOrCreateData
+} from './node_data';
 import { Context } from './context';
 import { symbols } from './symbols';
 import {
@@ -129,6 +132,10 @@ var matches = function(nodeName, key) {
  *     name-value pairs.
  */
 var alignWithDOM = function(nodeName, key, statics) {
+  if (currentNode) {
+    getOrCreateData(currentNode);
+  }
+
   if (currentNode && matches(nodeName, key)) {
     return;
   }
@@ -219,6 +226,8 @@ var clearUnvisitedDOM = function() {
  * Changes to the first child of the current node.
  */
 var enterNode = function() {
+  getOrCreateData(currentNode);
+
   currentParent = currentNode;
   currentNode = currentNode.firstChild;
   previousNode = null;

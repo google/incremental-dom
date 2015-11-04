@@ -16,8 +16,9 @@
 
 import { updateAttribute } from './attributes';
 import {
-    getData,
-    initData
+  getOrCreateData,
+  getData,
+  initData
 } from './node_data';
 import { createMap } from './util';
 
@@ -111,7 +112,7 @@ var createKeyMap = function(el) {
 
   for (var i = 0; i < count; i += 1) {
     var child = children[i];
-    var key = getData(child).key;
+    var key = getOrCreateData(child).key;
 
     if (key) {
       map[key] = child;
