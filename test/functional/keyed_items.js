@@ -144,5 +144,26 @@ describe('rendering with keys', () => {
     patch(container, () => render(items));
     expect(container.childNodes).to.have.length(1);
   });
+
+  describe('with an existing DOM tree', () => {
+    beforeEach(() => {
+      container.innerHTML = '<div key="key"></div>';
+    });
+
+    it('should not error when removing keyed element', function() {
+      patch(container, () => {});
+    });
+
+    it('should not lose keyed element', () => {
+      var el = container.childNodes[0];
+
+      patch(container, () => {
+        elementVoid('div');
+        elementVoid('div', 'key');
+      });
+
+      expect(container.childNodes[1]).to.equal(el);
+    });
+  });
 });
 

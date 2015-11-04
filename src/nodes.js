@@ -163,9 +163,24 @@ var registerChild = function(parent, key, child) {
 };
 
 
+/**
+ * Invalidates the keyMap so that it will be validated later.
+ * Also ensures the keyMap exists, so DOM alignment may keep references
+ * to children.
+ * @param {!Node} el The element to invalidate
+ */
+var invalidateKeyMap = function(el) {
+  var data = getData(el);
+  getKeyMap(el);
+
+  data.keyMapValid = false;
+};
+
+
 /** */
 export {
   createNode,
   getChild,
-  registerChild
+  registerChild,
+  invalidateKeyMap
 };

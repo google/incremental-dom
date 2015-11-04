@@ -17,7 +17,8 @@
 import {
   createNode,
   getChild,
-  registerChild
+  registerChild,
+  invalidateKeyMap
 } from './nodes';
 import { getData } from './node_data';
 import { Context } from './context';
@@ -159,8 +160,8 @@ var alignWithDOM = function(nodeName, key, statics) {
   // Since we hold on to a reference through the keyMap, we can always add it
   // back.
   if (currentNode && getData(currentNode).key) {
+    invalidateKeyMap(currentParent);
     currentParent.replaceChild(node, currentNode);
-    getData(currentParent).keyMapValid = false;
   } else {
     currentParent.insertBefore(node, currentNode);
   }
@@ -193,9 +194,11 @@ var clearUnvisitedDOM = function() {
     node.removeChild(child);
     context.markDeleted(/** @type {!Node}*/(child));
 
-    key = getData(child).key;
-    if (key) {
-      delete keyMap[key];
+    if (keyMap) {
+      key = getData(child).key;
+      if (key) {
+        delete keyMap[key];
+      }
     }
     child = node.lastChild;
   }
