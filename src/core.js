@@ -26,8 +26,9 @@ import {
   assertInPatch,
   assertKeyedTagMatches,
   assertNoUnclosedTags,
-  setInAttributes,
-  assertNotInAttributes
+  assertNotInAttributes,
+  assertVirtualAttributesClosed,
+  setInAttributes
 } from './assertions';
 import { notifications } from './notifications';
 
@@ -85,6 +86,7 @@ var patch = function(node, fn, data) {
   exitNode();
 
   if (process.env.NODE_ENV !== 'production') {
+    assertVirtualAttributesClosed();
     assertNoUnclosedTags(previousNode, node);
   }
 

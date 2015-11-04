@@ -94,6 +94,17 @@ var assertInAttributes = function(functionName) {
 
 
 /**
+ * Makes sure the patch closes virtual attributes call
+ */
+var assertVirtualAttributesClosed = function() {
+  if (inAttributes) {
+    throw new Error('elementOpenEnd() must be called after calling ' +
+        'elementOpenStart().');
+  }
+};
+
+
+/**
   * Makes sure that placeholders have a key specified. Otherwise, conditional
   * placeholders and conditional elements next to placeholders will cause
   * placeholder elements to be re-used as non-placeholders and vice versa.
@@ -137,5 +148,6 @@ export {
   assertInAttributes,
   assertPlaceholderKeySpecified,
   assertCloseMatchesOpenTag,
+  assertVirtualAttributesClosed,
   setInAttributes
 };
