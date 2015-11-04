@@ -146,8 +146,15 @@ describe('rendering with keys', () => {
   });
 
   describe('with an existing DOM tree', () => {
-    it('should not lose keyed element', () => {
+    beforeEach(() => {
       container.innerHTML = '<div key="key"></div>';
+    });
+
+    it('should not error when removing keyed element', function() {
+      patch(container, () => {});
+    });
+
+    it('should not lose keyed element', () => {
       var el = container.childNodes[0];
 
       patch(container, () => {
