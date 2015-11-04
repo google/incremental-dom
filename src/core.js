@@ -133,25 +133,25 @@ var alignWithDOM = function(nodeName, key, statics) {
     return;
   }
 
-  var existingNode = getChild(currentParent, key);
-  var matchingNode;
+  var node;
 
-  // Check to see if the node has moved within the parent or if a new one
-  // should be created
-  if (existingNode) {
-    if (process.env.NODE_ENV !== 'production') {
-      assertKeyedTagMatches(getData(existingNode).nodeName, nodeName, key);
+  // Check to see if the node has moved within the parent.
+  if (key) {
+    node = getChild(currentParent, key);
+    if (node && process.env.NODE_ENV !== 'production') {
+      assertKeyedTagMatches(getData(node).nodeName, nodeName, key);
     }
+  }
 
-    matchingNode = existingNode;
-  } else {
-    matchingNode = createNode(doc, nodeName, key, statics, currentParent);
+  // Create the node if it doesn't exist.
+  if (!node) {
+    node = createNode(doc, nodeName, key, statics, currentParent);
 
     if (key) {
-      registerChild(currentParent, key, matchingNode);
+      registerChild(currentParent, key, node);
     }
 
-    context.markCreated(matchingNode);
+    context.markCreated(node);
   }
 
   // If the node has a key, remove it from the DOM to prevent a large number
@@ -159,13 +159,13 @@ var alignWithDOM = function(nodeName, key, statics) {
   // Since we hold on to a reference through the keyMap, we can always add it
   // back.
   if (currentNode && getData(currentNode).key) {
-    currentParent.replaceChild(matchingNode, currentNode);
+    currentParent.replaceChild(node, currentNode);
     getData(currentParent).keyMapValid = false;
   } else {
-    currentParent.insertBefore(matchingNode, currentNode);
+    currentParent.insertBefore(node, currentNode);
   }
 
-  currentNode = matchingNode;
+  currentNode = node;
 };
 
 
