@@ -37,7 +37,7 @@ describe('virtual attribute updates', () => {
   });
 
   describe('for conditional attributes', () => {
-    function render(obj) {  
+    function render(obj) {
       elementOpenStart('div', '', []);
         if (obj.key) {
           attr('data-expanded', obj.key);
@@ -77,5 +77,12 @@ describe('virtual attribute updates', () => {
     });
   });
 
+  it('should throw when a virtual attributes element is unclosed', () => {
+    expect(() => {
+      patch(container, () => {
+        elementOpenStart('div');
+      });
+    }).to.throw('elementOpenEnd() must be called after calling elementOpenStart().');
+  });
 });
 
