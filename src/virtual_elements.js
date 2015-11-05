@@ -209,9 +209,8 @@ var elementClose = function(tag) {
  * @return {!Element} The corresponding Element.
  */
 var elementVoid = function(tag, key, statics, var_args) {
-  var node = elementOpen.apply(null, arguments);
-  elementClose.apply(null, arguments);
-  return node;
+  elementOpen.apply(null, arguments);
+  return elementClose.apply(null, arguments);
 };
 
 

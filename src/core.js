@@ -15,7 +15,8 @@
  */
 
 import {
-  createNode,
+  createElement,
+  createText,
   getChild,
   registerChild
 } from './nodes';
@@ -127,8 +128,11 @@ var matches = function(nodeName, key) {
  * @param {?string=} key The key used to identify this element.
  * @param {?Array<*>=} statics For an Element, this should be an array of
  *     name-value pairs.
+ * @param {function(Document, string, ?string=, ?Array<*>=, !Node):!T} factory
+ *     A factory function to create the returned node.
+ * @template T
  */
-var alignWithDOM = function(nodeName, key, statics) {
+var alignWithDOM = function(nodeName, key, statics, factory) {
   if (currentNode && matches(nodeName, key)) {
     return;
   }
@@ -145,7 +149,7 @@ var alignWithDOM = function(nodeName, key, statics) {
 
   // Create the node if it doesn't exist.
   if (!node) {
-    node = createNode(doc, nodeName, key, statics, currentParent);
+    node = factory(doc, nodeName, key, statics, currentParent);
 
     if (key) {
       registerChild(currentParent, key, node);
@@ -260,9 +264,9 @@ var exitNode = function() {
  * @return {!Element} The corresponding Element.
  */
 var elementOpen = function(tag, key, statics) {
-  alignWithDOM(tag, key, statics);
+  alignWithDOM(tag, key, statics, createElement);
   enterNode();
-  return /** @type {!Element} */(currentParent);
+  return currentParent;
 };
 
 
@@ -285,9 +289,9 @@ var elementClose = function() {
  * @return {!Text} The corresponding Text Node.
  */
 var text = function() {
-  alignWithDOM('#text', null, null);
+  alignWithDOM('#text', null, null, createText);
   nextNode();
-  return /** @type {!Text} */(previousNode);
+  return previousNode;
 };
 
 
