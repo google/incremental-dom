@@ -15,7 +15,8 @@
  */
 
 import {
-  createNode,
+  createElement,
+  createText,
   getChild,
   registerChild
 } from './nodes';
@@ -145,7 +146,11 @@ var alignWithDOM = function(nodeName, key, statics) {
 
   // Create the node if it doesn't exist.
   if (!node) {
-    node = createNode(doc, nodeName, key, statics, currentParent);
+    if (nodeName === '#text') {
+      node = createText(doc);
+    } else {
+      node = createElement(doc, nodeName, key, statics, currentParent);
+    }
 
     if (key) {
       registerChild(currentParent, key, node);

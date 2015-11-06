@@ -46,10 +46,12 @@ var getNamespaceForTag = function(tag, parent) {
  * @param {Document} doc The document with which to create the Element.
  * @param {string} tag The tag for the Element.
  * @param {?string=} key A key to identify the Element.
+ * @param {?Array<*>=} statics An array of attribute name/value pairs of the
+ *     static attributes for the Element.
  * @param {!Node} parent
  * @return {!Element}
  */
-var createElement = function(doc, tag, key, parent) {
+var createElement = function(doc, tag, key, statics, parent) {
   var namespace = getNamespaceForTag(tag, parent);
   var el;
 
@@ -59,41 +61,26 @@ var createElement = function(doc, tag, key, parent) {
     el = doc.createElement(tag);
   }
 
+  initData(el, tag, key);
+
+  if (statics) {
+    for (var i = 0; i < statics.length; i += 2) {
+      updateAttribute(el, /** @type {!string}*/(statics[i]), statics[i + 1]);
+    }
+  }
+
   return el;
 };
 
 
 /**
- * Creates a Node, either a Text or an Element depending on the node name
- * provided.
- * @param {Document} doc The document with which to create the Node.
- * @param {string} nodeName The tag if creating an element or #text to create
- *     a Text.
- * @param {?string=} key A key to identify the Element.
- * @param {?Array<*>=} statics The static data to initialize the Node
- *     with. For an Element, an array of attribute name/value pairs of
- *     the static attributes for the Element.
- * @param {!Node} parent
- * @return {!Node}
+ * Creates a Text Node.
+ * @param {Document} doc The document with which to create the Element.
+ * @return {!Text}
  */
-var createNode = function(doc, nodeName, key, statics, parent) {
-  var node;
-  if (nodeName === '#text') {
-    node = doc.createTextNode('');
-  } else {
-    node = createElement(doc, nodeName, key, parent);
-  }
-
-  initData(node, nodeName, key);
-
-  if (statics) {
-    for (var i = 0; i < statics.length; i += 2) {
-      updateAttribute(/** @type {!Element}*/(node),
-                      /** @type {!string}*/(statics[i]),
-                      statics[i + 1]);
-    }
-  }
-
+var createText = function(doc) {
+  var node = doc.createTextNode('');
+  initData(node, '#text', null);
   return node;
 };
 
@@ -165,7 +152,8 @@ var registerChild = function(parent, key, child) {
 
 /** */
 export {
-  createNode,
+  createElement,
+  createText,
   getChild,
   registerChild
 };
