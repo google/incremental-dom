@@ -25,10 +25,23 @@ import { createMap } from './util';
  */
 function NodeData(nodeName, key) {
   /**
-   * The attributes and their values.
-   * @const
+   * The node name for this node.
+   * @const {string}
    */
-  this.attrs = createMap();
+  this.nodeName = nodeName;
+
+  /**
+   * The key used to identify this node, used to preserve DOM nodes when they
+   * move within their parent.
+   * @const {?string}
+   */
+  this.key = key;
+
+  /**
+   * The attributes and their values.
+   * @type {boolean}
+   */
+  this.placeholder = false;
 
   /**
    * An array of attribute name/value pairs, used for quickly diffing the
@@ -45,29 +58,16 @@ function NodeData(nodeName, key) {
   this.newAttrs = createMap();
 
   /**
-   * The key used to identify this node, used to preserve DOM nodes when they
-   * move within their parent.
-   * @const
-   */
-  this.key = key;
-
-  /**
    * Keeps track of children within this node by their key.
-   * {?Object<string, !Element>}
+   * @type {?Object<string, !Element>}
    */
   this.keyMap = null;
 
   /**
    * Whether or not the keyMap is currently valid.
-   * {boolean}
+   * @type {boolean}
    */
   this.keyMapValid = true;
-
-  /**
-   * The node name for this node.
-   * @const {string}
-   */
-  this.nodeName = nodeName;
 
   /**
    * @type {?string}
