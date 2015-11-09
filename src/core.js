@@ -21,7 +21,6 @@ import {
 } from './nodes';
 import { getData } from './node_data';
 import { Context } from './context';
-import { symbols } from './symbols';
 import {
   assertInPatch,
   assertKeyedTagMatches,
@@ -185,7 +184,7 @@ var clearUnvisitedDOM = function() {
     return;
   }
 
-  if (data.attrs[symbols.placeholder] && node !== root) {
+  if (data.placeholder && node !== root) {
     return;
   }
 

@@ -45,7 +45,9 @@ var applyAttr = function(el, name, value) {
  * @param {*} value The property's value.
  */
 var applyProp = function(el, name, value) {
-  el[name] = value;
+  if (el[name] !== value) {
+    el[name] = value;
+  }
 };
 
 
@@ -99,17 +101,20 @@ var applyAttributeTyped = function(el, name, value) {
  * @param {*} value The attribute's value.
  */
 var updateAttribute = function(el, name, value) {
-  var data = getData(el);
-  var attrs = data.attrs;
-
-  if (attrs[name] === value) {
-    return;
-  }
-
   var mutator = attributes[name] || attributes[symbols.default];
   mutator(el, name, value);
+};
 
-  attrs[name] = value;
+
+/**
+ * Sets this element as a placeholder through attributes.
+ * @param {!Element} el
+ * @param {string} name The attribute's name.
+ * @param {*} value The attribute's value.
+ */
+var applyPlaceholder = function(el, name, value) {
+  var data = getData(el);
+  data.placeholder = !!value;
 };
 
 
@@ -123,7 +128,7 @@ var attributes = createMap();
 // have a specific mutator.
 attributes[symbols.default] = applyAttributeTyped;
 
-attributes[symbols.placeholder] = function() {};
+attributes[symbols.placeholder] = applyPlaceholder;
 
 attributes['style'] = applyStyle;
 
