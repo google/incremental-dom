@@ -18,6 +18,7 @@ import {
     patch,
     elementOpen,
     elementClose,
+    elementVoid,
     skip,
     text
 } from '../../index';
@@ -52,5 +53,41 @@ describe('skip', () => {
     expect(container.textContent).to.equal('some text');
   });
 
+  it('should throw if an element is declared after skipping', () => {
+    expect(() => {
+      patch(container, () => {
+        skip();
+        elementOpen('div');
+        elementClose('div');
+      });
+    }).to.throw('elementOpen() may not be called inside an element that has called skip().');
+  });
+
+  it('should throw if a text is declared after skipping', () => {
+    expect(() => {
+      patch(container, () => {
+        skip();
+        text('text');
+      });
+    }).to.throw('text() may not be called inside an element that has called skip().');
+  });
+
+  it('should throw skip is called after declaring an element', () => {
+    expect(() => {
+      patch(container, () => {
+        elementVoid('div');
+        skip();
+      });
+    }).to.throw('skip() must come before any child declarations inside the current element.');
+  });
+
+  it('should throw skip is called after declaring a text', () => {
+    expect(() => {
+      patch(container, () => {
+        text('text');
+        skip();
+      });
+    }).to.throw('skip() must come before any child declarations inside the current element.');
+  });
 });
 
