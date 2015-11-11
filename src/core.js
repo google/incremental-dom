@@ -80,8 +80,8 @@ var patch = function(node, fn, data) {
   previousNode = null;
 
   if (process.env.NODE_ENV !== 'production') {
-    setInAttributes(false);
-    setInSkip(false);
+    var previousInAttributes = setInAttributes(false);
+    var previousInSkip = setInSkip(false);
   }
 
   enterNode();
@@ -91,6 +91,8 @@ var patch = function(node, fn, data) {
   if (process.env.NODE_ENV !== 'production') {
     assertVirtualAttributesClosed();
     assertNoUnclosedTags(previousNode, node);
+    setInAttributes(previousInAttributes);
+    setInSkip(previousInSkip);
   }
 
   context.notifyChanges();

@@ -167,18 +167,24 @@ var assertNoChildrenDeclaredYet = function(functionName, previousNode) {
 /**
  * Updates the state of being in an attribute declaration.
  * @param {boolean} value
+ * @return {boolean} the previous value.
  */
 var setInAttributes = function(value) {
+  var previous = inAttributes;
   inAttributes = value;
+  return previous;
 };
 
 
 /**
  * Updates the state of being in a skip element.
  * @param {boolean} value
+ * @return {boolean} the previous value.
  */
 var setInSkip = function(value) {
+  var previous = inSkip;
   inSkip = value;
+  return previous;
 };
 
 
