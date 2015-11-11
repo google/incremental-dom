@@ -24,6 +24,14 @@ var inAttributes = false;
 
 
 /**
+  * Keeps track whether or not we are in an element that should not have its
+  * children cleared.
+  * @type {boolean}
+  */
+var inSkip = false;
+
+
+/**
  * Makes sure that there is a current patch context.
  * @param {*} context
  */
@@ -77,6 +85,18 @@ var assertNotInAttributes = function(functionName) {
   if (inAttributes) {
     throw new Error(functionName + '() may not be called between ' +
         'elementOpenStart() and elementOpenEnd().');
+  }
+};
+
+
+/**
+ * Makes sure that the caller is not inside an element that has declared skip.
+ * @param {string} functionName
+ */
+var assertNotInSkip = function(functionName) {
+  if (inSkip) {
+    throw new Error(functionName + '() may not be called inside an element ' +
+        'that has called skip().');
   }
 };
 
@@ -153,6 +173,15 @@ var setInAttributes = function(value) {
 };
 
 
+/**
+ * Updates the state of being in a skip element.
+ * @param {boolean} value
+ */
+var setInSkip = function(value) {
+  inSkip = value;
+};
+
+
 /** */
 export {
   assertInPatch,
@@ -164,5 +193,7 @@ export {
   assertCloseMatchesOpenTag,
   assertVirtualAttributesClosed,
   assertNoChildrenDeclaredYet,
-  setInAttributes
+  assertNotInSkip,
+  setInAttributes,
+  setInSkip
 };

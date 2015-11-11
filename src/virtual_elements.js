@@ -26,6 +26,7 @@ import { getData } from './node_data';
 import { symbols } from './symbols';
 import {
   assertNotInAttributes,
+  assertNotInSkip,
   assertInAttributes,
   assertPlaceholderKeySpecified,
   assertCloseMatchesOpenTag,
@@ -64,6 +65,7 @@ var argsBuilder = [];
 var elementOpen = function(tag, key, statics, var_args) {
   if (process.env.NODE_ENV !== 'production') {
     assertNotInAttributes('elementOpen');
+    assertNotInSkip('elementOpen');
   }
 
   var node = coreElementOpen(tag, key, statics);
@@ -255,6 +257,7 @@ var elementPlaceholder = function(tag, key, statics, var_args) {
 var text = function(value, var_args) {
   if (process.env.NODE_ENV !== 'production') {
     assertNotInAttributes('text');
+    assertNotInSkip('text');
   }
 
   var node = coreText();

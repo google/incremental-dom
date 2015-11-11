@@ -29,7 +29,8 @@ import {
   assertNotInAttributes,
   assertVirtualAttributesClosed,
   assertNoChildrenDeclaredYet,
-  setInAttributes
+  setInAttributes,
+  setInSkip
 } from './assertions';
 import { notifications } from './notifications';
 
@@ -80,6 +81,7 @@ var patch = function(node, fn, data) {
 
   if (process.env.NODE_ENV !== 'production') {
     setInAttributes(false);
+    setInSkip(false);
   }
 
   enterNode();
@@ -274,6 +276,10 @@ var elementOpen = function(tag, key, statics) {
  * @return {!Element} The corresponding Element.
  */
 var elementClose = function() {
+  if (process.env.NODE_ENV !== 'production') {
+    setInSkip(false);
+  }
+
   exitNode();
   return /** @type {!Element} */(previousNode);
 };
@@ -312,6 +318,7 @@ var currentElement = function() {
 var skip = function() {
   if (process.env.NODE_ENV !== 'production') {
     assertNoChildrenDeclaredYet('skip', previousNode);
+    setInSkip(true);
   }
   previousNode = currentParent.lastChild;
 };
