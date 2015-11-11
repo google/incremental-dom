@@ -131,7 +131,21 @@ var assertCloseMatchesOpenTag = function(nodeName, tag) {
 
 
 /**
- * Updates the state to being in an attribute declaration.
+ * Makes sure that no children elements have been declared yet in the current
+ * element.
+ * @param {string} functionName
+ * @param {?Node} previousNode
+ */
+var assertNoChildrenDeclaredYet = function(functionName, previousNode) {
+  if (previousNode !== null) {
+    throw new Error(functionName + '() must come before any child ' +
+        'declarations inside the current element.');
+  }
+};
+
+
+/**
+ * Updates the state of being in an attribute declaration.
  * @param {boolean} value
  */
 var setInAttributes = function(value) {
@@ -149,5 +163,6 @@ export {
   assertPlaceholderKeySpecified,
   assertCloseMatchesOpenTag,
   assertVirtualAttributesClosed,
+  assertNoChildrenDeclaredYet,
   setInAttributes
 };

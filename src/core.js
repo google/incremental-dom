@@ -28,6 +28,7 @@ import {
   assertNoUnclosedTags,
   assertNotInAttributes,
   assertVirtualAttributesClosed,
+  assertNoChildrenDeclaredYet,
   setInAttributes
 } from './assertions';
 import { notifications } from './notifications';
@@ -309,6 +310,9 @@ var currentElement = function() {
  * clearing out the children.
  */
 var skip = function() {
+  if (process.env.NODE_ENV !== 'production') {
+    assertNoChildrenDeclaredYet('skip', previousNode);
+  }
   previousNode = currentParent.lastChild;
 };
 
