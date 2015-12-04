@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.3.0
+
+- Added `skip` function
+- Added `currentElement` function
+- Added more asserts
+
 ## 0.2.0
 
 - Added asserts to non-minified build to help ensure proper usage
