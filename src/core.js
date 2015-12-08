@@ -29,7 +29,9 @@ import {
   assertNoUnclosedTags,
   assertNotInAttributes,
   assertVirtualAttributesClosed,
-  setInAttributes
+  assertNoChildrenDeclaredYet,
+  setInAttributes,
+  setInSkip
 } from './assertions';
 import { notifications } from './notifications';
 
@@ -79,7 +81,8 @@ var patch = function(node, fn, data) {
   previousNode = null;
 
   if (process.env.NODE_ENV !== 'production') {
-    setInAttributes(false);
+    var previousInAttributes = setInAttributes(false);
+    var previousInSkip = setInSkip(false);
   }
 
   enterNode();
@@ -89,6 +92,8 @@ var patch = function(node, fn, data) {
   if (process.env.NODE_ENV !== 'production') {
     assertVirtualAttributesClosed();
     assertNoUnclosedTags(previousNode, node);
+    setInAttributes(previousInAttributes);
+    setInSkip(previousInSkip);
   }
 
   context.notifyChanges();
@@ -278,6 +283,10 @@ var elementOpen = function(tag, key, statics) {
  * @return {!Element} The corresponding Element.
  */
 var elementClose = function() {
+  if (process.env.NODE_ENV !== 'production') {
+    setInSkip(false);
+  }
+
   exitNode();
   return /** @type {!Element} */(previousNode);
 };
@@ -314,6 +323,10 @@ var currentElement = function() {
  * clearing out the children.
  */
 var skip = function() {
+  if (process.env.NODE_ENV !== 'production') {
+    assertNoChildrenDeclaredYet('skip', previousNode);
+    setInSkip(true);
+  }
   previousNode = currentParent.lastChild;
 };
 

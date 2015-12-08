@@ -24,6 +24,14 @@ var inAttributes = false;
 
 
 /**
+  * Keeps track whether or not we are in an element that should not have its
+  * children cleared.
+  * @type {boolean}
+  */
+var inSkip = false;
+
+
+/**
  * Makes sure that there is a current patch context.
  * @param {*} context
  */
@@ -82,6 +90,18 @@ var assertNotInAttributes = function(functionName) {
 
 
 /**
+ * Makes sure that the caller is not inside an element that has declared skip.
+ * @param {string} functionName
+ */
+var assertNotInSkip = function(functionName) {
+  if (inSkip) {
+    throw new Error(functionName + '() may not be called inside an element ' +
+        'that has called skip().');
+  }
+};
+
+
+/**
  * Makes sure that the caller is where attributes are expected.
  * @param {string} functionName
  */
@@ -131,11 +151,40 @@ var assertCloseMatchesOpenTag = function(nodeName, tag) {
 
 
 /**
- * Updates the state to being in an attribute declaration.
+ * Makes sure that no children elements have been declared yet in the current
+ * element.
+ * @param {string} functionName
+ * @param {?Node} previousNode
+ */
+var assertNoChildrenDeclaredYet = function(functionName, previousNode) {
+  if (previousNode !== null) {
+    throw new Error(functionName + '() must come before any child ' +
+        'declarations inside the current element.');
+  }
+};
+
+
+/**
+ * Updates the state of being in an attribute declaration.
  * @param {boolean} value
+ * @return {boolean} the previous value.
  */
 var setInAttributes = function(value) {
+  var previous = inAttributes;
   inAttributes = value;
+  return previous;
+};
+
+
+/**
+ * Updates the state of being in a skip element.
+ * @param {boolean} value
+ * @return {boolean} the previous value.
+ */
+var setInSkip = function(value) {
+  var previous = inSkip;
+  inSkip = value;
+  return previous;
 };
 
 
@@ -149,5 +198,8 @@ export {
   assertPlaceholderKeySpecified,
   assertCloseMatchesOpenTag,
   assertVirtualAttributesClosed,
-  setInAttributes
+  assertNoChildrenDeclaredYet,
+  assertNotInSkip,
+  setInAttributes,
+  setInSkip
 };
