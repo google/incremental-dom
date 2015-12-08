@@ -132,7 +132,8 @@ function jsClosure(done) {
   return bundle('cjs').then(function(gen) {
     // Replace the first line with a goog.module declaration.
     var moduleDeclaration = 'goog.module(\'' + googModuleName + '\');';
-    var code = gen.code.replace(/.*/, moduleDeclaration);
+    var code = gen.code.replace(/.*/, moduleDeclaration)
+                       .replace(/'use strict';/, '');
 
     return file(artifactName + '-closure.js', code, {src: true})
       .pipe(sourcemaps.init({loadMaps: true}))
