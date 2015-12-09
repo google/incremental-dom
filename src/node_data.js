@@ -26,7 +26,7 @@ import { createMap } from './util';
 function NodeData(nodeName, key) {
   /**
    * The attributes and their values.
-   * @const
+   * @const {!Object<string, *>}
    */
   this.attrs = createMap();
 

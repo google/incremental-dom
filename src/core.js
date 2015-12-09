@@ -72,8 +72,10 @@ var patch = function(node, fn, data) {
   var prevCurrentNode = currentNode;
   var prevCurrentParent = currentParent;
   var prevPreviousNode = previousNode;
+  var previousInAttributes = false;
+  var previousInSkip = false;
 
-  context = new Context(node);
+  context = new Context();
   root = node;
   doc = node.ownerDocument;
   currentNode = node;
@@ -81,8 +83,8 @@ var patch = function(node, fn, data) {
   previousNode = null;
 
   if (process.env.NODE_ENV !== 'production') {
-    var previousInAttributes = setInAttributes(false);
-    var previousInSkip = setInSkip(false);
+    previousInAttributes = setInAttributes(false);
+    previousInSkip = setInSkip(false);
   }
 
   enterNode();
@@ -154,7 +156,7 @@ var alignWithDOM = function(nodeName, key, statics) {
     if (nodeName === '#text') {
       node = createText(doc);
     } else {
-      node = createElement(doc, nodeName, key, statics, currentParent);
+      node = createElement(doc, currentParent, nodeName, key, statics);
     }
 
     if (key) {

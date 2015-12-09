@@ -54,8 +54,8 @@ var applyProp = function(el, name, value) {
  * property names/values.
  * @param {!Element} el
  * @param {string} name The attribute's name.
- * @param {string|Object<string,string>} style The style to set. Either a
- *     string of css or an object containing property-value pairs.
+ * @param {*} style The style to set. Either a string of css or an object
+ *     containing property-value pairs.
  */
 var applyStyle = function(el, name, style) {
   if (typeof style === 'string') {
@@ -63,10 +63,11 @@ var applyStyle = function(el, name, style) {
   } else {
     el.style.cssText = '';
     var elStyle = el.style;
+    var obj = /** @type {!Object<string,string>} */(style);
 
-    for (var prop in style) {
-      if (has(style, prop)) {
-        elStyle[prop] = style[prop];
+    for (var prop in obj) {
+      if (has(obj, prop)) {
+        elStyle[prop] = obj[prop];
       }
     }
   }

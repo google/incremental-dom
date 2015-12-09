@@ -44,7 +44,7 @@ var assertInPatch = function(context) {
 
 /**
 * Makes sure that keyed Element matches the tag name provided.
-* @param {!Element} nodeName The nodeName of the node that is being matched.
+* @param {!string} nodeName The nodeName of the node that is being matched.
 * @param {string=} tag The tag name of the Element.
 * @param {?string=} key The key of the Element.
 */
@@ -58,7 +58,7 @@ var assertKeyedTagMatches = function(nodeName, tag, key) {
 
 /**
  * Makes sure that a patch closes every node that it opened.
- * @param {!Node} openElement
+ * @param {?Node} openElement
  * @param {!Node|!DocumentFragment} root
  */
 var assertNoUnclosedTags = function(openElement, root) {
@@ -66,10 +66,11 @@ var assertNoUnclosedTags = function(openElement, root) {
     return;
   }
 
+  var currentElement = openElement;
   var openTags = [];
-  while (openElement && openElement !== root) {
-    openTags.push(openElement.nodeName.toLowerCase());
-    openElement = openElement.parentNode;
+  while (currentElement && currentElement !== root) {
+    openTags.push(currentElement.nodeName.toLowerCase());
+    currentElement = currentElement.parentNode;
   }
 
   throw new Error('One or more tags were not closed:\n' +
