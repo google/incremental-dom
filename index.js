@@ -17,6 +17,7 @@
 
 export {
   patch,
+  patchElement,
   currentElement,
   skip
 } from './src/core';

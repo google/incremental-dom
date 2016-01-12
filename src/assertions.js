@@ -166,6 +166,32 @@ var assertNoChildrenDeclaredYet = function(functionName, previousNode) {
 
 
 /**
+ * Checks that a call to patchElement actually patched the element.
+ * @param {?Node} node The node requested to be patched.
+ * @param {?Node} currentNode The currentNode after the patch.
+ */
+var assertPatchElementNotEmpty = function(node, currentNode) {
+  if (node === currentNode) {
+    throw new Error('There must be exactly one top level call corresponding ' +
+        'to the patched element.');
+  }
+};
+
+
+/**
+ * Checks that a call to patchElement actually patched the element.
+ * @param {?Node} node The node requested to be patched.
+ * @param {?Node} previousNode The previousNode after the patch.
+ */
+var assertPatchElementNoExtras = function(node, previousNode) {
+  if (node !== previousNode) {
+    throw new Error('There must be exactly one top level call corresponding ' +
+        'to the patched element.');
+  }
+};
+
+
+/**
  * Updates the state of being in an attribute declaration.
  * @param {boolean} value
  * @return {boolean} the previous value.
@@ -201,6 +227,8 @@ export {
   assertVirtualAttributesClosed,
   assertNoChildrenDeclaredYet,
   assertNotInSkip,
+  assertPatchElementNotEmpty,
+  assertPatchElementNoExtras,
   setInAttributes,
   setInSkip
 };

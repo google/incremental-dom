@@ -25,7 +25,7 @@ import {
 } from '../../index';
 
 
-describe('patching an element', () => {
+describe('patching an element\'s children', () => {
   var container;
 
   beforeEach(() => {

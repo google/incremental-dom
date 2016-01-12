@@ -30,6 +30,8 @@ import {
   assertNotInAttributes,
   assertVirtualAttributesClosed,
   assertNoChildrenDeclaredYet,
+  assertPatchElementNotEmpty,
+  assertPatchElementNoExtras,
   setInAttributes,
   setInSkip
 } from './assertions';
@@ -56,16 +58,15 @@ var doc;
 
 
 /**
- * Patches the document starting at el with the provided function. This function
- * may be called during an existing patch operation.
+ * Sets up and restores a patch context, running the patch function with the
+ * provided data.
  * @param {!Element|!DocumentFragment} node The Element or Document
- *     to patch.
- * @param {!function(T)} fn A function containing elementOpen/elementClose/etc.
- *     calls that describe the DOM.
- * @param {T=} data An argument passed to fn to represent DOM state.
+ *     where the patch should start.
+ * @param {!function(T)} fn The patching function.
+ * @param {T=} data An argument passed to fn.
  * @template T
  */
-var patch = function(node, fn, data) {
+var runPatch = function(node, fn, data) {
   var prevContext = context;
   var prevRoot = root;
   var prevDoc = doc;
@@ -79,7 +80,7 @@ var patch = function(node, fn, data) {
   root = node;
   doc = node.ownerDocument;
   currentNode = node;
-  currentParent = null;
+  currentParent = node.parentNode;
   previousNode = null;
 
   if (process.env.NODE_ENV !== 'production') {
@@ -87,13 +88,10 @@ var patch = function(node, fn, data) {
     previousInSkip = setInSkip(false);
   }
 
-  enterNode();
   fn(data);
-  exitNode();
 
   if (process.env.NODE_ENV !== 'production') {
     assertVirtualAttributesClosed();
-    assertNoUnclosedTags(previousNode, node);
     setInAttributes(previousInAttributes);
     setInSkip(previousInSkip);
   }
@@ -106,6 +104,51 @@ var patch = function(node, fn, data) {
   currentNode = prevCurrentNode;
   currentParent = prevCurrentParent;
   previousNode = prevPreviousNode;
+};
+
+
+/**
+ * Patches the document starting at node with the provided function. This
+ * function may be called during an existing patch operation.
+ * @param {!Element|!DocumentFragment} node The Element or Document
+ *     to patch.
+ * @param {!function(T)} fn A function containing elementOpen/elementClose/etc.
+ *     calls that describe the DOM.
+ * @param {T=} data An argument passed to fn to represent DOM state.
+ * @template T
+ */
+var patch = function(node, fn, data) {
+  runPatch(node, function(data) {
+    enterNode();
+    fn(data);
+    exitNode();
+
+    if (process.env.NODE_ENV !== 'production') {
+      assertNoUnclosedTags(previousNode, node);
+    }
+  }, data);
+};
+
+
+/**
+ * Patches an Element with the the provided function. Exactly one top level
+ * element call should be made corresponding to `node`.
+ * @param {!Element} node The Element where the patch should start.
+ * @param {!function(T)} fn A function containing elementOpen/elementClose/etc.
+ *     calls that describe the DOM. This should have at most one top level
+ *     element call.
+ * @param {T=} data An argument passed to fn to represent DOM state.
+ * @template T
+ */
+var patchElement = function(node, fn, data) {
+  runPatch(node, function(data) {
+    fn(data);
+
+    if (process.env.NODE_ENV !== 'production') {
+      assertPatchElementNotEmpty(node, currentNode);
+      assertPatchElementNoExtras(node, previousNode);
+    }
+  }, data);
 };
 
 
@@ -339,6 +382,7 @@ export {
   elementClose,
   text,
   patch,
+  patchElement,
   currentElement,
   skip
 };
