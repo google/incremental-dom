@@ -16,8 +16,9 @@
  */
 
 export {
-  patch,
-  patchElement,
+  patchInner as patch,
+  patchInner,
+  patchOuter,
   currentElement,
   skip
 } from './src/core';

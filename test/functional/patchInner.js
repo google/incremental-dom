@@ -16,6 +16,7 @@
 
 import {
     patch,
+    patchInner,
     elementOpen,
     elementOpenStart,
     elementOpenEnd,
@@ -52,14 +53,14 @@ describe('patching an element\'s children', () => {
     });
 
     it('should preserve existing nodes', () => {
-      patch(container, render);
+      patchInner(container, render);
       var child = container.childNodes[0];
 
       expect(child).to.equal(div);
     });
 
     it('should update attributes', () => {
-      patch(container, render);
+      patchInner(container, render);
       var child = container.childNodes[0];
 
       expect(child.getAttribute('tabindex')).to.equal('0');
@@ -69,7 +70,7 @@ describe('patching an element\'s children', () => {
       var node;
 
       it('from elementOpen', () => {
-        patch(container, () => {
+        patchInner(container, () => {
           node = elementOpen('div');
           elementClose('div');
         });
@@ -78,7 +79,7 @@ describe('patching an element\'s children', () => {
       });
 
       it('from elementClose', () => {
-        patch(container, () => {
+        patchInner(container, () => {
           elementOpen('div');
           node = elementClose('div');
         });
@@ -87,7 +88,7 @@ describe('patching an element\'s children', () => {
       });
 
       it('from elementVoid', () => {
-        patch(container, () => {
+        patchInner(container, () => {
           node = elementVoid('div');
         });
 
@@ -95,7 +96,7 @@ describe('patching an element\'s children', () => {
       });
 
       it('from elementOpenEnd', () => {
-        patch(container, () => {
+        patchInner(container, () => {
           elementOpenStart('div');
           node = elementOpenEnd('div');
           elementClose('div');
@@ -112,7 +113,7 @@ describe('patching an element\'s children', () => {
 
     function renderOne() {
       elementOpen('div');
-        patch(containerTwo, renderTwo);
+        patchInner(containerTwo, renderTwo);
         text('hello');
       elementClose('div');
     }
@@ -121,7 +122,7 @@ describe('patching an element\'s children', () => {
       text('foobar');
     }
 
-    patch(containerOne, renderOne);
+    patchInner(containerOne, renderOne);
 
     expect(containerOne.textContent).to.equal('hello');
     expect(containerTwo.textContent).to.equal('foobar');
@@ -132,7 +133,7 @@ describe('patching an element\'s children', () => {
       text(content);
     }
 
-    patch(container, render, 'foobar');
+    patchInner(container, render, 'foobar');
 
     expect(container.textContent).to.equal('foobar');
   });
@@ -142,12 +143,18 @@ describe('patching a documentFragment', function() {
   it('should create the required DOM nodes', function() {
     var frag = document.createDocumentFragment();
 
-    patch(frag, function() {
+    patchInner(frag, function() {
       elementOpen('div', null, null,
           'id', 'aDiv');
       elementClose('div');
     });
 
     expect(frag.childNodes[0].id).to.equal('aDiv');
+  });
+});
+
+describe('patch', () => {
+  it('should alias patchInner', () => {
+    expect(patch).to.equal(patchInner);
   });
 });
