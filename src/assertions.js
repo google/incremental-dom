@@ -166,7 +166,7 @@ var assertNoChildrenDeclaredYet = function(functionName, previousNode) {
 
 
 /**
- * Checks that a call to patchElement actually patched the element.
+ * Checks that a call to patchOuter actually patched the element.
  * @param {?Node} node The node requested to be patched.
  * @param {?Node} currentNode The currentNode after the patch.
  */
@@ -179,7 +179,7 @@ var assertPatchElementNotEmpty = function(node, currentNode) {
 
 
 /**
- * Checks that a call to patchElement actually patched the element.
+ * Checks that a call to patchOuter actually patched the element.
  * @param {?Node} node The node requested to be patched.
  * @param {?Node} previousNode The previousNode after the patch.
  */

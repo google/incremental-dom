@@ -117,7 +117,7 @@ var runPatch = function(node, fn, data) {
  * @param {T=} data An argument passed to fn to represent DOM state.
  * @template T
  */
-var patch = function(node, fn, data) {
+var patchInner = function(node, fn, data) {
   runPatch(node, function(data) {
     enterNode();
     fn(data);
@@ -140,7 +140,7 @@ var patch = function(node, fn, data) {
  * @param {T=} data An argument passed to fn to represent DOM state.
  * @template T
  */
-var patchElement = function(node, fn, data) {
+var patchOuter = function(node, fn, data) {
   runPatch(node, function(data) {
     fn(data);
 
@@ -381,8 +381,8 @@ export {
   elementOpen,
   elementClose,
   text,
-  patch,
-  patchElement,
+  patchInner,
+  patchOuter,
   currentElement,
   skip
 };

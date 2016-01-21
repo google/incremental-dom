@@ -15,7 +15,7 @@
  */
 
 import {
-    patchElement,
+    patchOuter,
     elementOpen,
     elementClose,
     elementVoid,
@@ -41,7 +41,7 @@ describe('patching an element', () => {
           'tabindex', '0');
     }
   
-    patchElement(container, render);
+    patchOuter(container, render);
 
     expect(container.getAttribute('tabindex')).to.equal('0');
   });
@@ -53,7 +53,7 @@ describe('patching an element', () => {
       elementClose('div');
     }
   
-    patchElement(container, render);
+    patchOuter(container, render);
 
     expect(container.firstChild.tagName).to.equal('SPAN');
   });
@@ -64,7 +64,7 @@ describe('patching an element', () => {
 
     function renderOne() {
       elementOpen('div');
-        patchElement(containerTwo, renderTwo);
+        patchOuter(containerTwo, renderTwo);
         text('hello');
       elementClose('div');
     }
@@ -75,7 +75,7 @@ describe('patching an element', () => {
       elementClose('div');
     }
 
-    patchElement(containerOne, renderOne);
+    patchOuter(containerOne, renderOne);
 
     expect(containerOne.textContent).to.equal('hello');
     expect(containerTwo.textContent).to.equal('foobar');
@@ -88,7 +88,7 @@ describe('patching an element', () => {
       elementClose('div');
     }
 
-    patchElement(container, render, 'foobar');
+    patchOuter(container, render, 'foobar');
 
     expect(container.textContent).to.equal('foobar');
   });
@@ -96,7 +96,7 @@ describe('patching an element', () => {
   it('should throw an error on an empty patch', () => {
     function render() {}
   
-    expect(() => patchElement(container, render)).to.throw('There must be ' +
+    expect(() => patchOuter(container, render)).to.throw('There must be ' +
         'exactly one top level call corresponding to the patched element.');
   });
 
@@ -105,7 +105,7 @@ describe('patching an element', () => {
       elementVoid('span');
     }
   
-    expect(() => patchElement(container, render)).to.throw('There must be ' +
+    expect(() => patchOuter(container, render)).to.throw('There must be ' +
         'exactly one top level call corresponding to the patched element.');
   });
 
@@ -115,7 +115,7 @@ describe('patching an element', () => {
       elementVoid('div');
     }
   
-    expect(() => patchElement(container, render)).to.throw('There must be ' +
+    expect(() => patchOuter(container, render)).to.throw('There must be ' +
         'exactly one top level call corresponding to the patched element.');
   });
 });
