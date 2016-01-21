@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+/** @const */
 var symbols = {
   default: '__default',
 
