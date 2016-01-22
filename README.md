@@ -100,6 +100,20 @@ clock.render(document.body);
 setInterval(_ => clock.update({time: Date()}, 1000);
 ```
 
+### khufu
+
+[khufu](http://github.com/tailhook/khufu) is a template engine with a concise indentation-based
+syntax, and integration with [redux](http://github.com/rackt/redux):
+
+```html
+view main():
+  <div.counter-body>
+    store @counter = createStore(Counter)
+    <input disabled size="6" value=@counter>
+    <input type="button" value="+">
+       link {click} incr(1) -> @counter
+```
+
 ### Create your own
 
 If you work on a templating language we'd love to see Incremental DOM adopted as
