@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-/** */
+/** @const */
 var notifications = {
   /**
    * Called after patch has compleated with any Nodes that have been created
