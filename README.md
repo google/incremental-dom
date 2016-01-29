@@ -63,30 +63,42 @@ patch(myElement, function() {
 
 ### Installation
 
-`npm install incremental-dom`
+```sh
+npm install incremental-dom
+```
 
 ## Development
 
 To install the required development packages, run the following command:
 
-`npm i`
+```sh
+npm i
+```
 
 ### Running tests
 
 To run once:
 
-`gulp unit`
+```sh
+gulp unit
+```
 
 To run on change:
 
-`gulp unit-watch`
+```sh
+gulp unit-watch
+```
 
 ### Building
 
 To build once:
 
-`gulp js`
+```sh
+gulp js
+```
 
 To build on change:
 
-`gulp js-watch`
+```sh
+gulp js-watch
+```
