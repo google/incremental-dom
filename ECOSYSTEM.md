@@ -39,7 +39,7 @@ function render() {
 
 ### starplate
 
-[starplate](https://github.com/littlstar/starplate) is a fast template and view engine built on top of the incremental-dom API. It makes use of ES6 template strings for interpolation, [parse5](https://github.com/inikulin/parse5) for DOM travserval, and incremental-dom for DOM patches.
+[starplate](https://github.com/littlstar/starplate) is a fast template and view engine built on top of the incremental-dom API. It makes use of ES6 template strings for interpolation, [parse5](https://github.com/inikulin/parse5) for DOM traversal, and incremental-dom for DOM patches.
 
 Consider the following rudimentary example for rendering and updating a clock.
 
