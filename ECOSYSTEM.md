@@ -50,6 +50,23 @@ clock.render(document.body);
 setInterval(_ => clock.update({time: Date()}, 1000);
 ```
 
+### khufu
+
+[khufu](http://github.com/tailhook/khufu) is a template engine with a concise indentation-based syntax, and integration with [redux](http://github.com/rackt/redux):
+
+```html
+view main():
+  <div.counter-body>
+    store @counter = Counter
+    <input disabled size="6" value=@counter>
+    <input type="button" value="+">
+       link {click} incr(1) -> @counter
+```
+
+Khufu is a little bit more than a template engine as it allows you to add create local redux stores. This allows tracking local state like whether an accordion is expanded or whether a tooltip is shown without additional javascript boilerplate. The library implements useful scoping rules for stores as well as for styles included into the template.
+
+And khufu supports **hot reload**!
+
 ### Create your own
 
 If you work on a templating language we'd love to see Incremental DOM adopted as
