@@ -67,6 +67,17 @@ Khufu is a little bit more than a template engine as it allows you to add create
 
 And khufu supports **hot reload**!
 
+### jsonml2idom
+
+[jsonml2idom](https://github.com/paolocaminiti/jsonml2idom) - JSONML to Incremental DOM interpreter.
+```js
+function app(state) {
+  return ['h1', 'Hello World!']
+}
+
+IncrementalDOM.patch(root, jsonml2idom, app(state))
+```
+
 ### Create your own
 
 If you work on a templating language we'd love to see Incremental DOM adopted as
