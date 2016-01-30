@@ -1,7 +1,6 @@
 var defineComponent = (function() {
   var patch = IncrementalDOM.patch;
 
-  var shadowRoot = Symbol('shadowRoot');
   var firstUpdate = Symbol('firstUpdate');
   var props = Symbol('props');
   var render = Symbol('render');
@@ -13,7 +12,7 @@ var defineComponent = (function() {
 
   Component.prototype.createdCallback = function() {
     // Create a shadow root for the content of the component to render into
-    this[shadowRoot] = this.createShadowRoot();
+    this.createShadowRoot();
     this[firstUpdate] = true;
     this[props] = null;
 
@@ -32,7 +31,7 @@ var defineComponent = (function() {
    * render function defined by the component's spec.
    */
   Component.prototype[render] = function() {
-    patch(this[shadowRoot], this.render.bind(this));
+    patch(this.shadowRoot, this.render.bind(this));
   };    
 
 
@@ -46,7 +45,6 @@ var defineComponent = (function() {
    * Incremental DOM will update the 'props' property on the DOM node for our
    * component. This setter notifies us when the props have changed so that
    * we can check if an update is needed, and if so, call render. 
-   * 
    */
   Object.defineProperty(Component.prototype, 'props', {
     set: function(newProps) {
@@ -86,9 +84,10 @@ var defineComponent = (function() {
    */
   function defineComponent(spec) {
     var prototype = Object.create(Component.prototype);
-    
-    for(var name in spec) {
-      prototype[name] = spec[name];
+
+    for (var name in spec) {
+      var prop = Object.getOwnPropertyDescriptor(spec, name);
+      Object.defineProperty(prototype, name, prop);
     }
 
     return document.registerElement(spec.tag, {
