@@ -47,9 +47,6 @@ var currentNode;
 /** @type {?Node} */
 var currentParent;
 
-/** @type {?Node} */
-var previousNode;
-
 /** @type {?Element|?DocumentFragment} */
 var root;
 
@@ -72,16 +69,12 @@ var runPatch = function(node, fn, data) {
   var prevDoc = doc;
   var prevCurrentNode = currentNode;
   var prevCurrentParent = currentParent;
-  var prevPreviousNode = previousNode;
   var previousInAttributes = false;
   var previousInSkip = false;
 
   context = new Context();
   root = node;
   doc = node.ownerDocument;
-  currentNode = node;
-  currentParent = node.parentNode;
-  previousNode = null;
 
   if (process.env.NODE_ENV !== 'production') {
     previousInAttributes = setInAttributes(false);
@@ -103,7 +96,6 @@ var runPatch = function(node, fn, data) {
   doc = prevDoc;
   currentNode = prevCurrentNode;
   currentParent = prevCurrentParent;
-  previousNode = prevPreviousNode;
 };
 
 
@@ -119,12 +111,15 @@ var runPatch = function(node, fn, data) {
  */
 var patchInner = function(node, fn, data) {
   runPatch(node, function(data) {
+    currentNode = node;
+    currentParent = node.parentNode;
+
     enterNode();
     fn(data);
     exitNode();
 
     if (process.env.NODE_ENV !== 'production') {
-      assertNoUnclosedTags(previousNode, node);
+      assertNoUnclosedTags(currentNode, node);
     }
   }, data);
 };
@@ -142,11 +137,14 @@ var patchInner = function(node, fn, data) {
  */
 var patchOuter = function(node, fn, data) {
   runPatch(node, function(data) {
+    currentNode = /** @type {!Element} */({ nextSibling: node });
+    currentParent = node.parentNode;
+
     fn(data);
 
     if (process.env.NODE_ENV !== 'production') {
-      assertPatchElementNotEmpty(node, currentNode);
-      assertPatchElementNoExtras(node, previousNode);
+      assertPatchElementNotEmpty(node, currentNode.nextSibling);
+      assertPatchElementNoExtras(node, currentNode);
     }
   }, data);
 };
@@ -236,7 +234,7 @@ var clearUnvisitedDOM = function() {
   var child = node.lastChild;
   var key;
 
-  if (child === previousNode && keyMapValid) {
+  if (child === currentNode && keyMapValid) {
     return;
   }
 
@@ -244,7 +242,7 @@ var clearUnvisitedDOM = function() {
     return;
   }
 
-  while (child !== previousNode) {
+  while (child !== currentNode) {
     node.removeChild(child);
     context.markDeleted(/** @type {!Node}*/(child));
 
@@ -275,8 +273,7 @@ var clearUnvisitedDOM = function() {
  */
 var enterNode = function() {
   currentParent = currentNode;
-  currentNode = currentNode.firstChild;
-  previousNode = null;
+  currentNode = null;
 };
 
 
@@ -284,8 +281,11 @@ var enterNode = function() {
  * Changes to the next sibling of the current node.
  */
 var nextNode = function() {
-  previousNode = currentNode;
-  currentNode = currentNode.nextSibling;
+  if (currentNode) {
+    currentNode = currentNode.nextSibling;
+  } else {
+    currentNode = currentParent.firstChild;
+  }
 };
 
 
@@ -295,8 +295,7 @@ var nextNode = function() {
 var exitNode = function() {
   clearUnvisitedDOM();
 
-  previousNode = currentParent;
-  currentNode = currentParent.nextSibling;
+  currentNode = currentParent;
   currentParent = currentParent.parentNode;
 };
 
@@ -315,6 +314,7 @@ var exitNode = function() {
  * @return {!Element} The corresponding Element.
  */
 var elementOpen = function(tag, key, statics) {
+  nextNode();
   alignWithDOM(tag, key, statics);
   enterNode();
   return /** @type {!Element} */(currentParent);
@@ -333,7 +333,7 @@ var elementClose = function() {
   }
 
   exitNode();
-  return /** @type {!Element} */(previousNode);
+  return /** @type {!Element} */(currentNode);
 };
 
 
@@ -344,9 +344,9 @@ var elementClose = function() {
  * @return {!Text} The corresponding Text Node.
  */
 var text = function() {
-  alignWithDOM('#text', null, null);
   nextNode();
-  return /** @type {!Text} */(previousNode);
+  alignWithDOM('#text', null, null);
+  return /** @type {!Text} */(currentNode);
 };
 
 
@@ -369,10 +369,10 @@ var currentElement = function() {
  */
 var skip = function() {
   if (process.env.NODE_ENV !== 'production') {
-    assertNoChildrenDeclaredYet('skip', previousNode);
+    assertNoChildrenDeclaredYet('skip', currentNode);
     setInSkip(true);
   }
-  previousNode = currentParent.lastChild;
+  currentNode = currentParent.lastChild;
 };
 
 
