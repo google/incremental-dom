@@ -268,7 +268,11 @@ var text = function(value, var_args) {
 
     var formatted = value;
     for (var i = 1; i < arguments.length; i += 1) {
-      formatted = arguments[i](formatted);
+      /*
+       * The parenthesis syntax prevents leaking the arguments object.
+       * https://github.com/google/incremental-dom/pull/204#issuecomment-178223574
+       */
+      formatted = (0, arguments[i])(formatted);
     }
 
     node.data = formatted;
