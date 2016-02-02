@@ -82,5 +82,12 @@ describe('formatters', () => {
       expect(stub).to.have.been.calledTwice;
     });
   });
+
+  it('should not leak the arguments object', () => {
+    var stub = sinon.stub().returns('value');
+    patch(container, () => text('value', stub));
+
+    expect(stub).to.have.been.calledOn(undefined);
+  });
 });
 
