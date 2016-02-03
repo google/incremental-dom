@@ -27,7 +27,7 @@ import {
 
 
 describe('patching an element\'s children', () => {
-  var container;
+  let container;
 
   beforeEach(() => {
     container = document.createElement('div');
@@ -39,7 +39,7 @@ describe('patching an element\'s children', () => {
   });
 
   describe('with an existing document tree', () => {
-    var div;
+    let div;
 
     function render() {
       elementVoid('div', null, null,
@@ -54,20 +54,20 @@ describe('patching an element\'s children', () => {
 
     it('should preserve existing nodes', () => {
       patchInner(container, render);
-      var child = container.childNodes[0];
+      const child = container.childNodes[0];
 
       expect(child).to.equal(div);
     });
 
     it('should update attributes', () => {
       patchInner(container, render);
-      var child = container.childNodes[0];
+      const child = container.childNodes[0];
 
       expect(child.getAttribute('tabindex')).to.equal('0');
     });
 
     describe('should return DOM node', () => {
-      var node;
+      let node;
 
       it('from elementOpen', () => {
         patchInner(container, () => {
@@ -108,8 +108,8 @@ describe('patching an element\'s children', () => {
   });
 
   it('should be re-entrant', function() {
-    var containerOne = document.createElement('div');
-    var containerTwo = document.createElement('div');
+    const containerOne = document.createElement('div');
+    const containerTwo = document.createElement('div');
 
     function renderOne() {
       elementOpen('div');
@@ -139,7 +139,7 @@ describe('patching an element\'s children', () => {
   });
 
   it('should patch a detached node', () => {
-    var container = document.createElement('div');
+    const container = document.createElement('div');
     function render() {
       elementVoid('span');
     }
@@ -160,7 +160,7 @@ describe('patching an element\'s children', () => {
 
 describe('patching a documentFragment', function() {
   it('should create the required DOM nodes', function() {
-    var frag = document.createDocumentFragment();
+    const frag = document.createDocumentFragment();
 
     patchInner(frag, function() {
       elementOpen('div', null, null,

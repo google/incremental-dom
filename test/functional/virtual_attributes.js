@@ -25,7 +25,7 @@ import {
 
 
 describe('virtual attribute updates', () => {
-  var container;
+  let container;
 
   beforeEach(() => {
     container = document.createElement('div');
@@ -50,7 +50,7 @@ describe('virtual attribute updates', () => {
       patch(container, () => render({
         key: 'hello'
       }));
-      var el = container.childNodes[0];
+      const el = container.childNodes[0];
 
       expect(el.getAttribute('data-expanded')).to.equal('hello');
     });
@@ -59,7 +59,7 @@ describe('virtual attribute updates', () => {
       patch(container, () => render({
         key: false
       }));
-      var el = container.childNodes[0];
+      const el = container.childNodes[0];
 
       expect(el.getAttribute('data-expanded')).to.equal(null);
     });
@@ -71,7 +71,7 @@ describe('virtual attribute updates', () => {
       patch(container, () => render({
         key: 'bar'
       }));
-      var el = container.childNodes[0];
+      const el = container.childNodes[0];
 
       expect(el.getAttribute('data-expanded')).to.equal('bar');
     });

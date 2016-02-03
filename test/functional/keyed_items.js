@@ -21,11 +21,11 @@ import {
 
 
 describe('rendering with keys', () => {
-  var container;
+  let container;
 
   function render(items) {
-    for(var i=0; i<items.length; i++) {
-      var key = items[i].key;
+    for(let i=0; i<items.length; i++) {
+      const key = items[i].key;
       elementVoid('div', key, key ? ['id', key] : null);
     }
   }
@@ -40,12 +40,12 @@ describe('rendering with keys', () => {
   });
 
   it('should not re-use a node with a non-null key', () => {
-    var items = [
+    const items = [
       { key: 'one' }
     ];
 
     patch(container, () => render(items));
-    var keyedNode = container.childNodes[0];
+    const keyedNode = container.childNodes[0];
 
     items.unshift({ key : null });
     patch(container, () => render(items));
@@ -55,15 +55,15 @@ describe('rendering with keys', () => {
   });
 
   it('should not modify DOM nodes with falsey keys', () => {
-    var slice = Array.prototype.slice;
-    var items = [
+    const slice = Array.prototype.slice;
+    const items = [
       { key: null },
       { key: undefined },
       { key: '' },
     ];
 
     patch(container, () => render(items));
-    var nodes = slice.call(container.childNodes);
+    const nodes = slice.call(container.childNodes);
 
     patch(container, () => render(items));
 
@@ -71,14 +71,14 @@ describe('rendering with keys', () => {
   });
 
   it('should not modify the DOM nodes when inserting', () => {
-    var items = [
+    const items = [
       { key: 'one' },
       { key: 'two' }
     ];
 
     patch(container, () => render(items));
-    var firstNode = container.childNodes[0];
-    var secondNode = container.childNodes[1];
+    const firstNode = container.childNodes[0];
+    const secondNode = container.childNodes[1];
 
     items.splice(1, 0, { key: 'one-point-five' });
     patch(container, () => render(items));
@@ -92,15 +92,15 @@ describe('rendering with keys', () => {
   });
 
   it('should not modify the DOM nodes when removing', () => {
-    var items = [
+    const items = [
       { key: 'one' },
       { key: 'two' },
       { key: 'three' }
     ];
 
     patch(container, () => render(items));
-    var firstNode = container.childNodes[0];
-    var thirdNode = container.childNodes[2];
+    const firstNode = container.childNodes[0];
+    const thirdNode = container.childNodes[2];
 
     items.splice(1, 1);
     patch(container, () => render(items));
@@ -113,16 +113,16 @@ describe('rendering with keys', () => {
   });
 
   it('should not modify the DOM nodes when re-ordering', () => {
-    var items = [
+    const items = [
       { key: 'one' },
       { key: 'two' },
       { key: 'three' }
     ];
 
     patch(container, () => render(items));
-    var firstNode = container.childNodes[0];
-    var secondNode = container.childNodes[1];
-    var thirdNode = container.childNodes[2];
+    const firstNode = container.childNodes[0];
+    const secondNode = container.childNodes[1];
+    const thirdNode = container.childNodes[2];
 
     items.splice(1, 1);
     items.push({ key: 'two' });
@@ -138,7 +138,7 @@ describe('rendering with keys', () => {
   });
 
   it('should avoid collisions with Object.prototype', () => {
-    var items = [
+    const items = [
       { key: 'hasOwnProperty' }
     ];
 

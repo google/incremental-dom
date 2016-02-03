@@ -25,8 +25,8 @@ import {
 } from '../../index';
 
 describe('currentElement', () => {
-  var container;
-  var el
+  let container;
+  let el;
 
   beforeEach(() => {
     container = document.createElement('div');

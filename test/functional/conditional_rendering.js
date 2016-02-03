@@ -23,7 +23,7 @@ import {
 
 
 describe('conditional rendering', () => {
-  var container;
+  let container;
 
   beforeEach(() => {
     container = document.createElement('div');
@@ -51,7 +51,7 @@ describe('conditional rendering', () => {
     it('should un-render when the condition becomes false', () => {
       patch(container, () => render(true));
       patch(container, () => render(false));
-      var outer = container.childNodes[0];
+      const outer = container.childNodes[0];
 
       expect(outer.childNodes).to.have.length(2);
       expect(outer.childNodes[0].id).to.equal('one');
@@ -63,7 +63,7 @@ describe('conditional rendering', () => {
     it('should render when the condition becomes true', () => {
       patch(container, () => render(false));
       patch(container, () => render(true));
-      var outer = container.childNodes[0];
+      const outer = container.childNodes[0];
 
       expect(outer.childNodes).to.have.length(4);
       expect(outer.childNodes[0].id).to.equal('one');
@@ -92,7 +92,7 @@ describe('conditional rendering', () => {
     it('should not leave any remaning nodes', () => {
       patch(container, () => render(true));
       patch(container, () => render(false));
-      var outer = container.childNodes[0];
+      const outer = container.childNodes[0];
 
       expect(outer.childNodes).to.have.length(0);
     });
@@ -121,7 +121,7 @@ describe('conditional rendering', () => {
     it('should strip children when a conflicting node is re-used', () => {
       patch(container, () => render(true));
       patch(container, () => render(false));
-      var outer = container.childNodes[0];
+      const outer = container.childNodes[0];
 
       expect(outer.childNodes).to.have.length(2);
       expect(outer.childNodes[0].id).to.equal('one');
@@ -134,7 +134,7 @@ describe('conditional rendering', () => {
     it('should strip attributes when a conflicting node is re-used', () => {
       patch(container, () => render(true));
       patch(container, () => render(false));
-      var outer = container.childNodes[0];
+      const outer = container.childNodes[0];
 
       expect(outer.childNodes[1].getAttribute('data-foo')).to.be.null;
     });

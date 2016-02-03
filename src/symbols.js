@@ -15,7 +15,7 @@
  */
 
 /** @const */
-var symbols = {
+const symbols = {
   default: '__default',
 
   placeholder: '__placeholder'

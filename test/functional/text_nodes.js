@@ -22,7 +22,7 @@ import {
 
 
 describe('text nodes', () => {
-  var container;
+  let container;
 
   beforeEach(() => {
     container = document.createElement('div');
@@ -38,7 +38,7 @@ describe('text nodes', () => {
       patch(container, () => {
         text('Hello world!');
       });
-      var node = container.childNodes[0];
+      const node = container.childNodes[0];
 
       expect(node.textContent).to.equal('Hello world!');
       expect(node).to.be.instanceof(Text);
@@ -72,7 +72,7 @@ describe('text nodes', () => {
     it('should update the DOM when the text is updated', () => {
       patch(container, () => render('Hello'));
       patch(container, () => render('Hello World!'));
-      var node = container.childNodes[0];
+      const node = container.childNodes[0];
 
       expect(node.textContent).to.equal('Hello World!');
     });

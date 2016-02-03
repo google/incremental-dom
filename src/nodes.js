@@ -28,7 +28,7 @@ import { createMap } from './util';
  * @param {?Node} parent
  * @return {?string} The namespace to create the tag in.
  */
-var getNamespaceForTag = function(tag, parent) {
+const getNamespaceForTag = function(tag, parent) {
   if (tag === 'svg') {
     return 'http://www.w3.org/2000/svg';
   }
@@ -51,9 +51,9 @@ var getNamespaceForTag = function(tag, parent) {
  *     static attributes for the Element.
  * @return {!Element}
  */
-var createElement = function(doc, parent, tag, key, statics) {
-  var namespace = getNamespaceForTag(tag, parent);
-  var el;
+const createElement = function(doc, parent, tag, key, statics) {
+  const namespace = getNamespaceForTag(tag, parent);
+  let el;
 
   if (namespace) {
     el = doc.createElementNS(namespace, tag);
@@ -64,7 +64,7 @@ var createElement = function(doc, parent, tag, key, statics) {
   initData(el, tag, key);
 
   if (statics) {
-    for (var i = 0; i < statics.length; i += 2) {
+    for (let i = 0; i < statics.length; i += 2) {
       updateAttribute(el, /** @type {!string}*/(statics[i]), statics[i + 1]);
     }
   }
@@ -78,8 +78,8 @@ var createElement = function(doc, parent, tag, key, statics) {
  * @param {Document} doc The document with which to create the Element.
  * @return {!Text}
  */
-var createText = function(doc) {
-  var node = doc.createTextNode('');
+const createText = function(doc) {
+  const node = doc.createTextNode('');
   initData(node, '#text', null);
   return node;
 };
@@ -91,14 +91,14 @@ var createText = function(doc) {
  * @return {!Object<string, !Element>} A mapping of keys to the children of the
  *     Element.
  */
-var createKeyMap = function(el) {
-  var map = createMap();
-  var children = el.children;
-  var count = children.length;
+const createKeyMap = function(el) {
+  const map = createMap();
+  const children = el.children;
+  const count = children.length;
 
-  for (var i = 0; i < count; i += 1) {
-    var child = children[i];
-    var key = getData(child).key;
+  for (let i = 0; i < count; i += 1) {
+    const child = children[i];
+    const key = getData(child).key;
 
     if (key) {
       map[key] = child;
@@ -115,8 +115,8 @@ var createKeyMap = function(el) {
  * @param {?Node} el
  * @return {!Object<string, !Node>} A mapping of keys to child Elements
  */
-var getKeyMap = function(el) {
-  var data = getData(el);
+const getKeyMap = function(el) {
+  const data = getData(el);
 
   if (!data.keyMap) {
     data.keyMap = createKeyMap(el);
@@ -132,7 +132,7 @@ var getKeyMap = function(el) {
  * @param {?string=} key
  * @return {?Node} The child corresponding to the key.
  */
-var getChild = function(parent, key) {
+const getChild = function(parent, key) {
   return key ? getKeyMap(parent)[key] : null;
 };
 
@@ -145,7 +145,7 @@ var getChild = function(parent, key) {
  * @param {string} key A key to identify the child with.
  * @param {!Node} child The child to register.
  */
-var registerChild = function(parent, key, child) {
+const registerChild = function(parent, key, child) {
   getKeyMap(parent)[key] = child;
 };
 

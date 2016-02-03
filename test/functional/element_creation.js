@@ -24,8 +24,8 @@ import {
 } from '../../index';
 
 describe('element creation', () => {
-  var container;
-  var sandbox = sinon.sandbox.create();
+  let container;
+  let sandbox = sinon.sandbox.create();
 
   beforeEach(() => {
     container = document.createElement('div');
@@ -38,7 +38,7 @@ describe('element creation', () => {
   });
 
   describe('when creating a single node', () => {
-    var el;
+    let el;
 
     beforeEach(() => {
       patch(container, () => {
@@ -114,7 +114,7 @@ describe('element creation', () => {
       elementVoid('div', null, null,
           'id', 'test');
     });
-    var el = container.childNodes[0];
+    const el = container.childNodes[0];
     expect(el.id).to.equal('test');
   });
 
@@ -124,14 +124,14 @@ describe('element creation', () => {
         elementVoid('div');
       });
 
-      var el = container.childNodes[0];
+      const el = container.childNodes[0];
       expect(el.namespaceURI).to.equal('http://www.w3.org/1999/xhtml');
     });
 
     it('should use createElement if no namespace has been specified', () => {
-      var doc = container.ownerDocument;
-      var div = doc.createElement('div');
-      var el;
+      let doc = container.ownerDocument;
+      let div = doc.createElement('div');
+      let el;
       sandbox.stub(doc, 'createElement').returns(div);
 
       patch(container, () => {
@@ -163,37 +163,37 @@ describe('element creation', () => {
     });
 
     it('should create svgs in the svg namespace', () => {
-      var el = container.querySelector('svg');
+      const el = container.querySelector('svg');
       expect(el.namespaceURI).to.equal('http://www.w3.org/2000/svg');
     });
 
     it('should create descendants of svgs in the svg namespace', () => {
-      var el = container.querySelector('circle');
+      const el = container.querySelector('circle');
       expect(el.namespaceURI).to.equal('http://www.w3.org/2000/svg');
     });
 
     it('should have the svg namespace for foreignObjects', () => {
-      var el = container.querySelector('svg').childNodes[1];
+      const el = container.querySelector('svg').childNodes[1];
       expect(el.namespaceURI).to.equal('http://www.w3.org/2000/svg');
     });
 
     it('should revert to the xhtml namespace when encounering a foreignObject', () => {
-      var el = container.querySelector('p');
+      const el = container.querySelector('p');
       expect(el.namespaceURI).to.equal('http://www.w3.org/1999/xhtml');
     });
 
     it('should reset to the previous namespace after exiting a forignObject', () => {
-      var el = container.querySelector('path');
+      const el = container.querySelector('path');
       expect(el.namespaceURI).to.equal('http://www.w3.org/2000/svg');
     });
 
     it('should create children in the svg namespace when patching an svg', () => {
-      var svg = container.querySelector('svg');
+      const svg = container.querySelector('svg');
       patch(svg, () => {
         elementVoid('rect');
       });
 
-      var el = svg.querySelector('rect');
+      const el = svg.querySelector('rect');
       expect(el.namespaceURI).to.equal('http://www.w3.org/2000/svg');
     });
   });

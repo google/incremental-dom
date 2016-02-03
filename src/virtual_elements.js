@@ -39,7 +39,7 @@ import {
  * specified.
  * @const
  */
-var ATTRIBUTES_OFFSET = 3;
+const ATTRIBUTES_OFFSET = 3;
 
 
 /**
@@ -47,7 +47,7 @@ var ATTRIBUTES_OFFSET = 3;
  * elementOpenEnd.
  * @const {Array<*>}
  */
-var argsBuilder = [];
+const argsBuilder = [];
 
 
 /**
@@ -58,18 +58,18 @@ var argsBuilder = [];
  * @param {?Array<*>=} statics An array of attribute name/value pairs of the
  *     static attributes for the Element. These will only be set once when the
  *     Element is created.
- * @param {...*} var_args Attribute name/value pairs of the dynamic attributes
+ * @param {...*} const_args Attribute name/value pairs of the dynamic attributes
  *     for the Element.
  * @return {!Element} The corresponding Element.
  */
-var elementOpen = function(tag, key, statics, var_args) {
+const elementOpen = function(tag, key, statics, const_args) {
   if (process.env.NODE_ENV !== 'production') {
     assertNotInAttributes('elementOpen');
     assertNotInSkip('elementOpen');
   }
 
-  var node = coreElementOpen(tag, key, statics);
-  var data = getData(node);
+  const node = coreElementOpen(tag, key, statics);
+  const data = getData(node);
 
   /*
    * Checks to see if one or more attributes have changed for a given Element.
@@ -77,11 +77,11 @@ var elementOpen = function(tag, key, statics, var_args) {
    * individual argument. When attributes have changed, the overhead of this is
    * minimal.
    */
-  var attrsArr = data.attrsArr;
-  var newAttrs = data.newAttrs;
-  var attrsChanged = false;
-  var i = ATTRIBUTES_OFFSET;
-  var j = 0;
+  const attrsArr = data.attrsArr;
+  const newAttrs = data.newAttrs;
+  let attrsChanged = false;
+  let i = ATTRIBUTES_OFFSET;
+  let j = 0;
 
   for (; i < arguments.length; i += 1, j += 1) {
     if (attrsArr[j] !== arguments[i]) {
@@ -107,7 +107,7 @@ var elementOpen = function(tag, key, statics, var_args) {
       newAttrs[arguments[i]] = arguments[i + 1];
     }
 
-    for (var attr in newAttrs) {
+    for (const attr in newAttrs) {
       updateAttribute(node, attr, newAttrs[attr]);
       newAttrs[attr] = undefined;
     }
@@ -131,7 +131,7 @@ var elementOpen = function(tag, key, statics, var_args) {
  *     static attributes for the Element. These will only be set once when the
  *     Element is created.
  */
-var elementOpenStart = function(tag, key, statics) {
+const elementOpenStart = function(tag, key, statics) {
   if (process.env.NODE_ENV !== 'production') {
     assertNotInAttributes('elementOpenStart');
     setInAttributes(true);
@@ -150,7 +150,7 @@ var elementOpenStart = function(tag, key, statics) {
  * @param {string} name
  * @param {*} value
  */
-var attr = function(name, value) {
+const attr = function(name, value) {
   if (process.env.NODE_ENV !== 'production') {
     assertInAttributes('attr');
   }
@@ -163,13 +163,13 @@ var attr = function(name, value) {
  * Closes an open tag started with elementOpenStart.
  * @return {!Element} The corresponding Element.
  */
-var elementOpenEnd = function() {
+const elementOpenEnd = function() {
   if (process.env.NODE_ENV !== 'production') {
     assertInAttributes('elementOpenEnd');
     setInAttributes(false);
   }
 
-  var node = elementOpen.apply(null, argsBuilder);
+  const node = elementOpen.apply(null, argsBuilder);
   argsBuilder.length = 0;
   return node;
 };
@@ -181,12 +181,12 @@ var elementOpenEnd = function() {
  * @param {string} tag The element's tag.
  * @return {!Element} The corresponding Element.
  */
-var elementClose = function(tag) {
+const elementClose = function(tag) {
   if (process.env.NODE_ENV !== 'production') {
     assertNotInAttributes('elementClose');
   }
 
-  var node = coreElementClose();
+  const node = coreElementClose();
 
   if (process.env.NODE_ENV !== 'production') {
     assertCloseMatchesOpenTag(getData(node).nodeName, tag);
@@ -206,12 +206,12 @@ var elementClose = function(tag) {
  * @param {?Array<*>=} statics An array of attribute name/value pairs of the
  *     static attributes for the Element. These will only be set once when the
  *     Element is created.
- * @param {...*} var_args Attribute name/value pairs of the dynamic attributes
+ * @param {...*} const_args Attribute name/value pairs of the dynamic attributes
  *     for the Element.
  * @return {!Element} The corresponding Element.
  */
-var elementVoid = function(tag, key, statics, var_args) {
-  var node = elementOpen.apply(null, arguments);
+const elementVoid = function(tag, key, statics, const_args) {
+  const node = elementOpen.apply(null, arguments);
   elementClose.apply(null, arguments);
   return node;
 };
@@ -230,11 +230,11 @@ var elementVoid = function(tag, key, statics, var_args) {
  * @param {?Array<*>=} statics An array of attribute name/value pairs of the
  *     static attributes for the Element. These will only be set once when the
  *     Element is created.
- * @param {...*} var_args Attribute name/value pairs of the dynamic attributes
+ * @param {...*} const_args Attribute name/value pairs of the dynamic attributes
  *     for the Element.
  * @return {!Element} The corresponding Element.
  */
-var elementPlaceholder = function(tag, key, statics, var_args) {
+const elementPlaceholder = function(tag, key, statics, const_args) {
   if (process.env.NODE_ENV !== 'production') {
     assertPlaceholderKeySpecified(key);
     console.warn('elementPlaceholder will be removed in Incremental DOM 0.5' +
@@ -251,30 +251,30 @@ var elementPlaceholder = function(tag, key, statics, var_args) {
  * Declares a virtual Text at this point in the document.
  *
  * @param {string|number|boolean} value The value of the Text.
- * @param {...(function((string|number|boolean)):string)} var_args
+ * @param {...(function((string|number|boolean)):string)} const_args
  *     Functions to format the value which are called only when the value has
  *     changed.
  * @return {!Text} The corresponding text node.
  */
-var text = function(value, var_args) {
+const text = function(value, const_args) {
   if (process.env.NODE_ENV !== 'production') {
     assertNotInAttributes('text');
     assertNotInSkip('text');
   }
 
-  var node = coreText();
-  var data = getData(node);
+  const node = coreText();
+  const data = getData(node);
 
   if (data.text !== value) {
     data.text = /** @type {string} */(value);
 
-    var formatted = value;
-    for (var i = 1; i < arguments.length; i += 1) {
+    let formatted = value;
+    for (let i = 1; i < arguments.length; i += 1) {
       /*
        * Call the formatter function directly to prevent leaking arguments.
        * https://github.com/google/incremental-dom/pull/204#issuecomment-178223574
        */
-      var fn = arguments[i];
+      const fn = arguments[i];
       formatted = fn(formatted);
     }
 
