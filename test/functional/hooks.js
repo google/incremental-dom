@@ -15,12 +15,12 @@
  */
 
 import {
-    patch,
-    text,
-    elementVoid,
-    symbols,
-    attributes,
-    notifications
+  patch,
+  text,
+  elementVoid,
+  symbols,
+  attributes,
+  notifications
 } from '../../index';
 
 
@@ -42,7 +42,7 @@ describe('library hooks', () => {
 
   describe('for deciding how attributes are set', () => {
     function render(dynamicValue) {
-      elementVoid('div', null, ['staticName', 'staticValue'],
+      elementVoid('div', 'key', ['staticName', 'staticValue'],
           'dynamicName', dynamicValue);
     }
 
@@ -57,8 +57,7 @@ describe('library hooks', () => {
 
     afterEach(() => {
       for (var mutator in attributes) {
-        if (mutator !== symbols.default &&
-            mutator !== symbols.placeholder) {
+        if (mutator !== symbols.default && mutator !== symbols.placeholder) {
           attributes[mutator] = null;
         }
       }

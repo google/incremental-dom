@@ -15,8 +15,8 @@
  */
 
 import {
-    patch,
-    text
+  patch,
+  text
 } from '../../index';
 
 

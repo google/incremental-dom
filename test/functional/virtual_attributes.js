@@ -15,12 +15,12 @@
  */
 
 import {
-    patch,
-    elementOpen,
-    elementOpenStart,
-    elementOpenEnd,
-    elementClose,
-    attr
+  patch,
+  elementOpen,
+  elementOpenStart,
+  elementOpenEnd,
+  elementClose,
+  attr
 } from '../../index';
 
 
@@ -38,7 +38,7 @@ describe('virtual attribute updates', () => {
 
   describe('for conditional attributes', () => {
     function render(obj) {
-      elementOpenStart('div', '', []);
+      elementOpenStart('div');
         if (obj.key) {
           attr('data-expanded', obj.key);
         }

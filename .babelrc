@@ -1,6 +1,8 @@
 {
   "loose": ["all"],
   "whitelist": [
-    "es6.properties.computed"
+    "es6.modules",
+    "es6.properties.computed",
+    "es6.arrowFunctions"
   ]
 }

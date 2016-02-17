@@ -19,7 +19,7 @@ module.exports = function(config) {
     frameworks: ['browserify', 'mocha', 'sinon-chai'],
 
     basePath: '../',
-  
+
     files: [
       'test/**/*.js'
     ],
@@ -32,7 +32,7 @@ module.exports = function(config) {
     browserify: {
       watch: true,
       debug: true,
-      transform: ['es6ify']
+      transform: ['babelify']
     },
 
     reporters: ['progress'],
