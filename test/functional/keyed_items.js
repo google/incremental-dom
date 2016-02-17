@@ -145,5 +145,17 @@ describe('rendering with keys', () => {
     patch(container, () => render(items));
     expect(container.childNodes).to.have.length(1);
   });
+
+  it('should throw error when element does not match nodeName', () => {
+    function render(tag) {
+      elementVoid(tag, 'key');
+    }
+
+    patch(container, render, 'div');
+
+    expect(() => {
+      patch(container, render, 'span');
+    }).to.throw('Was expecting node with key "key" to be a span, not a div.');
+  });
 });
 

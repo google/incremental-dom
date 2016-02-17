@@ -37,7 +37,7 @@ var inSkip = false;
  */
 var assertInPatch = function(context) {
   if (!context) {
-    throw new Error('Cannot call currentElement() unless in patch');
+    throw new Error('Cannot call currentElement() unless in patch.');
   }
 };
 
@@ -84,7 +84,7 @@ var assertNoUnclosedTags = function(openElement, root) {
  */
 var assertNotInAttributes = function(functionName) {
   if (inAttributes) {
-    throw new Error(functionName + '() may not be called between ' +
+    throw new Error(functionName + '() can not be called between ' +
         'elementOpenStart() and elementOpenEnd().');
   }
 };
@@ -108,7 +108,7 @@ var assertNotInSkip = function(functionName) {
  */
 var assertInAttributes = function(functionName) {
   if (!inAttributes) {
-    throw new Error(functionName + '() must be called after ' +
+    throw new Error(functionName + '() can only be called after calling ' +
         'elementOpenStart().');
   }
 };
@@ -133,7 +133,7 @@ var assertVirtualAttributesClosed = function() {
   */
 var assertPlaceholderKeySpecified = function(key) {
   if (!key) {
-    throw new Error('Placeholder elements must have a key specified.');
+    throw new Error('elementPlaceholder() requires a key.');
   }
 };
 
@@ -145,8 +145,8 @@ var assertPlaceholderKeySpecified = function(key) {
   */
 var assertCloseMatchesOpenTag = function(nodeName, tag) {
   if (nodeName !== tag) {
-    throw new Error('Received a call to close ' + tag + ' but ' +
-        nodeName + ' was open.');
+    throw new Error('Received a call to close "' + tag + '" but "' +
+        nodeName + '" was open.');
   }
 };
 

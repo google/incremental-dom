@@ -75,6 +75,14 @@ describe('virtual attribute updates', () => {
 
       expect(el.getAttribute('data-expanded')).to.equal('bar');
     });
+
+    it('should throw when defined outside virtual attributes element', () => {
+      expect(() => {
+        patch(container, () => {
+          attr('data-expanded', true);
+        });
+      }).to.throw('attr() can only be called after calling elementOpenStart().');
+    });
   });
 
   it('should throw when a virtual attributes element is unclosed', () => {
@@ -83,6 +91,41 @@ describe('virtual attribute updates', () => {
         elementOpenStart('div');
       });
     }).to.throw('elementOpenEnd() must be called after calling elementOpenStart().');
+  });
+
+  it('should throw when virtual attributes element is closed without being opened', () => {
+    expect(() => {
+      patch(container, () => {
+        elementOpenEnd('div');
+      });
+    }).to.throw('elementOpenEnd() can only be called after calling elementOpenStart().');
+  });
+
+  it('should throw when opening an element inside a virtual attributes element', () => {
+    expect(() => {
+      patch(container, () => {
+        elementOpenStart('div');
+        elementOpen('div');
+      });
+    }).to.throw('elementOpen() can not be called between elementOpenStart() and elementOpenEnd().');
+  });
+
+  it('should throw when opening a virtual attributes element inside a virtual attributes element', () => {
+    expect(() => {
+      patch(container, () => {
+        elementOpenStart('div');
+        elementOpenStart('div');
+      });
+    }).to.throw('elementOpenStart() can not be called between elementOpenStart() and elementOpenEnd().');
+  });
+
+  it('should throw when closing an element inside a virtual attributes element', () => {
+    expect(() => {
+      patch(container, () => {
+        elementOpenStart('div');
+        elementClose('div');
+      });
+    }).to.throw('elementClose() can not be called between elementOpenStart() and elementOpenEnd().');
   });
 });
 
