@@ -237,8 +237,8 @@ var elementVoid = function(tag, key, statics, var_args) {
 var elementPlaceholder = function(tag, key, statics, var_args) {
   if (process.env.NODE_ENV !== 'production') {
     assertPlaceholderKeySpecified(key);
-    console.warn('elementPlaceholder will be removed in Incremental DOM 0.5'
-        + ' use skip() instead');
+    console.warn('elementPlaceholder will be removed in Incremental DOM 0.5' +
+        ' use skip() instead');
   }
 
   elementOpen.apply(null, arguments);
