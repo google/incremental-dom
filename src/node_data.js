@@ -15,6 +15,7 @@
  */
 
 import { createMap } from './util';
+import { symbols } from './symbols';
 
 
 /**
@@ -86,7 +87,7 @@ function NodeData(nodeName, key) {
  */
 var initData = function(node, nodeName, key) {
   var data = new NodeData(nodeName, key);
-  node['__incrementalDOMData'] = data;
+  node[symbols.incrementalDOMData] = data;
   return data;
 };
 
@@ -98,7 +99,7 @@ var initData = function(node, nodeName, key) {
  * @return {!NodeData} The NodeData for this Node.
  */
 var getData = function(node) {
-  var data = node['__incrementalDOMData'];
+  var data = node[symbols.incrementalDOMData];
 
   if (!data) {
     var nodeName = node.nodeName.toLowerCase();
