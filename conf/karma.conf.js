@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
+var babel = require('rollup-plugin-babel');
+var multi = require('rollup-plugin-multi-entry').default;
+
 module.exports = function(config) {
   config.set({
-    frameworks: ['browserify', 'mocha', 'sinon-chai'],
+    frameworks: ['mocha', 'sinon-chai'],
 
     basePath: '../',
 
@@ -25,14 +28,23 @@ module.exports = function(config) {
     ],
 
     preprocessors: {
-      'src/**/*.js': ['browserify'],
-      'test/**/*.js': ['browserify']
+      'src/**/*.js': ['rollup'],
+      'test/**/*.js': ['rollup']
     },
 
-    browserify: {
-      watch: true,
-      debug: true,
-      transform: ['babelify']
+    rollupPreprocessor: {
+      rollup: {
+        plugins: [
+          multi(),
+          babel({
+            exclude: 'node_modules/**',
+            plugins: ['transform-inline-environment-variables']
+          })
+        ]
+      },
+      bundle: {
+        sourceMap: 'inline'
+      }
     },
 
     reporters: ['progress'],
