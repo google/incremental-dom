@@ -39,19 +39,19 @@ import { notifications } from './notifications';
 
 
 /** @type {?Context} */
-var context = null;
+let context = null;
 
 /** @type {?Node} */
-var currentNode;
+let currentNode;
 
 /** @type {?Node} */
-var currentParent;
+let currentParent;
 
 /** @type {?Element|?DocumentFragment} */
-var root;
+let root;
 
 /** @type {?Document} */
-var doc;
+let doc;
 
 
 /**
@@ -63,14 +63,14 @@ var doc;
  * @param {T=} data An argument passed to fn.
  * @template T
  */
-var runPatch = function(node, fn, data) {
-  var prevContext = context;
-  var prevRoot = root;
-  var prevDoc = doc;
-  var prevCurrentNode = currentNode;
-  var prevCurrentParent = currentParent;
-  var previousInAttributes = false;
-  var previousInSkip = false;
+const runPatch = function(node, fn, data) {
+  const prevContext = context;
+  const prevRoot = root;
+  const prevDoc = doc;
+  const prevCurrentNode = currentNode;
+  const prevCurrentParent = currentParent;
+  let previousInAttributes = false;
+  let previousInSkip = false;
 
   context = new Context();
   root = node;
@@ -109,7 +109,7 @@ var runPatch = function(node, fn, data) {
  * @param {T=} data An argument passed to fn to represent DOM state.
  * @template T
  */
-var patchInner = function(node, fn, data) {
+const patchInner = function(node, fn, data) {
   runPatch(node, function(data) {
     currentNode = node;
     currentParent = node.parentNode;
@@ -135,7 +135,7 @@ var patchInner = function(node, fn, data) {
  * @param {T=} data An argument passed to fn to represent DOM state.
  * @template T
  */
-var patchOuter = function(node, fn, data) {
+const patchOuter = function(node, fn, data) {
   runPatch(node, function(data) {
     currentNode = /** @type {!Element} */({ nextSibling: node });
     currentParent = node.parentNode;
@@ -158,8 +158,8 @@ var patchOuter = function(node, fn, data) {
  * @param {?string=} key An optional key that identifies a node.
  * @return {boolean} True if the node matches, false otherwise.
  */
-var matches = function(nodeName, key) {
-  var data = getData(currentNode);
+const matches = function(nodeName, key) {
+  const data = getData(currentNode);
 
   // Key check is done using double equals as we want to treat a null key the
   // same as undefined. This should be okay as the only values allowed are
@@ -177,12 +177,12 @@ var matches = function(nodeName, key) {
  * @param {?Array<*>=} statics For an Element, this should be an array of
  *     name-value pairs.
  */
-var alignWithDOM = function(nodeName, key, statics) {
+const alignWithDOM = function(nodeName, key, statics) {
   if (currentNode && matches(nodeName, key)) {
     return;
   }
 
-  var node;
+  let node;
 
   // Check to see if the node has moved within the parent.
   if (key) {
@@ -226,13 +226,13 @@ var alignWithDOM = function(nodeName, key, statics) {
  * Clears out any unvisited Nodes, as the corresponding virtual element
  * functions were never called for them.
  */
-var clearUnvisitedDOM = function() {
-  var node = currentParent;
-  var data = getData(node);
-  var keyMap = data.keyMap;
-  var keyMapValid = data.keyMapValid;
-  var child = node.lastChild;
-  var key;
+const clearUnvisitedDOM = function() {
+  const node = currentParent;
+  const data = getData(node);
+  const keyMap = data.keyMap;
+  const keyMapValid = data.keyMapValid;
+  let child = node.lastChild;
+  let key;
 
   if (child === currentNode && keyMapValid) {
     return;
@@ -275,7 +275,7 @@ var clearUnvisitedDOM = function() {
 /**
  * Changes to the first child of the current node.
  */
-var enterNode = function() {
+const enterNode = function() {
   currentParent = currentNode;
   currentNode = null;
 };
@@ -284,7 +284,7 @@ var enterNode = function() {
 /**
  * Changes to the next sibling of the current node.
  */
-var nextNode = function() {
+const nextNode = function() {
   if (currentNode) {
     currentNode = currentNode.nextSibling;
   } else {
@@ -296,7 +296,7 @@ var nextNode = function() {
 /**
  * Changes to the parent of the current node, removing any unvisited children.
  */
-var exitNode = function() {
+const exitNode = function() {
   clearUnvisitedDOM();
 
   currentNode = currentParent;
@@ -317,7 +317,7 @@ var exitNode = function() {
  *     Element is created.
  * @return {!Element} The corresponding Element.
  */
-var elementOpen = function(tag, key, statics) {
+const elementOpen = function(tag, key, statics) {
   nextNode();
   alignWithDOM(tag, key, statics);
   enterNode();
@@ -331,7 +331,7 @@ var elementOpen = function(tag, key, statics) {
  *
  * @return {!Element} The corresponding Element.
  */
-var elementClose = function() {
+const elementClose = function() {
   if (process.env.NODE_ENV !== 'production') {
     setInSkip(false);
   }
@@ -347,7 +347,7 @@ var elementClose = function() {
  *
  * @return {!Text} The corresponding Text Node.
  */
-var text = function() {
+const text = function() {
   nextNode();
   alignWithDOM('#text', null, null);
   return /** @type {!Text} */(currentNode);
@@ -358,7 +358,7 @@ var text = function() {
  * Gets the current Element being patched.
  * @return {!Element}
  */
-var currentElement = function() {
+const currentElement = function() {
   if (process.env.NODE_ENV !== 'production') {
     assertInPatch(context);
     assertNotInAttributes('currentElement');
@@ -371,7 +371,7 @@ var currentElement = function() {
  * Skips the children in a subtree, allowing an Element to be closed without
  * clearing out the children.
  */
-var skip = function() {
+const skip = function() {
   if (process.env.NODE_ENV !== 'production') {
     assertNoChildrenDeclaredYet('skip', currentNode);
     setInSkip(true);

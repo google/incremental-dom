@@ -73,8 +73,8 @@ function lint() {
 
 function inlineEnv() {
   return babel({
-    whitelist: [
-      'utility.inlineEnvironmentVariables'
+    plugins: [
+      'transform-inline-environment-variables'
     ]
   });
 }

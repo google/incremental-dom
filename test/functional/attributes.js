@@ -24,7 +24,7 @@ import {
 } from '../../index';
 
 describe('attribute updates', () => {
-  var container;
+  let container;
 
   beforeEach(() => {
     container = document.createElement('div');
@@ -38,7 +38,7 @@ describe('attribute updates', () => {
   describe('for conditional attributes', () => {
     function render(attrs) {
       elementOpenStart('div');
-      for (var attrName in attrs) {
+      for (const attrName in attrs) {
         attr(attrName, attrs[attrName]);
       }
       elementOpenEnd();
@@ -49,7 +49,7 @@ describe('attribute updates', () => {
       patch(container, () => render({
         'data-expanded': 'hello'
       }));
-      var el = container.childNodes[0];
+      const el = container.childNodes[0];
 
       expect(el.getAttribute('data-expanded')).to.equal('hello');
     });
@@ -58,7 +58,7 @@ describe('attribute updates', () => {
       patch(container, () => render({
         'data-expanded': false
       }));
-      var el = container.childNodes[0];
+      const el = container.childNodes[0];
 
       expect(el.getAttribute('data-expanded')).to.equal('false');
     });
@@ -69,7 +69,7 @@ describe('attribute updates', () => {
         tabindex: undefined,
         'data-expanded': undefined
       }));
-      var el = container.childNodes[0];
+      const el = container.childNodes[0];
 
       expect(el.getAttribute('data-expanded')).to.equal(null);
       expect(el.getAttribute('id')).to.equal(null);
@@ -83,7 +83,7 @@ describe('attribute updates', () => {
       patch(container, () => render({
         'data-expanded': 'bar'
       }));
-      var el = container.childNodes[0];
+      const el = container.childNodes[0];
 
       expect(el.getAttribute('data-expanded')).to.equal('bar');
     });
@@ -95,7 +95,7 @@ describe('attribute updates', () => {
       patch(container, () => render({
         'data-bar': 'foo'
       }));
-      var el = container.childNodes[0];
+      const el = container.childNodes[0];
 
       expect(el.getAttribute('data-bar')).to.equal('foo');
       expect(el.getAttribute('data-foo')).to.equal(null);
@@ -107,7 +107,7 @@ describe('attribute updates', () => {
         'data-bar': 'bar'
       }));
       patch(container, () => render({}));
-      var el = container.childNodes[0];
+      const el = container.childNodes[0];
 
       expect(el.getAttribute('data-foo')).to.equal(null);
       expect(el.getAttribute('data-bar')).to.equal(null);
@@ -116,23 +116,23 @@ describe('attribute updates', () => {
 
   describe('for function attributes', () => {
     it('should not be set as attributes', () => {
-      var fn = () =>{};
+      const fn = () =>{};
       patch(container, () => {
         elementVoid('div', null, null,
             'fn', fn);
       });
-      var el = container.childNodes[0];
+      const el = container.childNodes[0];
 
       expect(el.hasAttribute('fn')).to.be.false;
     });
 
     it('should be set on the node', () => {
-      var fn = () =>{};
+      const fn = () =>{};
       patch(container, () => {
         elementVoid('div', null, null,
             'fn', fn);
       });
-      var el = container.childNodes[0];
+      const el = container.childNodes[0];
 
       expect(el.fn).to.equal(fn);
     });
@@ -140,23 +140,23 @@ describe('attribute updates', () => {
 
   describe('for object attributes', () => {
     it('should not be set as attributes', () => {
-      var obj = {};
+      const obj = {};
       patch(container, () => {
         elementVoid('div', null, null,
             'obj', obj);
       });
-      var el = container.childNodes[0];
+      const el = container.childNodes[0];
 
       expect(el.hasAttribute('obj')).to.be.false;
     });
 
     it('should be set on the node', () => {
-      var obj = {};
+      const obj = {};
       patch(container, () => {
         elementVoid('div', null, null,
             'obj', obj);
       });
-      var el = container.childNodes[0];
+      const el = container.childNodes[0];
 
       expect(el.obj).to.equal(obj);
     });
@@ -173,7 +173,7 @@ describe('attribute updates', () => {
         color: 'white',
         backgroundColor: 'red'
       }));
-      var el = container.childNodes[0];
+      const el = container.childNodes[0];
 
       expect(el.style.color).to.equal('white');
       expect(el.style.backgroundColor).to.equal('red');
@@ -186,7 +186,7 @@ describe('attribute updates', () => {
       patch(container, () => render({
         color: 'red'
       }));
-      var el = container.childNodes[0];
+      const el = container.childNodes[0];
 
       expect(el.style.color).to.equal('red');
     });
@@ -198,7 +198,7 @@ describe('attribute updates', () => {
       patch(container, () => render({
         backgroundColor: 'red'
       }));
-      var el = container.childNodes[0];
+      const el = container.childNodes[0];
 
       expect(el.style.color).to.equal('');
       expect(el.style.backgroundColor).to.equal('red');
@@ -206,7 +206,7 @@ describe('attribute updates', () => {
 
     it('should render with the correct style properties for strings', () => {
       patch(container, () => render('color: white; background-color: red;'));
-      var el = container.childNodes[0];
+      const el = container.childNodes[0];
 
       expect(el.style.color).to.equal('white');
       expect(el.style.backgroundColor).to.equal('red');
@@ -219,7 +219,7 @@ describe('attribute updates', () => {
         elementVoid('svg', null, null,
             'class', 'foo');
       });
-      var el = container.childNodes[0];
+      const el = container.childNodes[0];
 
       expect(el.getAttribute('class')).to.equal('foo');
     });

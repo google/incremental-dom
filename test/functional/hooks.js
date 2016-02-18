@@ -25,10 +25,10 @@ import {
 
 
 describe('library hooks', () => {
-  var sandbox = sinon.sandbox.create();
-  var container;
-  var allSpy;
-  var stub;
+  const sandbox = sinon.sandbox.create();
+  let container;
+  let allSpy;
+  let stub;
 
   beforeEach(() => {
     container = document.createElement('div');
@@ -56,7 +56,7 @@ describe('library hooks', () => {
     });
 
     afterEach(() => {
-      for (var mutator in attributes) {
+      for (const mutator in attributes) {
         if (mutator !== symbols.default && mutator !== symbols.placeholder) {
           attributes[mutator] = null;
         }
@@ -69,7 +69,7 @@ describe('library hooks', () => {
         stubOut('staticName');
 
         patch(container, render, 'dynamicValue');
-        var el = container.childNodes[0];
+        const el = container.childNodes[0];
 
         expect(stub).to.have.been.calledOnce;
         expect(stub).to.have.been.calledWith(el, 'staticName', 'staticValue');
@@ -77,7 +77,7 @@ describe('library hooks', () => {
 
       it('should call generic setter', () => {
         patch(container, render, 'dynamicValue');
-        var el = container.childNodes[0];
+        const el = container.childNodes[0];
 
         expect(allSpy).to.have.been.calledWith(el, 'staticName', 'staticValue');
       });
@@ -86,7 +86,7 @@ describe('library hooks', () => {
         stubOut('staticName');
 
         patch(container, render, 'dynamicValue');
-        var el = container.childNodes[0];
+        const el = container.childNodes[0];
 
         expect(stub).to.have.been.calledOnce;
         expect(allSpy).to.have.been.calledOnce;
@@ -101,7 +101,7 @@ describe('library hooks', () => {
 
       it('should be called for dynamic attributes', () => {
         patch(container, render, 'dynamicValue');
-        var el = container.childNodes[0];
+        const el = container.childNodes[0];
 
         expect(stub).to.have.been.calledOnce;
         expect(stub).to.have.been.calledWith(el, 'dynamicName', 'dynamicValue');
@@ -110,7 +110,7 @@ describe('library hooks', () => {
       it('should be called on attribute update', () => {
         patch(container, render, 'dynamicValueOne');
         patch(container, render, 'dynamicValueTwo');
-        var el = container.childNodes[0];
+        const el = container.childNodes[0];
 
         expect(stub).to.have.been.calledTwice;
         expect(stub).to.have.been.calledWith(el, 'dynamicName', 'dynamicValueTwo');
@@ -119,7 +119,7 @@ describe('library hooks', () => {
       it('should only be called when attributes change', () => {
         patch(container, render, 'dynamicValue');
         patch(container, render, 'dynamicValue');
-        var el = container.childNodes[0];
+        const el = container.childNodes[0];
 
         expect(stub).to.have.been.calledOnce;
         expect(stub).to.have.been.calledWith(el, 'dynamicName', 'dynamicValue');
@@ -127,7 +127,7 @@ describe('library hooks', () => {
 
       it('should prioritize specific setter over generic', () => {
         patch(container, render, 'dynamicValue');
-        var el = container.childNodes[0];
+        const el = container.childNodes[0];
 
         expect(stub).to.have.been.calledOnce;
         expect(allSpy).to.have.been.calledOnce;
@@ -138,7 +138,7 @@ describe('library hooks', () => {
     describe('for generic dynamic attributes', () => {
       it('should be called for dynamic attributes', () => {
         patch(container, render, 'dynamicValue');
-        var el = container.childNodes[0];
+        const el = container.childNodes[0];
 
         expect(allSpy).to.have.been.calledWith(el, 'dynamicName', 'dynamicValue');
       });
@@ -146,7 +146,7 @@ describe('library hooks', () => {
       it('should be called on attribute update', () => {
         patch(container, render, 'dynamicValueOne');
         patch(container, render, 'dynamicValueTwo');
-        var el = container.childNodes[0];
+        const el = container.childNodes[0];
 
         expect(allSpy).to.have.been.calledWith(el, 'dynamicName', 'dynamicValueTwo');
       });
@@ -154,7 +154,7 @@ describe('library hooks', () => {
       it('should only be called when attributes change', () => {
         patch(container, render, 'dynamicValue');
         patch(container, render, 'dynamicValue');
-        var el = container.childNodes[0];
+        const el = container.childNodes[0];
 
         expect(allSpy).to.have.been.calledTwice;
         expect(allSpy).to.have.been.calledWith(el, 'staticName', 'staticValue');
@@ -178,7 +178,7 @@ describe('library hooks', () => {
       patch(container, function render() {
         elementVoid('div', 'key', ['staticName', 'staticValue']);
       });
-      var el = container.childNodes[0];
+      const el = container.childNodes[0];
 
       expect(notifications.nodesCreated).to.have.been.calledOnce;
       expect(notifications.nodesCreated).calledWith([el]);
@@ -188,7 +188,7 @@ describe('library hooks', () => {
       patch(container, function render() {
         text('hello');
       });
-      var el = container.childNodes[0];
+      const el = container.childNodes[0];
 
       expect(notifications.nodesCreated).to.have.been.calledOnce;
       expect(notifications.nodesCreated).calledWith([el]);
@@ -196,8 +196,8 @@ describe('library hooks', () => {
   });
 
   describe('for being notified when nodes are deleted from the DOM', () => {
-    var txtEl;
-    var divEl;
+    let txtEl;
+    let divEl;
 
     function render(withTxt) {
       if (withTxt) {
@@ -221,7 +221,7 @@ describe('library hooks', () => {
 
     it('should be called for detached element', () => {
       patch(container, render, false);
-      var el = container.childNodes[0];
+      const el = container.childNodes[0];
       patch(container, empty);
 
       expect(notifications.nodesDeleted).to.have.been.calledOnce;
@@ -230,7 +230,7 @@ describe('library hooks', () => {
 
     it('should be called for detached text', () => {
       patch(container, render, true);
-      var el = container.childNodes[0];
+      const el = container.childNodes[0];
       patch(container, empty);
 
       expect(notifications.nodesDeleted).to.have.been.calledOnce;
@@ -239,7 +239,7 @@ describe('library hooks', () => {
 
     it('should be called for replaced element', () => {
       patch(container, render, false);
-      var el = container.childNodes[0];
+      const el = container.childNodes[0];
       patch(container, render, true);
 
       expect(notifications.nodesDeleted).to.have.been.calledOnce;
@@ -248,7 +248,7 @@ describe('library hooks', () => {
 
     it('should be called for removed text', () => {
       patch(container, render, true);
-      var el = container.childNodes[0];
+      const el = container.childNodes[0];
       patch(container, render, false);
 
       expect(notifications.nodesDeleted).to.have.been.calledOnce;
@@ -258,7 +258,6 @@ describe('library hooks', () => {
   });
 
   describe('for not being notified when Elements are reordered', () => {
-
     function render(first) {
       if (first) {
         elementVoid('div', 'keyA', ['staticName', 'staticValue']);
@@ -279,7 +278,7 @@ describe('library hooks', () => {
 
     it('should not call the nodesDeleted callback', () => {
       patch(container, render, true);
-      var el = container.childNodes[0];
+      const el = container.childNodes[0];
       patch(container, render, false);
 
       expect(notifications.nodesDeleted).never;

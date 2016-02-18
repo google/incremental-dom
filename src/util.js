@@ -18,13 +18,13 @@
 /**
  * A cached reference to the hasOwnProperty function.
  */
-var hasOwnProperty = Object.prototype.hasOwnProperty;
+const hasOwnProperty = Object.prototype.hasOwnProperty;
 
 
 /**
  * A cached reference to the create function.
  */
-var create = Object.create;
+const create = Object.create;
 
 
 /**
@@ -33,7 +33,7 @@ var create = Object.create;
  * @param {string} property The property to check.
  * @return {boolean} Whether map has property.
  */
-var has = function(map, property) {
+const has = function(map, property) {
   return hasOwnProperty.call(map, property);
 };
 
@@ -42,7 +42,7 @@ var has = function(map, property) {
  * Creates an map object without a prototype.
  * @return {!Object}
  */
-var createMap = function() {
+const createMap = function() {
   return create(null);
 };
 

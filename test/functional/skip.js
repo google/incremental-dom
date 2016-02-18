@@ -24,7 +24,7 @@ import {
 } from '../../index';
 
 describe('skip', () => {
-  var container;
+  let container;
 
   beforeEach(() => {
     container = document.createElement('div');

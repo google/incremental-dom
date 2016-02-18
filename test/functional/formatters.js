@@ -21,7 +21,7 @@ import {
 
 
 describe('formatters', () => {
-  var container;
+  let container;
 
   beforeEach(() => {
     container = document.createElement('div');
@@ -45,14 +45,14 @@ describe('formatters', () => {
       patch(container, () => {
         text('hello world!', sliceOne, prefixQuote);
       });
-      var node = container.childNodes[0];
+      const node = container.childNodes[0];
 
       expect(node.textContent).to.equal('\'ello world!');
     });
   });
 
   describe('for updated Text nodes', () => {
-    var stub;
+    let stub;
 
     function render(value) {
       text(value, stub);
@@ -67,7 +67,7 @@ describe('formatters', () => {
     it('should not call the formatter for unchanged values', () => {
       patch(container, () => render('hello'));
       patch(container, () => render('hello'));
-      var node = container.childNodes[0];
+      const node = container.childNodes[0];
 
       expect(node.textContent).to.equal('stubValueOne');
       expect(stub).to.have.been.calledOnce;
@@ -76,7 +76,7 @@ describe('formatters', () => {
     it('should call the formatter when the value changes', () => {
       patch(container, () => render('hello'));
       patch(container, () => render('world'));
-      var node = container.childNodes[0];
+      const node = container.childNodes[0];
 
       expect(node.textContent).to.equal('stubValueTwo');
       expect(stub).to.have.been.calledTwice;
@@ -84,7 +84,7 @@ describe('formatters', () => {
   });
 
   it('should not leak the arguments object', () => {
-    var stub = sinon.stub().returns('value');
+    const stub = sinon.stub().returns('value');
     patch(container, () => text('value', stub));
 
     expect(stub).to.have.been.calledOn(undefined);

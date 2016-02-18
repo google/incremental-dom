@@ -24,7 +24,7 @@ import {
 
 
 describe('placeholders', () => {
-  var container;
+  let container;
 
   beforeEach(() => {
     container = document.createElement('div');
@@ -42,16 +42,16 @@ describe('placeholders', () => {
 
     it('should not add an attribute', () => {
       patch(container, render, { key: 'key' });
-      var el = container.firstChild;
+      const el = container.firstChild;
 
       expect(el.attributes.length).to.equal(0);
     });
 
     it('should not remove children on update', () => {
-      var child = document.createElement('div');
+      const child = document.createElement('div');
 
       patch(container, render, { key: 'key' });
-      var el = container.firstChild;
+      const el = container.firstChild;
       el.appendChild(child);
       patch(container, render, { key: 'key' });
 
@@ -68,7 +68,7 @@ describe('placeholders', () => {
       }
 
       patch(container, render, { key: 'key' });
-      var el = container.firstChild;
+      const el = container.firstChild;
       patch(el, innerRender, true);
       patch(el, innerRender, false);
 
@@ -83,13 +83,13 @@ describe('placeholders', () => {
     }
 
     it('should warn about a missing key', () => {
-      var fn = () => patch(container, render, {});
+      const fn = () => patch(container, render, {});
       expect(fn).to.throw('elementPlaceholder() requires a key.');
     });
 
     it('should render with specified static attributes', () => {
       patch(container, render, { key: 'key' });
-      var el = container.firstChild;
+      const el = container.firstChild;
 
       expect(el.getAttribute('staticName')).to.equal('staticValue');
     });
@@ -99,24 +99,24 @@ describe('placeholders', () => {
         key: 'key',
         val: 'dynamicValue'
       });
-      var el = container.firstChild;
+      const el = container.firstChild;
 
       expect(el.getAttribute('dynamicName')).to.equal('dynamicValue');
     });
 
     it('should reuse the same node', () => {
       patch(container, render, { key: 'key' });
-      var el = container.firstChild;
+      const el = container.firstChild;
       patch(container, render, { key: 'key' });
 
       expect(container.firstChild).to.equal(el);
     });
 
     it('should not remove children on update', () => {
-      var child = document.createElement('div');
+      const child = document.createElement('div');
 
       patch(container, render, { key: 'key' });
-      var el = container.firstChild;
+      const el = container.firstChild;
       el.appendChild(child);
       patch(container, render, { key: 'key' });
 
@@ -133,7 +133,7 @@ describe('placeholders', () => {
       }
 
       patch(container, render, { key: 'key' });
-      var el = container.firstChild;
+      const el = container.firstChild;
       patch(el, innerRender, true);
       patch(el, innerRender, false);
 

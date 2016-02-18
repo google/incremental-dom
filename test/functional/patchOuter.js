@@ -24,7 +24,7 @@ import {
 
 
 describe('patching an element', () => {
-  var container;
+  let container;
 
   beforeEach(() => {
     container = document.createElement('div');
@@ -59,8 +59,8 @@ describe('patching an element', () => {
   });
 
   it('should be re-entrant', function() {
-    var containerOne = document.createElement('div');
-    var containerTwo = document.createElement('div');
+    const containerOne = document.createElement('div');
+    const containerTwo = document.createElement('div');
 
     function renderOne() {
       elementOpen('div');
@@ -94,7 +94,7 @@ describe('patching an element', () => {
   });
 
   it('should patch a detached node', () => {
-    var container = document.createElement('div');
+    const container = document.createElement('div');
     function render() {
       elementOpen('div');
         elementVoid('span');

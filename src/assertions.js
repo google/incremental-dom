@@ -20,7 +20,7 @@
   * elementOpenStart, but before elementOpenEnd).
   * @type {boolean}
   */
-var inAttributes = false;
+let inAttributes = false;
 
 
 /**
@@ -28,14 +28,14 @@ var inAttributes = false;
   * children cleared.
   * @type {boolean}
   */
-var inSkip = false;
+let inSkip = false;
 
 
 /**
  * Makes sure that there is a current patch context.
  * @param {*} context
  */
-var assertInPatch = function(context) {
+const assertInPatch = function(context) {
   if (!context) {
     throw new Error('Cannot call currentElement() unless in patch.');
   }
@@ -48,7 +48,7 @@ var assertInPatch = function(context) {
 * @param {string=} tag The tag name of the Element.
 * @param {?string=} key The key of the Element.
 */
-var assertKeyedTagMatches = function(nodeName, tag, key) {
+const assertKeyedTagMatches = function(nodeName, tag, key) {
   if (nodeName !== tag) {
     throw new Error('Was expecting node with key "' + key + '" to be a ' +
         tag + ', not a ' + nodeName + '.');
@@ -61,13 +61,13 @@ var assertKeyedTagMatches = function(nodeName, tag, key) {
  * @param {?Node} openElement
  * @param {!Node|!DocumentFragment} root
  */
-var assertNoUnclosedTags = function(openElement, root) {
+const assertNoUnclosedTags = function(openElement, root) {
   if (openElement === root) {
     return;
   }
 
-  var currentElement = openElement;
-  var openTags = [];
+  let currentElement = openElement;
+  const openTags = [];
   while (currentElement && currentElement !== root) {
     openTags.push(currentElement.nodeName.toLowerCase());
     currentElement = currentElement.parentNode;
@@ -82,7 +82,7 @@ var assertNoUnclosedTags = function(openElement, root) {
  * Makes sure that the caller is not where attributes are expected.
  * @param {string} functionName
  */
-var assertNotInAttributes = function(functionName) {
+const assertNotInAttributes = function(functionName) {
   if (inAttributes) {
     throw new Error(functionName + '() can not be called between ' +
         'elementOpenStart() and elementOpenEnd().');
@@ -94,7 +94,7 @@ var assertNotInAttributes = function(functionName) {
  * Makes sure that the caller is not inside an element that has declared skip.
  * @param {string} functionName
  */
-var assertNotInSkip = function(functionName) {
+const assertNotInSkip = function(functionName) {
   if (inSkip) {
     throw new Error(functionName + '() may not be called inside an element ' +
         'that has called skip().');
@@ -106,7 +106,7 @@ var assertNotInSkip = function(functionName) {
  * Makes sure that the caller is where attributes are expected.
  * @param {string} functionName
  */
-var assertInAttributes = function(functionName) {
+const assertInAttributes = function(functionName) {
   if (!inAttributes) {
     throw new Error(functionName + '() can only be called after calling ' +
         'elementOpenStart().');
@@ -117,7 +117,7 @@ var assertInAttributes = function(functionName) {
 /**
  * Makes sure the patch closes virtual attributes call
  */
-var assertVirtualAttributesClosed = function() {
+const assertVirtualAttributesClosed = function() {
   if (inAttributes) {
     throw new Error('elementOpenEnd() must be called after calling ' +
         'elementOpenStart().');
@@ -131,7 +131,7 @@ var assertVirtualAttributesClosed = function() {
   * placeholder elements to be re-used as non-placeholders and vice versa.
   * @param {string} key
   */
-var assertPlaceholderKeySpecified = function(key) {
+const assertPlaceholderKeySpecified = function(key) {
   if (!key) {
     throw new Error('elementPlaceholder() requires a key.');
   }
@@ -143,7 +143,7 @@ var assertPlaceholderKeySpecified = function(key) {
   * @param {string} nodeName
   * @param {string} tag
   */
-var assertCloseMatchesOpenTag = function(nodeName, tag) {
+const assertCloseMatchesOpenTag = function(nodeName, tag) {
   if (nodeName !== tag) {
     throw new Error('Received a call to close "' + tag + '" but "' +
         nodeName + '" was open.');
@@ -157,7 +157,7 @@ var assertCloseMatchesOpenTag = function(nodeName, tag) {
  * @param {string} functionName
  * @param {?Node} previousNode
  */
-var assertNoChildrenDeclaredYet = function(functionName, previousNode) {
+const assertNoChildrenDeclaredYet = function(functionName, previousNode) {
   if (previousNode !== null) {
     throw new Error(functionName + '() must come before any child ' +
         'declarations inside the current element.');
@@ -170,7 +170,7 @@ var assertNoChildrenDeclaredYet = function(functionName, previousNode) {
  * @param {?Node} node The node requested to be patched.
  * @param {?Node} currentNode The currentNode after the patch.
  */
-var assertPatchElementNotEmpty = function(node, currentNode) {
+const assertPatchElementNotEmpty = function(node, currentNode) {
   if (node === currentNode) {
     throw new Error('There must be exactly one top level call corresponding ' +
         'to the patched element.');
@@ -183,7 +183,7 @@ var assertPatchElementNotEmpty = function(node, currentNode) {
  * @param {?Node} node The node requested to be patched.
  * @param {?Node} previousNode The previousNode after the patch.
  */
-var assertPatchElementNoExtras = function(node, previousNode) {
+const assertPatchElementNoExtras = function(node, previousNode) {
   if (node !== previousNode) {
     throw new Error('There must be exactly one top level call corresponding ' +
         'to the patched element.');
@@ -196,8 +196,8 @@ var assertPatchElementNoExtras = function(node, previousNode) {
  * @param {boolean} value
  * @return {boolean} the previous value.
  */
-var setInAttributes = function(value) {
-  var previous = inAttributes;
+const setInAttributes = function(value) {
+  const previous = inAttributes;
   inAttributes = value;
   return previous;
 };
@@ -208,8 +208,8 @@ var setInAttributes = function(value) {
  * @param {boolean} value
  * @return {boolean} the previous value.
  */
-var setInSkip = function(value) {
-  var previous = inSkip;
+const setInSkip = function(value) {
+  const previous = inSkip;
   inSkip = value;
   return previous;
 };
