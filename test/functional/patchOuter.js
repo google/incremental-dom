@@ -93,6 +93,19 @@ describe('patching an element', () => {
     expect(container.textContent).to.equal('foobar');
   });
 
+  it('should patch a detached node', () => {
+    var container = document.createElement('div');
+    function render() {
+      elementOpen('div');
+        elementVoid('span');
+      elementClose('div');
+    }
+
+    patchOuter(container, render);
+
+    expect(container.firstChild.tagName).to.equal('SPAN');
+  });
+
   it('should throw an error on an empty patch', () => {
     function render() {}
 
