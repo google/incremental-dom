@@ -18,6 +18,8 @@
 var symbols = {
   default: '__default',
 
+  incrementalDOMData: '__incrementalDOMData',
+
   placeholder: '__placeholder'
 };
 
