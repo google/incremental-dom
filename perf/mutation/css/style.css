@@ -1,0 +1,26 @@
+#list {
+  font-size: .9em;
+}
+
+.item-name {
+  width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.item-change {
+  text-align: right;
+  width: 160px;
+}
+
+.item-value {
+  width: 55px;
+}
+
+.item-change {
+  color: green;
+}
+
+.item-change[data-positive="false"] {
+  color: red;
+}

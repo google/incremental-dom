@@ -44,7 +44,13 @@
   }
  
   function text(value) {
-    var node = document.createTextNode(value);
+    var formatted = value;
+    for (var i = 1; i < arguments.length; i += 1) {
+      var formatter = arguments[i];
+      formatted = formatter(formatted);
+    }
+
+    var node = document.createTextNode(formatted);
     currentParent.appendChild(node);
   }
 

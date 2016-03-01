@@ -68,7 +68,13 @@
   }
  
   function text(value) {
-    buf += escapeHtml(value);
+    var formatted = value;
+    for (var i = 1; i < arguments.length; i += 1) {
+      var formatter = arguments[i];
+      formatted = formatter(formatted);
+    }
+
+    buf += escapeHtml(formatted);
   }
 
   scope.CreationInnerHtml = {
