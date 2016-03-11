@@ -2,6 +2,7 @@
 const reorderList = (function() {
   const elementOpen = IncrementalDOM.elementOpen;
   const elementClose = IncrementalDOM.elementClose;
+  const currentElement = IncrementalDom.currentElement;
 
   const locations = new WeakMap();
   const initializedEls = new WeakSet();
