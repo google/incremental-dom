@@ -87,10 +87,10 @@ const elementOpen = function(tag, key, statics, const_args) {
         value = arguments[i+1];
         
     swapAttrKeys[key] = 1;
-    updateAttribute(node, key, value);
-    delete attrKeys[key];
+    updateAttribute(node, key, value);//If not equal to update in updateAttribute
+    delete attrKeys[key];//Delete existing and new keys from ‘May be removed’
   }
-  for (let key in attrKeys) {//delete
+  for (let key in attrKeys) {//To delete key
     updateAttribute(node, key, undefined);
   }
   data.attrKeys = swapAttrKeys;
