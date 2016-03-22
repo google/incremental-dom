@@ -77,41 +77,31 @@ const elementOpen = function(tag, key, statics, const_args) {
    * individual argument. When attributes have changed, the overhead of this is
    * minimal.
    */
-  const attrsArr = data.attrsArr;
-  const newAttrs = data.newAttrs;
-  let attrsChanged = false;
+  let attrKeys = data.attrKeys;
+  let attrMap = data.attrMap;
   let i = ATTRIBUTES_OFFSET;
-  let j = 0;
+  let swapAttrKeys={};
 
-  for (; i < arguments.length; i += 1, j += 1) {
-    if (attrsArr[j] !== arguments[i]) {
-      attrsChanged = true;
-      break;
+  for (; i < arguments.length; i += 2) {
+    let key = arguments[i],
+        value = arguments[i+1];
+    swapAttrKeys[key] = 1;//下一次可能需要删除的key
+    
+    if (attrMap[key] !== value) {//新增或修改
+      if(key in attrMap){//修改的
+         delete attrKeys[key];
+      }
+      updateAttribute(node, key, value);
+    }else{//相同的
+      delete attrKeys[key];
     }
   }
 
-  for (; i < arguments.length; i += 1, j += 1) {
-    attrsArr[j] = arguments[i];
+  for (const attrKey in attrKeys) {
+    updateAttribute(node, attrKey, undefined);
   }
-
-  if (j < attrsArr.length) {
-    attrsChanged = true;
-    attrsArr.length = j;
-  }
-
-  /*
-   * Actually perform the attribute update.
-   */
-  if (attrsChanged) {
-    for (i = ATTRIBUTES_OFFSET; i < arguments.length; i += 2) {
-      newAttrs[arguments[i]] = arguments[i + 1];
-    }
-
-    for (const attr in newAttrs) {
-      updateAttribute(node, attr, newAttrs[attr]);
-      newAttrs[attr] = undefined;
-    }
-  }
+    
+  data.attrKeys = swapAttrKeys;
 
   return node;
 };

@@ -238,7 +238,7 @@ const clearUnvisitedDOM = function() {
     return;
   }
 
-  if (data.attrs[symbols.placeholder] && node !== root) {
+  if (data.attrMap[symbols.placeholder] && node !== root) {
     if (process.env.NODE_ENV !== 'production') {
       console.warn('symbols.placeholder will be removed in Incremental DOM' +
           ' 0.5 use skip() instead');
