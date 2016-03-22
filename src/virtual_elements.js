@@ -103,14 +103,16 @@ const elementOpen = function(tag, key, statics, const_args) {
    * Actually perform the attribute update.
    */
   if (attrsChanged) {
+    let swapNewAttrs = {};
     for (i = ATTRIBUTES_OFFSET; i < arguments.length; i += 2) {
       newAttrs[arguments[i]] = arguments[i + 1];
+      swapNewAttrs[arguments[i]] = undefined;//next need delete
     }
 
     for (const attr in newAttrs) {
       updateAttribute(node, attr, newAttrs[attr]);
-      newAttrs[attr] = undefined;
     }
+    data.newAttrs = swapNewAttrs;
   }
 
   return node;
