@@ -92,7 +92,6 @@ const elementOpen = function(tag, key, statics, const_args) {
          delete attrKeys[key];
       }
       updateAttribute(node, key, value);
-      attrMap[key] = value;
     }else{//相同的
       delete attrKeys[key];
     }
@@ -100,7 +99,6 @@ const elementOpen = function(tag, key, statics, const_args) {
 
   for (const attrKey in attrKeys) {
     updateAttribute(node, attrKey, undefined);
-    delete attrMap[attrKey]
   }
     
   data.attrKeys = swapAttrKeys;
