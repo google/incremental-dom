@@ -28,7 +28,7 @@ function NodeData(nodeName, key) {
    * The attributes and their values.
    * @const {!Object<string, *>}
    */
-  this.attrs = createMap();
+  this.attrKeys = createMap();
 
   /**
    * An array of attribute name/value pairs, used for quickly diffing the
@@ -36,7 +36,7 @@ function NodeData(nodeName, key) {
    * updated.
    * @const {Array<*>}
    */
-  this.attrsArr = [];
+  this.attrMap = createMap();
 
   /**
    * The incoming attributes for this Node, before they are updated.
