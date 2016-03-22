@@ -29,7 +29,8 @@ function NodeData(nodeName, key) {
    * @const {!Object<string, *>}
    */
   this.attrs = createMap();
-
+  
+  //The next update may remove the key
   this.attrKeys = createMap();
 
   /**
