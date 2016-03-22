@@ -101,16 +101,16 @@ const applyAttributeTyped = function(el, name, value) {
  */
 const updateAttribute = function(el, name, value) {
   const data = getData(el);
-  const attrs = data.attrs;
+  const attrMap = data.attrMap;
 
-  if (attrs[name] === value) {
+  if (attrMap[name] === value) {
     return;
   }
 
   const mutator = attributes[name] || attributes[symbols.default];
   mutator(el, name, value);
 
-  attrs[name] = value;
+  attrMap[name] = value;
 };
 
 
