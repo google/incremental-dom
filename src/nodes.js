@@ -93,16 +93,16 @@ const createText = function(doc) {
  */
 const createKeyMap = function(el) {
   const map = createMap();
-  const children = el.children;
-  const count = children.length;
+  let child = el.firstElementChild;
 
-  for (let i = 0; i < count; i += 1) {
-    const child = children[i];
+  while (child) {
     const key = getData(child).key;
 
     if (key) {
       map[key] = child;
     }
+
+    child = child.nextElementSibling;
   }
 
   return map;
