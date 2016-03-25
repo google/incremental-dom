@@ -35,6 +35,7 @@ import {
   setInAttributes,
   setInSkip
 } from './assertions';
+import { last } from './util';
 import { notifications } from './notifications';
 
 
@@ -46,6 +47,12 @@ let currentNode;
 
 /** @type {?Node} */
 let currentParent;
+
+/** @type {!Array<!Node>} */
+let currentParents = [];
+
+/** @type {!Array<!Node>} */
+let prevNodes = [];
 
 /** @type {?Element|?DocumentFragment} */
 let root;
@@ -116,6 +123,7 @@ const patchInner = function(node, fn, data) {
 
     enterNode();
     fn(data);
+    clearUnvisitedDOM();
     exitNode();
 
     if (process.env.NODE_ENV !== 'production') {
@@ -139,9 +147,11 @@ const patchOuter = function(node, fn, data) {
   runPatch(node, function(data) {
     currentNode = /** @type {!Element} */({ nextSibling: node });
     currentParent = node.parentNode;
+    currentParents.push(currentParent);
 
     fn(data);
 
+    currentParents.pop();
     if (process.env.NODE_ENV !== 'production') {
       assertPatchElementNotEmpty(node, currentNode.nextSibling);
       assertPatchElementNoExtras(node, currentNode);
@@ -176,10 +186,11 @@ const matches = function(nodeName, key) {
  * @param {?string=} key The key used to identify this element.
  * @param {?Array<*>=} statics For an Element, this should be an array of
  *     name-value pairs.
+ * @return {!Node}
  */
 const alignWithDOM = function(nodeName, key, statics) {
   if (currentNode && matches(nodeName, key)) {
-    return;
+    return currentNode;
   }
 
   let node;
@@ -207,18 +218,29 @@ const alignWithDOM = function(nodeName, key, statics) {
     context.markCreated(node);
   }
 
-  // If the node has a key, remove it from the DOM to prevent a large number
-  // of re-orders in the case that it moved far or was completely removed.
-  // Since we hold on to a reference through the keyMap, we can always add it
-  // back.
-  if (currentNode && getData(currentNode).key) {
-    currentParent.replaceChild(node, currentNode);
-    getData(currentParent).keyMapValid = false;
-  } else {
-    currentParent.insertBefore(node, currentNode);
-  }
+  return node;
+};
 
-  currentNode = node;
+
+/**
+ * Places node in the same spot as prevNode. prevNode may be pushed backwards,
+ * or replaced entirely.
+ * @param {!Node} node
+ * @param {!Node} prevNode
+ */
+const placeChild = function(node, prevNode) {
+  if (node !== prevNode) {
+    // If the node has a key, remove it from the DOM to prevent a large
+    // number of re-orders in the case that it moved far or was completely
+    // removed.  Since we hold on to a reference through the keyMap, we can
+    // always add it back.
+    if (prevNode && getData(prevNode).key) {
+        currentParent.replaceChild(node, prevNode);
+        getData(currentParent).keyMapValid = false;
+    } else {
+        currentParent.insertBefore(node, prevNode);
+    }
+  }
 };
 
 
@@ -227,18 +249,17 @@ const alignWithDOM = function(nodeName, key, statics) {
  * functions were never called for them.
  */
 const clearUnvisitedDOM = function() {
-  const node = currentParent;
-  const data = getData(node);
+  const data = getData(currentParent);
   const keyMap = data.keyMap;
   const keyMapValid = data.keyMapValid;
-  let child = node.lastChild;
+  let child = currentParent.lastChild;
   let key;
 
   if (child === currentNode && keyMapValid) {
     return;
   }
 
-  if (data.attrs[symbols.placeholder] && node !== root) {
+  if (data.attrs[symbols.placeholder] && currentParent !== root) {
     if (process.env.NODE_ENV !== 'production') {
       console.warn('symbols.placeholder will be removed in Incremental DOM' +
           ' 0.5 use skip() instead');
@@ -247,21 +268,21 @@ const clearUnvisitedDOM = function() {
   }
 
   while (child !== currentNode) {
-    node.removeChild(child);
+    currentParent.removeChild(child);
     context.markDeleted(/** @type {!Node}*/(child));
 
     key = getData(child).key;
     if (key) {
       delete keyMap[key];
     }
-    child = node.lastChild;
+    child = currentParent.lastChild;
   }
 
   // Clean the keyMap, removing any unusued keys.
   if (!keyMapValid) {
     for (key in keyMap) {
       child = keyMap[key];
-      if (child.parentNode !== node) {
+      if (child.parentNode !== currentParent) {
         context.markDeleted(child);
         delete keyMap[key];
       }
@@ -277,6 +298,7 @@ const clearUnvisitedDOM = function() {
  */
 const enterNode = function() {
   currentParent = currentNode;
+  currentParents.push(currentParent);
   currentNode = null;
 };
 
@@ -297,10 +319,8 @@ const nextNode = function() {
  * Changes to the parent of the current node, removing any unvisited children.
  */
 const exitNode = function() {
-  clearUnvisitedDOM();
-
-  currentNode = currentParent;
-  currentParent = currentParent.parentNode;
+  currentNode = currentParents.pop();
+  currentParent = last(currentParents);
 };
 
 
@@ -319,9 +339,10 @@ const exitNode = function() {
  */
 const elementOpen = function(tag, key, statics) {
   nextNode();
-  alignWithDOM(tag, key, statics);
+  prevNodes.push(currentNode);
+  const node = currentNode = alignWithDOM(tag, key, statics);
   enterNode();
-  return /** @type {!Element} */(currentParent);
+  return /** @type {!Element} */(node);
 };
 
 
@@ -336,7 +357,12 @@ const elementClose = function() {
     setInSkip(false);
   }
 
+  const prevNode = prevNodes.pop();
+  clearUnvisitedDOM();
   exitNode();
+
+  placeChild(currentNode, prevNode);
+
   return /** @type {!Element} */(currentNode);
 };
 
@@ -349,7 +375,11 @@ const elementClose = function() {
  */
 const text = function() {
   nextNode();
-  alignWithDOM('#text', null, null);
+  const node = alignWithDOM('#text', null, null);
+
+  placeChild(node, currentNode);
+  currentNode = node;
+
   return /** @type {!Text} */(currentNode);
 };
 
