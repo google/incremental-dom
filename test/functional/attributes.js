@@ -16,6 +16,7 @@
 
 import {
   patch,
+  elementOpen,
   elementOpenStart,
   elementOpenEnd,
   attr,
@@ -223,6 +224,17 @@ describe('attribute updates', () => {
 
       expect(el.getAttribute('class')).to.equal('foo');
     });
+    
+    it('should apply the correct namespace for namespaced SVG attributes', function(){
+      patch(container, () => {
+        elementOpen('svg');
+        elementVoid('image', null, null,
+            'xlink:href', '#foo');
+        elementClose('svg');
+      });
+      const el = container.childNodes[0].childNodes[0];
+      expect(el.getAttributeNS('http://www.w3.org/1999/xlink', 'href')).to.equal('#foo');
+    })
   });
 });
 

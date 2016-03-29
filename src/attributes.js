@@ -34,7 +34,18 @@ const applyAttr = function(el, name, value) {
   if (value == null) {
     el.removeAttribute(name);
   } else {
-    el.setAttribute(name, value);
+    const svgns = 'http://www.w3.org/2000/svg';
+
+    if (el.namespaceURI === svgns) {
+      var ns = null;
+      if (name === 'xlink:href') {
+        ns = 'http://www.w3.org/1999/xlink';
+        name = 'href';
+      }
+      el.setAttributeNS(ns, name, value);
+    } else {
+      el.setAttribute(name, value);
+    }
   }
 };
 
