@@ -9,6 +9,10 @@ Incremental DOM is a library for building up DOM trees and updating them in-plac
 Incremental DOM is primarily intended as a compilation target for templating languages. It could be used to implement a higher level API for human consumption. The API was carefully designed to minimize heap allocations and where unavoidable ensure that as many objects as possible can be de-allocated by incremental GC. One unique feature of its API is that it separates opening and closing of tags so that it is suitable as a compilation target for templating languages that allow (temporarily) unbalanced HTML in templates (e.g. tags that are opened and closed in separate templates) and arbitrary logic for creating HTML attributes.
 *Think of it as ASM.dom.*
 
+## Supported Browsers
+
+Incremental DOM supports IE9 and above.
+
 ## Usage
 
 HTML is expressed in Incremental DOM using the `elementOpen`, `elementClose`, `elementVoid` and `text` methods. Consider the following example:
