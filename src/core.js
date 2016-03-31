@@ -18,7 +18,10 @@ import {
   createElement,
   createText,
   getChild,
-  registerChild
+  registerChild,
+  useKey,
+  clearUsedKeys,
+  trackUsedKeys
 } from './nodes';
 import { getData } from './node_data';
 import { Context } from './context';
@@ -187,8 +190,11 @@ const alignWithDOM = function(nodeName, key, statics) {
   // Check to see if the node has moved within the parent.
   if (key) {
     node = getChild(currentParent, key);
-    if (node && process.env.NODE_ENV !== 'production') {
-      assertKeyedTagMatches(getData(node).nodeName, nodeName, key);
+    if (process.env.NODE_ENV !== 'production') {
+      useKey(currentParent, key);
+      if (node) {
+        assertKeyedTagMatches(getData(node).nodeName, nodeName, key);
+      }
     }
   }
 
@@ -276,6 +282,9 @@ const clearUnvisitedDOM = function() {
  * Changes to the first child of the current node.
  */
 const enterNode = function() {
+  if (process.env.NODE_ENV !== 'production') {
+    trackUsedKeys(currentNode);
+  }
   currentParent = currentNode;
   currentNode = null;
 };
@@ -301,6 +310,9 @@ const exitNode = function() {
 
   currentNode = currentParent;
   currentParent = currentParent.parentNode;
+  if (process.env.NODE_ENV !== 'production') {
+    clearUsedKeys(currentNode);
+  }
 };
 
 

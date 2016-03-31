@@ -215,6 +215,19 @@ const setInSkip = function(value) {
 };
 
 
+/**
+ * Makes sure that a key is only used once for this parent node, per patch.
+ * @param {string} key
+ * @param {!Object<string, !Node>} usedKeys
+ */
+const assertUniqueKey = function(key, usedKeys) {
+  if (key in usedKeys) {
+    throw new Error('Duplicate key "' + key + '" specified. Keys must be ' +
+        'unique within an Element.');
+  }
+};
+
+
 /** */
 export {
   assertInPatch,
@@ -229,6 +242,7 @@ export {
   assertNotInSkip,
   assertPatchElementNotEmpty,
   assertPatchElementNoExtras,
+  assertUniqueKey,
   setInAttributes,
   setInSkip
 };

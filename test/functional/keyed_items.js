@@ -16,6 +16,8 @@
 
 import {
   patch,
+  elementOpen,
+  elementClose,
   elementVoid
 } from '../../index';
 
@@ -156,6 +158,47 @@ describe('rendering with keys', () => {
     expect(() => {
       patch(container, render, 'span');
     }).to.throw('Was expecting node with key "key" to be a span, not a div.');
+  });
+
+  it('should throw when a duplicate key is specified', () => {
+    expect(() => {
+      patch(container, render, [
+        { key: 'key' },
+        { key: 'key' }
+      ]);
+    }).to.throw('Duplicate key "key" specified. Keys must be unique within an Element.');
+  });
+
+  it('should not throw when a duplicate key is used in a separate patch', () => {
+    function render(before) {
+      const el = elementOpen('div');
+        if (before) {
+          elementVoid('div', 'key');
+        }
+        patch(el, () => {
+          elementVoid('div', 'key')
+        });
+        if (!before) {
+          elementVoid('div', 'key');
+        }
+      elementClose('div');
+    }
+    patch(container, render, true);
+    patch(container, render, false);
+  });
+
+  it('should throw when a duplicate key is after a reentrant patch', () => {
+    function render() {
+      const el = elementOpen('div');
+        elementVoid('div', 'key');
+        patch(el, () => {
+          elementVoid('div', 'key')
+        });
+        elementVoid('div', 'key');
+      elementClose('div');
+    }
+    expect(() => { patch(container, render);
+    }).to.throw('Duplicate key "key" specified. Keys must be unique within an Element.')
   });
 });
 
