@@ -3,7 +3,10 @@
   function Samples(count) {
     this.startTime = 0;
 
-    this.data = new Array(count).fill(0);
+    this.data = new Array(count);
+    for (var i = 0; i < count; i++) {
+      this.data[i] = 0;
+    }
     this.data.length = 0;
   };
 

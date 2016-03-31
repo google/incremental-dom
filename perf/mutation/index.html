@@ -77,22 +77,22 @@
 
         function render() {
           eo('div');
-            IMPLS.forEach((impl) => {
+            IMPLS.forEach(function(impl) {
               eo('button', null, null,
                   'disabled', running || undefined,
                   'aria-selected', currentImpl === impl,
-                  'onclick', () => setImpl(impl));
+                  'onclick', function() { setImpl(impl) });
                 tx(impl.name);
               ec('button');
             });
           ec('div');
 
           eo('div');
-            TESTS.forEach((test) => {
+            TESTS.forEach(function(test) {
               eo('button', null, null,
                   'disabled', running || undefined,
                   'aria-selected', currentTest === test,
-                  'onclick', () => setTest(test));
+                  'onclick', function() { setTest(test) });
                 tx(test.name);
               ec('button');
             });
@@ -108,14 +108,14 @@
         }
 
         function delay(time) {
-          return new Promise((resolve) => setTimeout(resolve, time));
+          return new Promise(function(resolve) { setTimeout(resolve, time) });
         }
       
         function run() {
           delay(100)
-            .then(() => currentTest.fn.run(currentRenderer))
-            .then((samples) => Stats.avg(Stats.filterOutliers(samples)))
-            .then((avg) => {
+            .then(function() { return currentTest.fn.run(currentRenderer) })
+            .then(function(samples) { return Stats.avg(Stats.filterOutliers(samples)) })
+            .then(function(avg) {
               results = `time per iteration: ${avg.toFixed(3)}ms`;
               running = false;
               update();

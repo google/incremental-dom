@@ -1,7 +1,7 @@
 (function(scope) {
   function filterOutliers(arr) {
     var values = [].concat(arr);
-    values.sort((a, b) => a - b);
+    values.sort(function(a, b) { return a - b });
 
     var q1 = values[Math.floor((values.length / 4))];
     var q3 = values[Math.ceil((values.length * (3 / 4)))];
@@ -10,11 +10,11 @@
     var min = q1 - iqr*1.5;
     var max = q3 + iqr*1.5;
 
-    return arr.filter((a) => (min < a) && (a < max));
+    return arr.filter(function(a) { return (min < a) && (a < max) });
   }
 
   function sum(arr) {
-    return arr.reduce((sum, val) => sum + val);
+    return arr.reduce(function(sum, val) { return sum + val }, 0);
   }
 
   function avg(arr) {
