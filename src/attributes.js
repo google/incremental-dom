@@ -51,7 +51,7 @@ const applyAttr = function(el, name, value) {
   if (value == null) {
     el.removeAttribute(name);
   } else {
-    let attrNS = attributeNSMap[name];
+    const attrNS = attributeNSMap[name];
     if (attrNS) {
       el.setAttributeNS(attrNS, name, value);
     } else {
