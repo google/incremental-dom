@@ -249,7 +249,7 @@ describe('attribute updates', () => {
         elementClose('svg');
       });
       const el = container.childNodes[0].childNodes[0];
-      expect(el.getAttributeNS('http://www.w3.org/1999/xlink', 'href')).to.equal(null);
+      expect(el.hasAttributeNS('http://www.w3.org/1999/xlink', 'href')).to.be.false;
     });
   });
 });
