@@ -21,11 +21,30 @@ import {
   has
 } from './util';
 
+/**
+ * Namespace reference map for attributes on special non-HTML elements
+ * Associates each attribute name with the required namespace
+ */
+const xlinkNS = 'http://www.w3.org/1999/xlink';
+const xmlNS = 'http://www.w3.org/XML/1998/namespace';
+const attributeNSMap = {
+  'xlink:actuate': xlinkNS,
+  'xlink:arcrole': xlinkNS,
+  'xlink:href': xlinkNS,
+  'xlink:role': xlinkNS,
+  'xlink:show': xlinkNS,
+  'xlink:title': xlinkNS,
+  'xlink:type': xlinkNS,
+  'xml:base': xmlNS,
+  'xml:lang': xmlNS,
+  'xml:space': xmlNS
+};
 
 /**
  * Applies an attribute or property to a given Element. If the value is null
  * or undefined, it is removed from the Element. Otherwise, the value is set
- * as an attribute.
+ * as an attribute. If the element is not in the HTML namespace (eg SVG),
+ * the attribute is set in the appropriate namespace.
  * @param {!Element} el
  * @param {string} name The attribute's name.
  * @param {?(boolean|number|string)=} value The attribute's value.
@@ -34,15 +53,9 @@ const applyAttr = function(el, name, value) {
   if (value == null) {
     el.removeAttribute(name);
   } else {
-    const svgns = 'http://www.w3.org/2000/svg';
-
-    if (el.namespaceURI === svgns) {
-      var ns = null;
-      if (name === 'xlink:href') {
-        ns = 'http://www.w3.org/1999/xlink';
-        name = 'href';
-      }
-      el.setAttributeNS(ns, name, value);
+    if (el.namespaceURI !== 'http://www.w3.org/1999/xhtml') {
+      const attrNS = attributeNSMap[name] || null;
+      el.setAttributeNS(attrNS, name, value);
     } else {
       el.setAttribute(name, value);
     }
