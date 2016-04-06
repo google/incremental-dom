@@ -21,6 +21,23 @@ import {
   has
 } from './util';
 
+/**
+ * Reference map for SVG namespaced attributes
+ */
+const xlinkNS = 'http://www.w3.org/1999/xlink';
+const xmlNS = 'http://www.w3.org/XML/1998/namespace';
+const attributeNSMap = {
+  'xlink:actuate': xlinkNS,
+  'xlink:arcrole': xlinkNS,
+  'xlink:href': xlinkNS,
+  'xlink:role': xlinkNS,
+  'xlink:show': xlinkNS,
+  'xlink:title': xlinkNS,
+  'xlink:type': xlinkNS,
+  'xml:base': xmlNS,
+  'xml:lang': xmlNS,
+  'xml:space': xmlNS
+};
 
 /**
  * Applies an attribute or property to a given Element. If the value is null
@@ -34,7 +51,12 @@ const applyAttr = function(el, name, value) {
   if (value == null) {
     el.removeAttribute(name);
   } else {
-    el.setAttribute(name, value);
+    const attrNS = attributeNSMap[name];
+    if (attrNS) {
+      el.setAttributeNS(attrNS, name, value);
+    } else {
+      el.setAttribute(name, value);
+    }
   }
 };
 
