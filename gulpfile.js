@@ -19,6 +19,7 @@ var del = require('del');
 var source = require('vinyl-source-stream');
 var buffer = require('vinyl-buffer');
 var rollup = require('rollup-stream');
+var closureCompiler = require('google-closure-compiler').gulp();
 var babel = require('rollup-plugin-babel');
 var uglify = require('rollup-plugin-uglify');
 var gjslint = require('gulp-gjslint');
@@ -158,9 +159,23 @@ function jsDist() {
   // change process.env.NODE_ENV. The CommonJS target could run in parallel
   // with the js and jsMin targets, but currently is not.
   return clean()
+    .then(jsClosureChecks)
     .then(jsCommonJS)
     .then(js)
     .then(jsMin);
+}
+
+function jsClosureChecks() {
+  return gulp.src([
+    'index.js',
+    './src/**/*.js'
+  ])
+  .pipe(closureCompiler({
+    checks_only: 'true',
+    externs: 'node_externs.js',
+    language_in: 'ECMASCRIPT6_STRICT',
+    warning_level: 'VERBOSE'
+  }));
 }
 
 gulp.task('clean', clean);
@@ -173,6 +188,7 @@ gulp.task('js-watch', jsWatch);
 gulp.task('js-min', jsMin);
 gulp.task('js-dist', jsDist);
 gulp.task('js-closure', jsClosure);
+gulp.task('js-closure-checks', jsClosureChecks);
 gulp.task('build', ['lint', 'unit'], js);
 gulp.task('dist', ['lint', 'unit-phantom'], jsDist);
 
