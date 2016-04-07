@@ -92,18 +92,26 @@ const createText = function(doc) {
  *     Element.
  */
 const createKeyMap = function(el) {
+  const data = getData(el);
   const map = createMap();
-  let child = el.firstElementChild;
 
-  while (child) {
-    const key = getData(child).key;
+  // keyMap will be set to undefined if the node was imported from the existing
+  // DOM. In this case, it may have keyed children that we must find.
+  if (data.keyMap === undefined) {
+    let child = el.firstElementChild;
 
-    if (key) {
-      map[key] = child;
+    while (child) {
+      const key = getData(child).key;
+
+      if (key) {
+        map[key] = child;
+      }
+
+      child = child.nextElementSibling;
     }
-
-    child = child.nextElementSibling;
   }
+
+  data.keyMap = map;
 
   return map;
 };
@@ -116,13 +124,7 @@ const createKeyMap = function(el) {
  * @return {!Object<string, !Node>} A mapping of keys to child Elements
  */
 const getKeyMap = function(el) {
-  const data = getData(el);
-
-  if (!data.keyMap) {
-    data.keyMap = createKeyMap(el);
-  }
-
-  return data.keyMap;
+  return getData(el).keyMap || createKeyMap(el);
 };
 
 
@@ -133,7 +135,7 @@ const getKeyMap = function(el) {
  * @return {?Node} The child corresponding to the key.
  */
 const getChild = function(parent, key) {
-  return key ? getKeyMap(parent)[key] : null;
+  return getKeyMap(parent)[key];
 };
 
 

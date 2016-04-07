@@ -109,6 +109,7 @@ const getData = function(node) {
     }
 
     data = initData(node, nodeName, key);
+    data.keyMap = undefined;
   }
 
   return data;
