@@ -24,7 +24,7 @@ import {
 
 /**
  * @param {string} name
- * @return {?string} The namespace to use for the attribute.
+ * @return {string|undefined} The namespace to use for the attribute.
  */
 const getNamespace = function(name) {
   if (name.lastIndexOf('xml:', 0) === 0) {
