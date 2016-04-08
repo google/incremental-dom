@@ -1,5 +1,14 @@
 # Change Log
 
+## 0.4.0
+
+- Deprecated `symbols.placeholder`, will be removed in 0.5.0
+- Fixed performance issue with `text` call
+- Added `patchOuter` function, which patches an Element rather than an
+  Element's children
+- Added `patchInner` as an alias of `patch`
+- Added support for `xlink:href` and other `xlink:` attributes
+
 ## 0.3.0
 
 - Added `skip` function
