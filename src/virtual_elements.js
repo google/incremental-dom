@@ -211,9 +211,8 @@ const elementClose = function(tag) {
  * @return {!Element} The corresponding Element.
  */
 const elementVoid = function(tag, key, statics, const_args) {
-  const node = elementOpen.apply(null, arguments);
-  elementClose.apply(null, arguments);
-  return node;
+  elementOpen.apply(null, arguments);
+  return elementClose(tag);
 };
 
 
@@ -243,7 +242,7 @@ const elementPlaceholder = function(tag, key, statics, const_args) {
 
   elementOpen.apply(null, arguments);
   skip();
-  return elementClose.apply(null, arguments);
+  return elementClose(tag);
 };
 
 
