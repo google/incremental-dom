@@ -157,5 +157,22 @@ describe('rendering with keys', () => {
       patch(container, render, 'span');
     }).to.throw('Was expecting node with key "key" to be a span, not a div.');
   });
+
+  it('should preserve nodes already in the DOM', () => {
+    function render() {
+      elementVoid('div', 'key');
+      elementVoid('div');
+    }
+
+    container.innerHTML = `
+      <div></div>
+      <div key="key"><div>
+    `;
+
+    const keyedDiv = container.lastChild;
+    patch(container, render);
+
+    expect(container.firstChild).to.equal(keyedDiv);
+  });
 });
 
