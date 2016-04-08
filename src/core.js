@@ -42,60 +42,61 @@ import { notifications } from './notifications';
 let context = null;
 
 /** @type {?Node} */
-let currentNode;
+let currentNode = null;
 
 /** @type {?Node} */
-let currentParent;
+let currentParent = null;
 
 /** @type {?Element|?DocumentFragment} */
-let root;
+let root = null;
 
 /** @type {?Document} */
-let doc;
+let doc = null;
 
 
 /**
- * Sets up and restores a patch context, running the patch function with the
- * provided data.
- * @param {!Element|!DocumentFragment} node The Element or Document
- *     where the patch should start.
- * @param {!function(T)} fn The patching function.
- * @param {T=} data An argument passed to fn.
+ * Returns a patcher function that sets up and restores a patch context,
+ * running the run function with the provided data.
+ * @param {function((!Element|!DocumentFragment),!function(T),T=)} run
+ * @return {function((!Element|!DocumentFragment),!function(T),T=)}
  * @template T
  */
-const runPatch = function(node, fn, data) {
-  const prevContext = context;
-  const prevRoot = root;
-  const prevDoc = doc;
-  const prevCurrentNode = currentNode;
-  const prevCurrentParent = currentParent;
-  let previousInAttributes = false;
-  let previousInSkip = false;
+const patchFactory = function(run) {
+  return function(node, fn, data) {
+    const prevContext = context;
+    const prevRoot = root;
+    const prevDoc = doc;
+    const prevCurrentNode = currentNode;
+    const prevCurrentParent = currentParent;
+    let previousInAttributes = false;
+    let previousInSkip = false;
 
-  context = new Context();
-  root = node;
-  doc = node.ownerDocument;
+    context = new Context();
+    root = node;
+    doc = node.ownerDocument;
+    currentParent = node.parentNode;
 
-  if (process.env.NODE_ENV !== 'production') {
-    previousInAttributes = setInAttributes(false);
-    previousInSkip = setInSkip(false);
-  }
+    if (process.env.NODE_ENV !== 'production') {
+      previousInAttributes = setInAttributes(false);
+      previousInSkip = setInSkip(false);
+    }
 
-  fn(data);
+    run(node, fn, data);
 
-  if (process.env.NODE_ENV !== 'production') {
-    assertVirtualAttributesClosed();
-    setInAttributes(previousInAttributes);
-    setInSkip(previousInSkip);
-  }
+    if (process.env.NODE_ENV !== 'production') {
+      assertVirtualAttributesClosed();
+      setInAttributes(previousInAttributes);
+      setInSkip(previousInSkip);
+    }
 
-  context.notifyChanges();
+    context.notifyChanges();
 
-  context = prevContext;
-  root = prevRoot;
-  doc = prevDoc;
-  currentNode = prevCurrentNode;
-  currentParent = prevCurrentParent;
+    context = prevContext;
+    root = prevRoot;
+    doc = prevDoc;
+    currentNode = prevCurrentNode;
+    currentParent = prevCurrentParent;
+  };
 };
 
 
@@ -109,20 +110,17 @@ const runPatch = function(node, fn, data) {
  * @param {T=} data An argument passed to fn to represent DOM state.
  * @template T
  */
-const patchInner = function(node, fn, data) {
-  runPatch(node, function(data) {
-    currentNode = node;
-    currentParent = node.parentNode;
+const patchInner = patchFactory(function(node, fn, data) {
+  currentNode = node;
 
-    enterNode();
-    fn(data);
-    exitNode();
+  enterNode();
+  fn(data);
+  exitNode();
 
-    if (process.env.NODE_ENV !== 'production') {
-      assertNoUnclosedTags(currentNode, node);
-    }
-  }, data);
-};
+  if (process.env.NODE_ENV !== 'production') {
+    assertNoUnclosedTags(currentNode, node);
+  }
+});
 
 
 /**
@@ -135,19 +133,16 @@ const patchInner = function(node, fn, data) {
  * @param {T=} data An argument passed to fn to represent DOM state.
  * @template T
  */
-const patchOuter = function(node, fn, data) {
-  runPatch(node, function(data) {
-    currentNode = /** @type {!Element} */({ nextSibling: node });
-    currentParent = node.parentNode;
+const patchOuter = patchFactory(function(node, fn, data) {
+  currentNode = /** @type {!Element} */({ nextSibling: node });
 
-    fn(data);
+  fn(data);
 
-    if (process.env.NODE_ENV !== 'production') {
-      assertPatchElementNotEmpty(node, currentNode.nextSibling);
-      assertPatchElementNoExtras(node, currentNode);
-    }
-  }, data);
-};
+  if (process.env.NODE_ENV !== 'production') {
+    assertPatchElementNotEmpty(node, currentNode.nextSibling);
+    assertPatchElementNoExtras(node, currentNode);
+  }
+});
 
 
 /**
