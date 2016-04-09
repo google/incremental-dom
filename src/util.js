@@ -47,9 +47,21 @@ const createMap = function() {
 };
 
 
+/**
+ * Returns the last item of an array.
+ * @param {Array<T>} array
+ * @return {T|undefined}
+ * @template T
+ */
+const last = function(array) {
+  return array.length > 0 ? array[array.length - 1] : undefined;
+};
+
+
 /** */
 export {
   createMap,
-  has
+  has,
+  last
 };
 
