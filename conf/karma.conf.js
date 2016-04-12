@@ -43,6 +43,8 @@ module.exports = function(config) {
         ]
       },
       bundle: {
+        intro: '(function() {',
+        outro: '})();',
         sourceMap: 'inline'
       }
     },
