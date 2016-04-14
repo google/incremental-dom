@@ -16,10 +16,10 @@
 
 /** @externs */
 
-/** @type {!Object} */
+/** @type {?} */
 var process;
 
-/** @type {*} */
+/** @type {?} */
 process.env;
 
 /** @type {string} */
