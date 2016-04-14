@@ -62,7 +62,16 @@ let doc = null;
  * @template T
  */
 const patchFactory = function(run) {
-  return function(node, fn, data) {
+  /**
+   * TODO(moz): These annotations won't be necessary once we switch to Closure
+   * Compiler's new type inference. Remove these once the switch is done.
+   *
+   * @param {(!Element|!DocumentFragment)} node
+   * @param {!function(T)} fn
+   * @param {T=} data
+   * @template T
+   */
+  const f = function(node, fn, data) {
     const prevContext = context;
     const prevRoot = root;
     const prevDoc = doc;
@@ -97,6 +106,7 @@ const patchFactory = function(run) {
     currentNode = prevCurrentNode;
     currentParent = prevCurrentParent;
   };
+  return f;
 };
 
 
