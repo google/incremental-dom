@@ -167,24 +167,26 @@ const assertNoChildrenDeclaredYet = function(functionName, previousNode) {
 
 /**
  * Checks that a call to patchOuter actually patched the element.
- * @param {?Node} node The node requested to be patched.
- * @param {?Node} currentNode The currentNode after the patch.
+ * @param {?Node} startNode The value for the currentNode when the patch
+ *     started.
+ * @param {?Node} currentNode The currentNode when the patch finished.
+ * @param {?Node} expectedNextNode The Node that is expected to follow the
+ *    currentNode after the patch;
+ * @param {?Node} expectedPrevNode The Node that is expected to preceed the
+ *    currentNode after the patch.
  */
-const assertPatchElementNotEmpty = function(node, currentNode) {
-  if (node === currentNode) {
-    throw new Error('There must be exactly one top level call corresponding ' +
-        'to the patched element.');
-  }
-};
+const assertPatchElementNoExtras = function(
+    startNode,
+    currentNode,
+    expectedNextNode,
+    expectedPrevNode) {
+  const wasUpdated = currentNode.nextSibling === expectedNextNode &&
+                     currentNode.previousSibling === expectedPrevNode;
+  const wasChanged = currentNode.nextSibling === startNode.nextSibling &&
+                     currentNode.previousSibling === expectedPrevNode;
+  const wasRemoved = currentNode === startNode;
 
-
-/**
- * Checks that a call to patchOuter actually patched the element.
- * @param {?Node} node The node requested to be patched.
- * @param {?Node} previousNode The previousNode after the patch.
- */
-const assertPatchElementNoExtras = function(node, previousNode) {
-  if (node !== previousNode) {
+  if (!wasUpdated && !wasChanged && !wasRemoved) {
     throw new Error('There must be exactly one top level call corresponding ' +
         'to the patched element.');
   }
@@ -227,7 +229,6 @@ export {
   assertVirtualAttributesClosed,
   assertNoChildrenDeclaredYet,
   assertNotInSkip,
-  assertPatchElementNotEmpty,
   assertPatchElementNoExtras,
   setInAttributes,
   setInSkip
