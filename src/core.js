@@ -57,8 +57,8 @@ let doc = null;
 /**
  * Returns a patcher function that sets up and restores a patch context,
  * running the run function with the provided data.
- * @param {function((!Element|!DocumentFragment),!function(T),T=)} run
- * @return {function((!Element|!DocumentFragment),!function(T),T=)}
+ * @param {function((!Element|!DocumentFragment),!function(T),T=): ?Node} run
+ * @return {function((!Element|!DocumentFragment),!function(T),T=): ?Node}
  * @template T
  */
 const patchFactory = function(run) {
@@ -69,6 +69,7 @@ const patchFactory = function(run) {
    * @param {(!Element|!DocumentFragment)} node
    * @param {!function(T)} fn
    * @param {T=} data
+   * @return {?Node} node
    * @template T
    */
   const f = function(node, fn, data) {
@@ -90,7 +91,7 @@ const patchFactory = function(run) {
       previousInSkip = setInSkip(false);
     }
 
-    run(node, fn, data);
+    const retVal = run(node, fn, data);
 
     if (process.env.NODE_ENV !== 'production') {
       assertVirtualAttributesClosed();
@@ -105,6 +106,8 @@ const patchFactory = function(run) {
     doc = prevDoc;
     currentNode = prevCurrentNode;
     currentParent = prevCurrentParent;
+
+    return retVal;
   };
   return f;
 };
@@ -118,6 +121,7 @@ const patchFactory = function(run) {
  * @param {!function(T)} fn A function containing elementOpen/elementClose/etc.
  *     calls that describe the DOM.
  * @param {T=} data An argument passed to fn to represent DOM state.
+ * @return {!Node} The patched node.
  * @template T
  */
 const patchInner = patchFactory(function(node, fn, data) {
@@ -130,6 +134,8 @@ const patchInner = patchFactory(function(node, fn, data) {
   if (process.env.NODE_ENV !== 'production') {
     assertNoUnclosedTags(currentNode, node);
   }
+
+  return node;
 });
 
 
@@ -141,17 +147,33 @@ const patchInner = patchFactory(function(node, fn, data) {
  *     calls that describe the DOM. This should have at most one top level
  *     element call.
  * @param {T=} data An argument passed to fn to represent DOM state.
+ * @return {?Node} The node if it was updated, its replacedment or null if it
+ *     was removed.
  * @template T
  */
 const patchOuter = patchFactory(function(node, fn, data) {
-  currentNode = /** @type {!Element} */({ nextSibling: node });
+  let startNode = /** @type {!Element} */({ nextSibling: node });
+  let expectedNextNode = null;
+  let expectedPrevNode = null;
 
+  if (process.env.NODE_ENV !== 'production') {
+    expectedNextNode = node.nextSibling;
+    expectedPrevNode = node.previousSibling;
+  }
+
+  currentNode = startNode;
   fn(data);
 
   if (process.env.NODE_ENV !== 'production') {
-    assertPatchElementNotEmpty(node, currentNode.nextSibling);
-    assertPatchElementNoExtras(node, currentNode);
+    assertPatchElementNoExtras(startNode, currentNode, expectedNextNode,
+        expectedPrevNode);
   }
+
+  if (node !== currentNode) {
+    removeChild(currentParent, node, getData(currentParent).keyMap);
+  }
+
+  return (startNode === currentNode) ? null : currentNode;
 });
 
 
@@ -228,6 +250,21 @@ const alignWithDOM = function(nodeName, key, statics) {
 
 
 /**
+ * @param {?Node} node
+ * @param {?Node} child
+ * @param {?Object<string, !Element>} keyMap
+ */
+const removeChild = function(node, child, keyMap) {
+  node.removeChild(child);
+  context.markDeleted(/** @type {!Node}*/(child));
+
+  const key = getData(child).key;
+  if (key) {
+    delete keyMap[key];
+  }
+};
+
+/**
  * Clears out any unvisited Nodes, as the corresponding virtual element
  * functions were never called for them.
  */
@@ -252,13 +289,7 @@ const clearUnvisitedDOM = function() {
   }
 
   while (child !== currentNode) {
-    node.removeChild(child);
-    context.markDeleted(/** @type {!Node}*/(child));
-
-    key = getData(child).key;
-    if (key) {
-      delete keyMap[key];
-    }
+    removeChild(node, child, keyMap);
     child = node.lastChild;
   }
 

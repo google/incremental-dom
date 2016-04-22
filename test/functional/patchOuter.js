@@ -46,6 +46,16 @@ describe('patching an element', () => {
     expect(container.getAttribute('tabindex')).to.equal('0');
   });
 
+  it('should return the DOM node', () => {
+    function render() {
+      elementVoid('div');
+    }
+
+    const result = patchOuter(container, render);
+
+    expect(result).to.equal(container);
+  });
+
   it('should update children', () => {
     function render() {
       elementOpen('div');
@@ -106,29 +116,76 @@ describe('patching an element', () => {
     expect(container.firstChild.tagName).to.equal('SPAN');
   });
 
-  it('should throw an error on an empty patch', () => {
-    function render() {}
+  describe('with an empty patch', () => {
+    let div;
+    let result;
 
-    expect(() => patchOuter(container, render)).to.throw('There must be ' +
-        'exactly one top level call corresponding to the patched element.');
+    beforeEach(() => {
+      div = container.appendChild(document.createElement('div'));
+
+      result = patchOuter(div, () => {});
+    });
+
+    it('should remove the DOM node on an empty patch', () => {
+      expect(container.firstChild).to.be.null;
+    });
+
+    it('should remove the DOM node on an empty patch', () => {
+      expect(result).to.be.null;
+    });
   });
 
-  it('should throw an error when patching the wrong tag', () => {
+  describe('with a different tag', () => {
+    let div;
+    let span;
+    let result;
+
     function render() {
       elementVoid('span');
     }
 
-    expect(() => patchOuter(container, render)).to.throw('There must be ' +
-        'exactly one top level call corresponding to the patched element.');
+    beforeEach(() => {
+      div = container.appendChild(document.createElement('div'));
+
+      result = patchOuter(div, render);
+      span = container.querySelector('span');
+    });
+
+
+    it('should replace the DOM node', () => {
+      expect(container.children).to.have.length(1);
+      expect(container.firstChild).to.equal(span);
+    });
+
+    it('should return the new DOM node', () => {
+      expect(result).to.equal(span);
+    });
+  });
+
+  it('should not hang on to removed elements with keys', () => {
+    function render(present) {
+      elementVoid('div', 'key');
+    }
+
+    const divOne = container.appendChild(document.createElement('div'));
+    patchOuter(divOne, render);
+    const el = container.firstChild;
+    patchOuter(el, () => {});
+    const divTwo = container.appendChild(document.createElement('div'));
+    patchOuter(divTwo, render);
+
+    expect(container.children).to.have.length(1);
+    expect(container.firstChild).to.not.equal(el);
   });
 
   it('should throw an error when patching too many elements', () => {
+    const div = container.appendChild(document.createElement('div'));
     function render() {
       elementVoid('div');
       elementVoid('div');
     }
 
-    expect(() => patchOuter(container, render)).to.throw('There must be ' +
+    expect(() => patchOuter(div, render)).to.throw('There must be ' +
         'exactly one top level call corresponding to the patched element.');
   });
 });
