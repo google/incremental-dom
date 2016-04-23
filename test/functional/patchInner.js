@@ -156,6 +156,14 @@ describe('patching an element\'s children', () => {
       });
     }).to.throw('One or more tags were not closed:\ndiv');
   });
+
+  it('should throw when elementClose called too many times',() => {
+    expect(() => {
+      patch(container, () => {
+        elementClose('div');
+      });
+    }).to.throw('Received too many calls to elementClose().');
+  });
 });
 
 describe('patching a documentFragment', function() {

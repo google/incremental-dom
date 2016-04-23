@@ -58,19 +58,18 @@ const assertKeyedTagMatches = function(nodeName, tag, key) {
 
 /**
  * Makes sure that a patch closes every node that it opened.
- * @param {?Node} openElement
- * @param {!Node|!DocumentFragment} root
+ * @param {!Array<Array<string>>} openedElementsStack
  */
-const assertNoUnclosedTags = function(openElement, root) {
-  if (openElement === root) {
+const assertNoUnclosedTags = function(openedElementsStack) {
+  if (openedElementsStack.length <= 1) {
     return;
   }
 
-  let currentElement = openElement;
   const openTags = [];
-  while (currentElement && currentElement !== root) {
-    openTags.push(currentElement.nodeName.toLowerCase());
-    currentElement = currentElement.parentNode;
+  openedElementsStack.pop();
+  while (openedElementsStack.length > 0) {
+    const openedElements = openedElementsStack.pop();
+    openTags.push(openedElements.pop());
   }
 
   throw new Error('One or more tags were not closed:\n' +
@@ -167,26 +166,10 @@ const assertNoChildrenDeclaredYet = function(functionName, previousNode) {
 
 /**
  * Checks that a call to patchOuter actually patched the element.
- * @param {?Node} startNode The value for the currentNode when the patch
- *     started.
- * @param {?Node} currentNode The currentNode when the patch finished.
- * @param {?Node} expectedNextNode The Node that is expected to follow the
- *    currentNode after the patch;
- * @param {?Node} expectedPrevNode The Node that is expected to preceed the
- *    currentNode after the patch.
+ * @param {!Array<string>} openedElements
  */
-const assertPatchElementNoExtras = function(
-    startNode,
-    currentNode,
-    expectedNextNode,
-    expectedPrevNode) {
-  const wasUpdated = currentNode.nextSibling === expectedNextNode &&
-                     currentNode.previousSibling === expectedPrevNode;
-  const wasChanged = currentNode.nextSibling === startNode.nextSibling &&
-                     currentNode.previousSibling === expectedPrevNode;
-  const wasRemoved = currentNode === startNode;
-
-  if (!wasUpdated && !wasChanged && !wasRemoved) {
+const assertPatchElementNoExtras = function(openedElements) {
+  if (openedElements.length > 1) {
     throw new Error('There must be exactly one top level call corresponding ' +
         'to the patched element.');
   }
@@ -217,6 +200,18 @@ const setInSkip = function(value) {
 };
 
 
+/**
+ * Makes sure you are not closing the root element, i.e., not escaping the
+ * patch container element.
+ * @param {!Array<Array<string>>} openedElementsStack
+ */
+var assertClosingAnOpenedElement = function(openedElementsStack) {
+  if (openedElementsStack.length < 1) {
+    throw new Error('Received too many calls to elementClose().');
+  }
+};
+
+
 /** */
 export {
   assertInPatch,
@@ -230,6 +225,7 @@ export {
   assertNoChildrenDeclaredYet,
   assertNotInSkip,
   assertPatchElementNoExtras,
+  assertClosingAnOpenedElement,
   setInAttributes,
   setInSkip
 };

@@ -32,6 +32,7 @@ import {
   assertNoChildrenDeclaredYet,
   assertPatchElementNotEmpty,
   assertPatchElementNoExtras,
+  assertClosingAnOpenedElement,
   setInAttributes,
   setInSkip
 } from './assertions';
@@ -52,6 +53,12 @@ let root = null;
 
 /** @type {?Document} */
 let doc = null;
+
+/** @type {?Array<string>} */
+let openedElements = null;
+
+/** @type {?Array<Array<string>>} */
+let openedElementsStack = null;
 
 
 /**
@@ -80,6 +87,7 @@ const patchFactory = function(run) {
     const prevCurrentParent = currentParent;
     let previousInAttributes = false;
     let previousInSkip = false;
+    let prevOpenedElementsStack = null;
 
     context = new Context();
     root = node;
@@ -89,6 +97,9 @@ const patchFactory = function(run) {
     if (process.env.NODE_ENV !== 'production') {
       previousInAttributes = setInAttributes(false);
       previousInSkip = setInSkip(false);
+      prevOpenedElementsStack = openedElementsStack;
+      openedElements = [];
+      openedElementsStack = [openedElements];
     }
 
     const retVal = run(node, fn, data);
@@ -97,6 +108,7 @@ const patchFactory = function(run) {
       assertVirtualAttributesClosed();
       setInAttributes(previousInAttributes);
       setInSkip(previousInSkip);
+      openedElementsStack = prevOpenedElementsStack;
     }
 
     context.notifyChanges();
@@ -132,7 +144,7 @@ const patchInner = patchFactory(function(node, fn, data) {
   exitNode();
 
   if (process.env.NODE_ENV !== 'production') {
-    assertNoUnclosedTags(currentNode, node);
+    assertNoUnclosedTags(openedElementsStack);
   }
 
   return node;
@@ -153,20 +165,13 @@ const patchInner = patchFactory(function(node, fn, data) {
  */
 const patchOuter = patchFactory(function(node, fn, data) {
   let startNode = /** @type {!Element} */({ nextSibling: node });
-  let expectedNextNode = null;
-  let expectedPrevNode = null;
-
-  if (process.env.NODE_ENV !== 'production') {
-    expectedNextNode = node.nextSibling;
-    expectedPrevNode = node.previousSibling;
-  }
 
   currentNode = startNode;
   fn(data);
 
   if (process.env.NODE_ENV !== 'production') {
-    assertPatchElementNoExtras(startNode, currentNode, expectedNextNode,
-        expectedPrevNode);
+    assertNoUnclosedTags(openedElementsStack);
+    assertPatchElementNoExtras(openedElements);
   }
 
   if (node !== currentNode) {
@@ -354,6 +359,11 @@ const exitNode = function() {
  * @return {!Element} The corresponding Element.
  */
 const elementOpen = function(tag, key, statics) {
+  if (process.env.NODE_ENV !== 'production') {
+    openedElements.push(tag);
+    openedElements = [];
+    openedElementsStack.push(openedElements);
+  }
   nextNode();
   alignWithDOM(tag, key, statics);
   enterNode();
@@ -370,6 +380,9 @@ const elementOpen = function(tag, key, statics) {
 const elementClose = function() {
   if (process.env.NODE_ENV !== 'production') {
     setInSkip(false);
+    openedElementsStack.pop();
+    openedElements = openedElementsStack[openedElementsStack.length - 1];
+    assertClosingAnOpenedElement(openedElementsStack);
   }
 
   exitNode();

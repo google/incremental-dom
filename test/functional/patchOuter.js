@@ -188,4 +188,20 @@ describe('patching an element', () => {
     expect(() => patchOuter(div, render)).to.throw('There must be ' +
         'exactly one top level call corresponding to the patched element.');
   });
+
+  it('should throw when an element is unclosed', function() {
+    expect(() => {
+      patchOuter(container, () => {
+        elementOpen('div');
+      });
+    }).to.throw('One or more tags were not closed:\ndiv');
+  });
+
+  it('should throw when elementClose called too many times',() => {
+    expect(() => {
+      patchOuter(container, () => {
+        elementClose('div');
+      });
+    }).to.throw('Received too many calls to elementClose().');
+  });
 });
