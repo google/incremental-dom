@@ -25,7 +25,7 @@ var uglify = require('rollup-plugin-uglify');
 var gjslint = require('gulp-gjslint');
 var sourcemaps = require('gulp-sourcemaps');
 var replace = require('gulp-replace');
-var karma = require('karma').server;
+var karma = require('karma');
 var path = require('path');
 var buffer = require('vinyl-buffer');
 var fs = require('fs');
@@ -45,28 +45,28 @@ function clean() {
 
 function unit(done) {
   env.NODE_ENV = 'test';
-  karma.start({
+  new karma.Server({
     configFile: karmaConfig,
     singleRun: true,
     browsers: ['Chrome', 'Firefox']
-  }, done);
+  }, done).start();
 }
 
 function unitPhantom(done) {
   env.NODE_ENV = 'test';
-  karma.start({
+  new karma.Server({
     configFile: karmaConfig,
     singleRun: true,
     browsers: ['PhantomJS']
-  }, done);
+  }, done).start();
 }
 
 function unitWatch(done) {
   env.NODE_ENV = 'test';
-  karma.start({
+  new karma.Server({
     configFile: karmaConfig,
     browsers: ['Chrome']
-  }, done);
+  }, done).start();
 }
 
 function lint() {
