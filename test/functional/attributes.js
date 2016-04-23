@@ -21,7 +21,8 @@ import {
   elementOpenEnd,
   attr,
   elementClose,
-  elementVoid
+  elementVoid,
+  importNode
 } from '../../index';
 
 describe('attribute updates', () => {
@@ -225,7 +226,7 @@ describe('attribute updates', () => {
       expect(el.getAttribute('class')).to.equal('foo');
     });
     
-    it('should apply the correct namespace for namespaced SVG attributes', function(){
+    it('should apply the correct namespace for namespaced SVG attributes', () => {
       patch(container, () => {
         elementOpen('svg');
         elementVoid('image', null, null,
@@ -236,7 +237,7 @@ describe('attribute updates', () => {
       expect(el.getAttributeNS('http://www.w3.org/1999/xlink', 'href')).to.equal('#foo');
     });
 
-    it('should remove namespaced SVG attributes', function(){
+    it('should remove namespaced SVG attributes', () => {
       patch(container, () => {
         elementOpen('svg');
         elementVoid('image', null, null,
@@ -250,6 +251,65 @@ describe('attribute updates', () => {
       });
       const el = container.childNodes[0].childNodes[0];
       expect(el.hasAttributeNS('http://www.w3.org/1999/xlink', 'href')).to.be.false;
+    });
+  });
+
+  describe('for non-Incremental DOM attributes', () => {
+    function render() {
+      elementVoid('div');
+    }
+
+    it('should be preserved when changed between patches', () => {
+      patch(container, render);
+      const el = container.firstChild;
+      el.setAttribute('data-foo', 'bar');
+      patch(container, render);
+      
+      expect(el.getAttribute('data-foo')).to.equal('bar');
+    });
+
+    it('should be preserved when importing DOM', () => {
+      container.innerHTML = '<div></div>';
+
+      importNode(container);
+      const el = container.firstChild;
+      el.setAttribute('data-foo', 'bar');
+      patch(container, render);
+
+      expect(el.getAttribute('data-foo')).to.equal('bar');
+    });
+  });
+
+  describe('with an existing document tree', () => {
+    let div;
+
+    function render() {
+      elementVoid('div', null, null,
+          'tabindex', '0');
+    }
+
+    beforeEach(function() {
+      div = document.createElement('div');
+      div.setAttribute('tabindex', '-1');
+      container.appendChild(div);
+    });
+
+    it('should update attributes', () => {
+      patch(container, render);
+      const child = container.childNodes[0];
+
+      expect(child.getAttribute('tabindex')).to.equal('0');
+    });
+
+    it('should remove attributes', () => {
+      function render() {
+        elementVoid('div');
+      }
+
+      patch(container, render);
+      const child = container.childNodes[0];
+
+      expect(child.hasAttribute('tabindex')).to.false;
     });
   });
 });

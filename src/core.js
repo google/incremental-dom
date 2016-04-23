@@ -17,8 +17,6 @@
 import {
   createElement,
   createText,
-  getChild,
-  registerChild
 } from './nodes';
 import { getData } from './node_data';
 import { Context } from './context';
@@ -209,11 +207,13 @@ const alignWithDOM = function(nodeName, key, statics) {
     return;
   }
 
+  const parentData = getData(currentParent);
+  const keyMap = parentData.keyMap;
   let node;
 
   // Check to see if the node has moved within the parent.
   if (key) {
-    node = getChild(currentParent, key);
+    node = keyMap[key];
     if (node && process.env.NODE_ENV !== 'production') {
       assertKeyedTagMatches(getData(node).nodeName, nodeName, key);
     }
@@ -228,7 +228,7 @@ const alignWithDOM = function(nodeName, key, statics) {
     }
 
     if (key) {
-      registerChild(currentParent, key, node);
+      keyMap[key] = node;
     }
 
     context.markCreated(node);
@@ -240,7 +240,7 @@ const alignWithDOM = function(nodeName, key, statics) {
   // back.
   if (currentNode && getData(currentNode).key) {
     currentParent.replaceChild(node, currentNode);
-    getData(currentParent).keyMapValid = false;
+    parentData.keyMapValid = false;
   } else {
     currentParent.insertBefore(node, currentNode);
   }
