@@ -16,8 +16,16 @@
 
 import {
   patch,
-  elementVoid
+  elementOpen,
+  elementClose,
+  elementVoid,
+  currentElement,
+  skip
 } from '../../index';
+import {
+  attachShadow,
+  BROWSER_SUPPORTS_SHADOW_DOM
+} from '../util/dom';
 
 
 describe('rendering with keys', () => {
@@ -168,11 +176,141 @@ describe('rendering with keys', () => {
       <div></div>
       <div key="key"><div>
     `;
-
     const keyedDiv = container.lastChild;
+
     patch(container, render);
 
     expect(container.firstChild).to.equal(keyedDiv);
+  });
+
+  describe('an item with focus', () => {
+    function render(items) {
+      for (let i=0; i<items.length; i++) {
+        const key = items[i].key;
+        elementOpen('div', key);
+          elementVoid('div', null, null,
+              'id', key,
+              'tabindex', -1);
+        elementClose('div');
+      }
+    }
+
+    it('should retain focus when prepending a new item', () => {
+      const items = [
+        { key: 'one' }
+      ];
+
+      patch(container, () => render(items));
+      const focusNode = container.querySelector('#one');
+      focusNode.focus();
+
+      items.unshift({ key: 'zero' });
+      patch(container, () => render(items));
+
+      expect(document.activeElement).to.equal(focusNode);
+    });
+
+    it('should retain focus when moving up in DOM order', () => {
+      const items = [
+        { key: 'one' },
+        { key: 'two' },
+        { key: 'three' }
+      ];
+
+      patch(container, () => render(items));
+      const focusNode = container.querySelector('#three');
+      focusNode.focus();
+
+      items.unshift(items.pop());
+      patch(container, () => render(items));
+
+      expect(document.activeElement).to.equal(focusNode);
+    });
+
+    it('should retain focus when moving down in DOM order', () => {
+      const items = [
+        { key: 'one' },
+        { key: 'two' },
+        { key: 'three' }
+      ];
+
+      patch(container, () => render(items));
+      const focusNode = container.querySelector('#one');
+      focusNode.focus();
+
+      items.push(items.shift());
+      patch(container, () => render(items));
+
+      expect(document.activeElement).to.equal(focusNode);
+    });
+
+    it('should retain focus when doing a nested patch', () => {
+      function renderInner(id) {
+        elementVoid('div', null, null,
+            'id', id,
+            'tabindex', -1);
+      }
+
+      function render() {
+        for (let i=0; i<items.length; i++) {
+          const key = items[i].key;
+          elementOpen('div', key, null);
+            patch(currentElement(), () => renderInner(key));
+            skip();
+          elementClose('div');
+        }
+      }
+
+      const items = [
+        { key: 'one' },
+        { key: 'two' },
+        { key: 'three' }
+      ];
+
+      patch(container, () => render(items));
+      const focusNode = container.querySelector('#three');
+      focusNode.focus();
+
+      items.unshift(items.pop());
+      patch(container, () => render(items));
+
+      expect(document.activeElement).to.equal(focusNode);
+    });
+
+    if (BROWSER_SUPPORTS_SHADOW_DOM) {
+      it('should retain focus when patching a ShadowRoot', () => {
+        const items = [
+          { key: 'one' }
+        ];
+
+        const shadowRoot = attachShadow(container);
+        patch(shadowRoot, () => render(items));
+        const focusNode = shadowRoot.querySelector('#one');
+        focusNode.focus();
+
+        items.unshift({ key: 'zero' });
+        patch(shadowRoot, () => render(items));
+
+        expect(shadowRoot.activeElement).to.equal(focusNode);
+        expect(document.activeElement).to.equal(container);
+      });
+
+      it('should retain focus when patching outside a ShadowRoot', () => {
+        const items = [
+          { key: 'one' }
+        ];
+
+        const shadowRoot = attachShadow(container);
+        const shadowEl = shadowRoot.appendChild(document.createElement('div'));
+        shadowEl.tabIndex = -1;
+        shadowEl.focus();
+
+        items.unshift({ key: 'zero' });
+        patch(container, () => render(items));
+
+        expect(shadowRoot.activeElement).to.equal(shadowEl);
+      });
+    }
   });
 });
 
