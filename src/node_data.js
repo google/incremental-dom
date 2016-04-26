@@ -53,9 +53,9 @@ function NodeData(nodeName, key) {
 
   /**
    * Keeps track of children within this node by their key.
-   * {?Object<string, !Element>}
+   * {!Object<string, !Element>}
    */
-  this.keyMap = null;
+  this.keyMap = createMap();
 
   /**
    * Whether or not the keyMap is currently valid.
@@ -94,21 +94,56 @@ const initData = function(node, nodeName, key) {
 /**
  * Retrieves the NodeData object for a Node, creating it if necessary.
  *
- * @param {Node} node The node to retrieve the data for.
+ * @param {?Node} node The Node to retrieve the data for.
  * @return {!NodeData} The NodeData for this Node.
  */
 const getData = function(node) {
   let data = node['__incrementalDOMData'];
 
   if (!data) {
-    const nodeName = node.nodeName.toLowerCase();
-    let key = null;
+    data = importNode(node);
+  }
 
-    if (node instanceof Element) {
-      key = node.getAttribute('key');
+  return data;
+};
+
+
+/**
+ * Imports node and its subtree, initializing caches.
+ *
+ * @param {?Node} node The Node to import.
+ * @return {!NodeData} The NodeData for this Node.
+ */
+const importNode = function(node) {
+  const nodeName = node.nodeName.toLowerCase();
+  const isElement = node instanceof Element;
+  const key = isElement ? node.getAttribute('key') : null;
+  const data = initData(node, nodeName, key);
+
+  if (key) {
+    getData(node.parentNode).keyMap[key] = node;
+  }
+
+  if (isElement) {
+    const attributes = node.attributes;
+    const attrs = data.attrs;
+    const newAttrs = data.newAttrs;
+    const attrsArr = data.attrsArr;
+
+    for (let i = 0; i < attributes.length; i += 1) {
+      const attr = attributes[i];
+      const name = attr.name;
+      const value = attr.value;
+
+      attrs[name] = value;
+      newAttrs[name] = undefined;
+      attrsArr.push(name);
+      attrsArr.push(value);
     }
+  }
 
-    data = initData(node, nodeName, key);
+  for (let child = node.firstChild; child; child = child.nextSibling) {
+    importNode(child);
   }
 
   return data;
@@ -118,5 +153,6 @@ const getData = function(node) {
 /** */
 export {
   getData,
-  initData
+  initData,
+  importNode
 };

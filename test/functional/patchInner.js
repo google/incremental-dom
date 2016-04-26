@@ -59,13 +59,6 @@ describe('patching an element\'s children', () => {
       expect(child).to.equal(div);
     });
 
-    it('should update attributes', () => {
-      patchInner(container, render);
-      const child = container.childNodes[0];
-
-      expect(child.getAttribute('tabindex')).to.equal('0');
-    });
-
     describe('should return DOM node', () => {
       let node;
 

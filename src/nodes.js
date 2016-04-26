@@ -85,75 +85,8 @@ const createText = function(doc) {
 };
 
 
-/**
- * Creates a mapping that can be used to look up children using a key.
- * @param {?Node} el
- * @return {!Object<string, !Element>} A mapping of keys to the children of the
- *     Element.
- */
-const createKeyMap = function(el) {
-  const map = createMap();
-  let child = el.firstElementChild;
-
-  while (child) {
-    const key = getData(child).key;
-
-    if (key) {
-      map[key] = child;
-    }
-
-    child = child.nextElementSibling;
-  }
-
-  return map;
-};
-
-
-/**
- * Retrieves the mapping of key to child node for a given Element, creating it
- * if necessary.
- * @param {?Node} el
- * @return {!Object<string, !Node>} A mapping of keys to child Elements
- */
-const getKeyMap = function(el) {
-  const data = getData(el);
-
-  if (!data.keyMap) {
-    data.keyMap = createKeyMap(el);
-  }
-
-  return data.keyMap;
-};
-
-
-/**
- * Retrieves a child from the parent with the given key.
- * @param {?Node} parent
- * @param {?string=} key
- * @return {?Node} The child corresponding to the key.
- */
-const getChild = function(parent, key) {
-  return key ? getKeyMap(parent)[key] : null;
-};
-
-
-/**
- * Registers an element as being a child. The parent will keep track of the
- * child using the key. The child can be retrieved using the same key using
- * getKeyMap. The provided key should be unique within the parent Element.
- * @param {?Node} parent The parent of child.
- * @param {string} key A key to identify the child with.
- * @param {!Node} child The child to register.
- */
-const registerChild = function(parent, key, child) {
-  getKeyMap(parent)[key] = child;
-};
-
-
 /** */
 export {
   createElement,
-  createText,
-  getChild,
-  registerChild
+  createText
 };
