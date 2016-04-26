@@ -28,7 +28,6 @@ import {
   assertNotInAttributes,
   assertNotInSkip,
   assertInAttributes,
-  assertPlaceholderKeySpecified,
   assertCloseMatchesOpenTag,
   setInAttributes
 } from './assertions';
@@ -217,36 +216,6 @@ const elementVoid = function(tag, key, statics, const_args) {
 
 
 /**
- * Declares a virtual Element at the current location in the document that is a
- * placeholder element. Children of this Element can be manually managed and
- * will not be cleared by the library.
- *
- * A key must be specified to make sure that this node is correctly preserved
- * across all conditionals.
- *
- * @param {string} tag The element's tag.
- * @param {string} key The key used to identify this element.
- * @param {?Array<*>=} statics An array of attribute name/value pairs of the
- *     static attributes for the Element. These will only be set once when the
- *     Element is created.
- * @param {...*} const_args Attribute name/value pairs of the dynamic attributes
- *     for the Element.
- * @return {!Element} The corresponding Element.
- */
-const elementPlaceholder = function(tag, key, statics, const_args) {
-  if (process.env.NODE_ENV !== 'production') {
-    assertPlaceholderKeySpecified(key);
-    console.warn('elementPlaceholder will be removed in Incremental DOM 0.5' +
-        ' use skip() instead');
-  }
-
-  elementOpen.apply(null, arguments);
-  skip();
-  return elementClose(tag);
-};
-
-
-/**
  * Declares a virtual Text at this point in the document.
  *
  * @param {string|number|boolean} value The value of the Text.
@@ -291,7 +260,6 @@ export {
   elementOpen,
   elementVoid,
   elementClose,
-  elementPlaceholder,
   text,
   attr
 };

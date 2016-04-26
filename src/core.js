@@ -47,9 +47,6 @@ let currentNode = null;
 /** @type {?Node} */
 let currentParent = null;
 
-/** @type {?Element|?DocumentFragment} */
-let root = null;
-
 /** @type {?Document} */
 let doc = null;
 
@@ -74,7 +71,6 @@ const patchFactory = function(run) {
    */
   const f = function(node, fn, data) {
     const prevContext = context;
-    const prevRoot = root;
     const prevDoc = doc;
     const prevCurrentNode = currentNode;
     const prevCurrentParent = currentParent;
@@ -82,7 +78,6 @@ const patchFactory = function(run) {
     let previousInSkip = false;
 
     context = new Context();
-    root = node;
     doc = node.ownerDocument;
     currentParent = node.parentNode;
 
@@ -102,7 +97,6 @@ const patchFactory = function(run) {
     context.notifyChanges();
 
     context = prevContext;
-    root = prevRoot;
     doc = prevDoc;
     currentNode = prevCurrentNode;
     currentParent = prevCurrentParent;
@@ -277,14 +271,6 @@ const clearUnvisitedDOM = function() {
   let key;
 
   if (child === currentNode && keyMapValid) {
-    return;
-  }
-
-  if (data.attrs[symbols.placeholder] && node !== root) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.warn('symbols.placeholder will be removed in Incremental DOM' +
-          ' 0.5 use skip() instead');
-    }
     return;
   }
 

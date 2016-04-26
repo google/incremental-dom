@@ -144,8 +144,6 @@ const attributes = createMap();
 // have a specific mutator.
 attributes[symbols.default] = applyAttributeTyped;
 
-attributes[symbols.placeholder] = function() {};
-
 attributes['style'] = applyStyle;
 
 

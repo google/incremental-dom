@@ -126,19 +126,6 @@ const assertVirtualAttributesClosed = function() {
 
 
 /**
-  * Makes sure that placeholders have a key specified. Otherwise, conditional
-  * placeholders and conditional elements next to placeholders will cause
-  * placeholder elements to be re-used as non-placeholders and vice versa.
-  * @param {string} key
-  */
-const assertPlaceholderKeySpecified = function(key) {
-  if (!key) {
-    throw new Error('elementPlaceholder() requires a key.');
-  }
-};
-
-
-/**
   * Makes sure that tags are correctly nested.
   * @param {string} nodeName
   * @param {string} tag
@@ -224,7 +211,6 @@ export {
   assertNoUnclosedTags,
   assertNotInAttributes,
   assertInAttributes,
-  assertPlaceholderKeySpecified,
   assertCloseMatchesOpenTag,
   assertVirtualAttributesClosed,
   assertNoChildrenDeclaredYet,

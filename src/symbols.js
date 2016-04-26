@@ -16,9 +16,7 @@
 
 /** @const */
 const symbols = {
-  default: '__default',
-
-  placeholder: '__placeholder'
+  default: '__default'
 };
 
 /** */
