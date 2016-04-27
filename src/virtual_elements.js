@@ -17,13 +17,10 @@
 import {
   elementOpen as coreElementOpen,
   elementClose as coreElementClose,
-  text as coreText,
-  currentElement,
-  skip
+  text as coreText
 } from './core';
 import { updateAttribute } from './attributes';
 import { getData } from './node_data';
-import { symbols } from './symbols';
 import {
   assertNotInAttributes,
   assertNotInSkip,
@@ -57,11 +54,11 @@ const argsBuilder = [];
  * @param {?Array<*>=} statics An array of attribute name/value pairs of the
  *     static attributes for the Element. These will only be set once when the
  *     Element is created.
- * @param {...*} const_args Attribute name/value pairs of the dynamic attributes
+ * @param {...*} var_args, Attribute name/value pairs of the dynamic attributes
  *     for the Element.
  * @return {!Element} The corresponding Element.
  */
-const elementOpen = function(tag, key, statics, const_args) {
+const elementOpen = function(tag, key, statics, var_args) {
   if (process.env.NODE_ENV !== 'production') {
     assertNotInAttributes('elementOpen');
     assertNotInSkip('elementOpen');
@@ -205,11 +202,11 @@ const elementClose = function(tag) {
  * @param {?Array<*>=} statics An array of attribute name/value pairs of the
  *     static attributes for the Element. These will only be set once when the
  *     Element is created.
- * @param {...*} const_args Attribute name/value pairs of the dynamic attributes
+ * @param {...*} var_args Attribute name/value pairs of the dynamic attributes
  *     for the Element.
  * @return {!Element} The corresponding Element.
  */
-const elementVoid = function(tag, key, statics, const_args) {
+const elementVoid = function(tag, key, statics, var_args) {
   elementOpen.apply(null, arguments);
   return elementClose(tag);
 };
@@ -219,12 +216,12 @@ const elementVoid = function(tag, key, statics, const_args) {
  * Declares a virtual Text at this point in the document.
  *
  * @param {string|number|boolean} value The value of the Text.
- * @param {...(function((string|number|boolean)):string)} const_args
+ * @param {...(function((string|number|boolean)):string)} var_args
  *     Functions to format the value which are called only when the value has
  *     changed.
  * @return {!Text} The corresponding text node.
  */
-const text = function(value, const_args) {
+const text = function(value, var_args) {
   if (process.env.NODE_ENV !== 'production') {
     assertNotInAttributes('text');
     assertNotInSkip('text');
