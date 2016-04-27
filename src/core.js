@@ -20,7 +20,6 @@ import {
 } from './nodes';
 import { getData } from './node_data';
 import { Context } from './context';
-import { symbols } from './symbols';
 import {
   assertInPatch,
   assertKeyedTagMatches,
@@ -33,7 +32,6 @@ import {
   setInAttributes,
   setInSkip
 } from './assertions';
-import { notifications } from './notifications';
 
 
 /** @type {?Context} */
