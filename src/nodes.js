@@ -19,7 +19,6 @@ import {
     getData,
     initData
 } from './node_data';
-import { createMap } from './util';
 
 
 /**

@@ -16,7 +16,7 @@
 
 import {
   createElement,
-  createText,
+  createText
 } from './nodes';
 import { getData } from './node_data';
 import { Context } from './context';
@@ -27,7 +27,6 @@ import {
   assertNotInAttributes,
   assertVirtualAttributesClosed,
   assertNoChildrenDeclaredYet,
-  assertPatchElementNotEmpty,
   assertPatchElementNoExtras,
   setInAttributes,
   setInSkip

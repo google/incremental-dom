@@ -22,7 +22,7 @@ var rollup = require('rollup-stream');
 var closureCompiler = require('google-closure-compiler').gulp();
 var babel = require('rollup-plugin-babel');
 var uglify = require('rollup-plugin-uglify');
-var gjslint = require('gulp-gjslint');
+var eslint = require('gulp-eslint');
 var sourcemaps = require('gulp-sourcemaps');
 var replace = require('gulp-replace');
 var karma = require('karma');
@@ -34,8 +34,7 @@ var env = process.env;
 var entryFileName = 'index.js';
 var artifactName = 'incremental-dom';
 var googModuleName = 'incrementaldom';
-var jsFileName = 'incremental-dom.js';
-var srcs = [jsFileName, 'src/**/*.js'];
+var srcs = [entryFileName, 'src/**/*.js'];
 var tests = ['test/**/*.js'];
 var karmaConfig = path.resolve('conf/karma.conf.js');
 
@@ -71,9 +70,9 @@ function unitWatch(done) {
 
 function lint() {
   return gulp.src(srcs, tests)
-    .pipe(gjslint())
-    .pipe(gjslint.reporter('console'))
-    .pipe(gjslint.reporter('fail'));
+    .pipe(eslint())
+    .pipe(eslint.format())
+    .pipe(eslint.failAfterError());
 }
 
 function bundle(format) {
@@ -166,16 +165,13 @@ function jsDist() {
 }
 
 function jsClosureChecks() {
-  return gulp.src([
-    'index.js',
-    './src/**/*.js'
-  ])
-  .pipe(closureCompiler({
-    checks_only: 'true',
-    externs: 'node_externs.js',
-    language_in: 'ECMASCRIPT6_STRICT',
-    warning_level: 'VERBOSE'
-  }));
+  return gulp.src(srcs)
+    .pipe(closureCompiler({
+      checks_only: 'true',
+      externs: 'node_externs.js',
+      language_in: 'ECMASCRIPT6_STRICT',
+      warning_level: 'VERBOSE'
+    }));
 }
 
 gulp.task('clean', clean);
