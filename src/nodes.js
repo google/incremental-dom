@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { updateAttribute } from './attributes';
 import {
     getData,
     initData
@@ -46,11 +45,9 @@ const getNamespaceForTag = function(tag, parent) {
  * @param {?Node} parent
  * @param {string} tag The tag for the Element.
  * @param {?string=} key A key to identify the Element.
- * @param {?Array<*>=} statics An array of attribute name/value pairs of the
- *     static attributes for the Element.
  * @return {!Element}
  */
-const createElement = function(doc, parent, tag, key, statics) {
+const createElement = function(doc, parent, tag, key) {
   const namespace = getNamespaceForTag(tag, parent);
   let el;
 
@@ -61,12 +58,6 @@ const createElement = function(doc, parent, tag, key, statics) {
   }
 
   initData(el, tag, key);
-
-  if (statics) {
-    for (let i = 0; i < statics.length; i += 2) {
-      updateAttribute(el, /** @type {!string}*/(statics[i]), statics[i + 1]);
-    }
-  }
 
   return el;
 };

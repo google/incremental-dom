@@ -45,6 +45,12 @@ function NodeData(nodeName, key) {
   this.newAttrs = createMap();
 
   /**
+   * Whether or not the statics have been applied for the node yet.
+   * {boolean}
+   */
+  this.staticsApplied = false;
+
+  /**
    * The key used to identify this node, used to preserve DOM nodes when they
    * move within their parent.
    * @const
