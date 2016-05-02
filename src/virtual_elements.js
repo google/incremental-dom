@@ -64,8 +64,20 @@ const elementOpen = function(tag, key, statics, var_args) {
     assertNotInSkip('elementOpen');
   }
 
-  const node = coreElementOpen(tag, key, statics);
+  const node = coreElementOpen(tag, key);
   const data = getData(node);
+
+  if (!data.staticsApplied) {
+    if (statics) {
+      for (let i = 0; i < statics.length; i += 2) {
+        updateAttribute(node, statics[i], statics[i + 1]);
+      }
+    }
+    // Down the road, we may want to keep track of the statics array to use it
+    // as an additional signal about whether a node matches or not. For now,
+    // just use a marker so that we do not reapply statics.
+    data.staticsApplied = true;
+  }
 
   /*
    * Checks to see if one or more attributes have changed for a given Element.

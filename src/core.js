@@ -190,10 +190,8 @@ const matches = function(nodeName, key) {
  * @param {string} nodeName For an Element, this should be a valid tag string.
  *     For a Text, this should be #text.
  * @param {?string=} key The key used to identify this element.
- * @param {?Array<*>=} statics For an Element, this should be an array of
- *     name-value pairs.
  */
-const alignWithDOM = function(nodeName, key, statics) {
+const alignWithDOM = function(nodeName, key) {
   if (currentNode && matches(nodeName, key)) {
     return;
   }
@@ -215,7 +213,7 @@ const alignWithDOM = function(nodeName, key, statics) {
     if (nodeName === '#text') {
       node = createText(doc);
     } else {
-      node = createElement(doc, currentParent, nodeName, key, statics);
+      node = createElement(doc, currentParent, nodeName, key);
     }
 
     if (key) {
@@ -331,14 +329,11 @@ const exitNode = function() {
  * @param {?string=} key The key used to identify this element. This can be an
  *     empty string, but performance may be better if a unique value is used
  *     when iterating over an array of items.
- * @param {?Array<*>=} statics An array of attribute name/value pairs of the
- *     static attributes for the Element. These will only be set once when the
- *     Element is created.
  * @return {!Element} The corresponding Element.
  */
-const elementOpen = function(tag, key, statics) {
+const elementOpen = function(tag, key) {
   nextNode();
-  alignWithDOM(tag, key, statics);
+  alignWithDOM(tag, key);
   enterNode();
   return /** @type {!Element} */(currentParent);
 };
