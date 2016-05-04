@@ -29,20 +29,9 @@ function NodeData(nodeName, key) {
    * @const {!Object<string, *>}
    */
   this.attrs = createMap();
-
-  /**
-   * An array of attribute name/value pairs, used for quickly diffing the
-   * incomming attributes to see if the DOM node's attributes need to be
-   * updated.
-   * @const {Array<*>}
-   */
-  this.attrsArr = [];
-
-  /**
-   * The incoming attributes for this Node, before they are updated.
-   * @const {!Object<string, *>}
-   */
-  this.newAttrs = createMap();
+  
+  //The next update may remove the key
+  this.attrKeys = createMap();
 
   /**
    * Whether or not the statics have been applied for the node yet.

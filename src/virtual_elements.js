@@ -85,42 +85,23 @@ const elementOpen = function(tag, key, statics, var_args) {
    * individual argument. When attributes have changed, the overhead of this is
    * minimal.
    */
-  const attrsArr = data.attrsArr;
-  const newAttrs = data.newAttrs;
-  let attrsChanged = false;
+  const attrs = data.attrs;
+  const attrKeys = data.attrKeys;
   let i = ATTRIBUTES_OFFSET;
-  let j = 0;
+  let swapAttrKeys={};
 
-  for (; i < arguments.length; i += 1, j += 1) {
-    if (attrsArr[j] !== arguments[i]) {
-      attrsChanged = true;
-      break;
-    }
+  for (; i < arguments.length; i += 2) {
+    let key = arguments[i],
+        value = arguments[i+1];
+        
+    swapAttrKeys[key] = 1;
+    updateAttribute(node, key, value);//If not equal to update in updateAttribute
+    delete attrKeys[key];//Remove existing or new key ‘May be removed’
   }
-
-  for (; i < arguments.length; i += 1, j += 1) {
-    attrsArr[j] = arguments[i];
+  for (let key in attrKeys) {//need be removed
+    updateAttribute(node, key, undefined);
   }
-
-  if (j < attrsArr.length) {
-    attrsChanged = true;
-    attrsArr.length = j;
-  }
-
-  /*
-   * Actually perform the attribute update.
-   */
-  if (attrsChanged) {
-    for (i = ATTRIBUTES_OFFSET; i < arguments.length; i += 2) {
-      newAttrs[arguments[i]] = arguments[i + 1];
-    }
-
-    for (const attr in newAttrs) {
-      updateAttribute(node, attr, newAttrs[attr]);
-      newAttrs[attr] = undefined;
-    }
-  }
-
+  data.attrKeys = swapAttrKeys;
   return node;
 };
 

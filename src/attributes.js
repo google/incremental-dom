@@ -122,7 +122,8 @@ const applyAttributeTyped = function(el, name, value) {
 const updateAttribute = function(el, name, value) {
   const data = getData(el);
   const attrs = data.attrs;
-
+  const attrKeys = data.attrKeys;
+  
   if (attrs[name] === value) {
     return;
   }
@@ -131,6 +132,7 @@ const updateAttribute = function(el, name, value) {
   mutator(el, name, value);
 
   attrs[name] = value;
+  attrKeys[name] = 1;
 };
 
 
