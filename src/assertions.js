@@ -35,9 +35,9 @@ let inSkip = false;
  * Makes sure that there is a current patch context.
  * @param {*} context
  */
-const assertInPatch = function(context) {
+const assertInPatch = function(functionName, context) {
   if (!context) {
-    throw new Error('Cannot call currentElement() unless in patch.');
+    throw new Error('Cannot call ' + functionName + '() unless in patch.');
   }
 };
 
