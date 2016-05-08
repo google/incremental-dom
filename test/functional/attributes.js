@@ -225,7 +225,7 @@ describe('attribute updates', () => {
 
       expect(el.getAttribute('class')).to.equal('foo');
     });
-    
+
     it('should apply the correct namespace for namespaced SVG attributes', () => {
       patch(container, () => {
         elementOpen('svg');
@@ -264,7 +264,7 @@ describe('attribute updates', () => {
       const el = container.firstChild;
       el.setAttribute('data-foo', 'bar');
       patch(container, render);
-      
+
       expect(el.getAttribute('data-foo')).to.equal('bar');
     });
 

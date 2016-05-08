@@ -69,7 +69,7 @@ function unitWatch(done) {
 }
 
 function lint() {
-  return gulp.src(srcs, tests)
+  return gulp.src(srcs.concat(tests))
     .pipe(eslint())
     .pipe(eslint.format())
     .pipe(eslint.failAfterError());

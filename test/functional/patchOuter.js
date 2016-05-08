@@ -163,7 +163,7 @@ describe('patching an element', () => {
   });
 
   it('should not hang on to removed elements with keys', () => {
-    function render(present) {
+    function render() {
       elementVoid('div', 'key');
     }
 

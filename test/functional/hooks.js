@@ -196,14 +196,11 @@ describe('library hooks', () => {
   });
 
   describe('for being notified when nodes are deleted from the DOM', () => {
-    let txtEl;
-    let divEl;
-
     function render(withTxt) {
       if (withTxt) {
-        txtEl = text('hello');
+        text('hello');
       } else {
-        divEl = elementVoid('div', 'key2', ['staticName', 'staticValue']);
+        elementVoid('div', 'key2', ['staticName', 'staticValue']);
       }
     }
 
@@ -278,7 +275,7 @@ describe('library hooks', () => {
 
     it('should not call the nodesDeleted callback', () => {
       patch(container, render, true);
-      const el = container.childNodes[0];
+      container.childNodes[0];
       patch(container, render, false);
 
       expect(notifications.nodesDeleted).never;
