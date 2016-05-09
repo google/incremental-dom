@@ -16,7 +16,6 @@
 
 import {
     patch,
-    elementOpen,
     elementOpenStart,
     elementOpenEnd,
     elementClose,
@@ -32,7 +31,7 @@ describe('currentPointer', () => {
   beforeEach(() => {
     container = document.createElement('div');
     container.innerHTML = `<div></div><span></span>`;
-    
+
     firstChild = container.firstChild;
     lastChild = container.lastChild;
 
@@ -96,7 +95,7 @@ describe('currentPointer', () => {
     expect(() => {
       patch(container, () => {
         elementOpenStart('div');
-        el = currentPointer();
+        currentPointer();
         elementOpenEnd('div');
         elementClose('div');
       });
