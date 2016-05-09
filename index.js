@@ -19,7 +19,9 @@ export {
   patchInner,
   patchOuter,
   currentElement,
-  skip
+  currentPointer,
+  skip,
+  skipNode
 } from './src/core';
 export {
   elementVoid,

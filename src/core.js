@@ -299,14 +299,22 @@ const enterNode = function() {
 
 
 /**
+ * @return The next Node to be patched.
+ */
+const getNextNode = function() {
+  if (currentNode) {
+    return currentNode.nextSibling;
+  } else {
+    return currentParent.firstChild;
+  }
+};
+
+
+/**
  * Changes to the next sibling of the current node.
  */
 const nextNode = function() {
-  if (currentNode) {
-    currentNode = currentNode.nextSibling;
-  } else {
-    currentNode = currentParent.firstChild;
-  }
+  currentNode = getNextNode();
 };
 
 
@@ -374,10 +382,22 @@ const text = function() {
  */
 const currentElement = function() {
   if (process.env.NODE_ENV !== 'production') {
-    assertInPatch(context);
+    assertInPatch('currentElement', context);
     assertNotInAttributes('currentElement');
   }
   return /** @type {!Element} */(currentParent);
+};
+
+
+/**
+ * @return {Node} The Node that will be evaluated for the next instruction.
+ */
+const currentPointer = function() {
+  if (process.env.NODE_ENV !== 'production') {
+    assertInPatch('currentPointer', context);
+    assertNotInAttributes('currentPointer');
+  }
+  return getNextNode();
 };
 
 
@@ -394,6 +414,13 @@ const skip = function() {
 };
 
 
+/**
+ * Skips the next Node to be patched, moving the pointer forward to the next
+ * sibling of the current pointer.
+ */
+const skipNode = nextNode;
+
+
 /** */
 export {
   elementOpen,
@@ -402,5 +429,7 @@ export {
   patchInner,
   patchOuter,
   currentElement,
-  skip
+  currentPointer,
+  skip,
+  skipNode
 };
