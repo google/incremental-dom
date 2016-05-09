@@ -79,42 +79,52 @@ const elementOpen = function(tag, key, statics, var_args) {
     data.staticsApplied = true;
   }
 
-  /*
-   * Checks to see if one or more attributes have changed for a given Element.
-   * When no attributes have changed, this is much faster than checking each
-   * individual argument. When attributes have changed, the overhead of this is
-   * minimal.
-   */
   const attrsArr = data.attrsArr;
-  const newAttrs = data.newAttrs;
-  let attrsChanged = false;
   let i = ATTRIBUTES_OFFSET;
   let j = 0;
 
+  // Checks to see if one or more attributes have changed for a given Element.
+  // When no attributes have changed, this is much faster than checking each
+  // individual argument. When attributes have changed, the overhead of this is
+  // minimal.
   for (; i < arguments.length; i += 1, j += 1) {
     if (attrsArr[j] !== arguments[i]) {
-      attrsChanged = true;
       break;
     }
   }
 
-  for (; i < arguments.length; i += 1, j += 1) {
-    attrsArr[j] = arguments[i];
-  }
+  // If we didn't make it to the end of the attribute pairs in arguments, then
+  // obviously something's changed.  If we looped to the end but our cached
+  // attrsArr is longer, then we'll need to setup newAttrs with the attributes
+  // for this pass.
+  if (i < arguments.length || j < attrsArr.length) {
+    const newAttrs = data.newAttrs;
+    i -= ~i & 1;
+    j = j & ~1;
 
-  if (j < attrsArr.length) {
-    attrsChanged = true;
-    attrsArr.length = j;
-  }
-
-  /*
-   * Actually perform the attribute update.
-   */
-  if (attrsChanged) {
-    for (i = 0; i < attrsArr.length; i += 2) {
-      newAttrs[attrsArr[i]] = attrsArr[i + 1];
+    // For the attribute pairs that were the same, update newAttrs again so
+    // they are not lost during the updates.
+    for (let k = 0; k < j; k += 2) {
+      newAttrs[attrsArr[k]] = attrsArr[k + 1];
     }
 
+    // For the remaining attribute pairs, update attrsArr and newAttrs.
+    for (; i < arguments.length; i += 2, j += 2) {
+      const attr = arguments[i];
+      const value = arguments[i + 1];
+      attrsArr[j] = attr;
+      attrsArr[j + 1] = value;
+      newAttrs[attr] = value;
+    }
+
+    // We are now guaranteed to have all the attribute pairs passed in
+    // arguments in our cache.  Now we need to truncate our cached attributes
+    // if the last pass had more.
+    if (j < attrsArr.length) {
+      attrsArr.length = j;
+    }
+
+    // Update the attributes.
     for (const attr in newAttrs) {
       updateAttribute(node, attr, newAttrs[attr]);
       newAttrs[attr] = undefined;
