@@ -24,7 +24,7 @@ describe('rendering with keys', () => {
   let container;
 
   function render(items) {
-    for(let i=0; i<items.length; i++) {
+    for (let i=0; i<items.length; i++) {
       const key = items[i].key;
       elementVoid('div', key, key ? ['id', key] : null);
     }
@@ -59,7 +59,7 @@ describe('rendering with keys', () => {
     const items = [
       { key: null },
       { key: undefined },
-      { key: '' },
+      { key: '' }
     ];
 
     patch(container, () => render(items));
