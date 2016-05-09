@@ -111,8 +111,8 @@ const elementOpen = function(tag, key, statics, var_args) {
    * Actually perform the attribute update.
    */
   if (attrsChanged) {
-    for (i = ATTRIBUTES_OFFSET; i < arguments.length; i += 2) {
-      newAttrs[arguments[i]] = arguments[i + 1];
+    for (i = 0; i < attrsArr.length; i += 2) {
+      newAttrs[attrsArr[i]] = attrsArr[i + 1];
     }
 
     for (const attr in newAttrs) {
