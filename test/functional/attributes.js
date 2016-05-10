@@ -90,7 +90,7 @@ describe('attribute updates', () => {
       expect(el.getAttribute('data-expanded')).to.equal('bar');
     });
 
-    it('should update attribute in different position', () => {
+    it('should update different attribute in same position', () => {
       patch(container, () => render({
         'data-foo': 'foo'
       }));
@@ -101,6 +101,54 @@ describe('attribute updates', () => {
 
       expect(el.getAttribute('data-bar')).to.equal('foo');
       expect(el.getAttribute('data-foo')).to.equal(null);
+    });
+
+    it('should keep attribute in different position', () => {
+      patch(container, () => render({
+        'data-foo': 'foo',
+        'data-bar': 'bar'
+      }));
+      patch(container, () => render({
+        'data-bar': 'bar'
+      }));
+      const el = container.childNodes[0];
+      expect(el.getAttribute('data-foo')).to.equal(null);
+      expect(el.getAttribute('data-bar')).to.equal('bar');
+
+
+      patch(container, () => render({}));
+
+      patch(container, () => render({
+        'data-bar': 'bar'
+      }));
+      patch(container, () => render({
+        'data-foo': 'foo',
+        'data-bar': 'bar'
+      }));
+      expect(el.getAttribute('data-foo')).to.equal('foo');
+      expect(el.getAttribute('data-bar')).to.equal('bar');
+
+
+      patch(container, () => render({}));
+
+      patch(container, () => render({
+        'data-foo': 'foo',
+        'data-bar': 'bar',
+        'data-baz': 'baz'
+      }));
+      patch(container, () => render({
+        'data-bar': 'bar',
+        'data-baz': 'baz'
+      }));
+      expect(el.getAttribute('data-foo')).to.equal(null);
+      expect(el.getAttribute('data-bar')).to.equal('bar');
+      expect(el.getAttribute('data-baz')).to.equal('baz');
+      patch(container, () => render({
+        'data-bar': 'bar'
+      }));
+      expect(el.getAttribute('data-foo')).to.equal(null);
+      expect(el.getAttribute('data-bar')).to.equal('bar');
+      expect(el.getAttribute('data-baz')).to.equal(null);
     });
 
     it('should remove trailing attributes when missing', function() {
