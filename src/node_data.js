@@ -65,9 +65,15 @@ function NodeData(nodeName, key) {
 
   /**
    * Whether or not the keyMap is currently valid.
-   * {boolean}
+   * @type {boolean}
    */
   this.keyMapValid = true;
+
+  /**
+   * Whether or the associated node is, or contains, a focused Element.
+   * @type {boolean}
+   */
+  this.focused = false;
 
   /**
    * The node name for this node.

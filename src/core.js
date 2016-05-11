@@ -31,6 +31,10 @@ import {
   setInAttributes,
   setInSkip
 } from './assertions';
+import {
+  getFocusedPath,
+  moveBefore
+} from './dom_util';
 
 
 /** @type {?Context} */
@@ -44,6 +48,17 @@ let currentParent = null;
 
 /** @type {?Document} */
 let doc = null;
+
+
+/**
+ * @param {!Array<Node>} focusPath The nodes to mark.
+ * @param {boolean} focused Whether or not they are focused.
+ */
+const markFocused = function(focusPath, focused) {
+  for (let i = 0; i < focusPath.length; i += 1) {
+    getData(focusPath[i]).focused = focused;
+  }
+};
 
 
 /**
@@ -81,7 +96,10 @@ const patchFactory = function(run) {
       previousInSkip = setInSkip(false);
     }
 
+    const focusPath = getFocusedPath(node, currentParent);
+    markFocused(focusPath, true);
     const retVal = run(node, fn, data);
+    markFocused(focusPath, false);
 
     if (process.env.NODE_ENV !== 'production') {
       assertVirtualAttributesClosed();
@@ -197,6 +215,7 @@ const alignWithDOM = function(nodeName, key) {
   }
 
   const parentData = getData(currentParent);
+  const currentNodeData = currentNode && getData(currentNode);
   const keyMap = parentData.keyMap;
   let node;
 
@@ -223,11 +242,16 @@ const alignWithDOM = function(nodeName, key) {
     context.markCreated(node);
   }
 
-  // If the node has a key, remove it from the DOM to prevent a large number
-  // of re-orders in the case that it moved far or was completely removed.
-  // Since we hold on to a reference through the keyMap, we can always add it
-  // back.
-  if (currentNode && getData(currentNode).key) {
+  // Re-order the node into the right position, preserving focus if either
+  // node or currentNode are focused by making sure that they are not detached
+  // from the DOM.
+  if (getData(node).focused) {
+    // Move everything else before the node.
+    moveBefore(currentParent, node, currentNode);
+  } else if (currentNodeData && currentNodeData.key && !currentNodeData.focused) {
+    // Remove the currentNode, which can always be added back since we hold a
+    // reference through the keyMap. This prevents a large number of moves when
+    // a keyed item is removed or moved backwards in the DOM.
     currentParent.replaceChild(node, currentNode);
     parentData.keyMapValid = false;
   } else {
@@ -252,6 +276,7 @@ const removeChild = function(node, child, keyMap) {
     delete keyMap[key];
   }
 };
+
 
 /**
  * Clears out any unvisited Nodes, as the corresponding virtual element

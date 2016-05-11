@@ -24,7 +24,7 @@ module.exports = function(config) {
     basePath: '../',
 
     files: [
-      'test/**/*.js'
+      'test/functional/**/*.js'
     ],
 
     preprocessors: {
