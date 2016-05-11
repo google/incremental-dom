@@ -283,11 +283,6 @@ describe('attribute updates', () => {
   describe('with an existing document tree', () => {
     let div;
 
-    function render() {
-      elementVoid('div', null, null,
-          'tabindex', '0');
-    }
-
     beforeEach(function() {
       div = document.createElement('div');
       div.setAttribute('tabindex', '-1');
@@ -295,6 +290,11 @@ describe('attribute updates', () => {
     });
 
     it('should update attributes', () => {
+      function render() {
+        elementVoid('div', null, null,
+            'tabindex', '0');
+      }
+
       patch(container, render);
       const child = container.childNodes[0];
 
@@ -302,15 +302,58 @@ describe('attribute updates', () => {
     });
 
     it('should remove attributes', () => {
-      function render() {
-        elementVoid('div');
+      function render(data) {
+        elementVoid('div', null, null,
+            data.attr, 'bar');
       }
-
-      patch(container, render);
+      patch(container, render, { attr: 'data-foo' });
       const child = container.childNodes[0];
 
       expect(child.hasAttribute('tabindex')).to.false;
+      expect(child.getAttribute('data-foo')).to.equal('bar');
+
+      patch(container, render, { attr: 'data-bar' });
+      expect(child.hasAttribute('tabindex')).to.false;
+      expect(child.hasAttribute('data-foo')).to.false;
+      expect(child.getAttribute('data-bar')).to.equal('bar');
     });
+
+    it('should persist statics', () => {
+      function render(value) {
+        elementVoid('div', null, ['data-foo', value]);
+      }
+
+      patch(container, render, 'bar');
+      const child = container.childNodes[0];
+
+      expect(child.getAttribute('data-foo')).to.equal('bar');
+
+      patch(container, render, 'baz');
+      expect(child.getAttribute('data-foo')).to.equal('bar');
+    });
+
+    it('should persist statics when patching a parent', () => {
+      function renderParent(value) {
+        elementOpen('div')
+        render(value);
+        elementClose('div');
+      }
+      function render(value) {
+        elementVoid('div', null, ['data-foo', value]);
+      }
+
+      const child = container.childNodes[0];
+      patch(child, render, 'bar');
+      const grandChild = child.childNodes[0];
+
+      expect(grandChild.getAttribute('data-foo')).to.equal('bar');
+
+      patch(container, renderParent, 'baz');
+
+      expect(child.hasAttribute('tabindex')).to.false;
+      expect(grandChild.getAttribute('data-foo')).to.equal('bar');
+    });
+
   });
 });
 
