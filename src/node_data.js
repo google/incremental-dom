@@ -106,7 +106,7 @@ const initData = function(node, nodeName, key) {
 /**
  * Retrieves the NodeData object for a Node, creating it if necessary.
  *
- * @param {?Node} node The Node to retrieve the data for.
+ * @param {!Node} node The Node to retrieve the data for.
  * @return {!NodeData} The NodeData for this Node.
  */
 const getData = function(node) {
@@ -123,17 +123,24 @@ const getData = function(node) {
 /**
  * Imports node and its subtree, initializing caches.
  *
- * @param {?Node} node The Node to import.
+ * @param {!Node} node The Node to import.
+ * @param {?NodeData=} opt_parentData the node's parent's data cache.
  * @return {!NodeData} The NodeData for this Node.
  */
-const importNode = function(node) {
+const importNode = function(node, opt_parentData) {
   const nodeName = node.nodeName.toLowerCase();
   const isElement = node instanceof Element;
   const key = isElement ? node.getAttribute('key') : null;
   const data = initData(node, nodeName, key);
 
   if (key) {
-    getData(node.parentNode).keyMap[key] = node;
+    if (!opt_parentData) {
+      const parent = node.parentNode;
+      opt_parentData = parent && getData(parent);
+    }
+    if (opt_parentData) {
+      opt_parentData.keyMap[key] = node;
+    }
   }
 
   if (isElement) {
@@ -155,7 +162,7 @@ const importNode = function(node) {
   }
 
   for (let child = node.firstChild; child; child = child.nextSibling) {
-    importNode(child);
+    importNode(child, data);
   }
 
   return data;
