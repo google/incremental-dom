@@ -22,9 +22,12 @@ const hasOwnProperty = Object.prototype.hasOwnProperty;
 
 
 /**
- * A cached reference to the create function.
+ * A constructor function that will create blank objects.
+ * @constructor
  */
-const create = Object.create;
+function Blank() {}
+
+Blank.prototype = Object.create(null);
 
 
 /**
@@ -43,7 +46,7 @@ const has = function(map, property) {
  * @return {!Object}
  */
 const createMap = function() {
-  return create(null);
+  return new Blank();
 };
 
 
