@@ -33,6 +33,7 @@ let inSkip = false;
 
 /**
  * Makes sure that there is a current patch context.
+ * @param {string} functionName
  * @param {*} context
  */
 const assertInPatch = function(functionName, context) {

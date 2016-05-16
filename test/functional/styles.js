@@ -16,7 +16,7 @@
 
 import {
   patch,
-  elementVoid,
+  elementVoid
 } from '../../index';
 
 describe('style updates', () => {

@@ -324,7 +324,7 @@ const enterNode = function() {
 
 
 /**
- * @return The next Node to be patched.
+ * @return {?Node} The next Node to be patched.
  */
 const getNextNode = function() {
   if (currentNode) {

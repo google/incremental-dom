@@ -16,7 +16,8 @@
 
 
 /**
- * @return True if the node the root of a document, false otherwise.
+ * @param {!Node} node
+ * @return {boolean} True if the node the root of a document, false otherwise.
  */
 const isDocumentRoot = function(node) {
   // For ShadowRoots, check if they are a DocumentFragment instead of if they
