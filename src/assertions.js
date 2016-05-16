@@ -44,20 +44,6 @@ const assertInPatch = function(functionName, context) {
 
 
 /**
-* Makes sure that keyed Element matches the tag name provided.
-* @param {!string} nodeName The nodeName of the node that is being matched.
-* @param {string=} tag The tag name of the Element.
-* @param {?string=} key The key of the Element.
-*/
-const assertKeyedTagMatches = function(nodeName, tag, key) {
-  if (nodeName !== tag) {
-    throw new Error('Was expecting node with key "' + key + '" to be a ' +
-        tag + ', not a ' + nodeName + '.');
-  }
-};
-
-
-/**
  * Makes sure that a patch closes every node that it opened.
  * @param {?Node} openElement
  * @param {!Node|!DocumentFragment} root
@@ -208,7 +194,6 @@ const setInSkip = function(value) {
 /** */
 export {
   assertInPatch,
-  assertKeyedTagMatches,
   assertNoUnclosedTags,
   assertNotInAttributes,
   assertInAttributes,

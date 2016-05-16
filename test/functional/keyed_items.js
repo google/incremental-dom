@@ -154,16 +154,19 @@ describe('rendering with keys', () => {
     expect(container.childNodes).to.have.length(1);
   });
 
-  it('should throw error when element does not match nodeName', () => {
+  it('should not reuse dom node when nodeName doesn\'t match', () => {
     function render(tag) {
       elementVoid(tag, 'key');
     }
 
     patch(container, render, 'div');
+    const firstNode = container.childNodes[0];
 
-    expect(() => {
-      patch(container, render, 'span');
-    }).to.throw('Was expecting node with key "key" to be a span, not a div.');
+    patch(container, render, 'span');
+    const newNode = container.childNodes[0];
+    expect(newNode).not.to.equal(firstNode);
+    expect(newNode.nodeName).to.equal('SPAN');
+    expect(firstNode.parentNode).to.equal(null);
   });
 
   it('should preserve nodes already in the DOM', () => {
@@ -313,4 +316,3 @@ describe('rendering with keys', () => {
     }
   });
 });
-
