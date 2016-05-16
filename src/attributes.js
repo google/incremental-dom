@@ -75,7 +75,7 @@ const applyProp = function(el, name, value) {
  * @param {CSSStyleDeclaration} style
  * @param {!string} prop
  * @param {*} value
- */ 
+ */
 const setStyleValue = function(style, prop, value) {
   if (prop.indexOf('-') >= 0) {
     style.setProperty(prop, /** @type {string} */(value));

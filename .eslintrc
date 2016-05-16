@@ -14,8 +14,14 @@
     "no-unused-vars": [2, {"argsIgnorePattern": "var_args"}],
     "no-trailing-spaces": 2,
     "no-irregular-whitespace": 2,
+    "no-param-reassign": 2,
     "space-before-blocks": [2, "always"],
     "space-before-function-paren": [2, "never"],
-    "keyword-spacing": [2, {"before": true, "after": true}]
+    "keyword-spacing": [2, {"before": true, "after": true}],
+    "valid-jsdoc": ["error", {
+      "requireReturn": false,
+      "requireParamDescription": false,
+      "requireReturnDescription": false
+    }]
   }
 }
