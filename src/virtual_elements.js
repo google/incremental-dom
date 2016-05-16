@@ -163,7 +163,8 @@ const attr = function(name, value) {
     assertInAttributes('attr');
   }
 
-  argsBuilder.push(name, value);
+  argsBuilder.push(name);
+  argsBuilder.push(value);
 };
 
 
