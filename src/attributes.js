@@ -70,6 +70,22 @@ const applyProp = function(el, name, value) {
 
 
 /**
+ * Applies a value to a style declaration. Supports CSS custom properties by
+ * setting properties containing a dash using CSSStyleDeclaration.setProperty.
+ * @param {CSSStyleDeclaration} style
+ * @param {!string} prop
+ * @param {*} value
+ */ 
+const setStyleValue = function(style, prop, value) {
+  if (prop.indexOf('-') >= 0) {
+    style.setProperty(prop, /** @type {string} */(value));
+  } else {
+    style[prop] = value;
+  }
+};
+
+
+/**
  * Applies a style to an Element. No vendor prefix expansion is done for
  * property names/values.
  * @param {!Element} el
@@ -87,7 +103,7 @@ const applyStyle = function(el, name, style) {
 
     for (const prop in obj) {
       if (has(obj, prop)) {
-        elStyle[prop] = obj[prop];
+        setStyleValue(elStyle, prop, obj[prop]);
       }
     }
   }

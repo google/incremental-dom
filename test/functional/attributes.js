@@ -164,57 +164,6 @@ describe('attribute updates', () => {
     });
   });
 
-  describe('for style', () => {
-    function render(style) {
-      elementVoid('div', null, null,
-          'style', style);
-    }
-
-    it('should render with the correct style properties for objects', () => {
-      patch(container, () => render({
-        color: 'white',
-        backgroundColor: 'red'
-      }));
-      const el = container.childNodes[0];
-
-      expect(el.style.color).to.equal('white');
-      expect(el.style.backgroundColor).to.equal('red');
-    });
-
-    it('should update the correct style properties', () => {
-      patch(container, () => render({
-        color: 'white'
-      }));
-      patch(container, () => render({
-        color: 'red'
-      }));
-      const el = container.childNodes[0];
-
-      expect(el.style.color).to.equal('red');
-    });
-
-    it('should remove properties not present in the new object', () => {
-      patch(container, () => render({
-        color: 'white'
-      }));
-      patch(container, () => render({
-        backgroundColor: 'red'
-      }));
-      const el = container.childNodes[0];
-
-      expect(el.style.color).to.equal('');
-      expect(el.style.backgroundColor).to.equal('red');
-    });
-
-    it('should render with the correct style properties for strings', () => {
-      patch(container, () => render('color: white; background-color: red;'));
-      const el = container.childNodes[0];
-
-      expect(el.style.color).to.equal('white');
-      expect(el.style.backgroundColor).to.equal('red');
-    });
-  });
-
   describe('for svg elements', () => {
     it('should correctly apply the class attribute', function() {
       patch(container, () => {
