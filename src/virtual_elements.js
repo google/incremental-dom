@@ -87,30 +87,38 @@ const elementOpen = function(tag, key, statics, var_args) {
    */
   const attrsArr = data.attrsArr;
   const newAttrs = data.newAttrs;
-  let attrsChanged = false;
+  const isNew = !attrsArr.length;
   let i = ATTRIBUTES_OFFSET;
   let j = 0;
 
-  for (; i < arguments.length; i += 1, j += 1) {
-    if (attrsArr[j] !== arguments[i]) {
-      attrsChanged = true;
+  for (; i < arguments.length; i += 2, j += 2) {
+    const attr = arguments[i];
+    if (isNew) {
+      attrsArr[j] = attr;
+      newAttrs[attr] = undefined;
+    } else if (attrsArr[j] !== attr) {
       break;
+    }
+
+    const value = arguments[i + 1];
+    if (isNew || attrsArr[j + 1] !== value) {
+      attrsArr[j + 1] = value;
+      updateAttribute(node, attr, value);
     }
   }
 
-  for (; i < arguments.length; i += 1, j += 1) {
-    attrsArr[j] = arguments[i];
-  }
+  if (i < arguments.length || j < attrsArr.length) {
+    for (; i < arguments.length; i += 1, j += 1) {
+      attrsArr[j] = arguments[i];
+    }
 
-  if (j < attrsArr.length) {
-    attrsChanged = true;
-    attrsArr.length = j;
-  }
+    if (j < attrsArr.length) {
+      attrsArr.length = j;
+    }
 
-  /*
-   * Actually perform the attribute update.
-   */
-  if (attrsChanged) {
+    /*
+     * Actually perform the attribute update.
+     */
     for (i = 0; i < attrsArr.length; i += 2) {
       newAttrs[attrsArr[i]] = attrsArr[i + 1];
     }
