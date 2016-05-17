@@ -396,7 +396,7 @@ const elementClose = function() {
  */
 const text = function() {
   nextNode();
-  alignWithDOM('#text', null, null);
+  alignWithDOM('#text', null);
   return /** @type {!Text} */(currentNode);
 };
 

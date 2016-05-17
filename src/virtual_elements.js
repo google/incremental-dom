@@ -70,7 +70,9 @@ const elementOpen = function(tag, key, statics, var_args) {
   if (!data.staticsApplied) {
     if (statics) {
       for (let i = 0; i < statics.length; i += 2) {
-        updateAttribute(node, statics[i], statics[i + 1]);
+        const name = /** @type {string} */(statics[i]);
+        const value = statics[i + 1];
+        updateAttribute(node, name, value);
       }
     }
     // Down the road, we may want to keep track of the statics array to use it
@@ -120,7 +122,9 @@ const elementOpen = function(tag, key, statics, var_args) {
      * Actually perform the attribute update.
      */
     for (i = 0; i < attrsArr.length; i += 2) {
-      newAttrs[attrsArr[i]] = attrsArr[i + 1];
+      const name = /** @type {string} */(attrsArr[i]);
+      const value = attrsArr[i + 1];
+      newAttrs[name] = value;
     }
 
     for (const attr in newAttrs) {
