@@ -22,7 +22,6 @@ import { getData } from './node_data';
 import { Context } from './context';
 import {
   assertInPatch,
-  assertKeyedTagMatches,
   assertNoUnclosedTags,
   assertNotInAttributes,
   assertVirtualAttributesClosed,
@@ -190,10 +189,11 @@ const patchOuter = patchFactory(function(node, fn, data) {
  *
  * @param {?string} nodeName The nodeName for this node.
  * @param {?string=} key An optional key that identifies a node.
+ * @param {Element=} matchNode An optional node to match the data to.
  * @return {boolean} True if the node matches, false otherwise.
  */
-const matches = function(nodeName, key) {
-  const data = getData(currentNode);
+const matches = function(nodeName, key, matchNode) {
+  const data = getData(matchNode);
 
   // Key check is done using double equals as we want to treat a null key the
   // same as undefined. This should be okay as the only values allowed are
@@ -210,7 +210,7 @@ const matches = function(nodeName, key) {
  * @param {?string=} key The key used to identify this element.
  */
 const alignWithDOM = function(nodeName, key) {
-  if (currentNode && matches(nodeName, key)) {
+  if (currentNode && matches(nodeName, key, currentNode)) {
     return;
   }
 
@@ -221,9 +221,15 @@ const alignWithDOM = function(nodeName, key) {
 
   // Check to see if the node has moved within the parent.
   if (key) {
-    node = keyMap[key];
-    if (node && process.env.NODE_ENV !== 'production') {
-      assertKeyedTagMatches(getData(node).nodeName, nodeName, key);
+    const keyNode = keyMap[key];
+    if (keyNode) {
+      if (matches(nodeName, key, keyNode)) {
+        node = keyNode;
+      } else if (keyNode === currentNode) {
+        context.markDeleted(keyNode);
+      } else {
+        removeChild(currentParent, keyNode, keyMap);
+      }
     }
   }
 
