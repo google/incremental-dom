@@ -187,12 +187,12 @@ const patchOuter = patchFactory(function(node, fn, data) {
  * Checks whether or not the current node matches the specified nodeName and
  * key.
  *
+ * @param {!Node} matchNode A node to match the data to.
  * @param {?string} nodeName The nodeName for this node.
  * @param {?string=} key An optional key that identifies a node.
- * @param {Element=} matchNode An optional node to match the data to.
  * @return {boolean} True if the node matches, false otherwise.
  */
-const matches = function(nodeName, key, matchNode) {
+const matches = function(matchNode, nodeName, key) {
   const data = getData(matchNode);
 
   // Key check is done using double equals as we want to treat a null key the
@@ -210,7 +210,7 @@ const matches = function(nodeName, key, matchNode) {
  * @param {?string=} key The key used to identify this element.
  */
 const alignWithDOM = function(nodeName, key) {
-  if (currentNode && matches(nodeName, key, currentNode)) {
+  if (currentNode && matches(currentNode, nodeName, key)) {
     return;
   }
 
@@ -223,7 +223,7 @@ const alignWithDOM = function(nodeName, key) {
   if (key) {
     const keyNode = keyMap[key];
     if (keyNode) {
-      if (matches(nodeName, key, keyNode)) {
+      if (matches(keyNode, nodeName, key)) {
         node = keyNode;
       } else if (keyNode === currentNode) {
         context.markDeleted(keyNode);
