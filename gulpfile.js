@@ -169,6 +169,7 @@ function jsClosureChecks() {
     .pipe(closureCompiler({
       checks_only: 'true',
       externs: 'node_externs.js',
+      jscomp_error: 'checkTypes',
       language_in: 'ECMASCRIPT6_STRICT',
       warning_level: 'VERBOSE'
     }));
