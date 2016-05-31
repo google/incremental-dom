@@ -136,30 +136,67 @@ describe('patching an element', () => {
   });
 
   describe('with a different tag', () => {
-    let div;
-    let span;
-    let result;
+    describe('without a key', () => {
+      let div;
+      let span;
+      let result;
 
-    function render() {
-      elementVoid('span');
-    }
+      function render() {
+        elementVoid('span');
+      }
 
-    beforeEach(() => {
-      div = container.appendChild(document.createElement('div'));
+      beforeEach(() => {
+        div = container.appendChild(document.createElement('div'));
 
-      result = patchOuter(div, render);
-      span = container.querySelector('span');
+        result = patchOuter(div, render);
+        span = container.querySelector('span');
+      });
+
+      it('should replace the DOM node', () => {
+        expect(container.children).to.have.length(1);
+        expect(container.firstChild).to.equal(span);
+      });
+
+      it('should return the new DOM node', () => {
+        expect(result).to.equal(span);
+      });
+    });
+
+    describe('with a different key', () => {
+      let div;
+      let el;
+
+      function render(data) {
+        el = elementVoid(data.tag, data.key);
+      }
+
+      beforeEach(() => {
+        div = container.appendChild(document.createElement('div'));
+      });
+
+      it('should replace the DOM node when a key changes', () => {
+        div.setAttribute('key', 'key0');
+        patchOuter(div, render, { tag: 'span', key: 'key1' });
+        expect(container.children).to.have.length(1);
+        expect(container.firstChild).to.equal(el);
+      });
+
+      it('should replace the DOM node when a key is removed', () => {
+        div.setAttribute('key', 'key0');
+        patchOuter(div, render, { tag: 'span' });
+        expect(container.children).to.have.length(1);
+        expect(container.firstChild.tagName).to.equal('SPAN');
+        expect(container.firstChild).to.equal(el);
+      });
+
+      it('should replace the DOM node when a key is added', () => {
+        patchOuter(div, render, { tag: 'span', key: 'key2' });
+        expect(container.children).to.have.length(1);
+        expect(container.firstChild).to.equal(el);
+      });
     });
 
 
-    it('should replace the DOM node', () => {
-      expect(container.children).to.have.length(1);
-      expect(container.firstChild).to.equal(span);
-    });
-
-    it('should return the new DOM node', () => {
-      expect(result).to.equal(span);
-    });
   });
 
   it('should not hang on to removed elements with keys', () => {
