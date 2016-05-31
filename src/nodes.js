@@ -31,7 +31,7 @@ const getNamespaceForTag = function(tag, parent) {
     return 'http://www.w3.org/2000/svg';
   }
 
-  if (getData(parent).nodeName === 'foreignObject') {
+  if (getData(parent).nodeName === 'foreignobject') {
     return null;
   }
 

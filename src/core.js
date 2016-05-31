@@ -27,6 +27,7 @@ import {
   assertVirtualAttributesClosed,
   assertNoChildrenDeclaredYet,
   assertPatchElementNoExtras,
+  assertValidTag,
   setInAttributes,
   setInSkip
 } from './assertions';
@@ -371,6 +372,10 @@ const exitNode = function() {
  * @return {!Element} The corresponding Element.
  */
 const elementOpen = function(tag, key) {
+  if (process.env.NODE_ENV !== 'production') {
+    assertValidTag(tag);
+  }
+
   nextNode();
   alignWithDOM(tag, key);
   enterNode();

@@ -136,9 +136,9 @@ describe('element creation', () => {
 
       patch(container, () => {
         elementOpen('svg');
-          elementOpen('foreignObject');
+          elementOpen('foreignobject');
             el = elementVoid('div');
-          elementClose('foreignObject');
+          elementClose('foreignobject');
         elementClose('svg');
       });
 
@@ -154,9 +154,9 @@ describe('element creation', () => {
           elementOpen('g');
             elementVoid('circle');
           elementClose('g');
-          elementOpen('foreignObject');
+          elementOpen('foreignobject');
             elementVoid('p');
-          elementClose('foreignObject');
+          elementClose('foreignobject');
           elementVoid('path');
         elementClose('svg');
       });

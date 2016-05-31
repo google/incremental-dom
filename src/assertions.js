@@ -168,6 +168,21 @@ const assertPatchElementNoExtras = function(
 
 
 /**
+ * Makes sure that a tag is a valid tag. In order to make sure that DOM nodes
+ * that were not rendered outside of the library are correctly tracked, checks
+ * that any tags specified are lowercase.
+ *
+ * @param {string} tag
+ */
+const assertValidTag = function(tag) {
+  if (tag.toLowerCase() !== tag) {
+    throw new Error('Tags are required to be lowercase. Encountered a' +
+        'non-lowercase tag:' + tag);
+  }
+};
+
+
+/**
  * Updates the state of being in an attribute declaration.
  * @param {boolean} value
  * @return {boolean} the previous value.
@@ -202,6 +217,7 @@ export {
   assertNoChildrenDeclaredYet,
   assertNotInSkip,
   assertPatchElementNoExtras,
+  assertValidTag,
   setInAttributes,
   setInSkip
 };
