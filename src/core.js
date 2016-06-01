@@ -198,7 +198,15 @@ const matches = function(matchNode, nodeName, key) {
   // Key check is done using double equals as we want to treat a null key the
   // same as undefined. This should be okay as the only values allowed are
   // strings, null and undefined so the == semantics are not too weird.
-  return nodeName === data.nodeName && key == data.key;
+  if (key == data.key) {
+      if (nodeName === data.nodeName) {
+          return true;
+      } else if (nodeName.toLowerCase() === data.nodeName.toLowerCase()) {
+          data.nodeName = nodeName;
+          return true;
+      }
+  }
+  return false;
 };
 
 
