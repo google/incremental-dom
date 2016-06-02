@@ -29,10 +29,12 @@ function render() {
 
 ### superviews.js
 
-[superviews.js](https://github.com/davidjamesstone/superviews.js) is a template language that closely maps to the incremental-dom API.
+[superviews.js](https://github.com/davidjamesstone/superviews.js) is a template language that closely maps to the incremental-dom API. It includes conditionals, iteration, interpolation and supported output for both ES6 and CommonJS. 
+
+Try it out [live in your browser](http://davidjamesstone.github.io/superviews.js/playground/)
 
 ```html
-<p if="showMe" class="{=cssClass}">
+<p if="showMe" class="{cssClass}">
   <span style="{ color: foo, width: bar }">{name}</span>
 </p>
 ```
