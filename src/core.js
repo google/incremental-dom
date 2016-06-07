@@ -175,7 +175,7 @@ const patchOuter = patchFactory(function(node, fn, data) {
         expectedPrevNode);
   }
 
-  if (node !== currentNode) {
+  if (node !== currentNode && node.parentNode) {
     removeChild(currentParent, node, getData(currentParent).keyMap);
   }
 
