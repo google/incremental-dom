@@ -131,8 +131,8 @@ const importNode = function(node) {
     return;
   }
 
-  const nodeName = node.nodeName.toLowerCase();
   const isElement = node instanceof Element;
+  const nodeName = isElement ? node.localName : node.nodeName;
   const key = isElement ? node.getAttribute('key') : null;
   const data = initData(node, nodeName, key);
 
