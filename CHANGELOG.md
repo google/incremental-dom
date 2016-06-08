@@ -1,5 +1,21 @@
 # Change Log
 
+## 0.5.0
+
+- Removed `symbols.placeholder`
+- Removed `#elementPlaceholder`
+- Fixed camelCase SVG tags not being imported correctly
+- Fixed bug where focus was not being maintained on a keyed item
+- Changed `#patchOuter` to allow removing or replacing the node with another
+  single node
+- Changed keyed items to allow being replaced with a different tag
+- Added `#importNode` function to help perserve DOM mutations made on DOM
+  before the first patch
+- Added `#currentPoiner` - the next Node Incrementl DOM will patch
+- Added `#skipNode` - skips the node pointed to by `#currentPointer`
+- Added support for dashed CSS properties (e.g. `background-color`), including
+  CSS custom properties, in a style object
+
 ## 0.4.0
 
 - Deprecated `symbols.placeholder`, will be removed in 0.5.0
