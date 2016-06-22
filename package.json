@@ -31,7 +31,7 @@
     "babel-plugin-transform-inline-environment-variables": "^6.5.0",
     "chai": "^3.0.0",
     "del": "^2.0.2",
-    "google-closure-compiler": "^20160517.1.0",
+    "google-closure-compiler": "^20160619.0.0",
     "gulp": "^3.9.0",
     "gulp-eslint": "^2.0.0",
     "gulp-replace": "^0.5.4",
