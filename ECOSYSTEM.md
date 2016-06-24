@@ -90,6 +90,6 @@ Here's an [example](https://gist.github.com/sparhami/197f3b947712998639eb).
 
 ## Libraries
 
-### Kickflip
+### Skate
 
-[Kickflip](https://github.com/skatejs/kickflip) is library that combines [Skate](https://github.com/skatejs/skatejs), [Named Slots](https://github.com/skatejs/named-slots) and [Incremental DOM](https://github.com/google/incremental-dom) so that you can write functional [web components](http://w3c.github.io/webcomponents/explainer/).
+[Skate](https://github.com/skatejs/skatejs) is library that leverages [Incremental DOM](https://github.com/google/incremental-dom) to encourage functional [web components](http://w3c.github.io/webcomponents/explainer/).
