@@ -126,7 +126,7 @@ function jsMin() {
 }
 
 function jsClosure(done) {
-  env.NODE_ENV = undefined;
+  delete env.NODE_ENV;
   env.min = false;
   var moduleDeclaration = 'goog.module(\'' + googModuleName + '\');';
 
@@ -141,7 +141,7 @@ function jsClosure(done) {
 }
 
 function jsCommonJS() {
-  env.NODE_ENV = undefined;
+  delete env.NODE_ENV;
   env.min = false;
 
   return bundle('cjs')
