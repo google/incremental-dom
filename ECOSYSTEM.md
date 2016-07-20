@@ -93,3 +93,7 @@ Here's an [example](https://gist.github.com/sparhami/197f3b947712998639eb).
 ### Skate
 
 [Skate](https://github.com/skatejs/skatejs) is library that leverages [Incremental DOM](https://github.com/google/incremental-dom) to encourage functional [web components](http://w3c.github.io/webcomponents/explainer/).
+
+### FerrugemJS
+
+[FerrugemJS](https://github.com/ferrugemjs/library) is a library inspired by the Aurelia and React using [Incremental DOM](https://github.com/google/incremental-dom) with [superviews.js](https://github.com/davidjamesstone/superviews.js) as template language.
