@@ -27,7 +27,10 @@ const hasOwnProperty = Object.prototype.hasOwnProperty;
  */
 function Blank() {}
 
-Blank.prototype = Object.create(null);
+// Use Object.create, if available, so iteration over the map will not include
+// any properties added to Object.prototype. If it's not available then fallback
+// to using and object literal (which will include any Object.prototype props).
+Blank.prototype = Object.create ? Object.create(null) : {};
 
 
 /**
