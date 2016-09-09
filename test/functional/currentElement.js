@@ -50,7 +50,7 @@ describe('currentElement', () => {
   it('should return the element from elementOpenEnd', () => {
     patch(container, () => {
       elementOpenStart('div');
-      elementOpenEnd('div');
+      elementOpenEnd();
       el = currentElement();
       elementClose('div');
     });
@@ -86,7 +86,7 @@ describe('currentElement', () => {
       patch(container, () => {
         elementOpenStart('div');
         el = currentElement();
-        elementOpenEnd('div');
+        elementOpenEnd();
         elementClose('div');
       });
     }).to.throw('currentElement() can not be called between elementOpenStart() and elementOpenEnd().');

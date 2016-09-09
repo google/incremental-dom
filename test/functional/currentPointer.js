@@ -96,7 +96,7 @@ describe('currentPointer', () => {
       patch(container, () => {
         elementOpenStart('div');
         currentPointer();
-        elementOpenEnd('div');
+        elementOpenEnd();
         elementClose('div');
       });
     }).to.throw('currentPointer() can not be called between elementOpenStart() and elementOpenEnd().');

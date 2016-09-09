@@ -91,7 +91,7 @@ describe('patching an element\'s children', () => {
       it('from elementOpenEnd', () => {
         patchInner(container, () => {
           elementOpenStart('div');
-          node = elementOpenEnd('div');
+          node = elementOpenEnd();
           elementClose('div');
         });
 

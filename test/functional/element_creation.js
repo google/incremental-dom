@@ -99,7 +99,7 @@ describe('element creation', () => {
       it('from elementOpenEnd', () => {
         patch(container, () => {
           elementOpenStart('div');
-          el = elementOpenEnd('div');
+          el = elementOpenEnd();
           elementClose('div');
         });
 

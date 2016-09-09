@@ -96,7 +96,7 @@ describe('virtual attribute updates', () => {
   it('should throw when virtual attributes element is closed without being opened', () => {
     expect(() => {
       patch(container, () => {
-        elementOpenEnd('div');
+        elementOpenEnd();
       });
     }).to.throw('elementOpenEnd() can only be called after calling elementOpenStart().');
   });
