@@ -45,9 +45,10 @@ const getNamespaceForTag = function(tag, parent) {
  * @param {?Node} parent
  * @param {string} tag The tag for the Element.
  * @param {?string=} key A key to identify the Element.
+ * @param {*=} typeId The type identifier for the Element.
  * @return {!Element}
  */
-const createElement = function(doc, parent, tag, key) {
+const createElement = function(doc, parent, tag, key, typeId) {
   const namespace = getNamespaceForTag(tag, parent);
   let el;
 
@@ -57,7 +58,7 @@ const createElement = function(doc, parent, tag, key) {
     el = doc.createElement(tag);
   }
 
-  initData(el, tag, key);
+  initData(el, tag, key, typeId);
 
   return el;
 };

@@ -18,6 +18,8 @@ export {
   patchInner as patch,
   patchInner,
   patchOuter,
+  open,
+  close,
   currentElement,
   currentPointer,
   skip,

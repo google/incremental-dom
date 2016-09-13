@@ -15,8 +15,8 @@
  */
 
 import {
-  elementOpen as coreElementOpen,
-  elementClose as coreElementClose,
+  open,
+  close,
   text as coreText
 } from './core';
 import { updateAttribute } from './attributes';
@@ -64,7 +64,7 @@ const elementOpen = function(tag, key, statics, var_args) {
     assertNotInSkip('elementOpen');
   }
 
-  const node = coreElementOpen(tag, key);
+  const node = open(tag, key);
   const data = getData(node);
 
   if (!data.staticsApplied) {
@@ -207,7 +207,7 @@ const elementClose = function(tag) {
     assertNotInAttributes('elementClose');
   }
 
-  const node = coreElementClose();
+  const node = close();
 
   if (process.env.NODE_ENV !== 'production') {
     assertCloseMatchesOpenTag(getData(node).nodeName, tag);

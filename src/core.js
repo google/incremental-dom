@@ -113,10 +113,9 @@ const patchFactory = function(run) {
 /**
  * Patches the document starting at node with the provided function. This
  * function may be called during an existing patch operation.
- * @param {!Element|!DocumentFragment} node The Element or Document
- *     to patch.
- * @param {!function(T)} fn A function containing elementOpen/elementClose/etc.
- *     calls that describe the DOM.
+ * @param {!Element|!DocumentFragment} node The Element or Documen to patch.
+ * @param {!function(T)} fn A function containing open/close/etc. calls that
+ *     describe the DOM.
  * @param {T=} data An argument passed to fn to represent DOM state.
  * @return {!Node} The patched node.
  * @template T
@@ -140,9 +139,8 @@ const patchInner = patchFactory(function(node, fn, data) {
  * Patches an Element with the the provided function. Exactly one top level
  * element call should be made corresponding to `node`.
  * @param {!Element} node The Element where the patch should start.
- * @param {!function(T)} fn A function containing elementOpen/elementClose/etc.
- *     calls that describe the DOM. This should have at most one top level
- *     element call.
+ * @param {!function(T)} fn A function containing open/close/etc. calls that
+ *     describe the DOM. This should have at most one top level element call.
  * @param {T=} data An argument passed to fn to represent DOM state.
  * @return {?Node} The node if it was updated, its replacedment or null if it
  *     was removed.
@@ -181,15 +179,19 @@ const patchOuter = patchFactory(function(node, fn, data) {
  * @param {!Node} matchNode A node to match the data to.
  * @param {?string} nodeName The nodeName for this node.
  * @param {?string=} key An optional key that identifies a node.
+ * @param {*=} typeId An type identifier that avoids reuse between elements that
+ *     would otherwise match.
  * @return {boolean} True if the node matches, false otherwise.
  */
-const matches = function(matchNode, nodeName, key) {
+const matches = function(matchNode, nodeName, key, typeId) {
   const data = getData(matchNode);
 
   // Key check is done using double equals as we want to treat a null key the
   // same as undefined. This should be okay as the only values allowed are
   // strings, null and undefined so the == semantics are not too weird.
-  return nodeName === data.nodeName && key == data.key;
+  return nodeName === data.nodeName &&
+         typeId === data.typeId &&
+         key == data.key;
 };
 
 
@@ -199,9 +201,11 @@ const matches = function(matchNode, nodeName, key) {
  * @param {string} nodeName For an Element, this should be a valid tag string.
  *     For a Text, this should be #text.
  * @param {?string=} key The key used to identify this element.
+ * @param {*=} typeId An type identifier that avoids reuse between elements that
+ *     would otherwise match.
  */
-const alignWithDOM = function(nodeName, key) {
-  if (currentNode && matches(currentNode, nodeName, key)) {
+const alignWithDOM = function(nodeName, key, typeId) {
+  if (currentNode && matches(currentNode, nodeName, key, typeId)) {
     return;
   }
 
@@ -214,7 +218,7 @@ const alignWithDOM = function(nodeName, key) {
   if (key) {
     const keyNode = keyMap[key];
     if (keyNode) {
-      if (matches(keyNode, nodeName, key)) {
+      if (matches(keyNode, nodeName, key, typeId)) {
         node = keyNode;
       } else if (keyNode !== currentNode) {
         removeChild(currentParent, keyNode, keyMap);
@@ -227,7 +231,7 @@ const alignWithDOM = function(nodeName, key) {
     if (nodeName === '#text') {
       node = createText(doc);
     } else {
-      node = createElement(doc, currentParent, nodeName, key);
+      node = createElement(doc, currentParent, nodeName, key, typeId);
     }
 
     if (key) {
@@ -353,11 +357,13 @@ const exitNode = function() {
  * @param {?string=} key The key used to identify this element. This can be an
  *     empty string, but performance may be better if a unique value is used
  *     when iterating over an array of items.
+ * @param {*=} typeId An type identifier that avoids reuse between elements that
+ *     would otherwise match.
  * @return {!Element} The corresponding Element.
  */
-const elementOpen = function(tag, key) {
+const open = function(tag, key, typeId) {
   nextNode();
-  alignWithDOM(tag, key);
+  alignWithDOM(tag, key, typeId);
   enterNode();
   return /** @type {!Element} */(currentParent);
 };
@@ -369,7 +375,7 @@ const elementOpen = function(tag, key) {
  *
  * @return {!Element} The corresponding Element.
  */
-const elementClose = function() {
+const close = function() {
   if (process.env.NODE_ENV !== 'production') {
     setInSkip(false);
   }
@@ -439,11 +445,11 @@ const skipNode = nextNode;
 
 /** */
 export {
-  elementOpen,
-  elementClose,
   text,
   patchInner,
   patchOuter,
+  open,
+  close,
   currentElement,
   currentPointer,
   skip,

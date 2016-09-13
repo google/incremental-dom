@@ -27,9 +27,10 @@ const DATA_PROP = '__incrementalDOMData';
  * Keeps track of information needed to perform diffs for a given DOM node.
  * @param {!string} nodeName
  * @param {?string=} key
+ * @param {*=} typeId
  * @constructor
  */
-function NodeData(nodeName, key) {
+function NodeData(nodeName, key, typeId) {
   /**
    * The attributes and their values.
    * @const {!Object<string, *>}
@@ -91,6 +92,11 @@ function NodeData(nodeName, key) {
    * @type {?string}
    */
   this.text = null;
+
+  /**
+   * @const
+   */
+  this.typeId = typeId;
 }
 
 
@@ -100,10 +106,11 @@ function NodeData(nodeName, key) {
  * @param {Node} node The node to initialize data for.
  * @param {string} nodeName The node name of node.
  * @param {?string=} key The key that identifies the node.
+ * @param {*=} typeId The type identifier for the Node.
  * @return {!NodeData} The newly initialized data object
  */
-const initData = function(node, nodeName, key) {
-  const data = new NodeData(nodeName, key);
+const initData = function(node, nodeName, key, typeId) {
+  const data = new NodeData(nodeName, key, typeId);
   node[DATA_PROP] = data;
   return data;
 };

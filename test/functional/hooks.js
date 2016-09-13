@@ -16,7 +16,6 @@
 
 import {
   patch,
-  text,
   elementVoid,
   symbols,
   attributes
