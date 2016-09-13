@@ -19,7 +19,6 @@ import {
   createText
 } from './nodes';
 import { getData } from './node_data';
-import { Context } from './context';
 import {
   assertInPatch,
   assertNoUnclosedTags,
@@ -35,9 +34,6 @@ import {
   moveBefore
 } from './dom_util';
 
-
-/** @type {?Context} */
-let context = null;
 
 /** @type {?Node} */
 let currentNode = null;
@@ -79,14 +75,12 @@ const patchFactory = function(run) {
    * @template T
    */
   const f = function(node, fn, data) {
-    const prevContext = context;
     const prevDoc = doc;
     const prevCurrentNode = currentNode;
     const prevCurrentParent = currentParent;
     let previousInAttributes = false;
     let previousInSkip = false;
 
-    context = new Context();
     doc = node.ownerDocument;
     currentParent = node.parentNode;
 
@@ -106,9 +100,6 @@ const patchFactory = function(run) {
       setInSkip(previousInSkip);
     }
 
-    context.notifyChanges();
-
-    context = prevContext;
     doc = prevDoc;
     currentNode = prevCurrentNode;
     currentParent = prevCurrentParent;
@@ -225,9 +216,7 @@ const alignWithDOM = function(nodeName, key) {
     if (keyNode) {
       if (matches(keyNode, nodeName, key)) {
         node = keyNode;
-      } else if (keyNode === currentNode) {
-        context.markDeleted(keyNode);
-      } else {
+      } else if (keyNode !== currentNode) {
         removeChild(currentParent, keyNode, keyMap);
       }
     }
@@ -244,8 +233,6 @@ const alignWithDOM = function(nodeName, key) {
     if (key) {
       keyMap[key] = node;
     }
-
-    context.markCreated(node);
   }
 
   // Re-order the node into the right position, preserving focus if either
@@ -275,7 +262,6 @@ const alignWithDOM = function(nodeName, key) {
  */
 const removeChild = function(node, child, keyMap) {
   node.removeChild(child);
-  context.markDeleted(/** @type {!Node}*/(child));
 
   const key = getData(child).key;
   if (key) {
@@ -310,7 +296,6 @@ const clearUnvisitedDOM = function() {
     for (key in keyMap) {
       child = keyMap[key];
       if (child.parentNode !== node) {
-        context.markDeleted(child);
         delete keyMap[key];
       }
     }
@@ -413,7 +398,7 @@ const text = function() {
  */
 const currentElement = function() {
   if (process.env.NODE_ENV !== 'production') {
-    assertInPatch('currentElement', context);
+    assertInPatch('currentElement', doc);
     assertNotInAttributes('currentElement');
   }
   return /** @type {!Element} */(currentParent);
@@ -425,7 +410,7 @@ const currentElement = function() {
  */
 const currentPointer = function() {
   if (process.env.NODE_ENV !== 'production') {
-    assertInPatch('currentPointer', context);
+    assertInPatch('currentPointer', doc);
     assertNotInAttributes('currentPointer');
   }
   return getNextNode();

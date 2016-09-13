@@ -19,8 +19,7 @@ import {
   text,
   elementVoid,
   symbols,
-  attributes,
-  notifications
+  attributes
 } from '../../index';
 
 
@@ -160,125 +159,6 @@ describe('library hooks', () => {
         expect(allSpy).to.have.been.calledWith(el, 'staticName', 'staticValue');
         expect(allSpy).to.have.been.calledWith(el, 'dynamicName', 'dynamicValue');
       });
-    });
-  });
-
-  describe('for being notified when nodes are created and added to DOM', () => {
-    beforeEach(() => {
-      notifications.nodesCreated = sandbox.spy((nodes)=> {
-        expect(nodes[0].parentNode).to.not.equal(null);
-      });
-    });
-
-    afterEach(() => {
-      notifications.nodesCreated = null;
-    });
-
-    it('should be called for elements', () => {
-      patch(container, function render() {
-        elementVoid('div', 'key', ['staticName', 'staticValue']);
-      });
-      const el = container.childNodes[0];
-
-      expect(notifications.nodesCreated).to.have.been.calledOnce;
-      expect(notifications.nodesCreated).calledWith([el]);
-    });
-
-    it('should be called for text', () => {
-      patch(container, function render() {
-        text('hello');
-      });
-      const el = container.childNodes[0];
-
-      expect(notifications.nodesCreated).to.have.been.calledOnce;
-      expect(notifications.nodesCreated).calledWith([el]);
-    });
-  });
-
-  describe('for being notified when nodes are deleted from the DOM', () => {
-    function render(withTxt) {
-      if (withTxt) {
-        text('hello');
-      } else {
-        elementVoid('div', 'key2', ['staticName', 'staticValue']);
-      }
-    }
-
-    function empty() {}
-
-    beforeEach(() => {
-      notifications.nodesDeleted = sandbox.spy((nodes)=> {
-        expect(nodes[0].parentNode).to.equal(null);
-      });
-    });
-
-    afterEach(() => {
-      notifications.nodesDeleted = null;
-    });
-
-    it('should be called for detached element', () => {
-      patch(container, render, false);
-      const el = container.childNodes[0];
-      patch(container, empty);
-
-      expect(notifications.nodesDeleted).to.have.been.calledOnce;
-      expect(notifications.nodesDeleted).calledWith([el]);
-    });
-
-    it('should be called for detached text', () => {
-      patch(container, render, true);
-      const el = container.childNodes[0];
-      patch(container, empty);
-
-      expect(notifications.nodesDeleted).to.have.been.calledOnce;
-      expect(notifications.nodesDeleted).calledWith([el]);
-    });
-
-    it('should be called for replaced element', () => {
-      patch(container, render, false);
-      const el = container.childNodes[0];
-      patch(container, render, true);
-
-      expect(notifications.nodesDeleted).to.have.been.calledOnce;
-      expect(notifications.nodesDeleted).calledWith([el]);
-    });
-
-    it('should be called for removed text', () => {
-      patch(container, render, true);
-      const el = container.childNodes[0];
-      patch(container, render, false);
-
-      expect(notifications.nodesDeleted).to.have.been.calledOnce;
-      expect(notifications.nodesDeleted).calledWith([el]);
-    });
-
-  });
-
-  describe('for not being notified when Elements are reordered', () => {
-    function render(first) {
-      if (first) {
-        elementVoid('div', 'keyA', ['staticName', 'staticValue']);
-      }
-      elementVoid('div', 'keyB')
-      if (!first) {
-        elementVoid('div', 'keyA', ['staticName', 'staticValue']);
-      }
-    }
-
-    beforeEach(() => {
-      notifications.nodesDeleted = sandbox.spy();
-    });
-
-    afterEach(() => {
-      notifications.nodesDeleted = null;
-    });
-
-    it('should not call the nodesDeleted callback', () => {
-      patch(container, render, true);
-      container.childNodes[0];
-      patch(container, render, false);
-
-      expect(notifications.nodesDeleted).never;
     });
   });
 });
