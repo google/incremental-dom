@@ -65,7 +65,14 @@ patch(myElement, function() {
 - [Introducing Incremental Dom](https://medium.com/google-developers/introducing-incremental-dom-e98f79ce2c5f)
 - [Docs and demos](http://google.github.io/incremental-dom/)
 
-### Installation
+## Getting Incremental DOM
+
+### Via CDN
+
+https://ajax.googleapis.com/ajax/libs/incrementaldom/0.5.0/incremental-dom.js
+https://ajax.googleapis.com/ajax/libs/incrementaldom/0.5.0/incremental-dom-min.js
+
+### Using npm
 
 ```sh
 npm install incremental-dom
