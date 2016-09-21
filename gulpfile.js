@@ -113,6 +113,10 @@ function jsWatch() {
   gulp.watch(srcs, ['js']);
 }
 
+function jsMinWatch() {
+  gulp.watch(srcs, ['js-min']);
+}
+
 function jsMin() {
   env.NODE_ENV = 'production';
   env.min = true;
@@ -181,8 +185,9 @@ gulp.task('unit-phantom', unitPhantom);
 gulp.task('unit-watch', unitWatch);
 gulp.task('lint', lint);
 gulp.task('js', js);
-gulp.task('js-watch', jsWatch);
+gulp.task('js-watch', ['js'], jsWatch);
 gulp.task('js-min', jsMin);
+gulp.task('js-min-watch', ['js-min'], jsMinWatch);
 gulp.task('js-dist', jsDist);
 gulp.task('js-closure', jsClosure);
 gulp.task('js-closure-checks', jsClosureChecks);
