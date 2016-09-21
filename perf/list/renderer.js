@@ -35,19 +35,19 @@ function ListRenderer(container, lib) {
     var items = props.items;
     var selectedKeys = props.selectedKeys;
 
-    elementOpen('div', null, listStatics);
+    elementOpen('ul', null, listStatics);
 
     for(var i = 0; i < items.length; i += 1) {
       var item = items[i];
       var isSelected = selectedKeys[item.key];
 
-      elementOpen('div', item.key, itemStatics,
+      elementOpen('li', item.key, itemStatics,
             'aria-selected', isSelected);
       
         elementVoid('div', null, checkboxStatics,
             'aria-checked', 'false');
 
-        elementVoid('div', null, starStatics,
+        elementVoid('button', null, starStatics,
             'data-starred', item.starred,
             'aria-label', item.starred ? 'Starred' : 'Not Starred');
         
@@ -56,19 +56,19 @@ function ListRenderer(container, lib) {
           text(item.sender);
         elementClose('span');
 
-        elementOpen('span', null, subjectStatics,
+        elementOpen('a', null, subjectStatics,
             'title', item.subject);
           text(item.subject);
-        elementClose('span');
+        elementClose('a');
 
         elementOpen('span');
           text(item.date);
         elementClose('span');
 
-      elementClose('div');
+      elementClose('li');
     }
     
-    elementClose('div'); 
+    elementClose('ul'); 
   }
 
   this.render = function(props) {

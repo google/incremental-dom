@@ -1,6 +1,8 @@
 #list {
   display: flex;
   flex-direction: column;
+
+  padding: 0;
 }
  
 .message {
@@ -20,6 +22,10 @@
 .checkbox::before {
   content: "\2610";
   margin: 4px;
+}
+
+.star {
+  all: initial;
 }
 
 .star::before {

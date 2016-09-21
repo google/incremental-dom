@@ -59,7 +59,9 @@ function MutationRenderer(container, lib) {
         elementOpen('td', null, changeStatics,
             'data-positive', item.change >= 0);
           text(delta, toFixedTwo);
-          text(item.change, toPercent, toFixedTwo, wrapChange)
+          elementOpen('strong'); 
+            text(item.change, toPercent, toFixedTwo, wrapChange)
+          elementClose('strong');
         elementClose('td');
       elementClose('tr');
     }
