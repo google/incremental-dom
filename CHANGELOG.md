@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.5.1
+
+- Fixed a performance regression causing patch to take up to 3x longer
+
 ## 0.5.0
 
 - Removed `symbols.placeholder`
