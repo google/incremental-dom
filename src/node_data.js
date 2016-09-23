@@ -18,12 +18,6 @@ import { createMap } from './util';
 
 
 /**
- * The property name where we store Incremental DOM data.
- */
-const DATA_PROP = '__incrementalDOMData';
-
-
-/**
  * Keeps track of information needed to perform diffs for a given DOM node.
  * @param {!string} nodeName
  * @param {?string=} key
@@ -111,7 +105,7 @@ function NodeData(nodeName, key, typeId) {
  */
 const initData = function(node, nodeName, key, typeId) {
   const data = new NodeData(nodeName, key, typeId);
-  node[DATA_PROP] = data;
+  node['__incrementalDOMData'] = data;
   return data;
 };
 
@@ -124,7 +118,7 @@ const initData = function(node, nodeName, key, typeId) {
  */
 const getData = function(node) {
   importNode(node);
-  return node[DATA_PROP];
+  return node['__incrementalDOMData'];
 };
 
 
@@ -134,7 +128,7 @@ const getData = function(node) {
  * @param {?Node} node The Node to import.
  */
 const importNode = function(node) {
-  if (node[DATA_PROP]) {
+  if (node['__incrementalDOMData']) {
     return;
   }
 
