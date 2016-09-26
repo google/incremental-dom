@@ -69,8 +69,8 @@ patch(myElement, function() {
 
 ### Via CDN
 
-https://ajax.googleapis.com/ajax/libs/incrementaldom/0.5.0/incremental-dom.js
-https://ajax.googleapis.com/ajax/libs/incrementaldom/0.5.0/incremental-dom-min.js
+https://ajax.googleapis.com/ajax/libs/incrementaldom/0.5.1/incremental-dom.js
+https://ajax.googleapis.com/ajax/libs/incrementaldom/0.5.1/incremental-dom-min.js
 
 ### Using npm
 
