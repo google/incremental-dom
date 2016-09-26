@@ -42,7 +42,7 @@ function createTests(Renderer, tests, impls) {
     update(); 
     run();
 
-    window.location.hash = tests.indexOf(test) + ',' + impls.indexOf(impl);
+    window.location.hash = impls.indexOf(impl) + ',' + tests.indexOf(test);
   }
 
   function setTest(test) {
@@ -100,9 +100,9 @@ function createTests(Renderer, tests, impls) {
       });
   }
 
-  var parts = window.location.hash.split(',');
-  var test = Number(parts[0]) || 0;
-  var impl = Number(parts[1]) || 0;
+  var parts = window.location.hash.substring(1).split(',');
+  var impl = Number(parts[0]) || 0;
+  var test = Number(parts[1]) || 0;
 
   setTestAndImpl(tests[test], impls[impl]);
 }
