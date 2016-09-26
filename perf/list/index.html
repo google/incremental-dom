@@ -6,124 +6,29 @@
     <script src="../creation-innerhtml.js"></script>
     <script src="../stats.js"></script>
     <script src="../samples.js"></script>
+    <script src="../create-tests.js"></script>
 
     <script src="setup.js"></script>
     <script src="creation.js"></script>
     <script src="selection.js"></script>
     <script src="selection-raf.js"></script>
     <script src="renderer.js"></script>
-
-    <style>
-      #container [aria-selected="true"] {
-        color: white;
-        background-color: blue;
-      }
-
-      #container button {
-        margin: 4px 4px;
-      }
-    </style>
   </head>
   <body>
-    <div id="container"></div>
-    <div id="testContainer"></div>
-
     <script>
-      (function() {
-        var patch = IncrementalDOM.patch;
-        var eo = IncrementalDOM.elementOpen;
-        var ec = IncrementalDOM.elementClose;
-        var tx = IncrementalDOM.text;
-
-        var TESTS = [
+      createTests(
+        ListRenderer,
+        [
           { name: 'selection', fn: Selection },
           { name: 'selection_raf', fn: SelectionRaf },
           { name: 'creation', fn: Creation }
-        ];
-
-        var IMPLS = [
+        ],
+        [
           { name: 'IncrementalDOM', obj: IncrementalDOM },
           { name: 'creation-js', obj: CreationJs },
           { name: 'creation-innerHTML', obj: CreationInnerHtml }
-        ];
-
-        var currentTest;
-        var currentImpl;
-        var currentRenderer;
-        var results;
-        var running;
-
-        function update() {
-          patch(container, render);
-        }
-
-        function setTestAndImpl(test, impl) {
-          currentTest = test;
-          currentImpl = impl;
-          currentRenderer = new ListRenderer(testContainer, impl.obj);
-
-          running = true;
-          update(); 
-          run();
-        }
-
-        function setTest(test) {
-          setTestAndImpl(test, currentImpl);
-        }
-
-        function setImpl(impl) {
-          setTestAndImpl(currentTest, impl);
-        }
-
-        function render() {
-          eo('div');
-            IMPLS.forEach(function(impl) {
-              eo('button', null, null,
-                  'disabled', running || undefined,
-                  'aria-selected', currentImpl === impl,
-                  'onclick', function() { setImpl(impl); });
-                tx(impl.name);
-              ec('button');
-            });
-          ec('div');
-
-          eo('div');
-            TESTS.forEach(function(test) {
-              eo('button', null, null,
-                  'disabled', running || undefined,
-                  'aria-selected', currentTest === test,
-                  'onclick', function() { setTest(test); });
-                tx(test.name);
-              ec('button');
-            });
-          ec('div');
-
-          eo('div');
-           if (running) {
-             tx('running');
-           } else {
-             tx(results);
-           }
-          ec('div');
-        }
-
-        function delay(time) {
-          return new Promise(function(resolve) { setTimeout(resolve, time); });
-        }
-      
-        function run() {
-          delay(100)
-            .then(function() { return currentTest.fn.run(currentRenderer) })
-            .then(function(samples) { return Stats.avg(Stats.filterOutliers(samples)) })
-            .then(function(avg) {
-              results = `time per iteration: ${avg.toFixed(3)}ms`;
-              running = false;
-              update();
-            });
-        }
-
-        setTestAndImpl(TESTS[2], IMPLS[0]);
-      })();
+        ]
+      );
     </script>
   </body>
 </html>
