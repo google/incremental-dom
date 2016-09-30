@@ -26,24 +26,12 @@ import { createMap } from './util';
  */
 function NodeData(nodeName, key, typeId) {
   /**
-   * The attributes and their values.
-   * @const {!Object<string, *>}
-   */
-  this.attrs = createMap();
-
-  /**
    * An array of attribute name/value pairs, used for quickly diffing the
    * incomming attributes to see if the DOM node's attributes need to be
    * updated.
    * @const {Array<*>}
    */
   this.attrsArr = [];
-
-  /**
-   * The incoming attributes for this Node, before they are updated.
-   * @const {!Object<string, *>}
-   */
-  this.newAttrs = createMap();
 
   /**
    * Whether or not the statics have been applied for the node yet.
@@ -143,8 +131,6 @@ const importNode = function(node) {
 
   if (isElement) {
     const attributes = node.attributes;
-    const attrs = data.attrs;
-    const newAttrs = data.newAttrs;
     const attrsArr = data.attrsArr;
 
     for (let i = 0; i < attributes.length; i += 1) {
@@ -152,8 +138,6 @@ const importNode = function(node) {
       const name = attr.name;
       const value = attr.value;
 
-      attrs[name] = value;
-      newAttrs[name] = undefined;
       attrsArr.push(name);
       attrsArr.push(value);
     }

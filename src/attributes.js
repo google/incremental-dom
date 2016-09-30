@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { getData } from './node_data';
 import { symbols } from './symbols';
 import {
   createMap,
@@ -136,17 +135,8 @@ const applyAttributeTyped = function(el, name, value) {
  * @param {*} value The attribute's value.
  */
 const updateAttribute = function(el, name, value) {
-  const data = getData(el);
-  const attrs = data.attrs;
-
-  if (attrs[name] === value) {
-    return;
-  }
-
   const mutator = attributes[name] || attributes[symbols.default];
   mutator(el, name, value);
-
-  attrs[name] = value;
 };
 
 
