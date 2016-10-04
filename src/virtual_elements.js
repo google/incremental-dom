@@ -66,12 +66,19 @@ const elementOpen = function(tag, key, statics, var_args) {
 
   const node = open(tag, key);
   const data = getData(node);
+  const attrsArr = data.attrsArr;
+  const newAttrs = data.newAttrs;
+  const isNew = !attrsArr.length;
 
   if (!data.staticsApplied) {
     if (statics) {
       for (let i = 0; i < statics.length; i += 2) {
         const name = /** @type {string} */(statics[i]);
         const value = statics[i + 1];
+        if (name in newAttrs) {
+          delete newAttrs[name];
+          attrsArr.splice(attrsArr.indexOf(name), 2);
+        }
         updateAttribute(node, name, value);
       }
     }
@@ -87,9 +94,6 @@ const elementOpen = function(tag, key, statics, var_args) {
    * individual argument. When attributes have changed, the overhead of this is
    * minimal.
    */
-  const attrsArr = data.attrsArr;
-  const newAttrs = data.newAttrs;
-  const isNew = !attrsArr.length;
   let i = ATTRIBUTES_OFFSET;
   let j = 0;
 

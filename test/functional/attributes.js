@@ -383,6 +383,24 @@ describe('attribute updates', () => {
       expect(grandChild.getAttribute('data-foo')).to.equal('bar');
     });
 
+    it('should allow declaring an imported attribute as static', () => {
+      function render(first) {
+        if (first) {
+          elementVoid('div', null, ['tabindex', '0']);
+        } else {
+          elementVoid('div');
+        }
+      }
+
+      patch(container, render, true);
+      const child = container.childNodes[0];
+
+      expect(child.getAttribute('tabindex')).to.equal('0');
+
+      patch(container, render, false);
+      expect(child.getAttribute('tabindex')).to.equal('0');
+    });
+
   });
 });
 
