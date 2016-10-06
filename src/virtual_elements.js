@@ -28,6 +28,7 @@ import {
   assertCloseMatchesOpenTag,
   setInAttributes
 } from './assertions';
+import { createMap } from './util';
 
 
 /**
@@ -44,6 +45,14 @@ const ATTRIBUTES_OFFSET = 3;
  * @const {Array<*>}
  */
 const argsBuilder = [];
+
+
+/**
+ * Used to keep track of the previous values when a 2-way diff is ncessary.
+ * This object is reused.
+ * @const {Object<*>}
+ */
+const prevAttrsMap = createMap();
 
 
 /**
@@ -88,30 +97,50 @@ const elementOpen = function(tag, key, statics, var_args) {
    * minimal.
    */
   const attrsArr = data.attrsArr;
-  const newAttrs = data.newAttrs;
   const isNew = !attrsArr.length;
   let i = ATTRIBUTES_OFFSET;
   let j = 0;
 
   for (; i < arguments.length; i += 2, j += 2) {
-    const attr = arguments[i];
+    const name = arguments[i];
     if (isNew) {
-      attrsArr[j] = attr;
-      newAttrs[attr] = undefined;
-    } else if (attrsArr[j] !== attr) {
+      attrsArr[j] = name;
+    } else if (attrsArr[j] !== name) {
       break;
     }
 
     const value = arguments[i + 1];
     if (isNew || attrsArr[j + 1] !== value) {
       attrsArr[j + 1] = value;
-      updateAttribute(node, attr, value);
+      updateAttribute(node, name, value);
     }
   }
 
+  /*
+   * Items did not line up exactly as before, need to make sure old items are
+   * removed. This can happen if using conditional logic when declaring
+   * attrs through the elementOpenStart flow or if one element is reused in
+   * the place of another.
+   */
   if (i < arguments.length || j < attrsArr.length) {
-    for (; i < arguments.length; i += 1, j += 1) {
-      attrsArr[j] = arguments[i];
+    const attrsStart = j;
+
+    for (; j < attrsArr.length; j += 2) {
+      prevAttrsMap[attrsArr[j]] = attrsArr[j + 1];
+    }
+
+    for (j = attrsStart; i < arguments.length; i += 2, j += 2) {
+      const name = arguments[i];
+      const value = arguments[i + 1];
+
+      if (prevAttrsMap[name] !== value) {
+        updateAttribute(node, name, value);
+      }
+
+      attrsArr[j] = name;
+      attrsArr[j + 1] = value;
+
+      delete prevAttrsMap[name];
     }
 
     if (j < attrsArr.length) {
@@ -119,17 +148,12 @@ const elementOpen = function(tag, key, statics, var_args) {
     }
 
     /*
-     * Actually perform the attribute update.
+     * At this point, only have attributes that were present before, but have
+     * been removed.
      */
-    for (i = 0; i < attrsArr.length; i += 2) {
-      const name = /** @type {string} */(attrsArr[i]);
-      const value = attrsArr[i + 1];
-      newAttrs[name] = value;
-    }
-
-    for (const attr in newAttrs) {
-      updateAttribute(node, attr, newAttrs[attr]);
-      newAttrs[attr] = undefined;
+    for (const name in prevAttrsMap) {
+      updateAttribute(node, name, undefined);
+      delete prevAttrsMap[name];
     }
   }
 
