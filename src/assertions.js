@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import { NameOrCtorDef } from './types';
+
 
 /**
   * Keeps track whether or not we are in an attributes declaration (after
@@ -114,13 +116,13 @@ const assertVirtualAttributesClosed = function() {
 
 /**
   * Makes sure that tags are correctly nested.
-  * @param {string} nodeName
-  * @param {string} tag
+  * @param {NameOrCtorDef} currentNameOrCtor
+  * @param {NameOrCtorDef} nameOrCtor
   */
-const assertCloseMatchesOpenTag = function(nodeName, tag) {
-  if (nodeName !== tag) {
-    throw new Error('Received a call to close "' + tag + '" but "' +
-        nodeName + '" was open.');
+const assertCloseMatchesOpenTag = function(currentNameOrCtor, nameOrCtor) {
+  if (currentNameOrCtor !== nameOrCtor) {
+    throw new Error('Received a call to close "' + nameOrCtor + '" but "' +
+        currentNameOrCtor + '" was open.');
   }
 };
 

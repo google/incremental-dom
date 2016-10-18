@@ -11,7 +11,10 @@
     "process": true
   },
   "rules": {
-    "no-unused-vars": [2, {"argsIgnorePattern": "var_args"}],
+    "no-unused-vars": [2, {
+      "varsIgnorePattern": "Def$",
+      "argsIgnorePattern": "var_args"
+    }],
     "no-trailing-spaces": 2,
     "no-irregular-whitespace": 2,
     "no-param-reassign": 2,

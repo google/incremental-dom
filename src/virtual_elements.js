@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { NameOrCtorDef } from './types';
 import {
   open,
   close,
@@ -56,7 +57,7 @@ const prevAttrsMap = createMap();
 
 
 /**
- * @param {string} tag The element's tag.
+ * @param {NameOrCtorDef} nameOrCtor The Element's tag or constructor.
  * @param {?string=} key The key used to identify this element. This can be an
  *     empty string, but performance may be better if a unique value is used
  *     when iterating over an array of items.
@@ -67,13 +68,13 @@ const prevAttrsMap = createMap();
  *     for the Element.
  * @return {!Element} The corresponding Element.
  */
-const elementOpen = function(tag, key, statics, var_args) {
+const elementOpen = function(nameOrCtor, key, statics, var_args) {
   if (process.env.NODE_ENV !== 'production') {
     assertNotInAttributes('elementOpen');
     assertNotInSkip('elementOpen');
   }
 
-  const node = open(tag, key);
+  const node = open(nameOrCtor, key);
   const data = getData(node);
 
   if (!data.staticsApplied) {
@@ -167,7 +168,7 @@ const elementOpen = function(tag, key, statics, var_args) {
  * like elementOpen, but the attributes are defined using the attr function
  * rather than being passed as arguments. Must be folllowed by 0 or more calls
  * to attr, then a call to elementOpenEnd.
- * @param {string} tag The element's tag.
+ * @param {NameOrCtorDef} nameOrCtor The Element's tag or constructor.
  * @param {?string=} key The key used to identify this element. This can be an
  *     empty string, but performance may be better if a unique value is used
  *     when iterating over an array of items.
@@ -175,13 +176,13 @@ const elementOpen = function(tag, key, statics, var_args) {
  *     static attributes for the Element. These will only be set once when the
  *     Element is created.
  */
-const elementOpenStart = function(tag, key, statics) {
+const elementOpenStart = function(nameOrCtor, key, statics) {
   if (process.env.NODE_ENV !== 'production') {
     assertNotInAttributes('elementOpenStart');
     setInAttributes(true);
   }
 
-  argsBuilder[0] = tag;
+  argsBuilder[0] = nameOrCtor;
   argsBuilder[1] = key;
   argsBuilder[2] = statics;
 };
@@ -223,10 +224,10 @@ const elementOpenEnd = function() {
 /**
  * Closes an open virtual Element.
  *
- * @param {string} tag The element's tag.
+ * @param {NameOrCtorDef} nameOrCtor The Element's tag or constructor.
  * @return {!Element} The corresponding Element.
  */
-const elementClose = function(tag) {
+const elementClose = function(nameOrCtor) {
   if (process.env.NODE_ENV !== 'production') {
     assertNotInAttributes('elementClose');
   }
@@ -234,7 +235,7 @@ const elementClose = function(tag) {
   const node = close();
 
   if (process.env.NODE_ENV !== 'production') {
-    assertCloseMatchesOpenTag(getData(node).nodeName, tag);
+    assertCloseMatchesOpenTag(getData(node).nameOrCtor, nameOrCtor);
   }
 
   return node;
@@ -244,7 +245,7 @@ const elementClose = function(tag) {
 /**
  * Declares a virtual Element at the current location in the document that has
  * no children.
- * @param {string} tag The element's tag.
+ * @param {NameOrCtorDef} nameOrCtor The Element's tag or constructor.
  * @param {?string=} key The key used to identify this element. This can be an
  *     empty string, but performance may be better if a unique value is used
  *     when iterating over an array of items.
@@ -255,9 +256,9 @@ const elementClose = function(tag) {
  *     for the Element.
  * @return {!Element} The corresponding Element.
  */
-const elementVoid = function(tag, key, statics, var_args) {
+const elementVoid = function(nameOrCtor, key, statics, var_args) {
   elementOpen.apply(null, arguments);
-  return elementClose(tag);
+  return elementClose(nameOrCtor);
 };
 
 

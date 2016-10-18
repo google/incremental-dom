@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
+import { NameOrCtorDef } from './types';
 import { createMap } from './util';
 
 
 /**
  * Keeps track of information needed to perform diffs for a given DOM node.
- * @param {!string} nodeName
+ * @param {NameOrCtorDef} nameOrCtor
  * @param {?string=} key
  * @param {*=} typeId
  * @constructor
  */
-function NodeData(nodeName, key, typeId) {
+function NodeData(nameOrCtor, key, typeId) {
   /**
    * An array of attribute name/value pairs, used for quickly diffing the
    * incomming attributes to see if the DOM node's attributes need to be
@@ -65,10 +66,10 @@ function NodeData(nodeName, key, typeId) {
   this.focused = false;
 
   /**
-   * The node name for this node.
-   * @const {string}
+   * The nodeName or contructor for the Node.
+   * @const {NameOrCtorDef}
    */
-  this.nodeName = nodeName;
+  this.nameOrCtor = nameOrCtor;
 
   /**
    * @type {?string}
@@ -86,13 +87,13 @@ function NodeData(nodeName, key, typeId) {
  * Initializes a NodeData object for a Node.
  *
  * @param {Node} node The node to initialize data for.
- * @param {string} nodeName The node name of node.
+ * @param {NameOrCtorDef} nameOrCtor The nodeName or constructor for the Node.
  * @param {?string=} key The key that identifies the node.
  * @param {*=} typeId The type identifier for the Node.
  * @return {!NodeData} The newly initialized data object
  */
-const initData = function(node, nodeName, key, typeId) {
-  const data = new NodeData(nodeName, key, typeId);
+const initData = function(node, nameOrCtor, key, typeId) {
+  const data = new NodeData(nameOrCtor, key, typeId);
   node['__incrementalDOMData'] = data;
   return data;
 };
