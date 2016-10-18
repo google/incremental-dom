@@ -49,6 +49,13 @@ module.exports = function(config) {
       }
     },
 
+    customLaunchers: {
+      chromeNoSandbox: {
+        base: 'Chrome',
+        flags: ['--no-sandbox']
+      }
+    },
+
     reporters: ['progress'],
 
     port: 9876,

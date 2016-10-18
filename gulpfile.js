@@ -51,12 +51,12 @@ function unit(done) {
   }, done).start();
 }
 
-function unitPhantom(done) {
+function unitDist(done) {
   env.NODE_ENV = 'test';
   new karma.Server({
     configFile: karmaConfig,
     singleRun: true,
-    browsers: ['PhantomJS']
+    browsers: ['chromeNoSandbox']
   }, done).start();
 }
 
@@ -181,7 +181,7 @@ function jsClosureChecks() {
 
 gulp.task('clean', clean);
 gulp.task('unit', unit);
-gulp.task('unit-phantom', unitPhantom);
+gulp.task('unit-dist', unitDist);
 gulp.task('unit-watch', unitWatch);
 gulp.task('lint', lint);
 gulp.task('js', js);
@@ -192,6 +192,6 @@ gulp.task('js-dist', jsDist);
 gulp.task('js-closure', jsClosure);
 gulp.task('js-closure-checks', jsClosureChecks);
 gulp.task('build', ['lint', 'unit'], js);
-gulp.task('dist', ['lint', 'unit-phantom'], jsDist);
+gulp.task('dist', ['lint', 'unit-dist'], jsDist);
 
 gulp.task('default', ['build']);
