@@ -46,11 +46,11 @@ const getAncestry = function(node, root) {
 
 
 /**
- * @param {!Node} node
- * @return {!Node} The root node of the DOM tree that contains node.
+ * @return {!Node} The root node of the DOM tree that contains this node.
+ * @this Node
  */
-const getRoot = function(node) {
-  let cur = node;
+const getRootNode = Node.prototype.getRootNode || function() {
+  let cur = this;
   let prev = cur;
 
   while (cur) {
@@ -68,7 +68,7 @@ const getRoot = function(node) {
  *     corresponding to node, if present.
  */
 const getActiveElement = function(node) {
-  const root = getRoot(node);
+  const root = getRootNode.call(node);
   return isDocumentRoot(root) ? root.activeElement : null;
 };
 
