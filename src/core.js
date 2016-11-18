@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { NameOrCtorDef } from './types';
 import {
   createElement,
   createText
@@ -173,39 +174,38 @@ const patchOuter = patchFactory(function(node, fn, data) {
 
 
 /**
- * Checks whether or not the current node matches the specified nodeName and
+ * Checks whether or not the current node matches the specified nameOrCtor and
  * key.
  *
  * @param {!Node} matchNode A node to match the data to.
- * @param {?string} nodeName The nodeName for this node.
+ * @param {NameOrCtorDef} nameOrCtor The name or constructor to check for.
  * @param {?string=} key An optional key that identifies a node.
  * @param {*=} typeId An type identifier that avoids reuse between elements that
  *     would otherwise match.
  * @return {boolean} True if the node matches, false otherwise.
  */
-const matches = function(matchNode, nodeName, key, typeId) {
+const matches = function(matchNode, nameOrCtor, key, typeId) {
   const data = getData(matchNode);
 
   // Key check is done using double equals as we want to treat a null key the
   // same as undefined. This should be okay as the only values allowed are
   // strings, null and undefined so the == semantics are not too weird.
-  return nodeName === data.nodeName &&
+  return nameOrCtor === data.nameOrCtor &&
          typeId === data.typeId &&
          key == data.key;
 };
 
 
 /**
- * Aligns the virtual Element definition with the actual DOM, moving the
+ * Aligns the virtual Node definition with the actual DOM, moving the
  * corresponding DOM node to the correct location or creating it if necessary.
- * @param {string} nodeName For an Element, this should be a valid tag string.
- *     For a Text, this should be #text.
- * @param {?string=} key The key used to identify this element.
+ * @param {NameOrCtorDef} nameOrCtor The name or constructor for the Node.
+ * @param {?string=} key The key used to identify the Node..
  * @param {*=} typeId An type identifier that avoids reuse between elements that
  *     would otherwise match.
  */
-const alignWithDOM = function(nodeName, key, typeId) {
-  if (currentNode && matches(currentNode, nodeName, key, typeId)) {
+const alignWithDOM = function(nameOrCtor, key, typeId) {
+  if (currentNode && matches(currentNode, nameOrCtor, key, typeId)) {
     return;
   }
 
@@ -218,7 +218,7 @@ const alignWithDOM = function(nodeName, key, typeId) {
   if (key) {
     const keyNode = keyMap[key];
     if (keyNode) {
-      if (matches(keyNode, nodeName, key, typeId)) {
+      if (matches(keyNode, nameOrCtor, key, typeId)) {
         node = keyNode;
       } else if (keyNode !== currentNode) {
         removeChild(currentParent, keyNode, keyMap);
@@ -228,10 +228,10 @@ const alignWithDOM = function(nodeName, key, typeId) {
 
   // Create the node if it doesn't exist.
   if (!node) {
-    if (nodeName === '#text') {
+    if (nameOrCtor === '#text') {
       node = createText(doc);
     } else {
-      node = createElement(doc, currentParent, nodeName, key, typeId);
+      node = createElement(doc, currentParent, nameOrCtor, key, typeId);
     }
 
     if (key) {
@@ -350,10 +350,10 @@ const exitNode = function() {
 
 
 /**
- * Makes sure that the current node is an Element with a matching tagName and
+ * Makes sure that the current node is an Element with a matching nameOrCtor and
  * key.
  *
- * @param {string} tag The element's tag.
+ * @param {NameOrCtorDef} nameOrCtor The tag or constructor for the Element.
  * @param {?string=} key The key used to identify this element. This can be an
  *     empty string, but performance may be better if a unique value is used
  *     when iterating over an array of items.
@@ -361,9 +361,9 @@ const exitNode = function() {
  *     would otherwise match.
  * @return {!Element} The corresponding Element.
  */
-const open = function(tag, key, typeId) {
+const open = function(nameOrCtor, key, typeId) {
   nextNode();
-  alignWithDOM(tag, key, typeId);
+  alignWithDOM(nameOrCtor, key, typeId);
   enterNode();
   return /** @type {!Element} */(currentParent);
 };

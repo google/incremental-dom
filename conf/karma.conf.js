@@ -24,6 +24,7 @@ module.exports = function(config) {
     basePath: '../',
 
     files: [
+      'test/util/globals.js',
       'test/functional/**/*.js'
     ],
 
@@ -37,7 +38,7 @@ module.exports = function(config) {
         plugins: [
           multi(),
           babel({
-            exclude: 'node_modules/**',
+            exclude: ['node_modules/**', 'test/util/globals.js'],
             plugins: ['transform-inline-environment-variables']
           })
         ]

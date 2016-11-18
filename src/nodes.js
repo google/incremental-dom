@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { NameOrCtorDef } from './types';
 import {
     getData,
     initData
@@ -31,7 +32,7 @@ const getNamespaceForTag = function(tag, parent) {
     return 'http://www.w3.org/2000/svg';
   }
 
-  if (getData(parent).nodeName === 'foreignObject') {
+  if (getData(parent).nameOrCtor === 'foreignObject') {
     return null;
   }
 
@@ -43,22 +44,27 @@ const getNamespaceForTag = function(tag, parent) {
  * Creates an Element.
  * @param {Document} doc The document with which to create the Element.
  * @param {?Node} parent
- * @param {string} tag The tag for the Element.
+ * @param {NameOrCtorDef} nameOrCtor The tag or constructor for the Element.
  * @param {?string=} key A key to identify the Element.
  * @param {*=} typeId The type identifier for the Element.
  * @return {!Element}
  */
-const createElement = function(doc, parent, tag, key, typeId) {
-  const namespace = getNamespaceForTag(tag, parent);
+const createElement = function(doc, parent, nameOrCtor, key, typeId) {
   let el;
 
-  if (namespace) {
-    el = doc.createElementNS(namespace, tag);
+  if (typeof nameOrCtor === 'function') {
+    el = new nameOrCtor();
   } else {
-    el = doc.createElement(tag);
+    const namespace = getNamespaceForTag(nameOrCtor, parent);
+
+    if (namespace) {
+      el = doc.createElementNS(namespace, nameOrCtor);
+    } else {
+      el = doc.createElement(nameOrCtor);
+    }
   }
 
-  initData(el, tag, key, typeId);
+  initData(el, nameOrCtor, key, typeId);
 
   return el;
 };
