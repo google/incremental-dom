@@ -20,10 +20,7 @@
  * @return {boolean} True if the node the root of a document, false otherwise.
  */
 const isDocumentRoot = function(node) {
-  // For ShadowRoots, check if they are a DocumentFragment instead of if they
-  // are a ShadowRoot so that this can work in 'use strict' if ShadowRoots are
-  // not supported.
-  return node instanceof Document || node instanceof DocumentFragment;
+  return node.nodeType === 11 || node.nodeType === 9;
 };
 
 
