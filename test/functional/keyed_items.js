@@ -169,6 +169,21 @@ describe('rendering with keys', () => {
     expect(firstNode.parentNode).to.equal(null);
   });
 
+  it('should patch correctly when child in key map is manually removed', () => {
+    function render(tag) {
+      elementVoid(tag, 'key');
+    }
+
+    patch(container, render, 'div');
+    const firstNode = container.firstChild;
+
+    container.removeChild(firstNode);
+
+    patch(container, render, 'span');
+    const newNode = container.firstChild;
+    expect(newNode.nodeName).to.equal('SPAN');
+  });
+
   it('should preserve nodes already in the DOM', () => {
     function render() {
       elementVoid('div', 'key');
