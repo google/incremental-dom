@@ -265,7 +265,9 @@ const alignWithDOM = function(nameOrCtor, key, typeId) {
  * @param {?Object<string, !Element>} keyMap
  */
 const removeChild = function(node, child, keyMap) {
-  node.removeChild(child);
+  if (child.parentNode === node) {
+    node.removeChild(child);
+  }
 
   const key = getData(child).key;
   if (key) {
