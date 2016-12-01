@@ -71,5 +71,15 @@ describe('typeId', () => {
 
     expect(container.children).to.have.length(2);
   });
+
+  it('should re-use elements created externally', () => {
+    const div = document.createElement('div');
+    div.typeId = 'someTypeId';
+
+    container.appendChild(div);
+    patch(container, () => render('div', null, div.typeId));
+
+    expect(container.firstChild).to.equal(div);
+  });
 });
 

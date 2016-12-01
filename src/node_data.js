@@ -124,7 +124,8 @@ const importNode = function(node) {
   const isElement = node instanceof Element;
   const nodeName = isElement ? node.localName : node.nodeName;
   const key = isElement ? node.getAttribute('key') : null;
-  const data = initData(node, nodeName, key);
+  const typeId = node['typeId'];
+  const data = initData(node, nodeName, key, typeId);
 
   if (key) {
     getData(node.parentNode).keyMap[key] = node;
