@@ -121,7 +121,7 @@ const importNode = function(node) {
     return;
   }
 
-  const isElement = node instanceof Element;
+  const isElement = node.nodeType === 1;
   const nodeName = isElement ? node.localName : node.nodeName;
   const key = isElement ? node.getAttribute('key') : null;
   const data = initData(node, nodeName, key);
