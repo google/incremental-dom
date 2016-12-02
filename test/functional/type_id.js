@@ -17,7 +17,8 @@
 import {
   patch,
   open,
-  close
+  close,
+  elementVoid
 } from '../../index';
 
 describe('typeId', () => {
@@ -70,6 +71,22 @@ describe('typeId', () => {
     });
 
     expect(container.children).to.have.length(2);
+  });
+
+  it('should pass typeId through virtual elements', () => {
+    patch(container, () => render('div', null, 1));
+    const div = container.firstChild;
+
+    patch(container, () => {
+      elementVoid('div', null, null, 'attr', 'value', 1);
+    });
+    expect(container.firstChild).to.equal(div);
+    expect(div.getAttribute('attr')).to.equal('value');
+
+    patch(container, () => {
+      elementVoid('div', null, null, 'attr', 'value', 2);
+    });
+    expect(container.firstChild).to.not.equal(div);
   });
 });
 

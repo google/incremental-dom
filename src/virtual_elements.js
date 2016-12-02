@@ -64,8 +64,10 @@ const prevAttrsMap = createMap();
  * @param {?Array<*>=} statics An array of attribute name/value pairs of the
  *     static attributes for the Element. These will only be set once when the
  *     Element is created.
- * @param {...*} var_args, Attribute name/value pairs of the dynamic attributes
+ * @param {...*} var_args Attribute name/value pairs of the dynamic attributes
  *     for the Element.
+ * @param {*=} typeId An type identifier that avoids reuse between elements that
+ *     would otherwise match.
  * @return {!Element} The corresponding Element.
  */
 const elementOpen = function(nameOrCtor, key, statics, var_args) {
@@ -74,7 +76,15 @@ const elementOpen = function(nameOrCtor, key, statics, var_args) {
     assertNotInSkip('elementOpen');
   }
 
-  const node = open(nameOrCtor, key);
+  let varArgsLength = arguments.length;
+  let typeId;
+
+  if (varArgsLength > ATTRIBUTES_OFFSET && varArgsLength % 2 === 0) {
+    varArgsLength--;
+    typeId = arguments[varArgsLength];
+  }
+
+  const node = open(nameOrCtor, key, typeId);
   const data = getData(node);
 
   if (!data.staticsApplied) {
@@ -102,7 +112,7 @@ const elementOpen = function(nameOrCtor, key, statics, var_args) {
   let i = ATTRIBUTES_OFFSET;
   let j = 0;
 
-  for (; i < arguments.length; i += 2, j += 2) {
+  for (; i < varArgsLength; i += 2, j += 2) {
     const name = arguments[i];
     if (isNew) {
       attrsArr[j] = name;
@@ -123,14 +133,14 @@ const elementOpen = function(nameOrCtor, key, statics, var_args) {
    * attrs through the elementOpenStart flow or if one element is reused in
    * the place of another.
    */
-  if (i < arguments.length || j < attrsArr.length) {
+  if (i < varArgsLength || j < attrsArr.length) {
     const attrsStart = j;
 
     for (; j < attrsArr.length; j += 2) {
       prevAttrsMap[attrsArr[j]] = attrsArr[j + 1];
     }
 
-    for (j = attrsStart; i < arguments.length; i += 2, j += 2) {
+    for (j = attrsStart; i < varArgsLength; i += 2, j += 2) {
       const name = arguments[i];
       const value = arguments[i + 1];
 
