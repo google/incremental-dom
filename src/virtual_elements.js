@@ -29,7 +29,10 @@ import {
   assertCloseMatchesOpenTag,
   setInAttributes
 } from './assertions';
-import { createMap } from './util';
+import {
+  createMap,
+  truncateArray
+} from './util';
 
 
 /**
@@ -43,7 +46,7 @@ const ATTRIBUTES_OFFSET = 3;
 /**
  * Builds an array of arguments for use with elementOpenStart, attr and
  * elementOpenEnd.
- * @const {Array<*>}
+ * @const {!Array<*>}
  */
 const argsBuilder = [];
 
@@ -145,7 +148,7 @@ const elementOpen = function(nameOrCtor, key, statics, var_args) {
     }
 
     if (j < attrsArr.length) {
-      attrsArr.length = j;
+      truncateArray(attrsArr, j);
     }
 
     /*
@@ -216,7 +219,7 @@ const elementOpenEnd = function() {
   }
 
   const node = elementOpen.apply(null, argsBuilder);
-  argsBuilder.length = 0;
+  truncateArray(argsBuilder, 0);
   return node;
 };
 
