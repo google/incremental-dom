@@ -50,9 +50,22 @@ const createMap = function() {
 };
 
 
+/**
+ * Truncates an array, removing items up until length.
+ * @param {!Array<*>} arr The array to truncate.
+ * @param {number} length The new length of the array.
+ */
+const truncateArray = function(arr, length) {
+  while (arr.length > length) {
+    arr.pop();
+  }
+};
+
+
 /** */
 export {
   createMap,
-  has
+  has,
+  truncateArray
 };
 
