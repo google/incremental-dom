@@ -52,7 +52,7 @@ const argsBuilder = [];
 
 
 /**
- * Used to keep track of the previous values when a 2-way diff is ncessary.
+ * Used to keep track of the previous values when a 2-way diff is necessary.
  * This object is reused.
  * @const {Object<*>}
  */

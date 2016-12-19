@@ -25,6 +25,7 @@ module.exports = function(config) {
 
     files: [
       'test/util/globals.js',
+      'test/unit/**/*.js',
       'test/functional/**/*.js'
     ],
 
