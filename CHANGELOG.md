@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.5.2
+
+- Fixed build including inlined source maps in artifacts
+
 ## 0.5.1
 
 - Fixed a performance regression causing patch to take up to 3x longer
