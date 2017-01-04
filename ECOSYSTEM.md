@@ -97,3 +97,7 @@ Here's an [example](https://gist.github.com/sparhami/197f3b947712998639eb).
 ### FerrugemJS
 
 [FerrugemJS](https://github.com/ferrugemjs/library) is a library inspired by Aurelia and React using [Incremental DOM](https://github.com/google/incremental-dom) with [superviews.js](https://github.com/davidjamesstone/superviews.js) as a template language.
+
+### Metal.js
+
+[Metal.js](https://github.com/metal/metal.js) is a JavaScript library for building UI components in a solid, flexible way. It leverages [Incremental DOM](https://github.com/google/incremental-dom) and currently supports both [Closure Templates](https://developers.google.com/closure/templates/) and [JSX syntax](https://facebook.github.io/jsx/).
