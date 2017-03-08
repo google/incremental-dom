@@ -165,8 +165,8 @@ const patchOuter = patchFactory(function(node, fn, data) {
         expectedPrevNode);
   }
 
-  if (node !== currentNode && node.parentNode) {
-    removeChild(currentParent, node, getData(currentParent).keyMap);
+  if (currentParent) {
+    clearUnvisitedDOM(currentParent, getNextNode(), node.nextSibling);
   }
 
   return (startNode === currentNode) ? null : currentNode;
@@ -255,21 +255,6 @@ const alignWithDOM = function(nameOrCtor, key, typeId) {
 
 
 /**
- * @param {?Node} node
- * @param {?Node} child
- * @param {?Object<string, !Element>} keyMap
- */
-const removeChild = function(node, child, keyMap) {
-  node.removeChild(child);
-
-  const key = getData(child).key;
-  if (key) {
-    delete keyMap[key];
-  }
-};
-
-
-/**
  * Clears out any unvisited Nodes in a given range.
  * @param {?Node} parentNode
  * @param {?Node} startNode The node to start clearing from, inclusive.
@@ -282,7 +267,11 @@ const clearUnvisitedDOM = function(parentNode, startNode, endNode) {
 
   while (child !== endNode) {
     const next = child.nextSibling;
-    removeChild(parentNode, child, keyMap);
+    const key = getData(child).key;
+    parentNode.removeChild(child);
+    if (key) {
+      delete keyMap[key];
+    }
     child = next;
   }
 };
