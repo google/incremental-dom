@@ -277,31 +277,29 @@ const removeChild = function(node, child, keyMap) {
 
 
 /**
- * Clears out any unvisited Nodes, as the corresponding virtual element
- * functions were never called for them.
+ * Clears out any unvisited Nodes in a given range.
+ * @param {?Node} parentNode
+ * @param {?Node} startNode The node to start clearing from, inclusive.
+ * @param {?Node} endNode The node to clear until, exclusive.
  */
-const clearUnvisitedDOM = function() {
-  const node = currentParent;
-  const data = getData(node);
+const clearUnvisitedDOM = function(parentNode, startNode, endNode) {
+  const data = getData(parentNode);
   const keyMap = data.keyMap;
   const keyMapValid = data.keyMapValid;
-  let child = node.lastChild;
+  let child = startNode;
   let key;
 
-  if (child === currentNode && keyMapValid) {
-    return;
-  }
-
-  while (child !== currentNode) {
-    removeChild(node, child, keyMap);
-    child = node.lastChild;
+  while (child !== endNode) {
+    const next = child.nextSibling;
+    removeChild(parentNode, child, keyMap);
+    child = next;
   }
 
   // Clean the keyMap, removing any unusued keys.
   if (!keyMapValid) {
     for (key in keyMap) {
       child = keyMap[key];
-      if (child.parentNode !== node) {
+      if (child.parentNode !== parentNode) {
         delete keyMap[key];
       }
     }
@@ -344,7 +342,7 @@ const nextNode = function() {
  * Changes to the parent of the current node, removing any unvisited children.
  */
 const exitNode = function() {
-  clearUnvisitedDOM();
+  clearUnvisitedDOM(currentParent, getNextNode(), null);
 
   currentNode = currentParent;
   currentParent = currentParent.parentNode;
