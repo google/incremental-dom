@@ -169,6 +169,24 @@ describe('rendering with keys', () => {
     expect(firstNode.parentNode).to.equal(null);
   });
 
+  it('should update the mapping when a keyed item does not match', () => {
+    function renderOne(tag) {
+      elementVoid('div', 'keyOne');
+      elementVoid(tag, 'keyTwo');
+    }
+
+    function renderTwo(tag) {
+      elementVoid(tag, 'keyTwo');
+    }
+
+    patch(container, renderOne, 'div');
+    patch(container, renderOne, 'span');
+    const newNode = container.lastChild;
+    patch(container, renderTwo, 'span');
+
+    expect(newNode).to.equal(container.lastChild);
+  });
+
   it('should patch correctly when child in key map is manually removed', () => {
     function render(tag) {
       elementVoid(tag, 'key');

@@ -43,7 +43,7 @@ function NodeData(nameOrCtor, key, typeId) {
   /**
    * The key used to identify this node, used to preserve DOM nodes when they
    * move within their parent.
-   * @const
+   * @type {?string|undefined}
    */
   this.key = key;
 
@@ -52,12 +52,6 @@ function NodeData(nameOrCtor, key, typeId) {
    * {!Object<string, !Element>}
    */
   this.keyMap = createMap();
-
-  /**
-   * Whether or not the keyMap is currently valid.
-   * @type {boolean}
-   */
-  this.keyMapValid = true;
 
   /**
    * Whether or the associated node is, or contains, a focused Element.

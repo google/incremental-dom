@@ -210,7 +210,6 @@ const alignWithDOM = function(nameOrCtor, key, typeId) {
   }
 
   const parentData = getData(currentParent);
-  const currentNodeData = currentNode && getData(currentNode);
   const keyMap = parentData.keyMap;
   let node;
 
@@ -220,8 +219,10 @@ const alignWithDOM = function(nameOrCtor, key, typeId) {
     if (keyNode) {
       if (matches(keyNode, nameOrCtor, key, typeId)) {
         node = keyNode;
-      } else if (keyNode !== currentNode) {
-        removeChild(currentParent, keyNode, keyMap);
+      } else {
+        // When the keyNode gets removed later, make sure we do not remove the
+        // new node from the map.
+        getData(keyNode).key = null;
       }
     }
   }
@@ -245,12 +246,6 @@ const alignWithDOM = function(nameOrCtor, key, typeId) {
   if (getData(node).focused) {
     // Move everything else before the node.
     moveBefore(currentParent, node, currentNode);
-  } else if (currentNodeData && currentNodeData.key && !currentNodeData.focused) {
-    // Remove the currentNode, which can always be added back since we hold a
-    // reference through the keyMap. This prevents a large number of moves when
-    // a keyed item is removed or moved backwards in the DOM.
-    currentParent.replaceChild(node, currentNode);
-    parentData.keyMapValid = false;
   } else {
     currentParent.insertBefore(node, currentNode);
   }
@@ -265,9 +260,7 @@ const alignWithDOM = function(nameOrCtor, key, typeId) {
  * @param {?Object<string, !Element>} keyMap
  */
 const removeChild = function(node, child, keyMap) {
-  if (child.parentNode === node) {
-    node.removeChild(child);
-  }
+  node.removeChild(child);
 
   const key = getData(child).key;
   if (key) {
@@ -285,26 +278,12 @@ const removeChild = function(node, child, keyMap) {
 const clearUnvisitedDOM = function(parentNode, startNode, endNode) {
   const data = getData(parentNode);
   const keyMap = data.keyMap;
-  const keyMapValid = data.keyMapValid;
   let child = startNode;
-  let key;
 
   while (child !== endNode) {
     const next = child.nextSibling;
     removeChild(parentNode, child, keyMap);
     child = next;
-  }
-
-  // Clean the keyMap, removing any unusued keys.
-  if (!keyMapValid) {
-    for (key in keyMap) {
-      child = keyMap[key];
-      if (child.parentNode !== parentNode) {
-        delete keyMap[key];
-      }
-    }
-
-    data.keyMapValid = true;
   }
 };
 
