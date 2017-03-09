@@ -118,20 +118,69 @@ describe('patching an element', () => {
 
   describe('with an empty patch', () => {
     let div;
+    let prev;
+    let next;
     let result;
 
     beforeEach(() => {
+      prev = container.appendChild(document.createElement('div'));
       div = container.appendChild(document.createElement('div'));
+      next = container.appendChild(document.createElement('div'));
 
       result = patchOuter(div, () => {});
     });
 
-    it('should remove the DOM node on an empty patch', () => {
-      expect(container.firstChild).to.be.null;
+    it('should remove the DOM node', () => {
+      expect(div.parentNode).to.be.null;
+      expect(container.children).to.have.length(2);
     });
 
-    it('should remove the DOM node on an empty patch', () => {
+    it('should leave prior nodes alone', () => {
+      expect(container.firstChild).to.equal(prev);
+    });
+
+    it('should leaving following nodes alone', () => {
+      expect(container.lastChild).to.equal(next);
+    });
+
+    it('should return null on an empty patch', () => {
       expect(result).to.be.null;
+    });
+  });
+
+  describe('with a matching node', () => {
+    let div;
+    let prev;
+    let next;
+    let result;
+
+    function render() {
+      elementVoid('div');
+    }
+
+    beforeEach(() => {
+      prev = container.appendChild(document.createElement('div'));
+      div = container.appendChild(document.createElement('div'));
+      next = container.appendChild(document.createElement('div'));
+
+      result = patchOuter(div, render);
+    });
+
+    it('should leave the patched node alone', () => {
+      expect(container.children).to.have.length(3);
+      expect(container.children[1]).to.equal(div);
+    });
+
+    it('should leave prior nodes alone', () => {
+      expect(container.firstChild).to.equal(prev);
+    });
+
+    it('should leaving following nodes alone', () => {
+      expect(container.lastChild).to.equal(next);
+    });
+
+    it('should return the patched node', () => {
+      expect(result).to.be.div;
     });
   });
 
@@ -139,6 +188,8 @@ describe('patching an element', () => {
     describe('without a key', () => {
       let div;
       let span;
+      let prev;
+      let next;
       let result;
 
       function render() {
@@ -146,15 +197,25 @@ describe('patching an element', () => {
       }
 
       beforeEach(() => {
+        prev = container.appendChild(document.createElement('div'));
         div = container.appendChild(document.createElement('div'));
+        next = container.appendChild(document.createElement('div'));
 
         result = patchOuter(div, render);
         span = container.querySelector('span');
       });
 
       it('should replace the DOM node', () => {
-        expect(container.children).to.have.length(1);
-        expect(container.firstChild).to.equal(span);
+        expect(container.children).to.have.length(3);
+        expect(container.children[1]).to.equal(span);
+      });
+
+      it('should leave prior nodes alone', () => {
+        expect(container.firstChild).to.equal(prev);
+      });
+
+      it('should leaving following nodes alone', () => {
+        expect(container.lastChild).to.equal(next);
       });
 
       it('should return the new DOM node', () => {
@@ -164,6 +225,8 @@ describe('patching an element', () => {
 
     describe('with a different key', () => {
       let div;
+      let prev;
+      let next;
       let el;
 
       function render(data) {
@@ -171,32 +234,71 @@ describe('patching an element', () => {
       }
 
       beforeEach(() => {
+        prev = container.appendChild(document.createElement('div'));
         div = container.appendChild(document.createElement('div'));
+        next = container.appendChild(document.createElement('div'));
       });
 
-      it('should replace the DOM node when a key changes', () => {
-        div.setAttribute('key', 'key0');
-        patchOuter(div, render, { tag: 'span', key: 'key1' });
-        expect(container.children).to.have.length(1);
-        expect(container.firstChild).to.equal(el);
+      describe('when a key changes', () => {
+        beforeEach(() => {
+          div.setAttribute('key', 'key0');
+          patchOuter(div, render, { tag: 'span', key: 'key1' });
+        });
+
+        it('should replace the DOM node', () => {
+          expect(container.children).to.have.length(3);
+          expect(container.children[1]).to.equal(el);
+        });
+
+        it('should leave prior nodes alone', () => {
+          expect(container.firstChild).to.equal(prev);
+        });
+
+        it('should leaving following nodes alone', () => {
+          expect(container.lastChild).to.equal(next);
+        });
       });
 
-      it('should replace the DOM node when a key is removed', () => {
-        div.setAttribute('key', 'key0');
-        patchOuter(div, render, { tag: 'span' });
-        expect(container.children).to.have.length(1);
-        expect(container.firstChild.tagName).to.equal('SPAN');
-        expect(container.firstChild).to.equal(el);
+      describe('when a key is removed', () => {
+        beforeEach(() => {
+          div.setAttribute('key', 'key0');
+          patchOuter(div, render, { tag: 'span' });
+        });
+
+        it('should replace the DOM node', () => {
+          expect(container.children).to.have.length(3);
+          expect(container.children[1].tagName).to.equal('SPAN');
+          expect(container.children[1]).to.equal(el);
+        });
+
+        it('should leave prior nodes alone', () => {
+          expect(container.firstChild).to.equal(prev);
+        });
+
+        it('should leaving following nodes alone', () => {
+          expect(container.lastChild).to.equal(next);
+        });
       });
 
-      it('should replace the DOM node when a key is added', () => {
-        patchOuter(div, render, { tag: 'span', key: 'key2' });
-        expect(container.children).to.have.length(1);
-        expect(container.firstChild).to.equal(el);
+      describe('when a key is added', () => {
+        beforeEach(() => {
+          patchOuter(div, render, { tag: 'span', key: 'key2' });
+        });
+
+        it('should replace the DOM node', () => {
+          expect(container.children).to.have.length(3);
+          expect(container.children[1]).to.equal(el);
+        });
+
+        it('should leave prior nodes alone', () => {
+          expect(container.firstChild).to.equal(prev);
+        });
+
+        it('should leaving following nodes alone', () => {
+          expect(container.lastChild).to.equal(next);
+        });
       });
     });
-
-
   });
 
   it('should not hang on to removed elements with keys', () => {
