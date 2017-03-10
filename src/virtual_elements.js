@@ -147,9 +147,7 @@ const elementOpen = function(nameOrCtor, key, statics, var_args) {
       delete prevAttrsMap[name];
     }
 
-    if (j < attrsArr.length) {
-      truncateArray(attrsArr, j);
-    }
+    truncateArray(attrsArr, j);
 
     /*
      * At this point, only have attributes that were present before, but have
