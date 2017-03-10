@@ -15,7 +15,10 @@
  */
 
 
-import { createMap } from './util';
+import {
+  createMap,
+  truncateArray
+} from './util';
 
 
 /**
@@ -80,9 +83,7 @@ const calculateDiff = function(prev, next, updateCtx, updateFn) {
       delete prevValuesMap[name];
     }
 
-    if (next.length < prev.length) {
-      prev.length = next.length;
-    }
+    truncateArray(prev, next.length);
 
     for (const name in prevValuesMap) {
       updateFn(updateCtx, name, undefined);
