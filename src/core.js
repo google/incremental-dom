@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import { NameOrCtorDef } from './types';
+import { NameOrCtorDef } from './types.js';
 import {
   createElement,
   createText
-} from './nodes';
-import { getData } from './node_data';
+} from './nodes.js';
+import { getData } from './node_data.js';
 import {
   assertInPatch,
   assertNoUnclosedTags,
@@ -29,11 +29,11 @@ import {
   assertPatchElementNoExtras,
   setInAttributes,
   setInSkip
-} from './assertions';
+} from './assertions.js';
 import {
   getFocusedPath,
   moveBefore
-} from './dom_util';
+} from './dom_util.js';
 
 
 /** @type {?Node} */

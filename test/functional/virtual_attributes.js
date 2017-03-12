@@ -21,7 +21,7 @@ import {
   elementOpenEnd,
   elementClose,
   attr
-} from '../../index';
+} from '../../index.js';
 
 
 describe('virtual attribute updates', () => {

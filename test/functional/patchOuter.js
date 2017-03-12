@@ -20,7 +20,7 @@ import {
   elementClose,
   elementVoid,
   text
-} from '../../index';
+} from '../../index.js';
 
 
 describe('patching an element', () => {

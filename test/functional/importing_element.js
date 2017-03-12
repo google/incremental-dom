@@ -20,7 +20,7 @@ import {
   elementOpen,
   elementClose,
   importNode
-} from '../../index';
+} from '../../index.js';
 
 describe('importing element', () => {
   let container;

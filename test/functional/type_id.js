@@ -18,7 +18,7 @@ import {
   patch,
   open,
   close
-} from '../../index';
+} from '../../index.js';
 
 describe('typeId', () => {
   let container;

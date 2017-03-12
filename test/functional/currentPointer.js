@@ -21,7 +21,7 @@ import {
     elementClose,
     elementVoid,
     currentPointer
-} from '../../index';
+} from '../../index.js';
 
 describe('currentPointer', () => {
   let container;

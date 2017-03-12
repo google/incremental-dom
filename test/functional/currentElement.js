@@ -22,7 +22,7 @@ import {
     elementClose,
     elementVoid,
     currentElement
-} from '../../index';
+} from '../../index.js';
 
 describe('currentElement', () => {
   let container;

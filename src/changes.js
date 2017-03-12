@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { truncateArray } from './util';
+import { truncateArray } from './util.js';
 
 
 /** @type {!Array<*>} */

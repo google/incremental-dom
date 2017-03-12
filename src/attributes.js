@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { symbols } from './symbols';
+import { symbols } from './symbols.js';
 import {
   createMap,
   has
-} from './util';
+} from './util.js';
 
 
 /**

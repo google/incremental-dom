@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-import { NameOrCtorDef } from './types';
+import { NameOrCtorDef } from './types.js';
 import {
   open,
   close,
   text as coreText
-} from './core';
-import { updateAttribute } from './attributes';
-import { getData } from './node_data';
+} from './core.js';
+import { updateAttribute } from './attributes.js';
+import { getData } from './node_data.js';
 import {
   assertNotInAttributes,
   assertNotInSkip,
   assertInAttributes,
   assertCloseMatchesOpenTag,
   setInAttributes
-} from './assertions';
+} from './assertions.js';
 import {
   createMap,
   truncateArray
-} from './util';
+} from './util.js';
 
 
 /**

@@ -23,7 +23,7 @@ import {
   elementClose,
   elementVoid,
   importNode
-} from '../../index';
+} from '../../index.js';
 
 describe('attribute updates', () => {
   let container;

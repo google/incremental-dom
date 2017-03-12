@@ -18,7 +18,7 @@ import {
   patch,
   open,
   close
-} from '../../index';
+} from '../../index.js';
 
 describe('Element constructors', () => {
   const MyElementRegister = window.MyElementRegister;

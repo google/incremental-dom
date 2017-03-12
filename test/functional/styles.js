@@ -17,7 +17,7 @@
 import {
   patch,
   elementVoid
-} from '../../index';
+} from '../../index.js';
 
 describe('style updates', () => {
   let container;

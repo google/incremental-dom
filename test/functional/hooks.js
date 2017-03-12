@@ -19,7 +19,7 @@ import {
   elementVoid,
   symbols,
   attributes
-} from '../../index';
+} from '../../index.js';
 
 
 describe('library hooks', () => {

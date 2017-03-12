@@ -18,7 +18,7 @@ import {
     patch,
     elementVoid,
     skipNode
-} from '../../index';
+} from '../../index.js';
 
 describe('skip', () => {
   let container;
