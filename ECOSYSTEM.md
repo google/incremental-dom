@@ -27,6 +27,22 @@ function render() {
 }
 ```
 
+### Handlebars
+
+[handlebars-idom](https://github.com/ahumphreys87/handlebars-idom) is a Handlebars template compiler that will convert your handlebars syntax to an incremental-dom function. Can be used on the command line or via plugins for you build pipeline, plugins are available for [rollup](https://github.com/ahumphreys87/rollup-plugin-hbsidom/) and [browserify](https://github.com/ahumphreys87/hbsidomify).
+
+```
+// Example input
+<p>{{name}}</p>
+
+// Example output
+function (data) {
+  IncrementalDOM.elementOpen('p');
+  IncrementalDOM.text(data.name);
+  IncrementalDOM.elementClose('p');
+}
+```
+
 ### superviews.js
 
 [superviews.js](https://github.com/davidjamesstone/superviews.js) is a template language that closely maps to the incremental-dom API. It includes conditionals, iteration, interpolation and supported output for both ES6 and CommonJS. 
