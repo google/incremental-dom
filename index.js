@@ -24,7 +24,7 @@ export {
   currentPointer,
   skip,
   skipNode
-} from './src/core';
+} from './src/core.js';
 export {
   elementVoid,
   elementOpenStart,
@@ -33,11 +33,11 @@ export {
   elementClose,
   text,
   attr
-} from './src/virtual_elements';
-export { symbols } from './src/symbols';
+} from './src/virtual_elements.js';
+export { symbols } from './src/symbols.js';
 export {
   attributes,
   applyAttr,
   applyProp
-} from './src/attributes';
-export { importNode } from './src/node_data';
+} from './src/attributes.js';
+export { importNode } from './src/node_data.js';

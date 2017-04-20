@@ -21,7 +21,7 @@ import {
   elementOpenEnd,
   elementClose,
   elementVoid
-} from '../../index';
+} from '../../index.js';
 
 describe('element creation', () => {
   let container;

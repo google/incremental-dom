@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { NameOrCtorDef } from './types';
-import { createMap } from './util';
+import { NameOrCtorDef } from './types.js';
+import { createMap } from './util.js';
 
 
 /**

@@ -18,7 +18,7 @@ import {
   patch,
   text,
   elementOpenStart
-} from '../../index';
+} from '../../index.js';
 
 
 describe('text nodes', () => {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { NameOrCtorDef } from './types';
+import { NameOrCtorDef } from './types.js';
 
 
 /**

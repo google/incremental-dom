@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { NameOrCtorDef } from './types';
+import { NameOrCtorDef } from './types.js';
 import {
     getData,
     initData
-} from './node_data';
+} from './node_data.js';
 
 
 /**

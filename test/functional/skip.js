@@ -21,7 +21,7 @@ import {
     elementVoid,
     skip,
     text
-} from '../../index';
+} from '../../index.js';
 
 describe('skip', () => {
   let container;

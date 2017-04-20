@@ -18,7 +18,7 @@
 import {
   createMap,
   truncateArray
-} from './util';
+} from './util.js';
 
 
 /**

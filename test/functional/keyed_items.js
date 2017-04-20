@@ -21,7 +21,7 @@ import {
   elementVoid,
   currentElement,
   skip
-} from '../../index';
+} from '../../index.js';
 import {
   attachShadow,
   BROWSER_SUPPORTS_SHADOW_DOM

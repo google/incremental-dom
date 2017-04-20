@@ -19,7 +19,7 @@ import {
   elementOpen,
   elementClose,
   elementVoid
-} from '../../index';
+} from '../../index.js';
 
 
 describe('conditional rendering', () => {

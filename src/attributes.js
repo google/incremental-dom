@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { symbols } from './symbols';
+import { symbols } from './symbols.js';
 import {
   createMap,
   has
-} from './util';
+} from './util.js';
 
 
 /**
@@ -72,12 +72,12 @@ const applyProp = function(el, name, value) {
  * Applies a value to a style declaration. Supports CSS custom properties by
  * setting properties containing a dash using CSSStyleDeclaration.setProperty.
  * @param {CSSStyleDeclaration} style
- * @param {!string} prop
- * @param {*} value
+ * @param {string} prop
+ * @param {string} value
  */
 const setStyleValue = function(style, prop, value) {
   if (prop.indexOf('-') >= 0) {
-    style.setProperty(prop, /** @type {string} */(value));
+    style.setProperty(prop, value);
   } else {
     style[prop] = value;
   }

@@ -17,7 +17,7 @@
 import {
   patch,
   text
-} from '../../index';
+} from '../../index.js';
 
 
 describe('formatters', () => {
