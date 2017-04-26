@@ -35,6 +35,11 @@ import {
   moveBefore
 } from './dom_util.js';
 
+/**
+ * Set to true by the build steps when compiling a development build.
+ * @type {boolean}
+ */
+const IS_DEVELOPMENT = false;
 
 /** @type {?Node} */
 let currentNode = null;
@@ -85,7 +90,7 @@ const patchFactory = function(run) {
     doc = node.ownerDocument;
     currentParent = node.parentNode;
 
-    if (process.env.NODE_ENV !== 'production') {
+    if (IS_DEVELOPMENT) {
       previousInAttributes = setInAttributes(false);
       previousInSkip = setInSkip(false);
     }
@@ -95,7 +100,7 @@ const patchFactory = function(run) {
     const retVal = run(node, fn, data);
     markFocused(focusPath, false);
 
-    if (process.env.NODE_ENV !== 'production') {
+    if (IS_DEVELOPMENT) {
       assertVirtualAttributesClosed();
       setInAttributes(previousInAttributes);
       setInSkip(previousInSkip);
@@ -128,7 +133,7 @@ const patchInner = patchFactory(function(node, fn, data) {
   fn(data);
   exitNode();
 
-  if (process.env.NODE_ENV !== 'production') {
+  if (IS_DEVELOPMENT) {
     assertNoUnclosedTags(currentNode, node);
   }
 
@@ -152,7 +157,7 @@ const patchOuter = patchFactory(function(node, fn, data) {
   let expectedNextNode = null;
   let expectedPrevNode = null;
 
-  if (process.env.NODE_ENV !== 'production') {
+  if (IS_DEVELOPMENT) {
     expectedNextNode = node.nextSibling;
     expectedPrevNode = node.previousSibling;
   }
@@ -160,7 +165,7 @@ const patchOuter = patchFactory(function(node, fn, data) {
   currentNode = startNode;
   fn(data);
 
-  if (process.env.NODE_ENV !== 'production') {
+  if (IS_DEVELOPMENT) {
     assertPatchElementNoExtras(startNode, currentNode, expectedNextNode,
         expectedPrevNode);
   }
@@ -344,7 +349,7 @@ const open = function(nameOrCtor, key, typeId) {
  * @return {!Element} The corresponding Element.
  */
 const close = function() {
-  if (process.env.NODE_ENV !== 'production') {
+  if (IS_DEVELOPMENT) {
     setInSkip(false);
   }
 
@@ -371,7 +376,7 @@ const text = function() {
  * @return {!Element}
  */
 const currentElement = function() {
-  if (process.env.NODE_ENV !== 'production') {
+  if (IS_DEVELOPMENT) {
     assertInPatch('currentElement', doc);
     assertNotInAttributes('currentElement');
   }
@@ -383,7 +388,7 @@ const currentElement = function() {
  * @return {Node} The Node that will be evaluated for the next instruction.
  */
 const currentPointer = function() {
-  if (process.env.NODE_ENV !== 'production') {
+  if (IS_DEVELOPMENT) {
     assertInPatch('currentPointer', doc);
     assertNotInAttributes('currentPointer');
   }
@@ -396,7 +401,7 @@ const currentPointer = function() {
  * clearing out the children.
  */
 const skip = function() {
-  if (process.env.NODE_ENV !== 'production') {
+  if (IS_DEVELOPMENT) {
     assertNoChildrenDeclaredYet('skip', currentNode);
     setInSkip(true);
   }

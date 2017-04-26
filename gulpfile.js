@@ -22,6 +22,7 @@ var rollup = require('rollup-stream');
 var closureCompiler = require('google-closure-compiler').gulp();
 var babel = require('rollup-plugin-babel');
 var uglify = require('rollup-plugin-uglify');
+var rollupReplace = require('rollup-plugin-replace');
 var eslint = require('gulp-eslint');
 var sourcemaps = require('gulp-sourcemaps');
 var replace = require('gulp-replace');
@@ -30,7 +31,6 @@ var path = require('path');
 var buffer = require('vinyl-buffer');
 var fs = require('fs');
 
-var env = process.env;
 var entryFileName = 'index.js';
 var artifactName = 'incremental-dom';
 var googModuleName = 'incrementaldom';
@@ -43,7 +43,6 @@ function clean() {
 }
 
 function unit(done) {
-  env.NODE_ENV = 'test';
   new karma.Server({
     configFile: karmaConfig,
     singleRun: true,
@@ -52,7 +51,6 @@ function unit(done) {
 }
 
 function unitDist(done) {
-  env.NODE_ENV = 'test';
   new karma.Server({
     configFile: karmaConfig,
     singleRun: true,
@@ -61,7 +59,6 @@ function unitDist(done) {
 }
 
 function unitWatch(done) {
-  env.NODE_ENV = 'test';
   new karma.Server({
     configFile: karmaConfig,
     browsers: ['Chrome']
@@ -75,21 +72,25 @@ function lint() {
     .pipe(eslint.failAfterError());
 }
 
-function bundle(format) {
+function bundle(format, development, minify) {
   return rollup({
     entry: entryFileName,
     sourceMap: true,
     banner: fs.readFileSync('./conf/license_header.txt'),
     plugins: [
-      env.min === 'true' ? uglify({
-          output: { comments: /@license/ },
-          compress: { keep_fargs: false }
+      rollupReplace({
+        values: {
+          IS_DEVELOPMENT: '(' + development + ')'
+        },
+        delimiters: ['(', ')']
+      }),
+      minify ? uglify({
+        output: { comments: /@license/ },
+        compress: { keep_fargs: false },
+        mangle: false
       }) : {},
       babel({
-        exclude: 'node_modules/**',
-        plugins: env.NODE_ENV ?
-          ['transform-inline-environment-variables'] :
-          []
+        exclude: 'node_modules/**'
       })
     ],
     format: format,
@@ -98,10 +99,7 @@ function bundle(format) {
 }
 
 function js() {
-  env.NODE_ENV = 'development';
-  env.min = false;
-
-  return bundle('umd')
+  return bundle('umd', 'true')
     .pipe(source(artifactName + '.js'))
     .pipe(buffer())
     .pipe(sourcemaps.init({loadMaps: true}))
@@ -118,10 +116,7 @@ function jsMinWatch() {
 }
 
 function jsMin() {
-  env.NODE_ENV = 'production';
-  env.min = true;
-
-  return bundle('umd')
+  return bundle('umd', 'false', true)
     .pipe(source(artifactName + '-min.js'))
     .pipe(buffer())
     .pipe(sourcemaps.init({loadMaps: true}))
@@ -130,25 +125,19 @@ function jsMin() {
 }
 
 function jsClosure(done) {
-  delete env.NODE_ENV;
-  env.min = false;
   var moduleDeclaration = 'goog.module(\'' + googModuleName + '\');';
 
-  return bundle('cjs')
+  return bundle('cjs', 'goog.DEBUG')
     .pipe(source(artifactName + '-closure.js'))
     .pipe(buffer())
     .pipe(sourcemaps.init({loadMaps: true}))
     .pipe(replace(/('|")use strict\1;/, moduleDeclaration))
-    .pipe(replace("process.env.NODE_ENV !== 'production'", 'goog.DEBUG'))
     .pipe(sourcemaps.write('.'))
     .pipe(gulp.dest('dist'));
 }
 
 function jsCommonJS() {
-  delete env.NODE_ENV;
-  env.min = false;
-
-  return bundle('cjs')
+  return bundle('cjs', "production.env.NODE_ENV !== 'production'")
     .pipe(source(artifactName + '-cjs.js'))
     .pipe(buffer())
     .pipe(sourcemaps.init({loadMaps: true}))

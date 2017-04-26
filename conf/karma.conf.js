@@ -15,6 +15,7 @@
  */
 
 var babel = require('rollup-plugin-babel');
+var replace = require('rollup-plugin-replace');
 var multi = require('rollup-plugin-multi-entry').default;
 
 module.exports = function(config) {
@@ -37,10 +38,15 @@ module.exports = function(config) {
     rollupPreprocessor: {
       rollup: {
         plugins: [
+          replace({
+            values: {
+              IS_DEVELOPMENT: '(true)'
+            },
+            delimiters: ['(', ')']
+          }),
           multi(),
           babel({
             exclude: ['node_modules/**', 'test/util/globals.js'],
-            plugins: ['transform-inline-environment-variables']
           })
         ]
       },

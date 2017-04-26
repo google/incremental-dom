@@ -36,6 +36,13 @@ import {
 
 
 /**
+ * Set to true by the build steps when compiling a development build.
+ * @type {boolean}
+ */
+const IS_DEVELOPMENT = false;
+
+
+/**
  * The offset in the virtual element declaration where the attributes are
  * specified.
  * @const
@@ -72,7 +79,7 @@ const prevAttrsMap = createMap();
  * @return {!Element} The corresponding Element.
  */
 const elementOpen = function(nameOrCtor, key, statics, var_args) {
-  if (process.env.NODE_ENV !== 'production') {
+  if (IS_DEVELOPMENT) {
     assertNotInAttributes('elementOpen');
     assertNotInSkip('elementOpen');
   }
@@ -178,7 +185,7 @@ const elementOpen = function(nameOrCtor, key, statics, var_args) {
  *     Element is created.
  */
 const elementOpenStart = function(nameOrCtor, key, statics) {
-  if (process.env.NODE_ENV !== 'production') {
+  if (IS_DEVELOPMENT) {
     assertNotInAttributes('elementOpenStart');
     setInAttributes(true);
   }
@@ -197,7 +204,7 @@ const elementOpenStart = function(nameOrCtor, key, statics) {
  * @param {*} value
  */
 const attr = function(name, value) {
-  if (process.env.NODE_ENV !== 'production') {
+  if (IS_DEVELOPMENT) {
     assertInAttributes('attr');
   }
 
@@ -211,7 +218,7 @@ const attr = function(name, value) {
  * @return {!Element} The corresponding Element.
  */
 const elementOpenEnd = function() {
-  if (process.env.NODE_ENV !== 'production') {
+  if (IS_DEVELOPMENT) {
     assertInAttributes('elementOpenEnd');
     setInAttributes(false);
   }
@@ -229,13 +236,13 @@ const elementOpenEnd = function() {
  * @return {!Element} The corresponding Element.
  */
 const elementClose = function(nameOrCtor) {
-  if (process.env.NODE_ENV !== 'production') {
+  if (IS_DEVELOPMENT) {
     assertNotInAttributes('elementClose');
   }
 
   const node = close();
 
-  if (process.env.NODE_ENV !== 'production') {
+  if (IS_DEVELOPMENT) {
     assertCloseMatchesOpenTag(getData(node).nameOrCtor, nameOrCtor);
   }
 
@@ -273,7 +280,7 @@ const elementVoid = function(nameOrCtor, key, statics, var_args) {
  * @return {!Text} The corresponding text node.
  */
 const text = function(value, var_args) {
-  if (process.env.NODE_ENV !== 'production') {
+  if (IS_DEVELOPMENT) {
     assertNotInAttributes('text');
     assertNotInSkip('text');
   }
