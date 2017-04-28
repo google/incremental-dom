@@ -35,7 +35,7 @@ import {
   getFocusedPath,
   moveBefore
 } from './dom_util.js';
-
+import { global } from './global.js';
 
 /** @type {?Node} */
 let currentNode = null;
@@ -86,7 +86,7 @@ const patchFactory = function(run) {
     doc = node.ownerDocument;
     currentParent = node.parentNode;
 
-    if (process.env.NODE_ENV !== 'production') {
+    if (global.DEBUG) {
       previousInAttributes = setInAttributes(false);
       previousInSkip = setInSkip(false);
     }
@@ -96,7 +96,7 @@ const patchFactory = function(run) {
     const retVal = run(node, fn, data);
     markFocused(focusPath, false);
 
-    if (process.env.NODE_ENV !== 'production') {
+    if (global.DEBUG) {
       assertVirtualAttributesClosed();
       setInAttributes(previousInAttributes);
       setInSkip(previousInSkip);
@@ -129,7 +129,7 @@ const patchInner = patchFactory(function(node, fn, data) {
   fn(data);
   exitNode();
 
-  if (process.env.NODE_ENV !== 'production') {
+  if (global.DEBUG) {
     assertNoUnclosedTags(currentNode, node);
   }
 
@@ -153,7 +153,7 @@ const patchOuter = patchFactory(function(node, fn, data) {
   let expectedNextNode = null;
   let expectedPrevNode = null;
 
-  if (process.env.NODE_ENV !== 'production') {
+  if (global.DEBUG) {
     assertPatchOuterHasParentNode(currentParent);
     expectedNextNode = node.nextSibling;
     expectedPrevNode = node.previousSibling;
@@ -162,7 +162,7 @@ const patchOuter = patchFactory(function(node, fn, data) {
   currentNode = startNode;
   fn(data);
 
-  if (process.env.NODE_ENV !== 'production') {
+  if (global.DEBUG) {
     assertPatchElementNoExtras(startNode, currentNode, expectedNextNode,
         expectedPrevNode);
   }
@@ -346,7 +346,7 @@ const open = function(nameOrCtor, key, typeId) {
  * @return {!Element} The corresponding Element.
  */
 const close = function() {
-  if (process.env.NODE_ENV !== 'production') {
+  if (global.DEBUG) {
     setInSkip(false);
   }
 
@@ -373,7 +373,7 @@ const text = function() {
  * @return {!Element}
  */
 const currentElement = function() {
-  if (process.env.NODE_ENV !== 'production') {
+  if (global.DEBUG) {
     assertInPatch('currentElement', doc);
     assertNotInAttributes('currentElement');
   }
@@ -385,7 +385,7 @@ const currentElement = function() {
  * @return {Node} The Node that will be evaluated for the next instruction.
  */
 const currentPointer = function() {
-  if (process.env.NODE_ENV !== 'production') {
+  if (global.DEBUG) {
     assertInPatch('currentPointer', doc);
     assertNotInAttributes('currentPointer');
   }
@@ -398,7 +398,7 @@ const currentPointer = function() {
  * clearing out the children.
  */
 const skip = function() {
-  if (process.env.NODE_ENV !== 'production') {
+  if (global.DEBUG) {
     assertNoChildrenDeclaredYet('skip', currentNode);
     setInSkip(true);
   }
