@@ -62,10 +62,27 @@ const truncateArray = function(arr, length) {
 };
 
 
+/**
+ * Coerces input into a number. If the number parses to NaN, returns -Infinity.
+ * @param {*} input
+ * @return {number}
+ */
+const notNaN = function(input) {
+  if (input == null) {
+    return -Infinity;
+  }
+
+  const number = parseInt(input, 10);
+  // Check for NaN
+  return number === number ? number : -Infinity;
+}
+
+
 /** */
 export {
   createMap,
   has,
-  truncateArray
+  truncateArray,
+  notNaN
 };
 

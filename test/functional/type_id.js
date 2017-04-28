@@ -40,7 +40,9 @@ describe('typeId', () => {
   it('should re-use matching types', () => {
     patch(container, () => render('div', null, 1));
     const div = container.firstChild;
-    patch(container, () => render('div', null, 1));
+    patch(container, () => {
+      render('div', null, 1)
+    });
 
     expect(container.firstChild).to.equal(div);
   });
@@ -72,9 +74,58 @@ describe('typeId', () => {
     expect(container.children).to.have.length(2);
   });
 
+  describe('for monotonic increasing typeId', () => {
+    beforeEach(() => {
+      patch(container, () => {
+        render('div', null, 1)
+        render('div', null, 3)
+      });
+    });
+
+    it('should optimize for low element removal', () => {
+      const first = container.firstChild;
+      const div = container.lastChild;
+
+      patch(container, () => {
+        render('div', null, 3)
+      });
+
+      expect(first.parentNode).to.be.null;
+      expect(container.firstChild).to.equal(div);
+    });
+
+    it('should preserve high elements', () => {
+      const first = container.firstChild;
+      const div = container.lastChild;
+
+      patch(container, () => {
+        render('div', null, 2)
+        render('div', null, 3)
+      });
+
+      expect(container.firstChild).to.not.equal(first);
+      expect(container.lastChild).to.equal(div);
+    });
+
+    it('should scan ahead for matching node', () => {
+      patch(container, () => {
+        render('div', null, 1)
+        render('span', null, 1)
+      });
+
+      const span = container.lastChild;
+
+      patch(container, () => {
+        render('span', null, 1)
+      });
+
+      expect(container.firstChild).to.equal(span);
+    });
+  });
+
   it('should re-use elements created externally', () => {
     const div = document.createElement('div');
-    div.typeId = 'someTypeId';
+    div.typeId = 1;
 
     container.appendChild(div);
     patch(container, () => render('div', null, div.typeId));
