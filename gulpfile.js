@@ -83,8 +83,7 @@ function bundle(format, development, minify) {
       }),
       minify ? uglify({
         output: { comments: /@license/ },
-        compress: { keep_fargs: false },
-        mangle: false
+        compress: { keep_fargs: false }
       }) : {},
       babel({
         exclude: 'node_modules/**'
