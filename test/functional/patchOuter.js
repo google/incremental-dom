@@ -69,8 +69,8 @@ describe('patching an element', () => {
   });
 
   it('should be re-entrant', function() {
-    const containerOne = document.createElement('div');
-    const containerTwo = document.createElement('div');
+    const containerOne = container.appendChild(document.createElement('div'));
+    const containerTwo = container.appendChild(document.createElement('div'));
 
     function renderOne() {
       elementOpen('div');
@@ -101,19 +101,6 @@ describe('patching an element', () => {
     patchOuter(container, render, 'foobar');
 
     expect(container.textContent).to.equal('foobar');
-  });
-
-  it('should patch a detached node', () => {
-    const container = document.createElement('div');
-    function render() {
-      elementOpen('div');
-        elementVoid('span');
-      elementClose('div');
-    }
-
-    patchOuter(container, render);
-
-    expect(container.firstChild.tagName).to.equal('SPAN');
   });
 
   describe('with an empty patch', () => {
@@ -327,4 +314,13 @@ describe('patching an element', () => {
     expect(() => patchOuter(div, render)).to.throw('There must be ' +
         'exactly one top level call corresponding to the patched element.');
   });
+
+  it('should throw an error when node is detached', () => {
+    const container = document.createElement('div');
+
+    expect(() => {
+      patchOuter(container, () => {});
+    }).to.throw('patchOuter requires the node have a parent.');
+  });
+
 });

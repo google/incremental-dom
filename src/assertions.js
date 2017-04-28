@@ -68,6 +68,17 @@ const assertNoUnclosedTags = function(openElement, root) {
 
 
 /**
+ * Makes sure that node being outer patched has a parent node.
+ * @param {?Node} parent
+ */
+const assertPatchOuterHasParentNode = function(parent) {
+  if (!parent) {
+    throw new Error('patchOuter requires the node have a parent.');
+  }
+};
+
+
+/**
  * Makes sure that the caller is not where attributes are expected.
  * @param {string} functionName
  */
@@ -204,6 +215,7 @@ export {
   assertNoChildrenDeclaredYet,
   assertNotInSkip,
   assertPatchElementNoExtras,
+  assertPatchOuterHasParentNode,
   setInAttributes,
   setInSkip
 };

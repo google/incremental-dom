@@ -27,6 +27,7 @@ import {
   assertVirtualAttributesClosed,
   assertNoChildrenDeclaredYet,
   assertPatchElementNoExtras,
+  assertPatchOuterHasParentNode,
   setInAttributes,
   setInSkip
 } from './assertions.js';
@@ -153,6 +154,7 @@ const patchOuter = patchFactory(function(node, fn, data) {
   let expectedPrevNode = null;
 
   if (process.env.NODE_ENV !== 'production') {
+    assertPatchOuterHasParentNode(currentParent);
     expectedNextNode = node.nextSibling;
     expectedPrevNode = node.previousSibling;
   }
