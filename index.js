@@ -26,6 +26,15 @@ export {
   skipNode
 } from './src/core.js';
 export {
+  applyUpdates,
+  bufferAttribute,
+  bufferProperty,
+  queueAttribute,
+  queueProperty,
+  queueUpdates
+} from './src/updates.js';
+export { flush } from './src/changes.js';
+export {
   elementVoid,
   elementOpenStart,
   elementOpenEnd,

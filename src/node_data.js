@@ -35,6 +35,14 @@ function NodeData(nameOrCtor, key, typeId) {
   this.attrsArr = [];
 
   /**
+   * An array of property name/value pairs, used for quickly diffing the
+   * incomming properties to see if the DOM node's properties need to be
+   * updated.
+   * @const {Array<*>}
+   */
+  this.propertiesArr = [];
+
+  /**
    * Whether or not the statics have been applied for the node yet.
    * {boolean}
    */

@@ -42,17 +42,18 @@ const getNamespace = function(name) {
  * as an attribute.
  * @param {!Element} el
  * @param {string} name The attribute's name.
- * @param {?(boolean|number|string)=} value The attribute's value.
+ * @param {*} value The attribute's value.
  */
 const applyAttr = function(el, name, value) {
   if (value == null) {
     el.removeAttribute(name);
   } else {
     const attrNS = getNamespace(name);
+    const attrVal = /** @type {boolean|number|string} */(value);
     if (attrNS) {
-      el.setAttributeNS(attrNS, name, value);
+      el.setAttributeNS(attrNS, name, attrVal);
     } else {
-      el.setAttribute(name, value);
+      el.setAttribute(name, attrVal);
     }
   }
 };
@@ -123,7 +124,7 @@ const applyAttributeTyped = function(el, name, value) {
   if (type === 'object' || type === 'function') {
     applyProp(el, name, value);
   } else {
-    applyAttr(el, name, /** @type {?(boolean|number|string)} */(value));
+    applyAttr(el, name, value);
   }
 };
 
