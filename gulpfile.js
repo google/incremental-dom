@@ -79,10 +79,7 @@ function bundle(format, development, minify) {
     banner: fs.readFileSync('./conf/license_header.txt'),
     plugins: [
       rollupReplace({
-        values: {
-          'global.DEBUG': '(' + development + ')'
-        },
-        delimiters: ['(', ')']
+        'global.DEBUG': development
       }),
       minify ? uglify({
         output: { comments: /@license/ },
