@@ -80,7 +80,7 @@ function bundle(format, development, minify) {
     plugins: [
       rollupReplace({
         values: {
-          IS_DEVELOPMENT: '(' + development + ')'
+          'global.DEBUG': '(' + development + ')'
         },
         delimiters: ['(', ')']
       }),

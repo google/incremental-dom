@@ -40,7 +40,7 @@ module.exports = function(config) {
         plugins: [
           replace({
             values: {
-              IS_DEVELOPMENT: '(true)'
+              'global.DEBUG': '(true)'
             },
             delimiters: ['(', ')']
           }),
