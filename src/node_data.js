@@ -103,7 +103,9 @@ const initData = function(node, nameOrCtor, key, typeId) {
  * @return {!NodeData} The NodeData for this Node.
  */
 const getData = function(node) {
-  importNode(node);
+  if (!node['__incrementalDOMData']) {
+    importNode(node);
+  }
   return node['__incrementalDOMData'];
 };
 

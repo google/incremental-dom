@@ -275,6 +275,10 @@ const insertNode = function(nameOrCtor, key, typeId) {
 const alignNodeWith = function(nameOrCtor, key, typeId) {
   let node;
 
+  if (matches(currentNode, nameOrCtor, key, typeId)) {
+    return;
+  }
+
   // Check to see if the node has moved within the parent.
   if (key) {
     const keyMap = getData(currentParent).keyMap;
