@@ -48,12 +48,12 @@ let doc = null;
 
 
 /**
- * @param {!Array<Node>} focusPath The nodes to mark.
+ * @param {!Array<!NodeData>} focusPath The nodes to mark.
  * @param {boolean} focused Whether or not they are focused.
  */
 const markFocused = function(focusPath, focused) {
   for (let i = 0; i < focusPath.length; i += 1) {
-    getData(focusPath[i]).focused = focused;
+    focusPath[i].focused = focused;
   }
 };
 
@@ -167,9 +167,7 @@ const patchOuter = patchFactory(function(node, fn, data) {
         expectedPrevNode);
   }
 
-  if (currentParent) {
-    clearUnvisitedDOM(currentParent, getNextNode(), node.nextSibling);
-  }
+  clearUnvisitedDOM(currentNode.nextSibling, node.nextSibling);
 
   return (startNode === currentNode) ? null : currentNode;
 });
@@ -218,14 +216,8 @@ const alignWithDOM = function(nameOrCtor, key, typeId) {
   // Check to see if the node has moved within the parent.
   if (key) {
     const keyNode = keyMap[key];
-    if (keyNode) {
-      if (matches(keyNode, nameOrCtor, key, typeId)) {
-        node = keyNode;
-      } else {
-        // When the keyNode gets removed later, make sure we do not remove the
-        // new node from the map.
-        getData(keyNode).key = null;
-      }
+    if (keyNode && matches(keyNode, nameOrCtor, key, typeId)) {
+      node = keyNode;
     }
   }
 
@@ -235,10 +227,9 @@ const alignWithDOM = function(nameOrCtor, key, typeId) {
       node = createText(doc);
     } else {
       node = createElement(doc, currentParent, nameOrCtor, key, typeId);
-    }
-
-    if (key) {
-      keyMap[key] = node;
+      if (key) {
+        keyMap[key] = node;
+      }
     }
   }
 
@@ -258,12 +249,11 @@ const alignWithDOM = function(nameOrCtor, key, typeId) {
 
 /**
  * Clears out any unvisited Nodes in a given range.
- * @param {?Node} parentNode
  * @param {?Node} startNode The node to start clearing from, inclusive.
  * @param {?Node} endNode The node to clear until, exclusive.
  */
-const clearUnvisitedDOM = function(parentNode, startNode, endNode) {
-  const data = getData(parentNode);
+const clearUnvisitedDOM = function(startNode, endNode) {
+  const data = getData(currentParent);
   const keyMap = data.keyMap;
   let child = startNode;
 
@@ -271,7 +261,7 @@ const clearUnvisitedDOM = function(parentNode, startNode, endNode) {
     const next = child.nextSibling;
     const key = getData(child).key;
     parentNode.removeChild(child);
-    if (key) {
+    if (key && keyMap[key] === child) {
       delete keyMap[key];
     }
     child = next;
@@ -312,7 +302,7 @@ const nextNode = function() {
  * Changes to the parent of the current node, removing any unvisited children.
  */
 const exitNode = function() {
-  clearUnvisitedDOM(currentParent, getNextNode(), null);
+  clearUnvisitedDOM(getNextNode(), null);
 
   currentNode = currentParent;
   currentParent = currentParent.parentNode;
