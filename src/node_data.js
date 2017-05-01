@@ -108,6 +108,7 @@ const getData = function(node) {
  * Imports node and its subtree, initializing caches.
  *
  * @param {?Node} node The Node to import.
+ * @return {!NodeData}
  */
 const importNode = function(node) {
   const isElement = node.nodeType === 1;

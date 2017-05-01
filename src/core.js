@@ -260,7 +260,7 @@ const clearUnvisitedDOM = function(startNode, endNode) {
   while (child !== endNode) {
     const next = child.nextSibling;
     const key = getData(child).key;
-    parentNode.removeChild(child);
+    currentParent.removeChild(child);
     if (key && keyMap[key] === child) {
       delete keyMap[key];
     }
