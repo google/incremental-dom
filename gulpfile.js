@@ -133,7 +133,7 @@ function jsClosure(done) {
 }
 
 function jsCommonJS() {
-  return bundle('cjs', "production.env.NODE_ENV !== 'production'")
+  return bundle('cjs', "process.env.NODE_ENV !== 'production'")
     .pipe(source(artifactName + '-cjs.js'))
     .pipe(buffer())
     .pipe(sourcemaps.init({loadMaps: true}))
