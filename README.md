@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/google/incremental-dom.svg?branch=master)](https://travis-ci.org/google/incremental-dom) 
+[![Build Status](https://travis-ci.org/google/incremental-dom.svg?branch=master)](https://travis-ci.org/google/incremental-dom)
 
 # Incremental DOM
 
@@ -12,6 +12,10 @@ Incremental DOM is primarily intended as a compilation target for templating lan
 ## Supported Browsers
 
 Incremental DOM supports IE9 and above.
+
+### Caveats
+ - If running in a browser that does not support `Object.create` then there may
+   be inconsistent behavior if enumerable properties exist on `Object.prototype`.
 
 ## Usage
 
