@@ -101,3 +101,6 @@ Here's an [example](https://gist.github.com/sparhami/197f3b947712998639eb).
 ### Metal.js
 
 [Metal.js](https://github.com/metal/metal.js) is a JavaScript library for building UI components in a solid, flexible way. It leverages [Incremental DOM](https://github.com/google/incremental-dom) and currently supports both [Closure Templates](https://developers.google.com/closure/templates/) and [JSX syntax](https://facebook.github.io/jsx/).
+
+### YallaJS
+[YallaJS](https://github.com/yallajs/yalla) is a javascript client framework for building Mobile, Tablet and Web application with great ease and simplicity. It uses [Incremental DOM](https://github.com/google/incremental-dom) embrace clean and zero boilerplate application.
