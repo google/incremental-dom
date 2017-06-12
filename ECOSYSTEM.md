@@ -96,7 +96,7 @@ Here's an [example](https://gist.github.com/sparhami/197f3b947712998639eb).
 
 ### FerrugemJS
 
-[FerrugemJS](https://github.com/ferrugemjs/library) is a library inspired by Aurelia and React using [Incremental DOM](https://github.com/google/incremental-dom) with [superviews.js](https://github.com/davidjamesstone/superviews.js) as a template language.
+[FerrugemJS](https://ferrugemjs.github.io/home-page/) is a library inspired by Aurelia and React using [Incremental DOM](https://github.com/google/incremental-dom) with a easy and intuitive template language.
 
 ### Metal.js
 
