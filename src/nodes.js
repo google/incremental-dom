@@ -46,7 +46,7 @@ const getNamespaceForTag = function(tag, parent) {
  * @param {?Node} parent
  * @param {NameOrCtorDef} nameOrCtor The tag or constructor for the Element.
  * @param {?string=} key A key to identify the Element.
- * @param {*=} typeId The type identifier for the Element.
+ * @param {number} typeId The type identifier for the Element.
  * @return {!Element}
  */
 const createElement = function(doc, parent, nameOrCtor, key, typeId) {
@@ -77,7 +77,7 @@ const createElement = function(doc, parent, nameOrCtor, key, typeId) {
  */
 const createText = function(doc) {
   const node = doc.createTextNode('');
-  initData(node, '#text', null);
+  initData(node, '#text', null, -Infinity);
   return node;
 };
 

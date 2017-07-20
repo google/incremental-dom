@@ -36,6 +36,8 @@ import {
   moveBefore
 } from './dom_util.js';
 import { global } from './global.js';
+import { notNaN } from './util.js';
+
 
 /** @type {?Node} */
 let currentNode = null;
@@ -182,7 +184,7 @@ const patchOuter = patchFactory(function(node, fn, data) {
  * @param {!Node} matchNode A node to match the data to.
  * @param {NameOrCtorDef} nameOrCtor The name or constructor to check for.
  * @param {?string=} key An optional key that identifies a node.
- * @param {*=} typeId An type identifier that avoids reuse between elements that
+ * @param {number} typeId A type identifier that avoids reuse between elements that
  *     would otherwise match.
  * @return {boolean} True if the node matches, false otherwise.
  */
@@ -203,43 +205,105 @@ const matches = function(matchNode, nameOrCtor, key, typeId) {
  * corresponding DOM node to the correct location or creating it if necessary.
  * @param {NameOrCtorDef} nameOrCtor The name or constructor for the Node.
  * @param {?string=} key The key used to identify the Node..
- * @param {*=} typeId An type identifier that avoids reuse between elements that
+ * @param {number} typeId A type identifier that avoids reuse between elements that
  *     would otherwise match.
  */
 const alignWithDOM = function(nameOrCtor, key, typeId) {
-  if (currentNode && matches(currentNode, nameOrCtor, key, typeId)) {
+  let next = currentNode;
+  // Clear out nodes with lower typeIds, which means that they should have come
+  // before the new node being aligned.
+  while (next && getData(next).typeId < typeId) {
+    next = next.nextSibling;
+  }
+  if (next !== currentNode) {
+    clearUnvisitedDOM(currentParent, currentNode, next);
+    currentNode = next;
+  }
+
+  if (currentNode) {
+    alignNodeWith(nameOrCtor, key, typeId);
+  } else {
+    insertNode(nameOrCtor, key, typeId);
+  }
+}
+
+
+/**
+ * Creates the new node, and updates the parent's keyMap.
+ * @param {NameOrCtorDef} nameOrCtor
+ * @param {?string=} key
+ * @param {number} typeId
+ * @return {!Text|!Element}
+ */
+const createNode = function(nameOrCtor, key, typeId) {
+  if (nameOrCtor === '#text') {
+    return createText(doc);
+  }
+
+  const element = createElement(doc, currentParent, nameOrCtor, key, typeId);
+
+  if (key) {
+    const parentData = getData(currentParent);
+    parentData.keyMap[key] = element;
+  }
+
+  return element;
+};
+
+
+/**
+ * Inserts the new node without expensive alignment checking.
+ * This is only called when there is not a current node to align against.
+ * @param {NameOrCtorDef} nameOrCtor
+ * @param {?string=} key
+ * @param {number} typeId
+ */
+const insertNode = function(nameOrCtor, key, typeId) {
+  const node = createNode(nameOrCtor, key, typeId);
+  currentParent.appendChild(node);
+  currentNode = node;
+};
+
+
+/**
+ * Aligns the new node with the current node, reusing a previous node if
+ * possible or inserting if not.
+ * @param {NameOrCtorDef} nameOrCtor
+ * @param {?string=} key
+ * @param {number} typeId
+ */
+const alignNodeWith = function(nameOrCtor, key, typeId) {
+  let node;
+
+  if (matches(currentNode, nameOrCtor, key, typeId)) {
     return;
   }
 
-  const parentData = getData(currentParent);
-  const keyMap = parentData.keyMap;
-  let node;
-
   // Check to see if the node has moved within the parent.
   if (key) {
+    const keyMap = getData(currentParent).keyMap;
     const keyNode = keyMap[key];
-    if (keyNode) {
-      if (matches(keyNode, nameOrCtor, key, typeId)) {
-        node = keyNode;
-      } else {
-        // When the keyNode gets removed later, make sure we do not remove the
-        // new node from the map.
-        getData(keyNode).key = null;
+    if (keyNode && matches(keyNode, nameOrCtor, key, typeId)) {
+      node = keyNode;
+    }
+  }
+
+  // Scan ahead to see if there is a matching node.
+  if (!node) {
+    let maybe = currentNode;
+    while (maybe && getData(maybe).typeId === typeId) {
+      if (matches(maybe, nameOrCtor, key, typeId)) {
+        node = maybe;
+        break;
       }
+
+      maybe = maybe.nextSibling;
     }
   }
 
   // Create the node if it doesn't exist.
   if (!node) {
-    if (nameOrCtor === '#text') {
-      node = createText(doc);
-    } else {
-      node = createElement(doc, currentParent, nameOrCtor, key, typeId);
-    }
-
-    if (key) {
-      keyMap[key] = node;
-    }
+    node = createNode(nameOrCtor, key, typeId);
   }
 
   // Re-order the node into the right position, preserving focus if either
@@ -270,10 +334,10 @@ const clearUnvisitedDOM = function(parentNode, startNode, endNode) {
   while (child !== endNode) {
     const next = child.nextSibling;
     const key = getData(child).key;
-    parentNode.removeChild(child);
-    if (key) {
+    if (key && keyMap[key] === child) {
       delete keyMap[key];
     }
+    parentNode.removeChild(child);
     child = next;
   }
 };
@@ -327,13 +391,13 @@ const exitNode = function() {
  * @param {?string=} key The key used to identify this element. This can be an
  *     empty string, but performance may be better if a unique value is used
  *     when iterating over an array of items.
- * @param {*=} typeId An type identifier that avoids reuse between elements that
+ * @param {number=} typeId A type identifier that avoids reuse between elements that
  *     would otherwise match.
  * @return {!Element} The corresponding Element.
  */
 const open = function(nameOrCtor, key, typeId) {
   nextNode();
-  alignWithDOM(nameOrCtor, key, typeId);
+  alignWithDOM(nameOrCtor, key, notNaN(typeId));
   enterNode();
   return /** @type {!Element} */(currentParent);
 };
@@ -363,7 +427,7 @@ const close = function() {
  */
 const text = function() {
   nextNode();
-  alignWithDOM('#text', null);
+  alignWithDOM('#text', null, -Infinity);
   return /** @type {!Text} */(currentNode);
 };
 

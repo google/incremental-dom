@@ -15,14 +15,17 @@
  */
 
 import { NameOrCtorDef } from './types.js';
-import { createMap } from './util.js';
+import {
+  createMap,
+  notNaN
+} from './util.js';
 
 
 /**
  * Keeps track of information needed to perform diffs for a given DOM node.
  * @param {NameOrCtorDef} nameOrCtor
  * @param {?string=} key
- * @param {*=} typeId
+ * @param {number} typeId
  * @constructor
  */
 function NodeData(nameOrCtor, key, typeId) {
@@ -83,7 +86,7 @@ function NodeData(nameOrCtor, key, typeId) {
  * @param {Node} node The node to initialize data for.
  * @param {NameOrCtorDef} nameOrCtor The nodeName or constructor for the Node.
  * @param {?string=} key The key that identifies the node.
- * @param {*=} typeId The type identifier for the Node.
+ * @param {number} typeId The type identifier for the Node.
  * @return {!NodeData} The newly initialized data object
  */
 const initData = function(node, nameOrCtor, key, typeId) {
@@ -100,7 +103,9 @@ const initData = function(node, nameOrCtor, key, typeId) {
  * @return {!NodeData} The NodeData for this Node.
  */
 const getData = function(node) {
-  importNode(node);
+  if (!node['__incrementalDOMData']) {
+    importNode(node);
+  }
   return node['__incrementalDOMData'];
 };
 
@@ -118,7 +123,7 @@ const importNode = function(node) {
   const isElement = node.nodeType === 1;
   const nodeName = isElement ? node.localName : node.nodeName;
   const key = isElement ? node.getAttribute('key') : null;
-  const typeId = node['typeId'];
+  const typeId = notNaN(node['typeId']);
   const data = initData(node, nodeName, key, typeId);
 
   if (key) {
