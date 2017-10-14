@@ -8,7 +8,8 @@
     "browser": true
   },
   "globals": {
-    "process": true
+    "process": true,
+    "global": true
   },
   "rules": {
     "no-unused-vars": [2, {

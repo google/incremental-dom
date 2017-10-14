@@ -33,7 +33,7 @@ import {
   createMap,
   truncateArray
 } from './util.js';
-import { global } from './global.js';
+import { globalObj } from './global.js';
 
 
 /**
@@ -73,7 +73,7 @@ const prevAttrsMap = createMap();
  * @return {!Element} The corresponding Element.
  */
 const elementOpen = function(nameOrCtor, key, statics, var_args) {
-  if (global.DEBUG) {
+  if (globalObj.DEBUG) {
     assertNotInAttributes('elementOpen');
     assertNotInSkip('elementOpen');
   }
@@ -179,7 +179,7 @@ const elementOpen = function(nameOrCtor, key, statics, var_args) {
  *     Element is created.
  */
 const elementOpenStart = function(nameOrCtor, key, statics) {
-  if (global.DEBUG) {
+  if (globalObj.DEBUG) {
     assertNotInAttributes('elementOpenStart');
     setInAttributes(true);
   }
@@ -198,7 +198,7 @@ const elementOpenStart = function(nameOrCtor, key, statics) {
  * @param {*} value
  */
 const attr = function(name, value) {
-  if (global.DEBUG) {
+  if (globalObj.DEBUG) {
     assertInAttributes('attr');
   }
 
@@ -212,7 +212,7 @@ const attr = function(name, value) {
  * @return {!Element} The corresponding Element.
  */
 const elementOpenEnd = function() {
-  if (global.DEBUG) {
+  if (globalObj.DEBUG) {
     assertInAttributes('elementOpenEnd');
     setInAttributes(false);
   }
@@ -230,13 +230,13 @@ const elementOpenEnd = function() {
  * @return {!Element} The corresponding Element.
  */
 const elementClose = function(nameOrCtor) {
-  if (global.DEBUG) {
+  if (globalObj.DEBUG) {
     assertNotInAttributes('elementClose');
   }
 
   const node = close();
 
-  if (global.DEBUG) {
+  if (globalObj.DEBUG) {
     assertCloseMatchesOpenTag(getData(node).nameOrCtor, nameOrCtor);
   }
 
@@ -274,7 +274,7 @@ const elementVoid = function(nameOrCtor, key, statics, var_args) {
  * @return {!Text} The corresponding text node.
  */
 const text = function(value, var_args) {
-  if (global.DEBUG) {
+  if (globalObj.DEBUG) {
     assertNotInAttributes('text');
     assertNotInSkip('text');
   }

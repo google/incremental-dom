@@ -35,7 +35,7 @@ import {
   getFocusedPath,
   moveBefore
 } from './dom_util.js';
-import { global } from './global.js';
+import { globalObj } from './global.js';
 
 /** @type {?Node} */
 let currentNode = null;
@@ -61,9 +61,9 @@ const markFocused = function(focusPath, focused) {
 /**
  * Returns a patcher function that sets up and restores a patch context,
  * running the run function with the provided data.
- * @param {function((!Element|!DocumentFragment),!function(T),T=): ?Node} run
- * @return {function((!Element|!DocumentFragment),!function(T),T=): ?Node}
- * @template T
+ * @param {function((!Element|!DocumentFragment),!function(T),T=): R} run
+ * @return {function((!Element|!DocumentFragment),!function(T),T=): R}
+ * @template T, R
  */
 const patchFactory = function(run) {
   /**
@@ -73,8 +73,8 @@ const patchFactory = function(run) {
    * @param {(!Element|!DocumentFragment)} node
    * @param {!function(T)} fn
    * @param {T=} data
-   * @return {?Node} node
-   * @template T
+   * @return {R} node
+   * @template T, R
    */
   const f = function(node, fn, data) {
     const prevDoc = doc;
@@ -86,7 +86,7 @@ const patchFactory = function(run) {
     doc = node.ownerDocument;
     currentParent = node.parentNode;
 
-    if (global.DEBUG) {
+    if (globalObj.DEBUG) {
       previousInAttributes = setInAttributes(false);
       previousInSkip = setInSkip(false);
     }
@@ -96,7 +96,7 @@ const patchFactory = function(run) {
     const retVal = run(node, fn, data);
     markFocused(focusPath, false);
 
-    if (global.DEBUG) {
+    if (globalObj.DEBUG) {
       assertVirtualAttributesClosed();
       setInAttributes(previousInAttributes);
       setInSkip(previousInSkip);
@@ -129,7 +129,7 @@ const patchInner = patchFactory(function(node, fn, data) {
   fn(data);
   exitNode();
 
-  if (global.DEBUG) {
+  if (globalObj.DEBUG) {
     assertNoUnclosedTags(currentNode, node);
   }
 
@@ -153,7 +153,7 @@ const patchOuter = patchFactory(function(node, fn, data) {
   let expectedNextNode = null;
   let expectedPrevNode = null;
 
-  if (global.DEBUG) {
+  if (globalObj.DEBUG) {
     assertPatchOuterHasParentNode(currentParent);
     expectedNextNode = node.nextSibling;
     expectedPrevNode = node.previousSibling;
@@ -162,7 +162,7 @@ const patchOuter = patchFactory(function(node, fn, data) {
   currentNode = startNode;
   fn(data);
 
-  if (global.DEBUG) {
+  if (globalObj.DEBUG) {
     assertPatchElementNoExtras(startNode, currentNode, expectedNextNode,
         expectedPrevNode);
   }
@@ -346,7 +346,7 @@ const open = function(nameOrCtor, key, typeId) {
  * @return {!Element} The corresponding Element.
  */
 const close = function() {
-  if (global.DEBUG) {
+  if (globalObj.DEBUG) {
     setInSkip(false);
   }
 
@@ -373,7 +373,7 @@ const text = function() {
  * @return {!Element}
  */
 const currentElement = function() {
-  if (global.DEBUG) {
+  if (globalObj.DEBUG) {
     assertInPatch('currentElement', doc);
     assertNotInAttributes('currentElement');
   }
@@ -385,7 +385,7 @@ const currentElement = function() {
  * @return {Node} The Node that will be evaluated for the next instruction.
  */
 const currentPointer = function() {
-  if (global.DEBUG) {
+  if (globalObj.DEBUG) {
     assertInPatch('currentPointer', doc);
     assertNotInAttributes('currentPointer');
   }
@@ -398,7 +398,7 @@ const currentPointer = function() {
  * clearing out the children.
  */
 const skip = function() {
-  if (global.DEBUG) {
+  if (globalObj.DEBUG) {
     assertNoChildrenDeclaredYet('skip', currentNode);
     setInSkip(true);
   }

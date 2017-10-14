@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-const global = typeof self !== 'undefined' ? self :
+const globalObj = typeof self !== 'undefined' ? self :
     typeof window !== 'undefined' ?  window :
     typeof global !== 'undefined' ?  global :
     {};
 
 export {
-  global
+  globalObj
 };

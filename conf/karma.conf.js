@@ -39,7 +39,7 @@ module.exports = function(config) {
       rollup: {
         plugins: [
           replace({
-            'global.DEBUG': 'true'
+            'globalObj.DEBUG': 'true'
           }),
           multi(),
           babel({

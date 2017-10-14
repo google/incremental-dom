@@ -72,30 +72,31 @@ function lint() {
     .pipe(eslint.failAfterError());
 }
 
-function bundle(format, development, minify) {
+function bundle(format, development, minify, runBabel) {
   return rollup({
-    entry: entryFileName,
-    sourceMap: true,
+    input: entryFileName,
+    sourcemap: true,
     banner: fs.readFileSync('./conf/license_header.txt'),
     plugins: [
       rollupReplace({
-        'global.DEBUG': development
+        'globalObj.DEBUG': development
       }),
       minify ? uglify({
         output: { comments: /@license/ },
         compress: { keep_fargs: false }
       }) : {},
-      babel({
+      runBabel ? babel({
         exclude: 'node_modules/**'
-      })
+      }) : {}
     ],
     format: format,
-    moduleName: 'IncrementalDOM',
+    name: 'IncrementalDOM',
+    treeshake: false,
   });
 }
 
 function js() {
-  return bundle('umd', 'true')
+  return bundle('umd', 'true', false, true)
     .pipe(source(artifactName + '.js'))
     .pipe(buffer())
     .pipe(sourcemaps.init({loadMaps: true}))
@@ -112,7 +113,7 @@ function jsMinWatch() {
 }
 
 function jsMin() {
-  return bundle('umd', 'false', true)
+  return bundle('umd', 'false', true, true)
     .pipe(source(artifactName + '-min.js'))
     .pipe(buffer())
     .pipe(sourcemaps.init({loadMaps: true}))
@@ -123,17 +124,19 @@ function jsMin() {
 function jsClosure(done) {
   var moduleDeclaration = 'goog.module(\'' + googModuleName + '\');';
 
-  return bundle('cjs', 'goog.DEBUG')
+  return bundle('cjs', 'goog.DEBUG', false, false)
     .pipe(source(artifactName + '-closure.js'))
     .pipe(buffer())
     .pipe(sourcemaps.init({loadMaps: true}))
     .pipe(replace(/('|")use strict\1;/, moduleDeclaration))
+    .pipe(replace('Object.defineProperty(exports, \'__esModule\', { value: true });', ''))
+    .pipe(replace(' global ', ' undefined ')) 
     .pipe(sourcemaps.write('.'))
     .pipe(gulp.dest('dist'));
 }
 
 function jsCommonJS() {
-  return bundle('cjs', "process.env.NODE_ENV !== 'production'")
+  return bundle('cjs', "process.env.NODE_ENV !== 'production'", false, true)
     .pipe(source(artifactName + '-cjs.js'))
     .pipe(buffer())
     .pipe(sourcemaps.init({loadMaps: true}))
@@ -155,6 +158,7 @@ function jsDist() {
 
 function jsClosureChecks() {
   return gulp.src(srcs)
+    .pipe(replace(' global ', ' undefined ')) 
     .pipe(closureCompiler({
       checks_only: 'true',
       externs: 'node_externs.js',
