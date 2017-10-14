@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import { getData } from './node_data.js';
+
 
 /**
  * @param {!Node} node
@@ -27,14 +29,14 @@ const isDocumentRoot = function(node) {
 /**
  * @param {!Node} node The node to start at, inclusive.
  * @param {?Node} root The root ancestor to get until, exclusive.
- * @return {!Array<!Node>} The ancestry of DOM nodes.
+ * @return {!Array<!NodeData>} The ancestry of DOM nodes.
  */
 const getAncestry = function(node, root) {
   const ancestry = [];
   let cur = node;
 
   while (cur !== root) {
-    ancestry.push(cur);
+    ancestry.push(getData(cur));
     cur = cur.parentNode;
   }
 
@@ -75,7 +77,7 @@ const getActiveElement = function(node) {
  * a reference node, up until the root.
  * @param {!Node} node The reference node to get the activeElement for.
  * @param {?Node} root The root to get the focused path until.
- * @return {!Array<Node>}
+ * @return {!Array<!NodeData>}
  */
 const getFocusedPath = function(node, root) {
   const activeElement = getActiveElement(node);

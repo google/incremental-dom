@@ -100,8 +100,7 @@ const initData = function(node, nameOrCtor, key, typeId) {
  * @return {!NodeData} The NodeData for this Node.
  */
 const getData = function(node) {
-  importNode(node);
-  return node['__incrementalDOMData'];
+  return node['__incrementalDOMData'] || importNode(node);
 };
 
 
@@ -109,12 +108,9 @@ const getData = function(node) {
  * Imports node and its subtree, initializing caches.
  *
  * @param {?Node} node The Node to import.
+ * @return {!NodeData}
  */
 const importNode = function(node) {
-  if (node['__incrementalDOMData']) {
-    return;
-  }
-
   const isElement = node.nodeType === 1;
   const nodeName = isElement ? node.localName : node.nodeName;
   const key = isElement ? node.getAttribute('key') : null;
@@ -140,8 +136,12 @@ const importNode = function(node) {
   }
 
   for (let child = node.firstChild; child; child = child.nextSibling) {
-    importNode(child);
+    if (!child['__incrementalDOMData']) {
+      importNode(child);
+    }
   }
+
+  return data;
 };
 
 

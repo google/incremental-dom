@@ -24,7 +24,7 @@ import {
 /**
  * Gets the namespace to create an element (of a given tag) in.
  * @param {string} tag The tag to get the namespace for.
- * @param {?Node} parent
+ * @param {!Node} parent
  * @return {?string} The namespace to create the tag in.
  */
 const getNamespaceForTag = function(tag, parent) {
@@ -43,7 +43,7 @@ const getNamespaceForTag = function(tag, parent) {
 /**
  * Creates an Element.
  * @param {Document} doc The document with which to create the Element.
- * @param {?Node} parent
+ * @param {!Node} parent
  * @param {NameOrCtorDef} nameOrCtor The tag or constructor for the Element.
  * @param {?string=} key A key to identify the Element.
  * @param {*=} typeId The type identifier for the Element.
