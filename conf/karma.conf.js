@@ -14,45 +14,27 @@
  * limitations under the License.
  */
 
-var babel = require('rollup-plugin-babel');
-var replace = require('rollup-plugin-replace');
-var multi = require('rollup-plugin-multi-entry').default;
-
 module.exports = function(config) {
   config.set({
-    frameworks: ['mocha', 'sinon-chai'],
 
+    // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '../',
 
+
+    // frameworks to use
+    // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
+    frameworks: ['mocha', 'sinon-chai', 'karma-typescript'],
+
+
+    // list of files / patterns to load in the browser
     files: [
-      'test/util/globals.js',
-      'test/unit/**/*.js',
-      'test/functional/**/*.js'
+      './src/*.ts',
+      './test/util/dom.ts',
+      './test/util/globals.js',
+      './test/unit/*.ts',
+      './test/functional/*.ts',
+      './index.ts',
     ],
-
-    preprocessors: {
-      'src/**/*.js': ['rollup'],
-      'test/**/*.js': ['rollup']
-    },
-
-    rollupPreprocessor: {
-      rollup: {
-        plugins: [
-          replace({
-            'globalObj.DEBUG': 'true'
-          }),
-          multi(),
-          babel({
-            exclude: ['node_modules/**', 'test/util/globals.js'],
-          })
-        ]
-      },
-      bundle: {
-        intro: '(function() {',
-        outro: '})();',
-        sourceMap: 'inline'
-      }
-    },
 
     customLaunchers: {
       chromeNoSandbox: {
@@ -61,21 +43,64 @@ module.exports = function(config) {
       }
     },
 
-    reporters: ['progress'],
+    karmaTypescriptConfig: {
+      tsconfig: './tsconfig.json',
+      coverageOptions: {exclude: /\.test\.tsx?/},
+    },
 
+
+    // list of files / patterns to exclude
+    exclude: [],
+
+
+    // preprocess matching files before serving them to the browser
+    // available preprocessors:
+    // https://npmjs.org/browse/keyword/karma-preprocessor
+    preprocessors: {
+      './src/*.ts': ['karma-typescript'],
+      './test/**/*.ts': ['karma-typescript'],
+      './index.ts': ['karma-typescript'],
+    },
+
+
+    // test results reporter to use
+    // possible values: 'dots', 'progress'
+    // available reporters: https://npmjs.org/browse/keyword/karma-reporter
+    reporters: ['nyan', 'karma-typescript'],
+
+
+    // web server port
     port: 9876,
 
+
+    // enable / disable colors in the output (reporters and logs)
     colors: true,
 
+
+    // level of logging
+    // possible values: config.LOG_DISABLE || config.LOG_ERROR ||
+    // config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
     logLevel: config.LOG_INFO,
 
+
+    // enable / disable watching file and executing tests whenever any file
+    // changes
     autoWatch: true,
 
-    // change Karma's debug.html to the mocha web reporter
-    client: {
-      mocha: {
-        reporter: 'html'
-      }
-    }
-  });
-};
+
+    // start these browsers
+    // available browser launchers:
+    // https://npmjs.org/browse/keyword/karma-launcher
+    browsers: ['Chrome'],
+
+    mime: {'text/x-typescript': ['ts', 'tsx']},
+
+    // Continuous Integration mode
+    // if true, Karma captures browsers, runs the tests and exits
+    singleRun: false,
+
+    // Concurrency level
+    // how many browser should be started simultaneous
+    concurrency: Infinity
+  })
+}
