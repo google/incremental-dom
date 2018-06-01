@@ -1,5 +1,6 @@
 /**
- * Copyright 2017 The Incremental DOM Authors. All Rights Reserved.
+ * @license
+ * Copyright 2018 The Incremental DOM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +28,6 @@ if (window.customElements) {
 }
 
 if (document.registerElement) {
-  window.MyElementRegister = document.registerElement('my-element-register', {
-    prototype: Object.create(HTMLElement.prototype)
-  });
+  window.MyElementRegister = document.registerElement(
+      'my-element-register', {prototype: Object.create(HTMLElement.prototype)});
 }
