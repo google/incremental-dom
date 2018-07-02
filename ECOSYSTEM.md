@@ -80,6 +80,46 @@ function app(state) {
 IncrementalDOM.patch(root, jsonml2idom, app(state))
 ```
 
+### incremental-dom-loder
+
+[incremental-dom-loader](https://github.com/helloIAmPau/incremental-dom-loader) - An incremental-dom loader for webpack. It transpiles an HTML template file into an incremental-dom script.
+
+```html
+<h1>Hello!</h1>
+
+<dom-if test="${ state.check() }">
+  <dom-loop items="${ state.items }">
+    <h2>${ value.title }</h2>
+    <p>${ value.text }</p>
+    <button onclick="${ state.love }">Show Love!</button>
+  </dom-loop>
+</dom-if>
+```
+
+```js
+var id = require('incremental-dom');
+
+module.exports = function(state) {
+  id.elementOpen('h1', 'hio0k', []);
+    id.text(`Hello!`);
+  id.elementClose('h1');
+  if(state.check()) {
+    for(const key of Object.keys(state.items)) {
+      const value = state.items[key];
+      id.elementOpen('h2', `ncj5k-${ key }`, []);
+        id.text(`${ value.title }`);
+      id.elementClose('h2');
+      id.elementOpen('p', `jde79-${ key }`, []);
+        id.text(`${ value.text }`);
+      id.elementClose('p');
+      id.elementOpen('button', `eima7-${ key }`, [], 'onclick', state.love);
+        id.text(`Show Love!`);
+      id.elementClose('button');
+    }
+  }
+}
+```
+
 ### Create your own
 
 If you work on a templating language we'd love to see Incremental DOM adopted as
