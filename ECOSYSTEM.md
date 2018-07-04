@@ -80,7 +80,7 @@ function app(state) {
 IncrementalDOM.patch(root, jsonml2idom, app(state))
 ```
 
-### incremental-dom-loder
+### incremental-dom-loader
 
 [incremental-dom-loader](https://github.com/helloIAmPau/incremental-dom-loader) - An incremental-dom loader for webpack. It transpiles an HTML template file into an incremental-dom script.
 
