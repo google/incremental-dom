@@ -1,6 +1,6 @@
 /**
  * @fileoverview
- * @suppress {extraRequire}  
+ * @suppress {extraRequire}
  * @license
  * Copyright 2018 The Incremental DOM Authors. All Rights Reserved.
  *
@@ -66,7 +66,7 @@ function assertNoUnclosedTags(
   }
 
   let currentElement = openElement;
-  const openTags: Array<string> = [];
+  const openTags: string[] = [];
   while (currentElement && currentElement !== root) {
     openTags.push(currentElement.nodeName.toLowerCase());
     currentElement = currentElement.parentNode;

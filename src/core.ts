@@ -1,6 +1,6 @@
 /**
  * @fileoverview
- * @suppress {extraRequire}  
+ * @suppress {extraRequire}
  * @license
  * Copyright 2018 The Incremental DOM Authors. All Rights Reserved.
  *
@@ -150,8 +150,8 @@ const patchInner = patchFactory((node, fn, data) => {
 const patchOuter = patchFactory((node, fn, data) => {
   // tslint:disable-next-line:no-any
   const startNode = (({nextSibling: node}) as any) as Element;
-  let expectedNextNode: (Node|null) = null;
-  let expectedPrevNode: (Node|null) = null;
+  let expectedNextNode: Node|null = null;
+  let expectedPrevNode: Node|null = null;
 
   if (DEBUG) {
     expectedNextNode = node.nextSibling;

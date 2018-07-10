@@ -1,6 +1,6 @@
 /**
  * @fileoverview
- * @suppress {extraRequire}  
+ * @suppress {extraRequire}
  * @license
  * Copyright 2018 The Incremental DOM Authors. All Rights Reserved.
  *
@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-import {truncateArray} from './util.js';
+import {truncateArray} from './util';
 
 
 // tslint:disable-next-line:no-any TODO(tomnguyen): Make this a struct[].
