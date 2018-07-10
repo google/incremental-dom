@@ -37,11 +37,12 @@ describe('formatters', () => {
   });
 
   describe('for newly created Text nodes', () => {
-    function sliceOne(str: string|number|boolean): (string|number|boolean)  {
+
+    function sliceOne(str: {}): string {
       return ('' + str).slice(1);
     }
 
-    function prefixQuote(str: string|number|boolean): (string|number|boolean) {
+    function prefixQuote(str: {}): string {
       return '\'' + str;
     }
 

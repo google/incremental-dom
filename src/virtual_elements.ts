@@ -1,6 +1,6 @@
 /**
  * @fileoverview
- * @suppress {extraRequire}  
+ * @suppress {extraRequire}
  * @license
  * Copyright 2018 The Incremental DOM Authors. All Rights Reserved.
  *
@@ -283,7 +283,7 @@ function elementVoid(
  *     changed.
  * @return The corresponding text node.
  */
-function text(value: string|number|boolean, ...varArgs: Array<(a: string|number|boolean) => (string|number|boolean)>) {
+function text(value: string|number|boolean, ...varArgs: Array<(a: {}) => string>) {
   if (DEBUG) {
     assertNotInAttributes('text');
     assertNotInSkip('text');
