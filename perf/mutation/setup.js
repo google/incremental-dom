@@ -1,61 +1,42 @@
-(function(scope) {
-  var uidGen = 1;
+let uidGen = 1;
 
-  var MutationSetup = {
-    uid: function() {
-      return uidGen++;
-    },
+function uid() {
+  return uidGen++;
+}
 
-    randomPercent: function() {
-      return (Math.random() - 0.5) * 0.3;
-    },
+function randomPercent() {
+  return (Math.random() - 0.5) * 0.3;
+}
 
-    randomValue: function() {
-      return Math.random() * 700;
-    },
+function randomValue() {
+  return Math.random() * 700;
+}
 
-    randomChars: function() {
-      return (Math.random() + 1).toString(36).substring(2, 10);
-    },
+function randomChars() {
+  return (Math.random() + 1).toString(36).substring(2, 10);
+}
 
-    randomText: function(count) {
-      var text = '';
+function randomText(count) {
+  return new Array(count).fill(0).map(randomChars).join();
+}
 
-      for (var i = 0; i < count; i += 1) {
-        text += this.randomChars();
-      }
+function createItem() {
+  return Object.freeze({
+    key: '' + uid(),
+    name: randomText(1),
+    value: randomValue(),
+    change: randomPercent()
+  });
+}
 
-      return text;
-    },
+export function createItems(count) {
+  return new Array(count).fill(0).map(createItem);
+}
 
-    createItem: function() {
-      return Object.freeze({
-        key: '' + this.uid(),
-        name: this.randomText(1),
-        value: this.randomValue(),
-        change: this.randomPercent()
-      });
-    },
-
-    createItems: function(count) {
-      var data = [];
-
-      for (var i = 0; i < count; i += 1) {
-        data[i] = this.createItem();
-      }
-
-      return data;
-    },
-
-    updateItems: function(items) {
-      for (var i = 0; i < items.length; i += 1) {
-        var change = this.randomPercent();
-        items[i].value *= (1 + change);
-        items[i].change = change;
-      }
-    }
-  };
-
-  scope.MutationSetup = MutationSetup;
-
-}(window));
+export function updateItems(items) {
+  items.forEach((item, i) => {
+    const change = randomPercent();
+    items[i].value *= (1 + change);
+    items[i].change = change;
+  });
+}

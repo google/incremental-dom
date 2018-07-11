@@ -1,33 +1,28 @@
-(function(scope) {
-  var ITEM_COUNT = 100;
-  var ITERATION_COUNT = 200;
-  var items = ListSetup.createItems(ITEM_COUNT);
+import {Samples} from '../samples.js';
+import {createItems} from './setup.js';
 
-  var run = function(impl) {
-    var samples = new Samples(ITERATION_COUNT);
-    var selectedKeys = {};
+const ITEM_COUNT = 100;
+const ITERATION_COUNT = 200;
+const items = createItems(ITEM_COUNT);
 
-    function pass() {
-      impl.clear();
+export function runCreation(impl) {
+  const samples = new Samples(ITERATION_COUNT);
+  const selectedKeys = {};
 
-      samples.timeStart();
-      impl.render({
-        items: items,
-        selectedKeys: selectedKeys
-      });
-      samples.timeEnd();
-    }
+  function pass() {
+    impl.clear();
 
-    for (var i = 0; i < ITERATION_COUNT; i += 1) {
-      pass();
-    }
+    samples.timeStart();
+    impl.render({
+      items: items,
+      selectedKeys: selectedKeys
+    });
+    samples.timeEnd();
+  }
 
-    return Promise.resolve(samples.data);
-  };
+  for (let i = 0; i < ITERATION_COUNT; i += 1) {
+    pass();
+  }
 
-  scope.Creation = {
-    run: run
-  };
-
-})(window);
-
+  return Promise.resolve(samples.data);
+};

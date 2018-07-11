@@ -1,17 +1,21 @@
-function createTests(Renderer, tests, impls) {
-  var patch = IncrementalDOM.patch;
-  var eo = IncrementalDOM.elementOpen;
-  var ec = IncrementalDOM.elementClose;
-  var tx = IncrementalDOM.text;
+import {avg, filterOutliers} from './stats.js';
 
-  var currentTest;
-  var currentImpl;
-  var currentRenderer;
-  var results;
-  var running;
+export function createTests(Renderer, tests, impls) {
+  const {
+    patch,
+    elementOpen: eo,
+    elementClose: ec,
+    text: tx,
+  } = IncrementalDOM;
 
-  var container = document.createElement('div');
-  var testContainer = document.createElement('div');
+  let currentTest;
+  let currentImpl;
+  let currentRenderer;
+  let results;
+  let running;
+
+  const container = document.createElement('div');
+  const testContainer = document.createElement('div');
   container.id = 'container';
 
   document.body.appendChild(container);
@@ -89,20 +93,19 @@ function createTests(Renderer, tests, impls) {
     return new Promise(function(resolve) { setTimeout(resolve, time); });
   }
 
-  function run() {
-    delay(100)
-      .then(function() { return currentTest.fn.run(currentRenderer) })
-      .then(function(samples) { return Stats.avg(Stats.filterOutliers(samples)) })
-      .then(function(avg) {
-        results = `time per iteration: ${avg.toFixed(3)}ms`;
-        running = false;
-        update();
-      });
+  async function run() {
+    await delay(100);
+    const samples = await currentTest.fn(currentRenderer);
+    const average = avg(filterOutliers(samples));
+
+    results = `time per iteration: ${average.toFixed(3)}ms`;
+    running = false;
+    update();
   }
 
-  var parts = window.location.hash.substring(1).split(',');
-  var impl = Number(parts[0]) || 0;
-  var test = Number(parts[1]) || 0;
+  const parts = window.location.hash.substring(1).split(',');
+  const impl = Number(parts[0]) || 0;
+  const test = Number(parts[1]) || 0;
 
   setTestAndImpl(tests[test], impls[impl]);
 }
