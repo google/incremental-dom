@@ -101,7 +101,9 @@ function patchFactory<T, R>(run: PatchFunction<T, R>): PatchFunction<T, R> {
       markFocused(focusPath, true);
 
       const retVal = run(node, fn, data);
-      assertVirtualAttributesClosed();
+      if (DEBUG) {
+        assertVirtualAttributesClosed();
+      }
 
       return retVal;
     } finally {
