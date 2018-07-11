@@ -71,6 +71,22 @@ function unitWatch(done) {
       .start();
 }
 
+function getReplacementConfig(development) {
+  var config = {
+    'if \\(DEBUG': null,
+  };
+
+  // The plugin looks up the matched part as a string, but we cannot have `(`
+  // as the replacement target since it is used in a RegExp. So the above
+  // allows finding the match, and this tells the plugin what to replace it
+  // with. This is non-enumerable so it isn't added to the replacment RegExp.
+  Object.defineProperty(config, 'if (DEBUG', {
+    'enumerable': false,
+    'value': 'if (' + development,
+  });
+
+  return config;
+}
 
 function bundle(format, development, minify, runBabel) {
   return rollup({
@@ -79,8 +95,7 @@ function bundle(format, development, minify, runBabel) {
     banner: fs.readFileSync('./conf/license_header.txt'),
     plugins: [
       typescript({typescript: require('typescript')}),
-      rollupReplace(
-          {'const DEBUG = true;': 'const DEBUG = ' + development + ';'}),
+      rollupReplace(getReplacementConfig(development)),
       minify ? uglify({
         output: {comments: /@preserve/},
         compress: {keep_fargs: false}
