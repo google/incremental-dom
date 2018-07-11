@@ -61,6 +61,28 @@ describe('conditional rendering', () => {
       expect(assertHTMLElement(outer.childNodes[1]).tagName).to.equal('SPAN');
     });
 
+    it('should not move non-keyed nodes', () => {
+      function render(condition: boolean) {
+        if (condition) {
+          elementVoid('div');
+        }
+
+        elementVoid('span');
+        elementVoid('div');
+      }
+
+      patch(container, () => render(false));
+      const secondDiv = container.lastChild;
+      patch(container, () => render(true));
+      const firstChild = container.firstChild;
+      const lastChild = container.lastChild;
+
+      expect(container.childNodes).to.have.length(3);
+      expect(firstChild).to.not.equal(secondDiv);
+      expect(lastChild).to.equal(secondDiv);
+    });
+
+
     it('should render when the condition becomes true', () => {
       patch(container, () => render(false));
       patch(container, () => render(true));

@@ -23,7 +23,7 @@ import {getFocusedPath, moveBefore} from './dom_util';
 import {DEBUG} from './global';
 import {getData} from './node_data';
 import {createElement, createText} from './nodes';
-import {NameOrCtorDef} from './types';
+import {Key, NameOrCtorDef} from './types';
 
 let context: Context|null = null;
 
@@ -180,26 +180,66 @@ const patchOuter = patchFactory((node, fn, data) => {
 /**
  * Checks whether or not the current node matches the specified nameOrCtor and
  * key.
- *
  * @param matchNode A node to match the data to.
  * @param nameOrCtor The name or constructor to check for.
- * @param key An optional key that identifies a node.
- * @param typeId An type identifier that avoids reuse between elements that
- *     would otherwise match.
+ * @param key The key used to identify the Node.
  * @return True if the node matches, false otherwise.
  */
 function matches(
-    matchNode: Node, nameOrCtor: NameOrCtorDef, key: string|null|undefined,
-    typeId: {}|null|undefined) {
+    matchNode: Node, nameOrCtor: NameOrCtorDef, key: Key) {
   const data = getData(matchNode);
 
   // Key check is done using double equals as we want to treat a null key the
   // same as undefined. This should be okay as the only values allowed are
   // strings, null and undefined so the == semantics are not too weird.
-  // tslint:disable:triple-equals
-  return nameOrCtor == data.nameOrCtor && typeId == data.typeId &&
-      key == data.key;
-  // tslint:enable:triple-equals
+  // tslint:disable-next-line:triple-equals
+  return nameOrCtor == data.nameOrCtor && key == data.key;
+}
+
+
+/**
+ * Finds the matching node, starting at `node` and looking at the subsequent
+ * siblings if a key is used.
+ * @param node The node to start looking at.
+ * @param nameOrCtor The name or constructor for the Node.
+ * @param key The key used to identify the Node.
+ */
+function getMatchingNode(
+    matchNode: Node|null, nameOrCtor: NameOrCtorDef, key: Key) {
+  if (!matchNode) {
+    return null;
+  }
+
+  if (matches(matchNode, nameOrCtor, key)) {
+    return matchNode;
+  }
+
+  if (!key) {
+    return null;
+  }
+
+  return getMatchingNode(matchNode.nextSibling, nameOrCtor, key);
+}
+
+
+/**
+ * Creates a Node and marking it as created.
+ * @param nameOrCtor The name or constructor for the Node.
+ * @param key The key used to identify the Node.
+ * @return The newly created node.
+ */
+function createNode(nameOrCtor, key): Node {
+  let node;
+
+  if (nameOrCtor === '#text') {
+    node = createText(doc!);
+  } else {
+    node = createElement(doc!, currentParent!, nameOrCtor, key);
+  }
+
+  context!.markCreated(node);
+
+  return node;
 }
 
 
@@ -207,48 +247,15 @@ function matches(
  * Aligns the virtual Node definition with the actual DOM, moving the
  * corresponding DOM node to the correct location or creating it if necessary.
  * @param nameOrCtor The name or constructor for the Node.
- * @param key The key used to identify the Node..
- * @param typeId An type identifier that avoids reuse between elements that
- *     would otherwise match.
+ * @param key The key used to identify the Node.
  */
-function alignWithDOM(
-    nameOrCtor: NameOrCtorDef, key: string|null|undefined,
-    typeId: {}|null|undefined) {
-  if ((currentNode && matches(currentNode, nameOrCtor, key, typeId))) {
+function alignWithDOM(nameOrCtor: NameOrCtorDef, key: Key) {
+  const existingNode = getMatchingNode(currentNode, nameOrCtor, key);
+  const node = existingNode || createNode(nameOrCtor, key);
+
+  // If we are at the matching node, then we are done.
+  if (node === currentNode) {
     return;
-  }
-
-  const parent = currentParent!;
-  const parentData = getData(parent);
-  const keyMap = parentData.keyMap;
-  let node;
-
-  // Check to see if the node has moved within the parent.
-  if (key) {
-    const keyNode = keyMap[key];
-    if (keyNode) {
-      if (matches(keyNode, nameOrCtor, key, typeId)) {
-        node = keyNode;
-      } else {
-        // When the keyNode gets removed later, make sure we do not remove the
-        // new node from the map.
-        getData(keyNode).key = null;
-      }
-    }
-  }
-
-  // Create the node if it doesn't exist.
-  if (!node) {
-    if (nameOrCtor === '#text') {
-      node = createText(doc!);
-    } else {
-      node = createElement(doc!, parent, nameOrCtor, key, typeId);
-    }
-    context!.markCreated(node);
-
-    if (key) {
-      keyMap[key] = node;
-    }
   }
 
   // Re-order the node into the right position, preserving focus if either
@@ -256,9 +263,9 @@ function alignWithDOM(
   // from the DOM.
   if (getData(node).focused) {
     // Move everything else before the node.
-    moveBefore(parent, node, currentNode);
+    moveBefore(currentParent!, node, currentNode);
   } else {
-    parent.insertBefore(node, currentNode);
+    currentParent!.insertBefore(node, currentNode);
   }
 
   currentNode = node;
@@ -274,18 +281,12 @@ function alignWithDOM(
 function clearUnvisitedDOM(
     maybeParentNode: Node|null, startNode: Node|null, endNode: Node|null) {
   const parentNode = maybeParentNode!;
-  const data = getData(parentNode);
-  const keyMap = data.keyMap;
   let child = startNode;
 
   while (child !== endNode) {
     const next = child!.nextSibling;
-    const key = getData(child!).key;
     parentNode.removeChild(child!);
     context!.markDeleted(child!);
-    if (key) {
-      delete keyMap[key];
-    }
     child = next;
   }
 }
@@ -339,15 +340,11 @@ function exitNode() {
  * @param key The key used to identify this element. This can be an
  *     empty string, but performance may be better if a unique value is used
  *     when iterating over an array of items.
- * @param typeId An type identifier that avoids reuse between elements that
- *     would otherwise match.
  * @return The corresponding Element.
  */
-function open(
-    nameOrCtor: NameOrCtorDef, key?: string|null|undefined,
-    typeId?: {}): HTMLElement {
+function open(nameOrCtor: NameOrCtorDef, key?: Key): HTMLElement {
   nextNode();
-  alignWithDOM(nameOrCtor, key, typeId);
+  alignWithDOM(nameOrCtor, key);
   enterNode();
   return (currentParent as HTMLElement);
 }
@@ -373,7 +370,7 @@ function close() {
  */
 function text(): Text {
   nextNode();
-  alignWithDOM('#text', null, null);
+  alignWithDOM('#text', null);
   return (currentNode) as Text;
 }
 

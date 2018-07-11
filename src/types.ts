@@ -23,3 +23,7 @@ export type AttrMutatorConfig = {[x: string]: AttrMutator};
 export type ElementConstructor = new () => Element;
 
 export type NameOrCtorDef = string|ElementConstructor;
+
+export type Key = string|number|null|undefined;
+
+export type Statics = Array<{}>|null|undefined;

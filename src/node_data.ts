@@ -17,9 +17,7 @@
  * limitations under the License.
  */
 
-import {assert} from './assertions';
-import {NameOrCtorDef} from './types';
-import {createMap} from './util';
+import {Key, NameOrCtorDef} from './types';
 
 
 /**
@@ -43,12 +41,7 @@ export class NodeData {
    * The key used to identify this node, used to preserve DOM nodes when they
    * move within their parent.
    */
-  key: string|null|undefined;
-
-  /**
-   * Keeps track of children within this node by their key.
-   */
-  keyMap = createMap();
+  key: Key;
 
   text: string|null = null;
 
@@ -57,27 +50,20 @@ export class NodeData {
    */
   readonly nameOrCtor: NameOrCtorDef;
 
-  // tslint:disable-next-line:no-any
-  readonly typeId: any;
-
   /**
    * Whether or the associated node is, or contains, a focused Element.
    */
   focused = false;
 
-  constructor(
-      nameOrCtor: NameOrCtorDef, key: string|null|undefined,
-      typeId: {}|null|undefined) {
+  constructor(nameOrCtor: NameOrCtorDef, key: Key) {
     this.nameOrCtor = nameOrCtor;
     this.key = key;
-    this.typeId = typeId;
   }
 }
 
 declare global {
   interface Node {
     '__incrementalDOMData': NodeData|null;
-    'typeId': {};
   }
 }
 
@@ -85,9 +71,8 @@ declare global {
  * Initializes a NodeData object for a Node.
  */
 function initData(
-    node: Node, nameOrCtor: NameOrCtorDef, key: string|null|undefined,
-    typeId?: {}|null|undefined): NodeData {
-  const data = new NodeData(nameOrCtor, key, typeId);
+    node: Node, nameOrCtor: NameOrCtorDef, key: Key): NodeData {
+  const data = new NodeData(nameOrCtor, key);
   node['__incrementalDOMData'] = data;
   return data;
 }
@@ -116,15 +101,7 @@ function importNode(node: Node) {
 
   const nodeName = isElement(node) ? node.localName : node.nodeName;
   const key = isElement(node) ? node.getAttribute('key') : null;
-  const typeId = node['typeId'];
-  const data = initData(node, nodeName!, key, typeId);
-
-  if (key) {
-    const parentNode = assert(node.parentNode);
-    const nodeData = getData(parentNode);
-    // tslint:disable-next-line:no-any
-    (nodeData.keyMap as any)[key] = node;
-  }
+  const data = initData(node, nodeName!, key);
 
   if (isElement(node)) {
     const attributes = node.attributes;
