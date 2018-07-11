@@ -17,6 +17,7 @@
  * limitations under the License.
  */
 
+import {AttrMutatorConfig} from './types';
 import {symbols} from './symbols';
 import {createMap, has} from './util';
 
@@ -131,10 +132,7 @@ function applyAttributeTyped(el: HTMLElement, name: string, value: {}) {
  * will just assume attributes is "any" otherwise and throws away
  * the type annotation set by tsickle.
  */
-// tslint:disable:no-any
-const attributes: {[x: string]: (a: HTMLElement, b: string, c: any) => void} =
-    (createMap() as {[x: string]: (a: HTMLElement, b: string, c: any) => void});
-// tslint:enable:no-any
+const attributes: AttrMutatorConfig = (createMap() as AttrMutatorConfig);
 
 // Special generic mutator that's called for any attribute that does not
 // have a specific mutator.

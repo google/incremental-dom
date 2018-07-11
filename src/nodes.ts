@@ -54,8 +54,7 @@ function createElement(
   let el;
 
   if (nameOrCtor instanceof Function) {
-    // tslint:disable-next-line:no-any
-    el = new (nameOrCtor as any)();
+    el = new nameOrCtor();
   } else {
     const namespace = getNamespaceForTag(nameOrCtor, parent);
 

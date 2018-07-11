@@ -217,9 +217,8 @@ function alignWithDOM(
   if ((currentNode && matches(currentNode, nameOrCtor, key, typeId))) {
     return;
   }
-  assert(currentParent);
-  const parent = currentParent!;
 
+  const parent = currentParent!;
   const parentData = getData(parent);
   const keyMap = parentData.keyMap;
   let node;
@@ -240,13 +239,11 @@ function alignWithDOM(
 
   // Create the node if it doesn't exist.
   if (!node) {
-    assert(doc);
     if (nameOrCtor === '#text') {
       node = createText(doc!);
     } else {
       node = createElement(doc!, parent, nameOrCtor, key, typeId);
     }
-    assert(context);
     context!.markCreated(node);
 
     if (key) {
@@ -261,8 +258,7 @@ function alignWithDOM(
     // Move everything else before the node.
     moveBefore(parent, node, currentNode);
   } else {
-    assert(currentParent);
-    currentParent!.insertBefore(node, currentNode);
+    parent.insertBefore(node, currentNode);
   }
 
   currentNode = node;
@@ -277,15 +273,12 @@ function alignWithDOM(
  */
 function clearUnvisitedDOM(
     maybeParentNode: Node|null, startNode: Node|null, endNode: Node|null) {
-  assert(maybeParentNode);
   const parentNode = maybeParentNode!;
   const data = getData(parentNode);
   const keyMap = data.keyMap;
   let child = startNode;
 
-  assert(context);
   while (child !== endNode) {
-    assert(child);
     const next = child!.nextSibling;
     const key = getData(child!).key;
     parentNode.removeChild(child!);
@@ -314,7 +307,6 @@ function getNextNode(): Node|null {
   if (currentNode) {
     return currentNode.nextSibling;
   } else {
-    assert(currentParent);
     return currentParent!.firstChild;
   }
 }
@@ -335,7 +327,6 @@ function exitNode() {
   clearUnvisitedDOM(currentParent, getNextNode(), null);
 
   currentNode = currentParent;
-  assert(currentParent);
   currentParent = currentParent!.parentNode;
 }
 

@@ -36,8 +36,7 @@ function getAncestry(node: Node, root: Node|null) {
   let cur: Node|null = node;
 
   while (cur !== root) {
-    assert(cur);
-    const n:Node = cur!;
+    const n: Node = cur!;
     ancestry.push(n);
     cur = n.parentNode;
   }
