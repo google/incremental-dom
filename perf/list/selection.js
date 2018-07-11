@@ -1,46 +1,40 @@
-(function(scope) {
-  var ITEM_COUNT = 200;
-  var ITERATION_COUNT = 400;
-  var items = ListSetup.createItems(ITEM_COUNT);
+import {Samples} from '../samples.js';
+import {createItems} from './setup.js';
 
+const ITEM_COUNT = 200;
+const ITERATION_COUNT = 400;
+const items = createItems(ITEM_COUNT);
 
-  var run = function(impl) {
-    var samples = new Samples(ITERATION_COUNT);
-    var counter = 0;
-    var index = 0;
-    var selectedKeys = {};
+export function runSelection (impl) {
+  const samples = new Samples(ITERATION_COUNT);
+  const selectedKeys = {};
+  let counter = 0;
+  let index = 0;
 
-    impl.clear();
+  impl.clear();
+  impl.render({
+      items,
+      selectedKeys
+  });
+
+  function pass() {
+    selectedKeys[items[index].key] = false;
+    index = counter % ITEM_COUNT;
+    selectedKeys[items[index].key] = true;
+
+    samples.timeStart();
     impl.render({
-       items: items,
-       selectedKeys: selectedKeys
+      items,
+      selectedKeys
     });
+    samples.timeEnd();
 
-    function pass() {
-      selectedKeys[items[index].key] = false;
-      index = counter % ITEM_COUNT;
-      selectedKeys[items[index].key] = true;
+    counter++;
+  }
 
-      samples.timeStart();
-      impl.render({
-        items: items,
-        selectedKeys: selectedKeys
-      });
-      samples.timeEnd();
+  for (let i = 0; i < ITERATION_COUNT; i += 1) {
+    pass();
+  }
 
-      counter++;
-    }
-
-    for (var i = 0; i < ITERATION_COUNT; i += 1) {
-      pass();
-    }
-
-    return Promise.resolve(samples.data);
-  };
-
-  scope.Selection = {
-    run: run
-  };
-
-})(window);
-
+  return samples.data;
+}

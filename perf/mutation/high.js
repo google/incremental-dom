@@ -1,49 +1,32 @@
-(function(scope) {
-  var ITEM_COUNT = 200;
-  var ITERATION_COUNT = 400;
-  var ITEMS = MutationSetup.createItems(ITEM_COUNT);
+import {Samples} from '../samples.js';
+import {createItems, updateItems} from './setup.js';
 
-  var assign = function(output) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i];
-      for (var prop in source) {
-        if (source.hasOwnProperty(prop)) {
-          output[prop] = source[prop];
-        }
-      }
-    }
-    return output;
-  };
+const ITEM_COUNT = 200;
+const ITERATION_COUNT = 400;
+const ITEMS = createItems(ITEM_COUNT);
 
-  var run = function(impl) {
-    var samples = new Samples(ITERATION_COUNT);
-    var items = ITEMS.map(function(item) { return assign({}, item) });
+export function runHigh(impl) {
+  const samples = new Samples(ITERATION_COUNT);
+  const items = ITEMS.map((item) => Object.assign({}, item));
 
-    impl.clear();
+  impl.clear();
+  impl.render({
+      items,
+  });
+
+  function pass() {
+    updateItems(items);
+
+    samples.timeStart();
     impl.render({
-       items: items
+      items,
     });
+    samples.timeEnd();
+  }
 
-    function pass() {
-      MutationSetup.updateItems(items);
+  for (var i = 0; i < ITERATION_COUNT; i += 1) {
+    pass();
+  }
 
-      samples.timeStart();
-      impl.render({
-        items: items
-      });
-      samples.timeEnd();
-    }
-
-    for (var i = 0; i < ITERATION_COUNT; i += 1) {
-      pass();
-    }
-
-    return Promise.resolve(samples.data);
-  };
-
-  scope.High = {
-    run: run
-  };
-
-})(window);
-
+  return samples.data;
+};

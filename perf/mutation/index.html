@@ -2,26 +2,23 @@
   <head>
     <link rel="stylesheet" href="css/style.css">
     <script src="../../dist/incremental-dom-min.js"></script>
-    <script src="../creation-js.js"></script>
-    <script src="../creation-innerhtml.js"></script>
-    <script src="../stats.js"></script>
-    <script src="../samples.js"></script>
-    <script src="../create-tests.js"></script>
-
-    <script src="setup.js"></script>
-    <script src="creation.js"></script>
-    <script src="high.js"></script>
-    <script src="high-raf.js"></script>
-    <script src="renderer.js"></script>
   </head>
   <body>
-    <script>
+    <script type="module">
+      import {CreationJs} from '../creation-js.js';
+      import {CreationInnerHtml} from '../creation-innerhtml.js';
+      import {MutationRenderer} from './renderer.js';
+      import {createTests} from '../create-tests.js';
+      import {runCreation} from './creation.js';
+      import {runHigh} from './high.js';
+      import {runHighRaf} from './high-raf.js';
+
       createTests(
         MutationRenderer,
         [
-          { name: 'creation', fn: Creation },
-          { name: 'high', fn: High },
-          { name: 'high_raf', fn: HighRaf }
+          { name: 'creation', fn: runCreation },
+          { name: 'high', fn: runHigh },
+          { name: 'high_raf', fn: runHighRaf }
         ],
         [
           { name: 'IncrementalDOM', obj: IncrementalDOM },

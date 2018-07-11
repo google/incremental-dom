@@ -1,19 +1,17 @@
-(function(scope) {
-
-var listStatics = [
+const listStatics = [
   'id', 'list',
 ];
-var itemStatics = [
+const itemStatics = [
   'class', 'item',
   'tabindex', '-1',
 ];
-var nameStatics = [
+const nameStatics = [
   'class', 'item-name'
 ];
-var valueStatics = [
+const valueStatics = [
   'class', 'item-value'
 ];
-var changeStatics = [
+const changeStatics = [
   'class', 'item-change'
 ];
 
@@ -29,22 +27,22 @@ function toPercent(value) {
   return value * 100;
 }
 
-function MutationRenderer(container, lib) {
-  var patch = lib.patch,
-      elementVoid = lib.elementVoid,
-      elementOpen = lib.elementOpen,
-      elementClose = lib.elementClose,
-      text = lib.text;
+export function MutationRenderer(container, lib) {
+  const {
+    patch,
+    elementOpen,
+    elementClose,
+    text
+  } = lib;
 
   function render(props) {
-    var items = props.items;
-    var selectedKeys = props.selectedKeys;
+    const items = props.items;
 
     elementOpen('table', null, listStatics);
 
-    for(var i = 0; i < items.length; i += 1) {
-      var item = items[i];
-      var delta = item.value * item.change;
+    for(let i = 0; i < items.length; i += 1) {
+      const item = items[i];
+      const delta = item.value * item.change;
 
       elementOpen('tr', item.key, itemStatics);
         elementOpen('td', null, nameStatics);
@@ -70,14 +68,10 @@ function MutationRenderer(container, lib) {
   }
 
   this.render = function(props) {
-    lib.patch(container, render, props)
+    patch(container, render, props)
   };
 
   this.clear = function() {
     container.innerHTML = '';
   };
 }
-
-scope.MutationRenderer = MutationRenderer;
-
-}(window));

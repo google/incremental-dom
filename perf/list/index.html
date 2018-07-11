@@ -2,26 +2,23 @@
   <head>
     <link rel="stylesheet" href="css/style.css">
     <script src="../../dist/incremental-dom-min.js"></script>
-    <script src="../creation-js.js"></script>
-    <script src="../creation-innerhtml.js"></script>
-    <script src="../stats.js"></script>
-    <script src="../samples.js"></script>
-    <script src="../create-tests.js"></script>
-
-    <script src="setup.js"></script>
-    <script src="creation.js"></script>
-    <script src="selection.js"></script>
-    <script src="selection-raf.js"></script>
-    <script src="renderer.js"></script>
   </head>
   <body>
-    <script>
+    <script type="module">
+      import {CreationJs} from '../creation-js.js';
+      import {CreationInnerHtml} from '../creation-innerhtml.js';
+      import {ListRenderer} from './renderer.js';
+      import {createTests} from '../create-tests.js';
+      import {runCreation} from './creation.js';
+      import {runSelection} from './selection.js';
+      import {runSelectionRaf} from './selection-raf.js';
+
       createTests(
         ListRenderer,
         [
-          { name: 'selection', fn: Selection },
-          { name: 'selection_raf', fn: SelectionRaf },
-          { name: 'creation', fn: Creation }
+          { name: 'selection', fn: runSelection },
+          { name: 'selection_raf', fn: runSelectionRaf },
+          { name: 'creation', fn: runCreation }
         ],
         [
           { name: 'IncrementalDOM', obj: IncrementalDOM },

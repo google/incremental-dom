@@ -1,45 +1,45 @@
-(function(scope) {
-
-var listStatics = [
+const listStatics = [
   'id', 'list',
   'role', 'list',
 ];
-var itemStatics = [
+const itemStatics = [
   'class', 'message',
   'role', 'listitem',
   'tabindex', '-1',
 ];
-var checkboxStatics = [
+const checkboxStatics = [
  'class', 'checkbox',
  'role', 'checkbox',
  'tabindex', '-1'
 ];
-var starStatics = [
+const starStatics = [
   'class', 'star'
 ];
-var senderStatics = [
+const senderStatics = [
   'class', 'sender'
 ];
-var subjectStatics = [
+const subjectStatics = [
   'class', 'subject'
 ];
 
-function ListRenderer(container, lib) {
-  var patch = lib.patch,
-      elementVoid = lib.elementVoid,
-      elementOpen = lib.elementOpen,
-      elementClose = lib.elementClose,
-      text = lib.text;
+export function ListRenderer(container, lib) {
+  const {
+    patch,
+    elementVoid,
+    elementOpen,
+    elementClose,
+    text
+  } = lib;
 
   function render(props) {
-    var items = props.items;
-    var selectedKeys = props.selectedKeys;
+    const items = props.items;
+    const selectedKeys = props.selectedKeys;
 
     elementOpen('ul', null, listStatics);
 
-    for(var i = 0; i < items.length; i += 1) {
-      var item = items[i];
-      var isSelected = selectedKeys[item.key];
+    for(let i = 0; i < items.length; i += 1) {
+      const item = items[i];
+      const isSelected = selectedKeys[item.key];
 
       elementOpen('li', item.key, itemStatics,
             'aria-selected', isSelected);
@@ -72,14 +72,10 @@ function ListRenderer(container, lib) {
   }
 
   this.render = function(props) {
-    lib.patch(container, render, props)
+    patch(container, render, props)
   };
 
   this.clear = function() {
     container.innerHTML = '';
   };
 }
-
-scope.ListRenderer = ListRenderer;
-
-}(window));

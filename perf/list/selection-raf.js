@@ -1,49 +1,41 @@
-(function(scope) {
-  var ITEM_COUNT = 200;
-  var ITERATION_COUNT = 200;
-  var items = ListSetup.createItems(ITEM_COUNT);
+import {Samples} from '../samples.js';
+import {createItems} from './setup.js';
 
-  var run = function(impl) {
-    var samples = new Samples(ITERATION_COUNT);
-    var counter = 0;
-    var selectedIndex = 0;
-    var selectedKeys = {};
+const ITEM_COUNT = 200;
+const ITERATION_COUNT = 200;
+const items = createItems(ITEM_COUNT);
 
-    impl.clear();
+export async function runSelectionRaf(impl) {
+  const samples = new Samples(ITERATION_COUNT);
+  const selectedKeys = {};
+  let counter = 0;
+  let selectedIndex = 0;
+
+  impl.clear();
+  impl.render({
+      items,
+      selectedKeys
+  });
+
+  function pass() {
+    selectedKeys[items[selectedIndex].key] = false;
+    selectedIndex = counter % ITEM_COUNT;
+    selectedKeys[items[selectedIndex].key] = true;
+
+    samples.timeStart();
     impl.render({
-       items: items,
-       selectedKeys: selectedKeys
+      items,
+      selectedKeys
     });
+    samples.timeEnd();
 
-    return new Promise(function(resolve) {
-      function pass() {
-        if (counter >= ITERATION_COUNT - 1) {
-          resolve(samples.data);
-          return;
-        }
+    counter += 1;
+    return new Promise((resolve) => requestAnimationFrame(resolve));
+  }
 
-        selectedKeys[items[selectedIndex].key] = false;
-        selectedIndex = counter % ITEM_COUNT;
-        selectedKeys[items[selectedIndex].key] = true;
+  for (let i = 0; i < ITERATION_COUNT; i += 1) {
+    await pass();
+  }
 
-        samples.timeStart();
-        impl.render({
-          items: items,
-          selectedKeys: selectedKeys
-        });
-        samples.timeEnd();
-
-        counter++;
-        requestAnimationFrame(pass);
-      }
-
-      requestAnimationFrame(pass);
-    });
-  };
-
-  scope.SelectionRaf = {
-    run: run
-  };
-
-})(window);
-
+  return samples.data;
+}
