@@ -34,15 +34,6 @@ let inAttributes = false;
  */
 let inSkip = false;
 
-/**
- * Makes sure that a key is not set in an argsbuilder.
- */
-function assertKeyNotSet(argsBuilder: Array<{}|null|undefined>) {
-  if (argsBuilder[1]) {
-    throw new Error(`Cannot redefine key in ${argsBuilder[0]}`);
-  }
-}
-
 
 /**
  * Makes sure that there is a current patch context.
@@ -228,7 +219,6 @@ function assert<T extends {}>(val: T|null|undefined): T {
 
 export {
   assert,
-  assertKeyNotSet,
   assertInPatch,
   assertNoUnclosedTags,
   assertNotInAttributes,
