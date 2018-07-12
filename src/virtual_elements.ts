@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-import {assert, assertCloseMatchesOpenTag, assertKeyNotSet, assertInAttributes, assertNotInAttributes, assertNotInSkip, setInAttributes} from './assertions';
+import {assert, assertCloseMatchesOpenTag, assertInAttributes, assertNotInAttributes, assertNotInSkip, setInAttributes} from './assertions';
 import {updateAttribute} from './attributes';
 import {getArgsBuilder, close, open, text as coreText} from './core';
 import {DEBUG} from './global';
@@ -190,7 +190,6 @@ function key(key:string) {
   if (DEBUG) {
     assertInAttributes('key');
     assert(argsBuilder);
-    assertKeyNotSet(argsBuilder!);
   }
   argsBuilder[1] = key;
 }
