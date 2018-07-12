@@ -32,6 +32,7 @@ module.exports = function(config) {
       './test/util/dom.ts',
       './test/util/globals.js',
       './test/unit/*.ts',
+      './test/integration/*.ts',
       './test/functional/*.ts',
       './index.ts',
     ],
@@ -45,7 +46,7 @@ module.exports = function(config) {
 
     karmaTypescriptConfig: {
       tsconfig: './tsconfig.json',
-      coverageOptions: {exclude: /\.test\.tsx?/},
+      coverageOptions: {exclude: /.*/},
     },
 
 

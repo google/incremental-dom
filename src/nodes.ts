@@ -18,7 +18,7 @@
  */
 
 import {getData, initData} from './node_data';
-import {NameOrCtorDef} from './types';
+import {Key, NameOrCtorDef} from './types';
 
 
 /**
@@ -49,8 +49,8 @@ function getNamespaceForTag(tag: string, parent: Node|null) {
  * @param  typeId The type identifier for the Element.
  */
 function createElement(
-    doc: Document, parent: Node|null, nameOrCtor: NameOrCtorDef,
-    key: string|undefined|null, typeId: {}|null|undefined = null): Element {
+    doc: Document, parent: Node|null, nameOrCtor: NameOrCtorDef, key: Key)
+    : Element {
   let el;
 
   if (nameOrCtor instanceof Function) {
@@ -65,7 +65,7 @@ function createElement(
     }
   }
 
-  initData(el, nameOrCtor, key, typeId);
+  initData(el, nameOrCtor, key);
 
   return el;
 }

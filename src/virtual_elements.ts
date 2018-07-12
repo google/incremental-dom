@@ -22,7 +22,7 @@ import {updateAttribute} from './attributes';
 import {getArgsBuilder, close, open, text as coreText} from './core';
 import {DEBUG} from './global';
 import {getData} from './node_data';
-import {NameOrCtorDef} from './types';
+import {Key, NameOrCtorDef, Statics} from './types';
 import {createMap, truncateArray} from './util';
 
 
@@ -45,25 +45,25 @@ const prevAttrsMap = createMap();
  * @param  key The key used to identify this element. This can be an
  *     empty string, but performance may be better if a unique value is used
  *     when iterating over an array of items.
- * @param statics An array of attribute name/value pairs of the
- *     static attributes for the Element. These will only be set once when the
+ * @param statics An array of attribute name/value pairs of the static
+ *     attributes for the Element. Attributes will only be set once when the
  *     Element is created.
  * @param varArgs, Attribute name/value pairs of the dynamic attributes
  *     for the Element.
  * @return The corresponding Element.
  */
 function elementOpen(
-    nameOrCtor: NameOrCtorDef, key?: string|null|undefined,
+    nameOrCtor: NameOrCtorDef, key?: Key,
     // Ideally we could tag statics and varArgs as an array where every odd
     // element is a string and every even element is any, but this is hard.
     // tslint:disable-next-line:no-any
-    statics?: Array<{}>|null|undefined, ...varArgs: any[]) {
+    statics?: Statics, ...varArgs: any[]) {
   if (DEBUG) {
     assertNotInAttributes('elementOpen');
     assertNotInSkip('elementOpen');
   }
 
-  const node = open(nameOrCtor, key, undefined);
+  const node = open(nameOrCtor, key);
   const data = getData(node);
 
   if (!data.staticsApplied) {
@@ -159,13 +159,12 @@ function elementOpen(
  * @param key The key used to identify this element. This can be an
  *     empty string, but performance may be better if a unique value is used
  *     when iterating over an array of items.
- * @param statics An array of attribute name/value pairs of the
- *     static attributes for the Element. These will only be set once when the
+ * @param statics An array of attribute name/value pairs of the static
+ *     attributes for the Element. Attributes will only be set once when the
  *     Element is created.
  */
 function elementOpenStart(
-    nameOrCtor: NameOrCtorDef, key?: string|null|undefined,
-    statics?: Array<{}>|null|undefined) {
+  nameOrCtor: NameOrCtorDef, key?: Key, statics?: Statics) {
   const argsBuilder = getArgsBuilder();
 
   if (DEBUG) {
@@ -259,16 +258,16 @@ function elementClose(nameOrCtor: NameOrCtorDef): Element {
  * @param key The key used to identify this element. This can be an
  *     empty string, but performance may be better if a unique value is used
  *     when iterating over an array of items.
- * @param statics An array of attribute name/value pairs of the
- *     static attributes for the Element. These will only be set once when the
+ * @param statics An array of attribute name/value pairs of the static
+ *     attributes for the Element. Attributes will only be set once when the
  *     Element is created.
  * @param varArgs Attribute name/value pairs of the dynamic attributes
  *     for the Element.
  * @return The corresponding Element.
  */
 function elementVoid(
-    nameOrCtor: NameOrCtorDef, key?: string|null|undefined,
-    statics?: Array<{}>|null|undefined, ...varArgs: Array<{}>) {
+    nameOrCtor: NameOrCtorDef, key?: Key, statics?: Statics,
+    ...varArgs: Array<{}>) {
   elementOpen.apply(null, arguments);
   return elementClose(nameOrCtor);
 }

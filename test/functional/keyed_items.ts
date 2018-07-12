@@ -184,6 +184,29 @@ describe('rendering with keys', () => {
     expect(newNode!.nodeName).to.equal('SPAN');
   });
 
+  describe('non-unique keys', () => {
+    it('should render all items', () => {
+      const items: Key[] = [{key: 'one'}, {key: 'one'}];
+      patch(container, () => render(items));
+
+      expect(container.childNodes).to.have.length(2);
+    });
+
+    it('should reuse items in order', () => {
+      const items: Key[] = [{key: 'one'}, {key: 'two'}, {key: 'one'}];
+      patch(container, () => render(items));
+      const first = container.childNodes[0];
+      const second = container.childNodes[2];
+
+      const newItems: Key[] = [{key: 'one'}, {key: 'one'}];
+      patch(container, () => render(newItems));
+
+      expect(container.childNodes).to.have.length(2);
+      expect(container.childNodes[0]).to.equal(first);
+      expect(container.childNodes[1]).to.equal(second);
+    });
+  });
+
   it('should preserve nodes already in the DOM', () => {
     function render() {
       elementVoid('div', 'key');
