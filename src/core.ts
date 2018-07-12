@@ -205,7 +205,7 @@ function matches(
  * @param key The key used to identify the Node.
  */
 function getMatchingNode(
-    matchNode: Node|null, nameOrCtor: NameOrCtorDef, key: Key) {
+    matchNode: Node|null, nameOrCtor: NameOrCtorDef, key: Key): Node|null {
   if (!matchNode) {
     return null;
   }
@@ -228,7 +228,7 @@ function getMatchingNode(
  * @param key The key used to identify the Node.
  * @return The newly created node.
  */
-function createNode(nameOrCtor, key): Node {
+function createNode(nameOrCtor: NameOrCtorDef, key:Key): Node {
   let node;
 
   if (nameOrCtor === '#text') {
