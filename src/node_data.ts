@@ -18,6 +18,7 @@
  */
 
 import {Key, NameOrCtorDef} from './types';
+import {isElement} from './dom_util';
 
 
 /**
@@ -84,10 +85,6 @@ function initData(
 function getData(node: Node) {
   importNode(node);
   return node['__incrementalDOMData']!;
-}
-
-function isElement(n: Node): n is Element {
-  return n.nodeType === 1;
 }
 
 
