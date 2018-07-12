@@ -20,10 +20,23 @@
 import {assert} from './assertions';
 
 /**
+ * Checks if the node is the root of a document. This is either a Document
+ * or ShadowRoot. DocumentFragments are included for simplicity of the
+ * implementation, though we only want to consider Documents or ShadowRoots.
+ * @param node The node to check.
  * @return True if the node the root of a document, false otherwise.
  */
-function isDocumentRoot(node: Node): boolean {
+function isDocumentRoot(node: Node): node is Document|ShadowRoot {
   return node.nodeType === 11 || node.nodeType === 9;
+}
+
+/**
+ * Checks if the node is an Element. This is faster than an instanceof check.
+ * @param node The node to check.
+ * @return Whether or not the node is an Element.
+ */
+function isElement(node: Node): node is Element {
+  return node.nodeType === 1;
 }
 
 /**
@@ -111,6 +124,7 @@ function moveBefore(parentNode: Node, node: Node, referenceNode: Node|null) {
 
 
 export {
+  isElement,
   getFocusedPath,
   moveBefore,
 };
