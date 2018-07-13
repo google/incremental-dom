@@ -1,28 +1,35 @@
 <html>
   <head>
     <script src="../../dist/incremental-dom.js"></script>
-    <script src="reorder_list.js"></script>
     <style>
       .item {
         transition-property: transform;
-        transition-duration: 500ms;        
+        transition-duration: 500ms;
       }
     </style>
   </head>
   <body>
     <div id="container"></div>
 
-    <script>
-      const patch = IncrementalDOM.patch;
-      const elementOpen = IncrementalDOM.elementOpen;
-      const elementClose = IncrementalDOM.elementClose;
-      const text = IncrementalDOM.text;
+    <script type="module">
+      import {reorderList} from './reorder_list.js';
 
-      const items = [
-        { key: 'one' },
-        { key: 'two' },
-        { key: 'three' },
-        { key: 'four' }
+      const {
+        patch,
+        elementOpen,
+        elementClose,
+        text,
+      } = IncrementalDOM;
+
+      const container = document.getElementById('container');
+
+      let items = [
+        {key: 'one'},
+        {key: 'two'},
+        {key: 'three'},
+        {key: 'four'},
+        {key: 'five'},
+        {key: 'six'}
       ];
 
       function render(data) {
@@ -38,10 +45,10 @@
 
       patch(container, render, { items: items });
 
-      setTimeout(_ => {
-        const newItems = items.slice(1).concat(items[0]);
-        patch(container, render, { items: newItems });
-      }, 500);
+      setInterval(_ => {
+        items = items.slice(1).concat(items[0]);
+        patch(container, render, {items});
+      }, 1000);
     </script>
   </body>
 </html>
