@@ -1,2 +1,3 @@
 bower_components/
-node_modules/
+node_modules/*
+!/node_modules/incremental-dom
