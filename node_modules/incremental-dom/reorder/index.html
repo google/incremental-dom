@@ -1,0 +1,54 @@
+<html>
+  <head>
+    <script src="../../dist/incremental-dom.js"></script>
+    <style>
+      .item {
+        transition-property: transform;
+        transition-duration: 500ms;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container"></div>
+
+    <script type="module">
+      import {reorderList} from './reorder_list.js';
+
+      const {
+        patch,
+        elementOpen,
+        elementClose,
+        text,
+      } = IncrementalDOM;
+
+      const container = document.getElementById('container');
+
+      let items = [
+        {key: 'one'},
+        {key: 'two'},
+        {key: 'three'},
+        {key: 'four'},
+        {key: 'five'},
+        {key: 'six'}
+      ];
+
+      function render(data) {
+        reorderList(_ => {
+          data.items.forEach((item, i) => {
+            elementOpen('div', item.key, null,
+                'class', 'item');
+              text(item.key);
+            elementClose('div');
+          });
+        });
+      }
+
+      patch(container, render, { items: items });
+
+      setInterval(_ => {
+        items = items.slice(1).concat(items[0]);
+        patch(container, render, {items});
+      }, 1000);
+    </script>
+  </body>
+</html>
