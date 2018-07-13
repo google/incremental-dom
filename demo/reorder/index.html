@@ -1,0 +1,47 @@
+<html>
+  <head>
+    <script src="../../dist/incremental-dom.js"></script>
+    <script src="reorder_list.js"></script>
+    <style>
+      .item {
+        transition-property: transform;
+        transition-duration: 500ms;        
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container"></div>
+
+    <script>
+      const patch = IncrementalDOM.patch;
+      const elementOpen = IncrementalDOM.elementOpen;
+      const elementClose = IncrementalDOM.elementClose;
+      const text = IncrementalDOM.text;
+
+      const items = [
+        { key: 'one' },
+        { key: 'two' },
+        { key: 'three' },
+        { key: 'four' }
+      ];
+
+      function render(data) {
+        reorderList(_ => {
+          data.items.forEach((item, i) => {
+            elementOpen('div', item.key, null,
+                'class', 'item');
+              text(item.key);
+            elementClose('div');
+          });
+        });
+      }
+
+      patch(container, render, { items: items });
+
+      setTimeout(_ => {
+        const newItems = items.slice(1).concat(items[0]);
+        patch(container, render, { items: newItems });
+      }, 500);
+    </script>
+  </body>
+</html>
