@@ -7,23 +7,25 @@
   <div id="container"><div><input type="text" value="world"></div><div>Hello <strong>world</strong></div>A string with more than 4 characters</div>
 
   <p>
-    Incremental DOM can update an existing DOM tree. In this demo, the page 
+    Incremental DOM can update an existing DOM tree. In this demo, the page
     contains the initial DOM. After a simulated delay of 500ms, Incremental
     DOM performs an initial diff of the subtree.
   </p>
 
   <script src="../dist/incremental-dom.js"></script>
-  <script>
+  <script type="module">
     setTimeout(function() {
-      var patch = IncrementalDOM.patch,
-          elementOpen = IncrementalDOM.elementOpen,
-          elementVoid = IncrementalDOM.elementVoid,
-          elementClose = IncrementalDOM.elementClose,
-          text = IncrementalDOM.text;
+      const {
+        patch,
+        elementOpen,
+        elementVoid,
+        elementClose,
+        text,
+      } = IncrementalDOM;
 
       function update(data) {
         patch(container, function() {
-          var moreThanFourCharacters = data.text.length > 4;
+          const moreThanFourCharacters = data.text.length > 4;
 
           elementOpen('div', null);
             elementVoid('input', null, null,

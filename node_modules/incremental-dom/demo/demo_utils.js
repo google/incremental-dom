@@ -1,4 +1,4 @@
-function before(obj, fnName, cb) {
+export function before(obj, fnName, cb) {
   var old = obj[fnName];
 
   obj[fnName] = function() {

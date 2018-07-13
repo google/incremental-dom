@@ -1,77 +1,80 @@
 <html>
 <head>
   <script src="../dist/incremental-dom.js"></script>
-  <script src="demo_utils.js"></script>
 </head>
 <body>
   <div id="container"></div>
 
-  <script>
-    (function() {
-      var patch = IncrementalDOM.patch,
-          elementOpen = IncrementalDOM.elementOpen,
-          elementVoid = IncrementalDOM.elementVoid,
-          elementClose = IncrementalDOM.elementClose,
-          text = IncrementalDOM.text;
+  <script type="module">
+    import {before} from './demo_utils.js';
 
-      function update(data) {
-        patch(container, function() {
-          elementOpen('div');
-            elementVoid('input', null, null,
-                'type', 'text',
-                'oninput', handleInput);
-          elementClose('div');
-          elementOpen('div');
-            text('last 10 inputs');
-          elementClose('div');
+    const {
+      patch,
+      elementOpen,
+      elementVoid,
+      elementClose,
+      text,
+    } = IncrementalDOM;
 
-          elementOpen('div');
-            lastInputs.forEach(function(item) {
-              // The key for this item is the item's id. During each update, DOM
-              // nodes are reused based on the key. This causes an additional
-              // div and text node to be created rather than all the text nodes
-              // being updated.
-              elementOpen('div', item.id, null,
-                  'style', 'min-height: 1em');
-                text(item.text);
-              elementClose('div');
-            });
-          elementClose('div');
+    const container = document.getElementById('container');
 
-          elementOpen('div', null, null,
-              'style', 'position: absolute; top: 0; right: 0;');
-            text('text nodes created: ' + data.textNodesCreated);
-          elementClose('div');
-        });
-      }
+    function update(data) {
+      patch(container, function() {
+        elementOpen('div');
+          elementVoid('input', null, null,
+              'type', 'text',
+              'oninput', handleInput);
+        elementClose('div');
+        elementOpen('div');
+          text('last 10 inputs');
+        elementClose('div');
 
-      var lastInputs = [];
-      var textNodesCreated = 0;
+        elementOpen('div');
+          lastInputs.forEach(function(item) {
+            // The key for this item is the item's id. During each update, DOM
+            // nodes are reused based on the key. This causes an additional
+            // div and text node to be created rather than all the text nodes
+            // being updated.
+            elementOpen('div', item.id, null,
+                'style', 'min-height: 1em');
+              text(item.text);
+            elementClose('div');
+          });
+        elementClose('div');
 
-      before(document, 'createTextNode', function() {
-        textNodesCreated += 1;
+        elementOpen('div', null, null,
+            'style', 'position: absolute; top: 0; right: 0;');
+          text('text nodes created: ' + data.textNodesCreated);
+        elementClose('div');
       });
+    }
 
-      function handleInput(e) {
-        lastInputs = [{
-            text: e.target.value,
-            id: Date.now()
-          }]
-          .concat(lastInputs)
-          .slice(0, 10);
+    let lastInputs = [];
+    let textNodesCreated = 0;
 
-        update({
-          lastInputs: lastInputs,
-          textNodesCreated: textNodesCreated
-        });
-      }
+    before(document, 'createTextNode', function() {
+      textNodesCreated += 1;
+    });
 
-      // Initial render
+    function handleInput(e) {
+      lastInputs = [{
+          text: e.target.value,
+          id: Date.now()
+        }]
+        .concat(lastInputs)
+        .slice(0, 10);
+
       update({
-        lastInputs: lastInputs,
-        textNodesCreated: textNodesCreated
+        lastInputs,
+        textNodesCreated,
       });
-    })();
+    }
+
+    // Initial render
+    update({
+      lastInputs,
+      textNodesCreated,
+    });
   </script>
 </body>
 </html>
