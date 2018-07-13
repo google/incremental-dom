@@ -1,0 +1,43 @@
+#list {
+  display: flex;
+  flex-direction: column;
+
+  padding: 0;
+}
+ 
+.message {
+  display: flex;
+  align-items: center;
+
+  padding: 5px;
+  background-color: #f6f6f6;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.message[aria-selected="true"] {
+  background-color: #4166f6;
+  color: white;
+}
+
+.checkbox::before {
+  content: "\2610";
+  margin: 4px;
+}
+
+.star {
+  all: initial;
+}
+
+.star::before {
+  content: "\2606";
+  margin: 4px;
+}
+
+.sender {
+  flex: 1;
+  margin-left: 10px;
+}
+
+.subject {
+  flex: 2;
+}
