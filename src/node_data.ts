@@ -78,22 +78,29 @@ function initData(
   return data;
 }
 
-
 /**
  * Retrieves the NodeData object for a Node, creating it if necessary.
  */
-function getData(node: Node) {
-  importNode(node);
-  return node['__incrementalDOMData']!;
+function getData(node: Node, key?: Key) {
+  // In this case, the node was server-side rendered.
+  if (!node['__incrementalDOMData'] && key !== undefined) {
+    const dataNode = importSingleNode(node);
+    dataNode.key = key;
+    if (node instanceof Text) {
+      dataNode.text = (node as Text).data;
+    }
+    return dataNode;
+  }
+  return importSingleNode(node);
 }
 
 
 /**
- * Imports node and its subtree, initializing caches.
+ * Imports single node and its subtree, initializing caches.
  */
-function importNode(node: Node) {
+function importSingleNode(node: Node) {
   if (node['__incrementalDOMData']) {
-    return;
+    return node['__incrementalDOMData']!;
   }
 
   const nodeName = isElement(node) ? node.localName : node.nodeName;
@@ -114,9 +121,19 @@ function importNode(node: Node) {
     }
   }
 
+  return node['__incrementalDOMData']!;
+}
+
+/**
+ * Imports node and its subtree, initializing caches.
+ */
+function importNode(node: Node) {
+  importSingleNode(node);
+
   for (let child = node.firstChild; child; child = child.nextSibling) {
     importNode(child);
   }
+  return node['__incrementalDOMData']!;
 }
 
 /**
