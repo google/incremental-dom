@@ -83,11 +83,7 @@ function initData(
  * Retrieves the NodeData object for a Node, creating it if necessary.
  */
 function getData(node: Node, key?: Key) {
-  // In this case, the node was server-side rendered.
-  if (!node['__incrementalDOMData'] && key !== undefined) {
-    return importSingleNode(node, key);
-  }
-  return importSingleNode(node);
+  return importSingleNode(node, key);
 }
 
 
