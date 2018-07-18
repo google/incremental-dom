@@ -187,7 +187,7 @@ const patchOuter = patchFactory((node, fn, data) => {
  */
 function matches(
     matchNode: Node, nameOrCtor: NameOrCtorDef, key: Key) {
-  const data = getData(matchNode);
+  const data = getData(matchNode, key);
 
   // Key check is done using double equals as we want to treat a null key the
   // same as undefined. This should be okay as the only values allowed are

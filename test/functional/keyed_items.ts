@@ -18,7 +18,7 @@
 // taze: mocha from //third_party/javascript/typings/mocha
 // taze: chai from //third_party/javascript/typings/chai
 
-import {currentElement, elementClose, elementOpen, elementVoid, patch, skip} from '../../index';
+import {currentElement, elementClose, elementOpen, elementVoid, patch, skip, text, clearCache} from '../../index';
 import {assertHTMLElement, attachShadow, BROWSER_SUPPORTS_SHADOW_DOM,} from '../util/dom';
 const {expect} = chai;
 
@@ -209,19 +209,26 @@ describe('rendering with keys', () => {
 
   it('should preserve nodes already in the DOM', () => {
     function render() {
-      elementVoid('div', 'key');
-      elementVoid('div');
+      elementOpen('div', 0);
+        text('Foo');
+      elementClose('div');
+      elementVoid('div', 1);
     }
 
-    container.innerHTML = `
-      <div></div>
-      <div key="key"><div>
-    `;
-    const keyedDiv = container.lastChild;
-
+    const config = {
+      'childList': true,
+      'attributes': true,
+      'characterData': true,
+      'subtree': true,
+    };
+    patch(container, render);
+    // Simulate serverside rendering by clearing the cache.
+    clearCache(container);
+    const observer = new MutationObserver(() => {});
+    observer.observe(container, config);
     patch(container, render);
 
-    expect(container.firstChild).to.equal(keyedDiv);
+    expect(observer.takeRecords()).to.be.empty;
   });
 
   describe('an item with focus', () => {

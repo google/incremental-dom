@@ -18,7 +18,7 @@
  */
 
 import {Key, NameOrCtorDef} from './types';
-import {isElement} from './dom_util';
+import {isElement, isText} from './dom_util';
 
 
 /**
@@ -44,7 +44,7 @@ export class NodeData {
    */
   key: Key;
 
-  text: string|null = null;
+  text: string|undefined;
 
   /**
    * The nodeName or contructor for the Node.
@@ -56,9 +56,10 @@ export class NodeData {
    */
   focused = false;
 
-  constructor(nameOrCtor: NameOrCtorDef, key: Key) {
+  constructor(nameOrCtor: NameOrCtorDef, key: Key, text: string|undefined) {
     this.nameOrCtor = nameOrCtor;
     this.key = key;
+    this.text = text;
   }
 }
 
@@ -72,33 +73,32 @@ declare global {
  * Initializes a NodeData object for a Node.
  */
 function initData(
-    node: Node, nameOrCtor: NameOrCtorDef, key: Key): NodeData {
-  const data = new NodeData(nameOrCtor, key);
+    node: Node, nameOrCtor: NameOrCtorDef, key: Key, text?: string|undefined): NodeData {
+  const data = new NodeData(nameOrCtor, key, text);
   node['__incrementalDOMData'] = data;
   return data;
 }
 
-
 /**
  * Retrieves the NodeData object for a Node, creating it if necessary.
  */
-function getData(node: Node) {
-  importNode(node);
-  return node['__incrementalDOMData']!;
+function getData(node: Node, key?: Key) {
+  return importSingleNode(node, key);
 }
 
 
 /**
- * Imports node and its subtree, initializing caches.
+ * Imports single node and its subtree, initializing caches.
  */
-function importNode(node: Node) {
+function importSingleNode(node: Node, fallbackKey?: Key) {
   if (node['__incrementalDOMData']) {
-    return;
+    return node['__incrementalDOMData']!;
   }
 
   const nodeName = isElement(node) ? node.localName : node.nodeName;
-  const key = isElement(node) ? node.getAttribute('key') : null;
-  const data = initData(node, nodeName!, key);
+  const key = isElement(node) ? (node.getAttribute('key') || fallbackKey) : null;
+  const text = isText(node) ? node.data : undefined;
+  const data = initData(node, nodeName!, key, text);
 
   if (isElement(node)) {
     const attributes = node.attributes;
@@ -113,6 +113,15 @@ function importNode(node: Node) {
       attrsArr.push(value);
     }
   }
+
+  return data;
+}
+
+/**
+ * Imports node and its subtree, initializing caches.
+ */
+function importNode(node: Node) {
+  importSingleNode(node);
 
   for (let child = node.firstChild; child; child = child.nextSibling) {
     importNode(child);
