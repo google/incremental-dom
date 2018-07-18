@@ -214,11 +214,15 @@ function getMatchingNode(
     return matchNode;
   }
 
-  if (!key) {
-    return null;
+  if (key) {
+    while ((matchNode = matchNode.nextSibling)) {
+      if (matches(matchNode, nameOrCtor, key)) {
+        return matchNode;
+      }
+    }
   }
 
-  return getMatchingNode(matchNode.nextSibling, nameOrCtor, key);
+  return null;
 }
 
 
