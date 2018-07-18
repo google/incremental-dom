@@ -114,7 +114,7 @@ function importSingleNode(node: Node, fallbackKey?: Key) {
     }
   }
 
-  return node['__incrementalDOMData']!;
+  return data;
 }
 
 /**
