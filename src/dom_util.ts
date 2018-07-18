@@ -39,6 +39,16 @@ function isElement(node: Node): node is Element {
   return node.nodeType === 1;
 }
 
+
+/**
+ * Checks if the node is a text node. This is faster than an instanceof check.
+ * @param node The node to check.
+ * @return Whether or not the node is a Text.
+ */
+function isText(node: Node): node is Text {
+  return node.nodeType === 3;
+}
+
 /**
  * @param  node The node to start at, inclusive.
  * @param  root The root ancestor to get until, exclusive.
@@ -125,6 +135,7 @@ function moveBefore(parentNode: Node, node: Node, referenceNode: Node|null) {
 
 export {
   isElement,
+  isText,
   getFocusedPath,
   moveBefore,
 };

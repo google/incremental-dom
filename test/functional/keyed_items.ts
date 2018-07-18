@@ -228,7 +228,7 @@ describe('rendering with keys', () => {
     observer.observe(container, config);
     patch(container, render);
 
-    expect(observer.takeRecords().length).to.equal(0);
+    expect(observer.takeRecords()).to.be.empty;
   });
 
   describe('an item with focus', () => {
