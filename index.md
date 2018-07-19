@@ -1,20 +1,22 @@
 ---
-title: Incremental DOM Docs
 ---
 
 [Source](https://github.com/google/incremental-dom)
 
-## <a id="about"></a> About
+* TOC
+{:toc}
+
+## About
 
 Incremental DOM is a library for expressing and applying updates to DOM trees. JavaScript can be used to extract, iterate over and transform data into calls generating `HTMLElement`s and `Text` nodes. It differs from Virtual DOM approaches in that a diff operation is performed *incrementally* (that is one node at a time) against the DOM, rather than on a virtual DOM tree.
 
 Rather than targeting direct usage, Incremental DOM aims to provide a platform for higher level libraries or frameworks. As you might notice from the examples, Incremental DOM-style markup can be somewhat challenging to write and read. See [Why Incremental DOM](#why-incremental-dom) for an explanation.
 
-## <a id="installation"></a> Installation
+## Installation
 
 See [our Github](https://github.com/google/incremental-dom).
 
-## <a id="rendering-dom"></a> Rendering DOM
+## Rendering DOM
 
 The DOM to be rendered is described with the incremental node functions, [`elementOpen`](#api/elementOpen), [`elementClose`](#api/elementClose) and [`text`](#api/text). For example, the following function:
 
@@ -40,7 +42,7 @@ Using the `renderPart` function from above, the <a href="#api/patch">`patch`</a>
 patch(document.getElementById('someId'), renderPart);
 ```
 
-### <a id="rendering-dom/attributes-and-properties"></a>Attributes and Properties
+### Attributes and Properties
 
 In addition to creating DOM nodes, you can also add/update attributes and properties on Elements. They are specified as variable arguments, alternating between attribute/property name and value. Values that are Objects or Functions are set as properties, with all others being set as attributes.
 
@@ -77,7 +79,7 @@ elementOpen('div', null, null,
 elementClose('div');
 ```
 
-### <a id="rendering-dom/statics-array"></a>Statics Array
+## Statics Array
 
 Often times, you know that some properties on a DOM node will not change. One example would be the `type` attribute in `<input type="text">`. Incremental DOM provides a shortcut to avoid comparing attributes/properties you know will not change. The third argument to [`elementOpen`](#api/elementOpen) is an array of unchanging attributes. To avoid allocating an array on each pass, you will want to declare the array in a scope that is only executed once. 
 
@@ -96,7 +98,7 @@ function render() {
 }
 ```
 
-### <a id="rendering-dom/applying-styles"></a>Applying Styles
+### Applying Styles
 
 Styles for an element can be set either using a string or an object. When setting styles using an object, the names should be camelCase as they are set on the Element's style property. 
 
@@ -110,6 +112,7 @@ elementClose('div');
 ```
 #### As an object
 
+
 ```javascript
 elementOpen('div', null, null,
     'style', {
@@ -120,9 +123,9 @@ elementOpen('div', null, null,
 elementClose('div');
 ```
 
-## <a id="conditional-rendering"></a>Conditional Rendering
+## Conditional Rendering
 
-### <a id="conditional-rendering/if-else"></a>If/else
+### If/else
 
 As you can mix node declarations and JavaScript, rendering conditional branches is fairly straightforward. Simply place the node declarations inside a branch. This works with switch statements too!
 
@@ -140,7 +143,7 @@ function renderGreeting(date, name) {
 }
 ```
 
-### <a id="conditional-rendering/array-of-items"></a>Array of Items
+### Array of Items
 
 You can use your favorite way to render an array (or any sort of iterable) of items. When rendering an array of items, you will want to specify a 'key' as the second argument to the [`elementOpen`](#api/elementOpen) function. Incremental DOM uses the key in order to:
 
@@ -160,7 +163,7 @@ elementOpen('ul');
 elementClose('ul');
 ```
 
-### <a id="conditional-rendering/logic-in-attributes"></a>Logic in Attributes
+### Logic in Attributes
 
 Incremental DOM provides some helpers to give some additional control over how attribures are specified. The [`elementOpenStart`](#api/elementOpenStart), [`attr`](#api/attr) and [`elementOpenEnd`](#api/elementOpenEnd) functions act as a helper for calling [`elementOpen`](#api/elementOpen), allowing you to mix logic and attributes or call other functions.
 
@@ -173,7 +176,7 @@ elementOpenStart('div');
 elementOpenEnd('div');
 ```
 
-## <a id="passing-functions"></a>Passing Functions
+## Passing Functions
 
 The incremental node functions are evaluated when they are called. If you do not want to have them appear in the current location (e.g. to pass them to another function), simply wrap the statements in a function which can be called later.
 
@@ -200,9 +203,9 @@ function renderGreeting(name) {
 }
 ```
 
-## <a id="hooks"></a>Hooks
+## Hooks
 
-### <a id="hooks/setting-values"></a>Setting Values
+### Setting Values
 
 Incremental DOM provides hooks to allow customization of how values are set. The `attributes` object allows you to provide a function to decide what to do when an attribute passed to `elementOpen` or similar functions changes. The following example makes Incremental DOM always set `value` as a property.
 
@@ -235,7 +238,7 @@ import {
 attributes[symbols.default] = someFunction;
 ``` 
 
-### <a id="hooks/added-removed-nodes"></a>Added/Removed Nodes
+### Added/Removed Nodes
 
 You can be notified when Nodes are added or removed by Incremental DOM by specifying functions for `notifications.nodesCreated` and `notifications.nodesDeleted`. If there are added or removed nodes during a patch operation, the appropriate function will be called at the end of the patch with the added or removed nodes.
 
@@ -249,15 +252,16 @@ notifications.nodesCreated = function(nodes) {
 };
 ``` 
 
-## <a id="api"></a>API
+## API
 
-### <a id="api/elementOpen"></a>elementOpen
+### elementOpen
 
 #### Description
 
   Declares an Element with zero or more attributes/properties that should be present at the current location in the document tree.
 
 #### Parameters
+
 <dl>
   <dt><code><em>string</em> tagname</code></dt>
   <dd>The name of the tag, e.g. 'div' or 'span'. This could also be the tag of a custom element.</dd>
@@ -287,13 +291,14 @@ elementOpen('div', item.key, ['staticAttr', 'staticValue'],
     'someFunctionAttr', somefunction);
 ```
 
-### <a id="api/elementOpenStart"></a>elementOpenStart
+### elementOpenStart
 
 #### Description
 
 Used with [`attr`](#api/attr) and [`elementOpenEnd`](#api/elementOpenEnd) to declare an element.
 
 #### Parameters
+
 <dl>
   <dt><code><em>string</em> tagname</code></dt>
   <dd>The name of the tag, e.g. 'div' or 'span'. This could also be the tag of a custom element.</dd>
@@ -303,19 +308,20 @@ Used with [`attr`](#api/attr) and [`elementOpenEnd`](#api/elementOpenEnd) to dec
   <dd>Pairs of property names and values. Depending on the type of the value, these will be set as either attributes or properties on the Element. These are only set on the Element once during creation. These will not be updated during subsequent passes. See <a href="#rendering-dom/statics-array">Statics Array</a>.</dd>
 </dl>
 
-### <a id="api/attr"></a>attr
+### attr
 
 #### Description
 
 Used with [`elementOpenStart`](#api/elementOpenStart) and [`elementOpenEnd`](#api/elementOpenEnd) to declare an element.
 
 #### Parameters
+
 <dl>
   <dt><code><em>string</em> name</code></dt>
   <dt><code><em>any</em> value</code></dt>
 </dl>
 
-### <a id="api/elementOpenEnd"></a>elementOpenEnd
+### elementOpenEnd
 
 #### Description
 
@@ -325,13 +331,14 @@ Used with [`elementOpenStart`](#api/elementOpenStart) and [`attr`](#api/attr) to
 
 `Element` The corresponding DOM Element.
 
-### <a id="api/elementClose"></a>elementClose
+### elementClose
 
 #### Description
 
 Signifies the end of the element opened with [`elementOpen`](#api/elementOpen), corresponding to a closing tag (e.g. `</div>` in HTML). Any childNodes of the currently open Element that are in the DOM that have not been encountered in the current render pass are removed by the call to `elementClose`.
 
 #### Parameters
+
 <dl>
   <dt><code><em>string</em> tagname</code></dt>
   <dd>The name of the tag, e.g. 'div' or 'span'. This could also be the tag of a custom element.</dd>
@@ -342,6 +349,7 @@ Signifies the end of the element opened with [`elementOpen`](#api/elementOpen), 
 `Element` The corresponding DOM Element.
 
 #### Usage
+
 ```javascript
 import { elementClose } from 'incremental-dom';
 
@@ -350,13 +358,14 @@ import { elementClose } from 'incremental-dom';
 elementClose('div');
 ```
 
-### <a id="api/elementVoid"></a>elementVoid
+### elementVoid
 
 #### Description
 
 A combination of [`elementOpen`](#api/elementOpen), followed by [`elementClose`](#api/elementClose).
 
 #### Parameters
+
 <dl>
   <dt><code><em>string</em> tagname</code></dt>
   <dd>The name of the tag, e.g. 'div' or 'span'. This could also be the tag of a custom element.</dd>
@@ -373,6 +382,7 @@ A combination of [`elementOpen`](#api/elementOpen), followed by [`elementClose`]
 `Element` The corresponding DOM Element.
 
 #### Usage
+
 ```javascript
 import { elementClose } from 'incremental-dom';
 
@@ -383,13 +393,14 @@ elementVoid('div', item.key, ['staticAttr', 'staticValue'],
 'someFunctionAttr', somefunction);
 ```
 
-### <a id="api/text"></a>text
+### text
 
 #### Description
 
 Declares a Text node, with the specified text, should appear at the current location in the document tree.
 
 #### Parameters
+
 <dl>
   <dt><code><em>string|boolean|number</em> value</code></dt>
   <dd>The value for the Text node.</dd>
@@ -403,6 +414,7 @@ Declares a Text node, with the specified text, should appear at the current loca
 
 
 #### Usage
+
 ```javascript
 import { text } from 'incremental-dom';
 
@@ -415,13 +427,14 @@ function toUpperCase(str) {
 text('hello world', toUpperCase);
 ```
 
-### <a id="api/patch"></a>patch
+### patch
 
 #### Description
 
 Updates the provided Node with a function containing zero or more calls to elementOpen, text and elementClose. The provided callback function may call other such functions. The patch function may be called with a new Node while a call to patch is already executing.
 
 #### Parameters
+
 <dl>
   <dt><code><em>Node</em> node</code></dt>
   <dd>The Node to patch. Typically, this will be an HTMLElement or DocumentFragment.</dd>
@@ -432,6 +445,7 @@ Updates the provided Node with a function containing zero or more calls to eleme
 </dl>
 
 #### Usage
+
 ```javascript
 import { patch } from 'incremental-dom';
 
@@ -446,27 +460,27 @@ const someData = {…};
 patch(myElement, render, someData);
 ```
 
-## <a id="demos"></a>Demos
+## Demos
 
-### <a id="demos/using-keys"></a>Using Keys
+### Using Keys
 
 The section on <a href="#conditional-rendering/array-of-items">arrays of items</a> mentions why using a key is important when iterating over an item. This demo shows how using a key prevents DOM nodes corresponding to separate items from being seen as a diff. In this case, a newly added item at the head of an array causes a new element by be created rather than all the items being updated.
 
 <a href="./demo/keys.html">Demo</a>
 
-### <a id="demos/using-with-web-components"></a>Using with Web Components
+### Using with Web Components
 
 Incremental DOM itself only renders Elements and Text nodes, but you may want to use components when building an application. One way this chould be solved is by using the emerging <a href="http://w3c.github.io/webcomponents/spec/custom/">web components</a> standards. The following demo shows one way you could create components.
 
 <a href="./demo/customelement.html">Demo</a>
 
-### <a id="demos/reorder-animation"></a>Animating When Reordering Items
+### Animating When Reordering Items
 
 Incremental DOM simply creates and moves DOM nodes. There are no hooks for telling when an item moves or having any input into the process. You can use MutationObserver to tell when things move and do fancy things like animate when items move within a the list. Animating out deletions can be done using a two step proccess where you render the item (but mark it as deleted), then do a later render where the item is actually removed.
 
 <a href="./demo/reorder.html">Demo</a>
 
-## <a id="why-incremental-dom"></a>Why Incremental DOM
+## Why Incremental DOM
 
 Incremental DOM has two main strengths compared to virtual DOM based approaches:
 * The incremental nature allows for significantly reduced memory allocation during render passes, allowing for more predictable performance.

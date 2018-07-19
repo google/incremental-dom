@@ -1,0 +1,33 @@
+---
+---
+
+@import "{{ site.theme }}";
+
+@media (min-width: 660px) {
+  #markdown-toc {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    overflow: auto;
+    box-sizing: border-box;
+    width: 250px;
+    padding: 16px;
+
+    ul, li {
+      list-style: none;
+    }
+  }
+
+  body {
+    margin-left: 250px;
+  }
+}
+
+:target {
+  color: #388E3C;
+
+  &::before {
+    content: '→ ';
+  }
+}

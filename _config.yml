@@ -1,2 +1,5 @@
 include:
   - dist
+
+kramdown:
+  toc_levels: "2,3"
