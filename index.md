@@ -521,7 +521,7 @@ Incremental DOM itself only renders Elements and Text nodes, but you may want to
 
 ### Animating When Reordering Items
 
-Incremental DOM simply creates and moves DOM nodes. There are no hooks for telling when an item moves or having any input into the process. You can use MutationObserver to tell when things move and do fancy things like animate when items move within a the list. Animating out deletions can be done using a two step proccess where you render the item (but mark it as deleted), then do a later render where the item is actually removed.
+Incremental DOM simply creates and moves DOM nodes. There are no hooks for telling when an item moves or having any input into the process. You can use [`MutationObserver`](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver) to tell when things move and do fancy things like animate when items move within a the list. Animating out deletions can be done using a two step proccess where you render the item (but mark it as deleted), then do a later render where the item is actually removed.
 
 <a href="./demo/reorder.html">Demo</a>
 
