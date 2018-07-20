@@ -18,7 +18,7 @@ See [our Github](https://github.com/google/incremental-dom).
 
 ## Rendering DOM
 
-The DOM to be rendered is described with the incremental node functions, [`elementOpen`](#api/elementOpen), [`elementClose`](#api/elementClose) and [`text`](#api/text). For example, the following function:
+The DOM to be rendered is described with the incremental node functions, [`elementOpen`](#elementopen), [`elementClose`](#elementclose) and [`text`](#text). For example, the following function:
 
 ```javascript
 function renderPart() {
@@ -36,7 +36,7 @@ would correspond to
 </div>
 ```
 
-Using the `renderPart` function from above, the <a href="#api/patch">`patch`</a> function can be used to render the desired structure into an existing <a href="https://developer.mozilla.org/en-US/docs/Web/API/element">`Element`</a> or <a href="https://developer.mozilla.org/en-US/docs/Web/API/document">`Document`</a> (which includes Shadow DOM). Calling the patch function again will patch the DOM tree with any changes, updating attributes, and creating/removing DOM nodes as needed.
+Using the `renderPart` function from above, the <a href="#patch">`patch`</a> function can be used to render the desired structure into an existing <a href="https://developer.mozilla.org/en-US/docs/Web/API/element">`Element`</a> or <a href="https://developer.mozilla.org/en-US/docs/Web/API/document">`Document`</a> (which includes Shadow DOM). Calling the patch function again will patch the DOM tree with any changes, updating attributes, and creating/removing DOM nodes as needed.
 
 ```javascript
 patch(document.getElementById('someId'), renderPart);
@@ -81,7 +81,7 @@ elementClose('div');
 
 ## Statics Array
 
-Often times, you know that some properties on a DOM node will not change. One example would be the `type` attribute in `<input type="text">`. Incremental DOM provides a shortcut to avoid comparing attributes/properties you know will not change. The third argument to [`elementOpen`](#api/elementOpen) is an array of unchanging attributes. To avoid allocating an array on each pass, you will want to declare the array in a scope that is only executed once. 
+Often times, you know that some properties on a DOM node will not change. One example would be the `type` attribute in `<input type="text">`. Incremental DOM provides a shortcut to avoid comparing attributes/properties you know will not change. The third argument to [`elementOpen`](#elementopen) is an array of unchanging attributes. To avoid allocating an array on each pass, you will want to declare the array in a scope that is only executed once. 
 
 
 If the statics array is provided, you must also provide a key. This ensures that an Element with the same tag but different statics array is never re-used by Incremental DOM.
@@ -194,7 +194,7 @@ elementClose('ul');
 
 ### Logic in Attributes
 
-Incremental DOM provides some helpers to give some additional control over how attribures are specified. The [`elementOpenStart`](#api/elementOpenStart), [`attr`](#api/attr) and [`elementOpenEnd`](#api/elementOpenEnd) functions act as a helper for calling [`elementOpen`](#api/elementOpen), allowing you to mix logic and attributes or call other functions.
+Incremental DOM provides some helpers to give some additional control over how attribures are specified. The [`elementOpenStart`](#elementopenstart), [`attr`](#attr) and [`elementOpenEnd`](#elementopenend) functions act as a helper for calling [`elementOpen`](#elementopen), allowing you to mix logic and attributes or call other functions.
 
 
 ```javascript
@@ -256,7 +256,7 @@ attributes.value = function(element, name, value) {
 };
 ``` 
 
-If no function is specified for a given name, a default function is used that applies values as described in [Attributes and Properties](#rendering-dom/attributes-and-properties). This can be changed by specifying the function for `symbols.default`.
+If no function is specified for a given name, a default function is used that applies values as described in [Attributes and Properties](#attributes-and-properties). This can be changed by specifying the function for `symbols.default`.
  
 ```javascript
 import {
@@ -284,6 +284,7 @@ notifications.nodesCreated = function(nodes) {
 ## API
 
 ### elementOpen
+<div class="api-fn" markdown="1">
 
 #### Description
 
@@ -295,9 +296,9 @@ notifications.nodesCreated = function(nodes) {
   <dt><code><em>string</em> tagname</code></dt>
   <dd>The name of the tag, e.g. 'div' or 'span'. This could also be the tag of a custom element.</dd>
   <dt><code><em>string</em> key</code></dt>
-  <dd>The key that identifies Element for reuse. See <a href="#conditional-rendering/array-of-items">Arrays of Items</a></dd>
+  <dd>The key that identifies Element for reuse. See <a href="#keys-and-arrays">Keys and Arrays</a></dd>
   <dt><code><em>Array</em> staticPropertyValuePairs</code></dt>
-  <dd>Pairs of property names and values. Depending on the type of the value, these will be set as either attributes or properties on the Element. These are only set on the Element once during creation. These will not be updated during subsequent passes. See <a href="#rendering-dom/statics-array">Statics Array</a>.</dd>
+  <dd>Pairs of property names and values. Depending on the type of the value, these will be set as either attributes or properties on the Element. These are only set on the Element once during creation. These will not be updated during subsequent passes. See <a href="#statics-array">Statics Array</a>.</dd>
   <dt><code><em>vargs</em> propertyValuePairs</code></dt>
   <dd>Pairs of property names and values. Depending on the type of the value, these will be set as either attributes or properties on the Element.</dd>
 </dl>
@@ -320,11 +321,13 @@ elementOpen('div', item.key, ['staticAttr', 'staticValue'],
     'someFunctionAttr', somefunction);
 ```
 
+</div>
 ### elementOpenStart
+<div class="api-fn" markdown="1">
 
 #### Description
 
-Used with [`attr`](#api/attr) and [`elementOpenEnd`](#api/elementOpenEnd) to declare an element.
+Used with [`attr`](#attr) and [`elementOpenEnd`](#elementopenend) to declare an element.
 
 #### Parameters
 
@@ -332,16 +335,18 @@ Used with [`attr`](#api/attr) and [`elementOpenEnd`](#api/elementOpenEnd) to dec
   <dt><code><em>string</em> tagname</code></dt>
   <dd>The name of the tag, e.g. 'div' or 'span'. This could also be the tag of a custom element.</dd>
   <dt><code><em>string</em> key</code></dt>
-  <dd>The key that identifies Element for reuse. See <a href="#conditional-rendering/array-of-items">Arrays of Items</a></dd>
+  <dd>The key that identifies Element for reuse. See <a href="#keys-and-arrays">Keys and Arrays</a></dd>
   <dt><code><em>Array</em> staticPropertyValuePairs</code></dt>
-  <dd>Pairs of property names and values. Depending on the type of the value, these will be set as either attributes or properties on the Element. These are only set on the Element once during creation. These will not be updated during subsequent passes. See <a href="#rendering-dom/statics-array">Statics Array</a>.</dd>
+  <dd>Pairs of property names and values. Depending on the type of the value, these will be set as either attributes or properties on the Element. These are only set on the Element once during creation. These will not be updated during subsequent passes. See <a href="#statics-array">Statics Array</a>.</dd>
 </dl>
 
+</div>
 ### attr
+<div class="api-fn" markdown="1">
 
 #### Description
 
-Used with [`elementOpenStart`](#api/elementOpenStart) and [`elementOpenEnd`](#api/elementOpenEnd) to declare an element.
+Used with [`elementOpenStart`](#elementopenstart) and [`elementOpenEnd`](#elementopenend) to declare an element.
 
 #### Parameters
 
@@ -350,21 +355,25 @@ Used with [`elementOpenStart`](#api/elementOpenStart) and [`elementOpenEnd`](#ap
   <dt><code><em>any</em> value</code></dt>
 </dl>
 
+</div>
 ### elementOpenEnd
+<div class="api-fn" markdown="1">
 
 #### Description
 
-Used with [`elementOpenStart`](#api/elementOpenStart) and [`attr`](#api/attr) to declare an element.
+Used with [`elementOpenStart`](#elementopenstart) and [`attr`](#attr) to declare an element.
 
 #### Returns
 
 `Element` The corresponding DOM Element.
 
+</div>
 ### elementClose
+<div class="api-fn" markdown="1">
 
 #### Description
 
-Signifies the end of the element opened with [`elementOpen`](#api/elementOpen), corresponding to a closing tag (e.g. `</div>` in HTML). Any childNodes of the currently open Element that are in the DOM that have not been encountered in the current render pass are removed by the call to `elementClose`.
+Signifies the end of the element opened with [`elementOpen`](#elementopen), corresponding to a closing tag (e.g. `</div>` in HTML). Any childNodes of the currently open Element that are in the DOM that have not been encountered in the current render pass are removed by the call to `elementClose`.
 
 #### Parameters
 
@@ -387,11 +396,13 @@ import { elementClose } from 'incremental-dom';
 elementClose('div');
 ```
 
+</div>
 ### elementVoid
+<div class="api-fn" markdown="1">
 
 #### Description
 
-A combination of [`elementOpen`](#api/elementOpen), followed by [`elementClose`](#api/elementClose).
+A combination of [`elementOpen`](#elementopen), followed by [`elementClose`](#elementclose).
 
 #### Parameters
 
@@ -399,9 +410,9 @@ A combination of [`elementOpen`](#api/elementOpen), followed by [`elementClose`]
   <dt><code><em>string</em> tagname</code></dt>
   <dd>The name of the tag, e.g. 'div' or 'span'. This could also be the tag of a custom element.</dd>
   <dt><code><em>string</em> key</code></dt>
-  <dd>The key that identifies Element for reuse. See <a href="#conditional-rendering/array-of-items">Arrays of Items</a></dd>
+  <dd>The key that identifies Element for reuse. See <a href="#keys-and-arrays">Arrays of Items</a></dd>
   <dt><code><em>Array</em> staticPropertyValuePairs</code></dt>
-  <dd>Pairs of property names and values. Depending on the type of the value, these will be set as either attributes or properties on the Element. These are only set on the Element once during creation. These will not be updated during subsequent passes. See <a href="#rendering-dom/statics-array">Statics Array</a>.</dd>
+  <dd>Pairs of property names and values. Depending on the type of the value, these will be set as either attributes or properties on the Element. These are only set on the Element once during creation. These will not be updated during subsequent passes. See <a href="#statics-array">Statics Array</a>.</dd>
   <dt><code><em>vargs</em> propertyValuePairs</code></dt>
   <dd>Pairs of property names and values. Depending on the type of the value, these will be set as either attributes or properties on the Element.</dd>
 </dl>
@@ -422,7 +433,9 @@ elementVoid('div', item.key, ['staticAttr', 'staticValue'],
 'someFunctionAttr', somefunction);
 ```
 
+</div>
 ### text
+<div class="api-fn" markdown="1">
 
 #### Description
 
@@ -456,7 +469,9 @@ function toUpperCase(str) {
 text('hello world', toUpperCase);
 ```
 
+</div>
 ### patch
+<div class="api-fn" markdown="1">
 
 #### Description
 
@@ -488,12 +503,13 @@ const myElement = document.getElementById(…);
 const someData = {…};
 patch(myElement, render, someData);
 ```
+</div>
 
 ## Demos
 
 ### Using Keys
 
-The section on <a href="#conditional-rendering/array-of-items">arrays of items</a> mentions why using a key is important when iterating over an item. This demo shows how using a key prevents DOM nodes corresponding to separate items from being seen as a diff. In this case, a newly added item at the head of an array causes a new element by be created rather than all the items being updated.
+The section on <a href="#keys-and-arrays">keys and arrays</a> mentions why using a key is important when iterating over an item. This demo shows how using a key prevents DOM nodes corresponding to separate items from being seen as a diff. In this case, a newly added item at the head of an array causes a new element by be created rather than all the items being updated.
 
 <a href="./demo/keys.html">Demo</a>
 
