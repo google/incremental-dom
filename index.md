@@ -143,15 +143,44 @@ function renderGreeting(date, name) {
 }
 ```
 
-### Array of Items
+### DOM Element Updates / Reuse
 
-You can use your favorite way to render an array (or any sort of iterable) of items. When rendering an array of items, you will want to specify a 'key' as the second argument to the [`elementOpen`](#api/elementOpen) function. Incremental DOM uses the key in order to:
+Incremental DOM compares the existing Element in the DOM with the one that is
+specified by the current function call. If the tag matches, it is reused. For
+example, given:
 
+```javascript
+if (condition) {
+  elementOpen('div');
+    // subtree 'A'
+  elementClose('div');
+}
+
+elementOpen('div');
+  // subtree 'B'
+elementClose('div');
+```
+
+If `condition` goes from `false` to `true`, Incremental DOM will transform subtree
+'B' into subree 'A'. Next, it will create a new `div` with subtree 'B'.
+
+#### Keys
+
+To prevent different logical subtrees being reused, you can give Incremental 
+DOM an additional signal to help distinguish between the two.
+
+This is done by passing "key" to the `elementOpen` function. This will be used
+to:
 
 1. Prevent the treating of newly added or moved items as a diff that needs to be reconciled.
 1. Correctly maintain focus on any input fields, buttons or other items that may receive focus that have moved.
 
-As Incremental DOM does not know when you are rendering an array of items, there is no warning generated when a key should be specified but is not present. If you are compiling from a template or transpiling, it might be a good idea to statically check to make sure a key is specified.
+Keys do not need to be unqiue. One strategy might be to simple autogenerate a
+key for every logical statement in the source.
+
+#### Keys and Arrays
+
+Arrays can be especially important when rendering arrays, especially if you plan on adding new items in the start/middle or moving items. As Incremental DOM does not know when you are rendering an array of items, there is no warning generated when a key should be specified but is not present. If you are compiling from a template or transpiling, it might be a good idea to statically check to make sure a key is specified.
 
 ```javascript
 elementOpen('ul');
