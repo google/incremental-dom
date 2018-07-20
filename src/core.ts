@@ -23,7 +23,7 @@ import {getFocusedPath, moveBefore} from './dom_util';
 import {DEBUG} from './global';
 import {getData} from './node_data';
 import {createElement, createText} from './nodes';
-import {Key, NameOrCtorDef} from './types';
+import {DEFERRED_KEY, Key, NameOrCtorDef} from './types';
 
 let context: Context|null = null;
 
@@ -62,7 +62,7 @@ function getArgsBuilder(): Array<{}|null|undefined>{
  */
 function markFocused(focusPath: Node[], focused: boolean) {
   for (let i = 0; i < focusPath.length; i += 1) {
-    getData(focusPath[i]).focused = focused;
+    getData(focusPath[i], DEFERRED_KEY).focused = focused;
   }
 }
 
