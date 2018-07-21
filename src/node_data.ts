@@ -51,11 +51,6 @@ export class NodeData {
    */
   readonly nameOrCtor: NameOrCtorDef;
 
-  /**
-   * Whether or the associated node is, or contains, a focused Element.
-   */
-  focused = false;
-
   constructor(nameOrCtor: NameOrCtorDef, key: Key, text: string|undefined) {
     this.nameOrCtor = nameOrCtor;
     this.key = key;

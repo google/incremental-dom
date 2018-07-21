@@ -33,6 +33,8 @@ let currentParent: Node|null = null;
 
 let doc: Document|null = null;
 
+let focusPath: Array<Node> = [];
+
 /**
  * Used to build up call arguments. Each patch call gets a separate copy, so
  * this works with nested calls to patch.
@@ -56,16 +58,6 @@ function getArgsBuilder(): Array<{}|null|undefined>{
   return argsBuilder;
 }
 
-/**
- * @param focusPath The nodes to mark.
- * @param focused Whether or not they are focused.
- */
-function markFocused(focusPath: Node[], focused: boolean) {
-  for (let i = 0; i < focusPath.length; i += 1) {
-    getData(focusPath[i]).focused = focused;
-  }
-}
-
 type PatchFunction<T, R> =
     (el: Element|DocumentFragment, template: (a: T|undefined) => void,
      data?: T|undefined) => R;
@@ -79,6 +71,7 @@ function patchFactory<T, R>(run: PatchFunction<T, R>): PatchFunction<T, R> {
   const f: PatchFunction<T, R> = (node, fn, data) => {
     const prevContext = context;
     const prevDoc = doc;
+    const prevFocusPath = focusPath;
     const prevArgsBuilder = argsBuilder;
     const prevCurrentNode = currentNode;
     const prevCurrentParent = currentParent;
@@ -87,6 +80,7 @@ function patchFactory<T, R>(run: PatchFunction<T, R>): PatchFunction<T, R> {
 
     context = new Context();
     doc = node.ownerDocument;
+    focusPath = getFocusedPath(node, currentParent);
     argsBuilder = [];
     currentParent = node.parentNode;
 
@@ -95,11 +89,7 @@ function patchFactory<T, R>(run: PatchFunction<T, R>): PatchFunction<T, R> {
       previousInSkip = setInSkip(false);
     }
 
-    const focusPath = getFocusedPath(node, currentParent);
-
     try {
-      markFocused(focusPath, true);
-
       const retVal = run(node, fn, data);
       if (DEBUG) {
         assertVirtualAttributesClosed();
@@ -107,9 +97,8 @@ function patchFactory<T, R>(run: PatchFunction<T, R>): PatchFunction<T, R> {
 
       return retVal;
     } finally {
-      markFocused(focusPath, false);
-
       doc = prevDoc;
+      focusPath = prevFocusPath;
       argsBuilder = prevArgsBuilder;
       currentNode = prevCurrentNode;
       currentParent = prevCurrentParent;
@@ -265,7 +254,7 @@ function alignWithDOM(nameOrCtor: NameOrCtorDef, key: Key) {
   // Re-order the node into the right position, preserving focus if either
   // node or currentNode are focused by making sure that they are not detached
   // from the DOM.
-  if (getData(node).focused) {
+  if (focusPath.indexOf(node) >= 0) {
     // Move everything else before the node.
     moveBefore(currentParent!, node, currentNode);
   } else {
