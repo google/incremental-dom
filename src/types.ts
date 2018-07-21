@@ -15,6 +15,9 @@
  * limitations under the License.
  */
 
+
+export const DEFERRED_KEY = class {};
+
 export interface ElementConstructor {new(): Element};
 
 // tslint:disable-next-line:no-any
@@ -24,6 +27,6 @@ export type AttrMutatorConfig = {[x: string]: AttrMutator};
 
 export type NameOrCtorDef = string|ElementConstructor;
 
-export type Key = string|number|null|undefined;
+export type Key = typeof DEFERRED_KEY|string|number|null|undefined;
 
 export type Statics = Array<{}>|null|undefined;

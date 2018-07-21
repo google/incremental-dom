@@ -231,6 +231,24 @@ describe('rendering with keys', () => {
     expect(observer.takeRecords()).to.be.empty;
   });
 
+  it('should preserve focus for nodes already in the DOM', () => {
+    function render() {
+      elementOpen('button', 0);
+        text('Foo');
+      elementClose('button');
+      elementVoid('div', 1);
+    }
+
+    patch(container, render);
+    // Simulate serverside rendering by clearing the cache.
+    clearCache(container);
+    const button = container.firstChild as HTMLButtonElement;
+    button.focus();
+    patch(container, render);
+
+    expect(document.activeElement).to.equal(button);
+  });
+
   describe('an item with focus', () => {
     function render(items: Key[]) {
       for (let i = 0; i < items.length; i++) {

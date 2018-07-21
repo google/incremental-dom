@@ -17,8 +17,8 @@
  * limitations under the License.
  */
 
-import {Key, NameOrCtorDef} from './types';
 import {isElement, isText} from './dom_util';
+import {DEFERRED_KEY, Key, NameOrCtorDef} from './types';
 
 
 /**
@@ -86,17 +86,24 @@ function getData(node: Node, key?: Key) {
   return importSingleNode(node, key);
 }
 
+function getKey(node: Node, key: Key) {
+  return isElement(node) ? (node.getAttribute('key') || key) : null;
+}
 
 /**
  * Imports single node and its subtree, initializing caches.
  */
 function importSingleNode(node: Node, fallbackKey?: Key) {
   if (node['__incrementalDOMData']) {
-    return node['__incrementalDOMData']!;
+    const data = node['__incrementalDOMData']!;
+    if (data.key === DEFERRED_KEY) {
+      data.key = getKey(node, fallbackKey);
+    }
+    return data;
   }
 
   const nodeName = isElement(node) ? node.localName : node.nodeName;
-  const key = isElement(node) ? (node.getAttribute('key') || fallbackKey) : null;
+  const key = getKey(node, fallbackKey);
   const text = isText(node) ? node.data : undefined;
   const data = initData(node, nodeName!, key, text);
 
