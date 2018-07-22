@@ -241,6 +241,19 @@ describe('rendering with keys', () => {
       }
     }
 
+    it('should retain focus when importing DOM with inferred keys', () => {
+      const items = [{key: 'one'}, {key: 'two'}];
+
+      patch(container, () => render(items));
+      const focusNode = assertHTMLElement(container.querySelector('#two'));
+      focusNode.focus();
+      // Simulate serverside rendering by clearing the cache.
+      clearCache(container);
+      patch(container, () => render(items));
+
+      expect(document.activeElement).to.equal(focusNode);
+    });
+
     it('should retain focus when prepending a new item', () => {
       const items = [{key: 'one'}];
 
