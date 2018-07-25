@@ -19,7 +19,7 @@
 // taze: mocha from //third_party/javascript/typings/mocha
 // taze: chai from //third_party/javascript/typings/chai
 
-import {attr, elementClose, elementOpen, elementOpenEnd, elementOpenStart, elementVoid, importNode, patch} from '../../index';
+import {attr, clearCache, elementClose, elementOpen, elementOpenEnd, elementOpenStart, elementVoid, importNode, patch} from '../../index';
 const {expect} = chai;
 
 describe('attribute updates', () => {
@@ -342,6 +342,29 @@ describe('attribute updates', () => {
 
       expect(child.getAttribute('data-foo')).to.equal('bar');
 
+      patch(container, render, 'baz');
+      expect(child.getAttribute('data-foo')).to.equal('bar');
+    });
+
+    it('should persist statics for serverside rendering', () => {
+      // tslint:disable-next-line:no-any
+      function render(value: any) {
+        elementVoid('div', null, ['data-foo', value]);
+      }
+
+      patch(container, render, 'bar');
+      const child = container.childNodes[0]! as HTMLElement;
+
+      expect(child.getAttribute('data-foo')).to.equal('bar');
+      // Simulate serverside rendering
+      clearCache(container);
+
+      // First patch should have the same parameters as the
+      // serverside render.
+      patch(container, render, 'bar');
+      expect(child.getAttribute('data-foo')).to.equal('bar');
+
+      // Now statics should persist.
       patch(container, render, 'baz');
       expect(child.getAttribute('data-foo')).to.equal('bar');
     });

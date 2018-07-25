@@ -23,7 +23,7 @@ import {getFocusedPath, moveBefore} from './dom_util';
 import {DEBUG} from './global';
 import {getData} from './node_data';
 import {createElement, createText} from './nodes';
-import {Key, NameOrCtorDef} from './types';
+import {Key, NameOrCtorDef, Statics} from './types';
 
 let context: Context|null = null;
 
@@ -172,11 +172,12 @@ const patchOuter = patchFactory((node, fn, data) => {
  * @param matchNode A node to match the data to.
  * @param nameOrCtor The name or constructor to check for.
  * @param key The key used to identify the Node.
+ * @param statics Static properties for the node
  * @return True if the node matches, false otherwise.
  */
 function matches(
-    matchNode: Node, nameOrCtor: NameOrCtorDef, key: Key) {
-  const data = getData(matchNode, key);
+    matchNode: Node, nameOrCtor: NameOrCtorDef, key: Key, statics: Statics) {
+  const data = getData(matchNode, key, statics);
 
   // Key check is done using double equals as we want to treat a null key the
   // same as undefined. This should be okay as the only values allowed are
@@ -194,18 +195,19 @@ function matches(
  * @param key The key used to identify the Node.
  */
 function getMatchingNode(
-    matchNode: Node|null, nameOrCtor: NameOrCtorDef, key: Key): Node|null {
+    matchNode: Node|null, nameOrCtor: NameOrCtorDef, key: Key,
+    statics: Statics): Node|null {
   if (!matchNode) {
     return null;
   }
 
-  if (matches(matchNode, nameOrCtor, key)) {
+  if (matches(matchNode, nameOrCtor, key, statics)) {
     return matchNode;
   }
 
   if (key) {
     while ((matchNode = matchNode.nextSibling)) {
-      if (matches(matchNode, nameOrCtor, key)) {
+      if (matches(matchNode, nameOrCtor, key, statics)) {
         return matchNode;
       }
     }
@@ -242,8 +244,8 @@ function createNode(nameOrCtor: NameOrCtorDef, key:Key): Node {
  * @param nameOrCtor The name or constructor for the Node.
  * @param key The key used to identify the Node.
  */
-function alignWithDOM(nameOrCtor: NameOrCtorDef, key: Key) {
-  const existingNode = getMatchingNode(currentNode, nameOrCtor, key);
+function alignWithDOM(nameOrCtor: NameOrCtorDef, key: Key, statics: Statics) {
+  const existingNode = getMatchingNode(currentNode, nameOrCtor, key, statics);
   const node = existingNode || createNode(nameOrCtor, key);
 
   // If we are at the matching node, then we are done.
@@ -335,9 +337,10 @@ function exitNode() {
  *     when iterating over an array of items.
  * @return The corresponding Element.
  */
-function open(nameOrCtor: NameOrCtorDef, key?: Key): HTMLElement {
+function open(
+    nameOrCtor: NameOrCtorDef, key?: Key, statics?: Statics): HTMLElement {
   nextNode();
-  alignWithDOM(nameOrCtor, key);
+  alignWithDOM(nameOrCtor, key, statics);
   enterNode();
   return (currentParent as HTMLElement);
 }
@@ -363,7 +366,7 @@ function close() {
  */
 function text(): Text {
   nextNode();
-  alignWithDOM('#text', null);
+  alignWithDOM('#text', null, []);
   return (currentNode) as Text;
 }
 
