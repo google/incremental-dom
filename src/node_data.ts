@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-import {Key, NameOrCtorDef} from './types';
+import {Key, NameOrCtorDef, Statics} from './types';
 import {isElement, isText} from './dom_util';
 
 
@@ -77,15 +77,15 @@ function initData(
 /**
  * Retrieves the NodeData object for a Node, creating it if necessary.
  */
-function getData(node: Node, key?: Key) {
-  return importSingleNode(node, key);
+function getData(node: Node, key?: Key, statics?: Statics) {
+  return importSingleNode(node, key, statics);
 }
 
 
 /**
- * Imports single node and its subtree, initializing caches.
+ * Imports single node, initializing cache.
  */
-function importSingleNode(node: Node, fallbackKey?: Key) {
+function importSingleNode(node: Node, fallbackKey?: Key, statics?: Statics) {
   if (node['__incrementalDOMData']) {
     return node['__incrementalDOMData']!;
   }
@@ -94,6 +94,12 @@ function importSingleNode(node: Node, fallbackKey?: Key) {
   const key = isElement(node) ? (node.getAttribute('key') || fallbackKey) : null;
   const text = isText(node) ? node.data : undefined;
   const data = initData(node, nodeName!, key, text);
+  const staticsKeys:string[] = [];
+  if (statics) {
+    for (let i = 0; i < statics.length; i+=2) {
+      staticsKeys.push(statics[i] as string);
+    }
+  }
 
   if (isElement(node)) {
     const attributes = node.attributes;
@@ -104,8 +110,10 @@ function importSingleNode(node: Node, fallbackKey?: Key) {
       const name = attr.name;
       const value = attr.value;
 
-      attrsArr.push(name);
-      attrsArr.push(value);
+      if (staticsKeys.indexOf(name) < 0) {
+        attrsArr.push(name);
+        attrsArr.push(value);
+      }
     }
   }
 

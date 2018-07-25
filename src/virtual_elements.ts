@@ -63,7 +63,7 @@ function elementOpen(
     assertNotInSkip('elementOpen');
   }
 
-  const node = open(nameOrCtor, key);
+  const node = open(nameOrCtor, key, statics);
   const data = getData(node);
 
   if (!data.staticsApplied) {
