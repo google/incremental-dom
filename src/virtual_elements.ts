@@ -139,7 +139,7 @@ function elementOpen(
      * At this point, only have attributes that were present before, but have
      * been removed.
      */
-    for (const name of Object.keys(prevAttrsMap)) {
+    for (const name in prevAttrsMap) {
       updateAttribute(node, name, undefined);
       delete prevAttrsMap[name];
     }
