@@ -35,9 +35,52 @@ const ATTRIBUTES_OFFSET = 3;
 
 /**
  * Used to keep track of the previous values when a 2-way diff is necessary.
- * This object is reused.s
+ * This object is reused.
+ * TODO(sparhamI) Scope this to a patch so you can call patch from an attribute
+ * update.
  */
 const prevAttrsMap = createMap();
+
+
+/**
+ * Applies the statics. When importing an Element, any existing attributes that
+ * match a static are converted into a static attribute.
+ * @param node The Element to apply statics for.
+ * @param statics The statics array,
+ * @param attrsArr The imported attributes array.
+ */
+function applyStatics(node: HTMLElement, statics: Statics, attrsArr: any[]) {
+  if (!statics) {
+    return;
+  }
+
+  for (let i = 0; i < statics.length; i += 2) {
+    prevAttrsMap[statics[i] as string] = i + 1;
+  }
+  
+  let j = 0;
+  for (let i = 0; i < attrsArr.length; i += 2) {
+    const name = attrsArr[i];
+
+    // For any attrs that are static, make sure we do not set them again.
+    if (prevAttrsMap[name]) {
+      delete prevAttrsMap[name];
+      continue;
+    }
+
+    // For any attrs that are dynamic, move them up to the right place.
+    attrsArr[j] = name;
+    attrsArr[j + 1] = attrsArr[i + 1];
+    j += 2;
+  }
+  // Anything after `j` was either moved up already or static.
+  truncateArray(attrsArr, j);
+  
+  for (const name in prevAttrsMap) {
+    updateAttribute(node, name, statics[prevAttrsMap[name]]);
+    delete prevAttrsMap[name];
+  }
+}
 
 
 /**
@@ -65,15 +108,11 @@ function elementOpen(
 
   const node = open(nameOrCtor, key);
   const data = getData(node);
+  const attrsArr = data.attrsArr;
+  const isNew = !attrsArr.length;
 
   if (!data.staticsApplied) {
-    if (statics) {
-      for (let i = 0; i < statics.length; i += 2) {
-        const name = (statics[i]) as string;
-        const value = statics[i + 1];
-        updateAttribute(node, name, value);
-      }
-    }
+    applyStatics(node, statics, attrsArr);
     // Down the road, we may want to keep track of the statics array to use it
     // as an additional signal about whether a node matches or not. For now,
     // just use a marker so that we do not reapply statics.
@@ -86,8 +125,6 @@ function elementOpen(
    * individual argument. When attributes have changed, the overhead of this is
    * minimal.
    */
-  const attrsArr = data.attrsArr;
-  const isNew = !attrsArr.length;
   let i = ATTRIBUTES_OFFSET;
   let j = 0;
 

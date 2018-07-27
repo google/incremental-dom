@@ -34,6 +34,19 @@ describe('attribute updates', () => {
     document.body.removeChild(container);
   });
 
+  /**
+   * @param container
+   */
+  function createMutationObserver(container: Element): MutationObserver {
+    const mo = new MutationObserver(() => {});
+    mo.observe(container, {
+      attributes: true,
+      subtree: true,
+    });
+
+    return mo;
+  }
+
   describe('for conditional attributes', () => {
     // tslint:disable-next-line:no-any
     function render(attrs: {[x: string]: any}) {
@@ -81,6 +94,14 @@ describe('attribute updates', () => {
       const el = container.childNodes[0] as HTMLElement;
 
       expect(el.getAttribute('data-expanded')).to.equal('bar');
+    });
+
+    it('should not cause a mutation when they are unchanged', () => {
+      patch(container, () => render({'data-expanded': 'foo'}));
+      const mo = createMutationObserver(container);
+      patch(container, () => render({'data-expanded': 'foo'}));
+
+      expect(mo.takeRecords()).to.be.empty;
     });
 
     it('should update different attribute in same position', () => {
@@ -331,19 +352,36 @@ describe('attribute updates', () => {
       expect(child.getAttribute('data-bar')).to.equal('bar');
     });
 
-    it('should persist statics', () => {
-      // tslint:disable-next-line:no-any
-      function render(value: any) {
-        elementVoid('div', null, ['data-foo', value]);
-      }
+    it('should apply new statics', () => {
+      const onclick = () => {};
 
-      patch(container, render, 'bar');
-      const child = container.childNodes[0]! as HTMLElement;
+      patch(container, () => {
+        elementVoid('div', null, ['tabindex', '-1', 'onclick', onclick]);
+      });
 
-      expect(child.getAttribute('data-foo')).to.equal('bar');
+      expect(div.onclick).to.equal(onclick);
+    });
 
-      patch(container, render, 'baz');
-      expect(child.getAttribute('data-foo')).to.equal('bar');
+    it('should not re-apply existing statics', () => {
+      div.setAttribute('data-foo', 'bar');
+      const mo = createMutationObserver(div);
+
+      patch(container, () => {
+        elementVoid('div', null, ['tabindex', '-1', 'data-foo', 'bar']);
+      });
+
+      expect(mo.takeRecords()).to.be.empty
+    });
+
+    it('should not re-apply existing statics regardless of order', () => {
+      div.setAttribute('data-foo', 'bar');
+      const mo = createMutationObserver(div);
+
+      patch(container, () => {
+        elementVoid('div', null, ['data-foo', 'bar', 'tabindex', '-1']);
+      });
+
+      expect(mo.takeRecords()).to.be.empty
     });
 
     it('should persist statics when patching a parent', () => {
@@ -369,6 +407,5 @@ describe('attribute updates', () => {
       expect(child.hasAttribute('tabindex')).to.false;
       expect(grandChild.getAttribute('data-foo')).to.equal('bar');
     });
-
   });
 });
