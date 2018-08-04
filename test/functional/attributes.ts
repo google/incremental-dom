@@ -362,7 +362,7 @@ describe('attribute updates', () => {
       expect(div.onclick).to.equal(onclick);
     });
 
-    it('should not re-apply existing statics', () => {
+    it('should not re-apply existing statics with the same vaue', () => {
       div.setAttribute('data-foo', 'bar');
       const mo = createMutationObserver(div);
 
@@ -371,6 +371,15 @@ describe('attribute updates', () => {
       });
 
       expect(mo.takeRecords()).to.be.empty
+    });
+
+    it('should apply changed statics', () => {
+      patch(container, () => {
+        elementVoid('div', null, ['tabindex', '42']);
+      });
+      const child = container.firstElementChild!;
+
+      expect(child.getAttribute('tabindex')).to.equal('42');
     });
 
     it('should not re-apply existing statics regardless of order', () => {
