@@ -57,25 +57,31 @@ function applyStatics(node: HTMLElement, statics: Statics, attrsArr: any[]) {
   for (let i = 0; i < statics.length; i += 2) {
     prevAttrsMap[statics[i] as string] = i + 1;
   }
-  
+
   let j = 0;
   for (let i = 0; i < attrsArr.length; i += 2) {
     const name = attrsArr[i];
+    const value = attrsArr[i + 1];
+    const staticsIndex = prevAttrsMap[name];
 
-    // For any attrs that are static, make sure we do not set them again.
-    if (prevAttrsMap[name]) {
-      delete prevAttrsMap[name];
+    if (staticsIndex) {
+      // For any attrs that are static and have the same value, make sure we do
+      // not set them again.
+      if (statics[staticsIndex] === value) {
+        delete prevAttrsMap[name];
+      }
+
       continue;
     }
 
     // For any attrs that are dynamic, move them up to the right place.
     attrsArr[j] = name;
-    attrsArr[j + 1] = attrsArr[i + 1];
+    attrsArr[j + 1] = value;
     j += 2;
   }
   // Anything after `j` was either moved up already or static.
   truncateArray(attrsArr, j);
-  
+
   for (const name in prevAttrsMap) {
     updateAttribute(node, name, statics[prevAttrsMap[name]]);
     delete prevAttrsMap[name];
