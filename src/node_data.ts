@@ -104,23 +104,7 @@ function importSingleNode(node: Node, fallbackKey?: Key) {
   const data = initData(node, nodeName!, key, text);
 
   if (isElement(node)) {
-    const attributes = node.attributes;
-    if (attributes.length > 0) {
-      const attrsArr = data.getAttrsArr();
-
-      // Use a cached length. The attributes array is really a live NamedNodeMap,
-      // which exists as a DOM "Host Object" (probably as C++ code). This makes
-      // the usual constant length iteration very difficult to optimize in JITs.
-      const length = attributes.length;
-      for (let i = 0; i < length; i += 1) {
-        const attr = attributes[i];
-        const name = attr.name;
-        const value = attr.value;
-
-        attrsArr.push(name);
-        attrsArr.push(value);
-      }
-    }
+    recordAttributes(node, data);
   }
 
   return data;
@@ -145,6 +129,34 @@ function clearCache(node: Node) {
 
   for (let child = node.firstChild; child; child = child.nextSibling) {
     clearCache(child);
+  }
+}
+
+
+/**
+ * Records the element's attributes.
+ * @param node The Element that may have attributes
+ * @param data The Element's data
+ */
+function recordAttributes(node: Element, data: NodeData) {
+  const attributes = node.attributes;
+  const length = attributes.length;
+  if (!length) {
+    return;
+  }
+
+  const attrsArr = data.getAttrsArr();
+
+  // Use a cached length. The attributes array is really a live NamedNodeMap,
+  // which exists as a DOM "Host Object" (probably as C++ code). This makes the
+  // usual constant length iteration very difficult to optimize in JITs.
+  for (let i = 0; i < length; i += 1) {
+    const attr = attributes[i];
+    const name = attr.name;
+    const value = attr.value;
+
+    attrsArr.push(name);
+    attrsArr.push(value);
   }
 }
 
