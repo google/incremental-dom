@@ -57,11 +57,11 @@ export class NodeData {
     this.text = text;
   }
 
-  hasAttrs(): boolean {
+  hasAttrsArr(): boolean {
     return !!this._attrsArr;
   }
 
-  attrsArr(): any[] {
+  getAttrsArr(): any[] {
     return this._attrsArr || (this._attrsArr = []);
   }
 }
@@ -106,7 +106,7 @@ function importSingleNode(node: Node, fallbackKey?: Key) {
   if (isElement(node)) {
     const attributes = node.attributes;
     if (attributes.length > 0) {
-      const attrsArr = data.attrsArr();
+      const attrsArr = data.getAttrsArr();
 
       // Use a cached length. The attributes array is really a live NamedNodeMap,
       // which exists as a DOM "Host Object" (probably as C++ code). This makes

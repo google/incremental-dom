@@ -59,7 +59,7 @@ function applyStatics(node: HTMLElement, data: NodeData, statics: Statics) {
     return;
   }
 
-  if (!data.hasAttrs()) {
+  if (!data.hasAttrsArr()) {
     for (let i = 0; i < statics.length; i += 2) {
       updateAttribute(node, statics[i] as string, statics[i + 1]);
     }
@@ -70,7 +70,7 @@ function applyStatics(node: HTMLElement, data: NodeData, statics: Statics) {
     prevAttrsMap[statics[i] as string] = i + 1;
   }
 
-  const attrsArr = data.attrsArr();
+  const attrsArr = data.getAttrsArr();
   let j = 0;
   for (let i = 0; i < attrsArr.length; i += 2) {
     const name = attrsArr[i];
@@ -132,11 +132,11 @@ function elementOpen(
     applyStatics(node, data, statics);
   }
 
-  if (arguments.length <= ATTRIBUTES_OFFSET && !data.hasAttrs()) {
+  if (arguments.length <= ATTRIBUTES_OFFSET && !data.hasAttrsArr()) {
     return node;
   }
 
-  const attrsArr = data.attrsArr();
+  const attrsArr = data.getAttrsArr();
   const isNew = !attrsArr.length;
 
   /*
