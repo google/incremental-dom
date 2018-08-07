@@ -31,7 +31,7 @@ export class NodeData {
    * updated.
    */
   // tslint:disable-next-line:no-any
-  readonly attrsArr: any[] = [];
+  private _attrsArr: null|any[] = null;
 
   /**
    * Whether or not the statics have been applied for the node yet.
@@ -55,6 +55,14 @@ export class NodeData {
     this.nameOrCtor = nameOrCtor;
     this.key = key;
     this.text = text;
+  }
+
+  hasAttrs(): boolean {
+    return !!this._attrsArr;
+  }
+
+  attrsArr(): any[] {
+    return this._attrsArr || (this._attrsArr = []);
   }
 }
 
@@ -97,19 +105,21 @@ function importSingleNode(node: Node, fallbackKey?: Key) {
 
   if (isElement(node)) {
     const attributes = node.attributes;
-    const attrsArr = data.attrsArr;
+    if (attributes.length > 0) {
+      const attrsArr = data.attrsArr();
 
-    // Use a cached length. The attributes array is really a live NamedNodeMap,
-    // which exists as a DOM "Host Object" (probably as C++ code). This makes
-    // the usual constant length iteration very difficult to optimize in JITs.
-    const length = attributes.length;
-    for (let i = 0; i < length; i += 1) {
-      const attr = attributes[i];
-      const name = attr.name;
-      const value = attr.value;
+      // Use a cached length. The attributes array is really a live NamedNodeMap,
+      // which exists as a DOM "Host Object" (probably as C++ code). This makes
+      // the usual constant length iteration very difficult to optimize in JITs.
+      const length = attributes.length;
+      for (let i = 0; i < length; i += 1) {
+        const attr = attributes[i];
+        const name = attr.name;
+        const value = attr.value;
 
-      attrsArr.push(name);
-      attrsArr.push(value);
+        attrsArr.push(name);
+        attrsArr.push(value);
+      }
     }
   }
 

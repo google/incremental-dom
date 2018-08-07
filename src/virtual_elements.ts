@@ -21,7 +21,7 @@ import {assert, assertCloseMatchesOpenTag, assertInAttributes, assertNotInAttrib
 import {updateAttribute} from './attributes';
 import {getArgsBuilder, close, open, text as coreText} from './core';
 import {DEBUG} from './global';
-import {getData} from './node_data';
+import {getData, NodeData} from './node_data';
 import {Key, NameOrCtorDef, Statics} from './types';
 import {createMap, truncateArray} from './util';
 
@@ -46,11 +46,23 @@ const prevAttrsMap = createMap();
  * Applies the statics. When importing an Element, any existing attributes that
  * match a static are converted into a static attribute.
  * @param node The Element to apply statics for.
+ * @param data The Element's data
  * @param statics The statics array,
- * @param attrsArr The imported attributes array.
  */
-function applyStatics(node: HTMLElement, statics: Statics, attrsArr: any[]) {
+function applyStatics(node: HTMLElement, data: NodeData, statics: Statics) {
+  // Down the road, we may want to keep track of the statics array to use it
+  // as an additional signal about whether a node matches or not. For now,
+  // just use a marker so that we do not reapply statics.
+  data.staticsApplied = true;
+
   if (!statics) {
+    return;
+  }
+
+  if (!data.hasAttrs()) {
+    for (let i = 0; i < statics.length; i += 2) {
+      updateAttribute(node, statics[i] as string, statics[i + 1]);
+    }
     return;
   }
 
@@ -58,6 +70,7 @@ function applyStatics(node: HTMLElement, statics: Statics, attrsArr: any[]) {
     prevAttrsMap[statics[i] as string] = i + 1;
   }
 
+  const attrsArr = data.attrsArr();
   let j = 0;
   for (let i = 0; i < attrsArr.length; i += 2) {
     const name = attrsArr[i];
@@ -114,16 +127,17 @@ function elementOpen(
 
   const node = open(nameOrCtor, key);
   const data = getData(node);
-  const attrsArr = data.attrsArr;
-  const isNew = !attrsArr.length;
 
   if (!data.staticsApplied) {
-    applyStatics(node, statics, attrsArr);
-    // Down the road, we may want to keep track of the statics array to use it
-    // as an additional signal about whether a node matches or not. For now,
-    // just use a marker so that we do not reapply statics.
-    data.staticsApplied = true;
+    applyStatics(node, data, statics);
   }
+
+  if (arguments.length <= ATTRIBUTES_OFFSET && !data.hasAttrs()) {
+    return node;
+  }
+
+  const attrsArr = data.attrsArr();
+  const isNew = !attrsArr.length;
 
   /*
    * Checks to see if one or more attributes have changed for a given Element.
