@@ -50,9 +50,6 @@ const prevAttrsMap = createMap();
  * @param statics The statics array,
  */
 function applyStatics(node: HTMLElement, data: NodeData, statics: Statics) {
-  // Down the road, we may want to keep track of the statics array to use it
-  // as an additional signal about whether a node matches or not. For now,
-  // just use a marker so that we do not reapply statics.
   data.staticsApplied = true;
 
   if (!statics) {
