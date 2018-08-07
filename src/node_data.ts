@@ -98,8 +98,11 @@ function importSingleNode(node: Node, fallbackKey?: Key) {
   if (isElement(node)) {
     const attributes = node.attributes;
     const attrsArr = data.attrsArr;
-    const length = attributes.length;
 
+    // Use a cached length. The attributes array is really a live NamedNodeMap,
+    // which exists as a DOM "Host Object" (probably as C++ code). This makes
+    // the usual constant length iteration very difficult to optimize in JITs.
+    const length = attributes.length;
     for (let i = 0; i < length; i += 1) {
       const attr = attributes[i];
       const name = attr.name;
