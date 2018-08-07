@@ -98,8 +98,9 @@ function importSingleNode(node: Node, fallbackKey?: Key) {
   if (isElement(node)) {
     const attributes = node.attributes;
     const attrsArr = data.attrsArr;
+    const length = attributes.length;
 
-    for (let i = 0; i < attributes.length; i += 1) {
+    for (let i = 0; i < length; i += 1) {
       const attr = attributes[i];
       const name = attr.name;
       const value = attr.value;
