@@ -52,7 +52,7 @@ const prevAttrsMap = createMap();
 function applyStatics(node: HTMLElement, data: NodeData, statics: Statics) {
   data.staticsApplied = true;
 
-  if (!statics) {
+  if (!statics || !statics.length) {
     return;
   }
 
@@ -129,12 +129,13 @@ function elementOpen(
     applyStatics(node, data, statics);
   }
 
-  if (arguments.length <= ATTRIBUTES_OFFSET && !data.hasAttrsArr()) {
+  const attrsLength = Math.max(0, arguments.length - ATTRIBUTES_OFFSET);
+  if (!attrsLength && !data.hasAttrsArr()) {
     return node;
   }
 
-  const attrsArr = data.getAttrsArr();
-  const isNew = !attrsArr.length;
+  const isNew = data.hasEmptyAttrsArr();
+  const attrsArr = data.getAttrsArr(attrsLength);
 
   /*
    * Checks to see if one or more attributes have changed for a given Element.

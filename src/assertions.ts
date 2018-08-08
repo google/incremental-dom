@@ -185,6 +185,18 @@ function assertPatchElementNoExtras(
 
 
 /**
+ * Asserts that index is a valid array index.
+ * @param index The number to check.
+ */
+function assertArrayIndex(index?: number) {
+  // Conveniently, array indexes are only 32bit ints.
+  if (index === undefined || (index | 0) !== index) {
+    throw new Error('Expected a positive integer');
+  }
+}
+
+
+/**
  * Updates the state of being in an attribute declaration.
  * @return the previous value.
  */
@@ -219,6 +231,7 @@ function assert<T extends {}>(val: T|null|undefined): T {
 
 export {
   assert,
+  assertArrayIndex,
   assertInPatch,
   assertNoUnclosedTags,
   assertNotInAttributes,
