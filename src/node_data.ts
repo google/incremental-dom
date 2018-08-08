@@ -17,8 +17,6 @@
  * limitations under the License.
  */
 
-import {assertArrayIndex} from './assertions';
-import {DEBUG} from './global';
 import {Key, NameOrCtorDef} from './types';
 import {isElement, isText} from './dom_util';
 
