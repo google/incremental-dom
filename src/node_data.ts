@@ -64,17 +64,12 @@ export class NodeData {
     return !attrs || !attrs.length;
   }
 
-  getAttrsArr(length?: number): any[] {
+  getAttrsArr(length: number): any[] {
     let attrs = this._attrsArr;
     if (attrs) {
       return attrs;
     }
-    // If there's not already an attrsArr, you need to provide the initial
-    // length.
-    if (DEBUG) {
-      assertArrayIndex(length);
-    }
-    return (this._attrsArr = new Array(length as number));
+    return (this._attrsArr = new Array(length));
   }
 }
 

@@ -67,7 +67,7 @@ function applyStatics(node: HTMLElement, data: NodeData, statics: Statics) {
     prevAttrsMap[statics[i] as string] = i + 1;
   }
 
-  const attrsArr = data.getAttrsArr();
+  const attrsArr = data.getAttrsArr(0);
   let j = 0;
   for (let i = 0; i < attrsArr.length; i += 2) {
     const name = attrsArr[i];
