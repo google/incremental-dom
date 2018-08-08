@@ -56,7 +56,7 @@ function applyStatics(node: HTMLElement, data: NodeData, statics: Statics) {
     return;
   }
 
-  if (!data.hasAttrsArr()) {
+  if (data.hasEmptyAttrsArr()) {
     for (let i = 0; i < statics.length; i += 2) {
       updateAttribute(node, statics[i] as string, statics[i + 1]);
     }
@@ -130,11 +130,12 @@ function elementOpen(
   }
 
   const attrsLength = Math.max(0, arguments.length - ATTRIBUTES_OFFSET);
-  if (!attrsLength && !data.hasAttrsArr()) {
+  const hadNoAttrs = data.hasEmptyAttrsArr();
+
+  if (!attrsLength && hadNoAttrs) {
     return node;
   }
 
-  const isNew = data.hasEmptyAttrsArr();
   const attrsArr = data.getAttrsArr(attrsLength);
 
   /*
@@ -148,14 +149,14 @@ function elementOpen(
 
   for (; i < arguments.length; i += 2, j += 2) {
     const name = arguments[i];
-    if (isNew) {
+    if (hadNoAttrs) {
       attrsArr[j] = name;
     } else if (attrsArr[j] !== name) {
       break;
     }
 
     const value = arguments[i + 1];
-    if (isNew || attrsArr[j + 1] !== value) {
+    if (hadNoAttrs || attrsArr[j + 1] !== value) {
       attrsArr[j + 1] = value;
       updateAttribute(node, name, value);
     }

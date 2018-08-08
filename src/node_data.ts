@@ -59,10 +59,6 @@ export class NodeData {
     this.text = text;
   }
 
-  hasAttrsArr(): boolean {
-    return !!this._attrsArr;
-  }
-
   hasEmptyAttrsArr(): boolean {
     const attrs = this._attrsArr;
     return !attrs || !attrs.length;
