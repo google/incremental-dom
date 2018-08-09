@@ -63,11 +63,7 @@ export class NodeData {
   }
 
   getAttrsArr(length: number): any[] {
-    let attrs = this._attrsArr;
-    if (attrs) {
-      return attrs;
-    }
-    return (this._attrsArr = new Array(length));
+    return this._attrsArr || (this._attrsArr = new Array(length));
   }
 }
 
