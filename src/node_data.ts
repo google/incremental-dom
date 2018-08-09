@@ -57,12 +57,13 @@ export class NodeData {
     this.text = text;
   }
 
-  hasAttrsArr(): boolean {
-    return !!this._attrsArr;
+  hasEmptyAttrsArr(): boolean {
+    const attrs = this._attrsArr;
+    return !attrs || !attrs.length;
   }
 
-  getAttrsArr(): any[] {
-    return this._attrsArr || (this._attrsArr = []);
+  getAttrsArr(length: number): any[] {
+    return this._attrsArr || (this._attrsArr = new Array(length));
   }
 }
 
@@ -145,18 +146,18 @@ function recordAttributes(node: Element, data: NodeData) {
     return;
   }
 
-  const attrsArr = data.getAttrsArr();
+  const attrsArr = data.getAttrsArr(length);
 
   // Use a cached length. The attributes array is really a live NamedNodeMap,
   // which exists as a DOM "Host Object" (probably as C++ code). This makes the
   // usual constant length iteration very difficult to optimize in JITs.
-  for (let i = 0; i < length; i += 1) {
+  for (let i = 0, j = 0; i < length; i += 1, j += 2) {
     const attr = attributes[i];
     const name = attr.name;
     const value = attr.value;
 
-    attrsArr.push(name);
-    attrsArr.push(value);
+    attrsArr[j] = name;
+    attrsArr[j + 1] = value;
   }
 }
 

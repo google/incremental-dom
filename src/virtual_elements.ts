@@ -52,11 +52,11 @@ const prevAttrsMap = createMap();
 function applyStatics(node: HTMLElement, data: NodeData, statics: Statics) {
   data.staticsApplied = true;
 
-  if (!statics) {
+  if (!statics || !statics.length) {
     return;
   }
 
-  if (!data.hasAttrsArr()) {
+  if (data.hasEmptyAttrsArr()) {
     for (let i = 0; i < statics.length; i += 2) {
       updateAttribute(node, statics[i] as string, statics[i + 1]);
     }
@@ -67,7 +67,7 @@ function applyStatics(node: HTMLElement, data: NodeData, statics: Statics) {
     prevAttrsMap[statics[i] as string] = i + 1;
   }
 
-  const attrsArr = data.getAttrsArr();
+  const attrsArr = data.getAttrsArr(0);
   let j = 0;
   for (let i = 0; i < attrsArr.length; i += 2) {
     const name = attrsArr[i];
@@ -129,12 +129,14 @@ function elementOpen(
     applyStatics(node, data, statics);
   }
 
-  if (arguments.length <= ATTRIBUTES_OFFSET && !data.hasAttrsArr()) {
+  const attrsLength = Math.max(0, arguments.length - ATTRIBUTES_OFFSET);
+  const hadNoAttrs = data.hasEmptyAttrsArr();
+
+  if (!attrsLength && hadNoAttrs) {
     return node;
   }
 
-  const attrsArr = data.getAttrsArr();
-  const isNew = !attrsArr.length;
+  const attrsArr = data.getAttrsArr(attrsLength);
 
   /*
    * Checks to see if one or more attributes have changed for a given Element.
@@ -147,14 +149,14 @@ function elementOpen(
 
   for (; i < arguments.length; i += 2, j += 2) {
     const name = arguments[i];
-    if (isNew) {
+    if (hadNoAttrs) {
       attrsArr[j] = name;
     } else if (attrsArr[j] !== name) {
       break;
     }
 
     const value = arguments[i + 1];
-    if (isNew || attrsArr[j + 1] !== value) {
+    if (hadNoAttrs || attrsArr[j + 1] !== value) {
       attrsArr[j + 1] = value;
       updateAttribute(node, name, value);
     }
