@@ -80,9 +80,9 @@ function patchFactory<T, R>(run: PatchFunction<T, R>): PatchFunction<T, R> {
 
     context = new Context();
     doc = node.ownerDocument;
-    focusPath = getFocusedPath(node, currentParent);
     argsBuilder = [];
     currentParent = node.parentNode;
+    focusPath = getFocusedPath(node, currentParent);
 
     if (DEBUG) {
       previousInAttributes = setInAttributes(false);
@@ -98,10 +98,10 @@ function patchFactory<T, R>(run: PatchFunction<T, R>): PatchFunction<T, R> {
       return retVal;
     } finally {
       doc = prevDoc;
-      focusPath = prevFocusPath;
       argsBuilder = prevArgsBuilder;
       currentNode = prevCurrentNode;
       currentParent = prevCurrentParent;
+      focusPath = prevFocusPath;
       context.notifyChanges();
 
       // Needs to be done after assertions because assertions rely on state

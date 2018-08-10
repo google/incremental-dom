@@ -293,7 +293,7 @@ describe('rendering with keys', () => {
       expect(document.activeElement).to.equal(focusNode);
     });
 
-    it('should retain focus when doing a nested patch', () => {
+    it('should retain focus when doing a nested patch of a subtree', () => {
       function renderInner(id: string|null|undefined) {
         elementVoid('div', null, null, 'id', id as string, 'tabindex', -1);
       }
@@ -316,6 +316,27 @@ describe('rendering with keys', () => {
 
       items.unshift(items.pop()!);
       patch(container, () => render(items));
+
+      expect(document.activeElement).to.equal(focusNode);
+    });
+
+    it('should retain focus when doing a nested patch of another tree', () => {
+      function renderOuter(items: Key[]) {
+        elementOpen('div', null, null);
+        patch(containerTwo, () => render(items));
+        elementClose('div');
+      }
+
+      const containerTwo = document.createElement('div');
+      const items: Key[] = [{key: 'one'}, {key: 'two'}, {key: 'three'}];
+
+      document.body.appendChild(containerTwo);
+      patch(container, () => renderOuter(items));
+      const focusNode = assertHTMLElement(containerTwo.querySelector('#three'));
+      focusNode.focus();
+
+      items.unshift(items.pop()!);
+      patch(container, () => renderOuter(items));
 
       expect(document.activeElement).to.equal(focusNode);
     });
