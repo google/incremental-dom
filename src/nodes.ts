@@ -28,6 +28,10 @@ function getNamespaceForTag(tag: string, parent: Node|null) {
   if (tag === 'svg') {
     return 'http://www.w3.org/2000/svg';
   }
+  
+  if (tag === 'math') {
+    return 'http://www.w3.org/1998/Math/MathML';
+  }
 
   if (parent == null) {
     return null;
