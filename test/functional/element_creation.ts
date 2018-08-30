@@ -202,4 +202,46 @@ describe('element creation', () => {
          expect(el.namespaceURI).to.equal('http://www.w3.org/2000/svg');
        });
   });
+
+  describe('for math elements', () => {
+    beforeEach(() => {
+      patch(container, () => {
+        elementOpen('math');
+          elementOpen('semantics');
+            elementOpen('mrow');
+              elementVoid('mo');
+            elementClose('mrow');
+          elementClose('semantics');
+        elementClose('math');
+        elementVoid('p');
+      });
+    });
+
+    it('should create equations in the MathML namespace', () => {
+      const el = assertElement(container.querySelector('math'));
+      expect(el.namespaceURI).to.equal('http://www.w3.org/1998/Math/MathML');
+    });
+
+    it('should create descendants of math in the MathML namespace', () => {
+      const el = assertElement(container.querySelector('mo'));
+      expect(el.namespaceURI).to.equal('http://www.w3.org/1998/Math/MathML');
+    });
+
+    it('should reset to the previous namespace after exiting math',
+       () => {
+         const el = assertElement(container.querySelector('p'));
+         expect(el.namespaceURI).to.equal('http://www.w3.org/1999/xhtml');
+       });
+
+    it('should create children in the MathML namespace when patching an equation',
+       () => {
+         const mrow = assertElement(container.querySelector('mrow'));
+         patch(mrow, () => {
+           elementVoid('mi');
+         });
+
+         const el = assertElement(mrow.querySelector('mi'));
+         expect(el.namespaceURI).to.equal('http://www.w3.org/1998/Math/MathML');
+       });
+  });
 });
