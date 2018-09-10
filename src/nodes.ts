@@ -57,7 +57,7 @@ function createElement(
     : Element {
   let el;
 
-  if (nameOrCtor instanceof Function) {
+  if (typeof nameOrCtor === 'function') {
     el = new nameOrCtor();
   } else {
     const namespace = getNamespaceForTag(nameOrCtor, parent);
