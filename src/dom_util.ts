@@ -1,6 +1,4 @@
 /**
- * @fileoverview
- * @suppress {extraRequire}
  * @license
  * Copyright 2018 The Incremental DOM Authors. All Rights Reserved.
  *
@@ -16,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import {assert} from './assertions';
 
 /**
  * Checks if the node is the root of a document. This is either a Document

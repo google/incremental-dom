@@ -1,6 +1,4 @@
 /**
- * @fileoverview
- * @suppress {extraRequire}
  * @license
  * Copyright 2018 The Incremental DOM Authors. All Rights Reserved.
  *
