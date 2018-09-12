@@ -29,6 +29,10 @@ var path = require('path');
 var buffer = require('vinyl-buffer');
 var fs = require('fs');
 var typescript = require('rollup-plugin-typescript');
+var child_process = require('child_process');
+var util = require('util');
+
+var exec = util.promisify(child_process.exec);
 
 var entryFileName = 'index.ts';
 var artifactName = 'incremental-dom';
@@ -147,12 +151,28 @@ function jsCommonJS() {
       .pipe(gulp.dest('dist'));
 }
 
+function jsClosure() {
+  return exec('npx tsickle').then(() => {
+    return gulp.src(['build/index.js*', 'build/src/*.js*'])
+      .pipe(replace('DEBUG = true', 'DEBUG = goog.DEBUG'))
+      .pipe(replace('goog.module(\'index\')', 'goog.module(\'incrementaldom\')'))
+      .pipe(replace('goog.module(\'src.', 'goog.module(\'incrementaldom.src.'))
+      .pipe(replace('goog.require(\'src.', 'goog.require(\'incrementaldom.src.'))
+      .pipe(replace('goog.require("src.', 'goog.require("incrementaldom.src.'))
+      .pipe(replace('goog.forwardDeclare("src.', 'goog.forwardDeclare("incrementaldom.src.'))
+      .pipe(gulp.dest('dist/closure'));
+  });
+}
+
 function jsDist() {
-  // These must be run serially: clean must complete before any of the js
-  // targets run. The js and jsMin targets cannot run in parallel as they both
-  // change process.env.NODE_ENV. The CommonJS target could run in parallel
-  // with the js and jsMin targets, but currently is not.
-  return clean().then(jsCommonJS).then(js).then(jsMin);
+  return clean().then(() => {
+    return Promise.all([
+      jsClosure(),
+      jsCommonJS(),
+      js(),
+      jsMin(),
+    ]);
+  });
 }
 
 gulp.task('clean', clean);
@@ -160,6 +180,7 @@ gulp.task('unit', unit);
 gulp.task('unit-dist', unitDist);
 gulp.task('unit-watch', unitWatch);
 gulp.task('js', js);
+gulp.task('js-closure', jsClosure);
 gulp.task('js-watch', ['js'], jsWatch);
 gulp.task('js-min', jsMin);
 gulp.task('js-min-watch', ['js-min'], jsMinWatch);
