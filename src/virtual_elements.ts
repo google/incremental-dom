@@ -320,8 +320,11 @@ function elementClose(nameOrCtor: NameOrCtorDef): Element {
  * @return The corresponding Element.
  */
 function elementVoid(
-    nameOrCtor: NameOrCtorDef, key?: Key, statics?: Statics,
-    ...varArgs: Array<{}>) {
+    nameOrCtor: NameOrCtorDef, key?: Key,
+    // Ideally we could tag statics and varArgs as an array where every odd
+    // element is a string and every even element is any, but this is hard.
+    // tslint:disable-next-line:no-any
+    statics?: Statics, ...varArgs: any[]) {
   elementOpen.apply(null, arguments);
   return elementClose(nameOrCtor);
 }
