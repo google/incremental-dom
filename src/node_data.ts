@@ -89,6 +89,9 @@ function getData(node: Node, key?: Key) {
 }
 
 function getKey(node: Node) {
+  if (!node['__incrementalDOMData']) {
+    throw new Error('Expected element to be initialized');
+  }
   return getData(node).key;
 }
 
