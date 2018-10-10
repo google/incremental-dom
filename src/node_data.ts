@@ -88,6 +88,12 @@ function getData(node: Node, key?: Key) {
   return importSingleNode(node, key);
 }
 
+function getKey(node: Node) {
+  if (!node['__incrementalDOMData']) {
+    throw new Error('Expected element to be initialized');
+  }
+  return getData(node).key;
+}
 
 /**
  * Imports single node and its subtree, initializing caches.
@@ -163,6 +169,7 @@ function recordAttributes(node: Element, data: NodeData) {
 /** */
 export {
   getData,
+  getKey,
   initData,
   importNode,
   clearCache,
