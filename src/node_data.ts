@@ -16,6 +16,7 @@
  */
 
 import {Key, NameOrCtorDef} from './types';
+import {assert} from './assertions';
 import {isElement, isText} from './dom_util';
 
 
@@ -88,6 +89,10 @@ function getData(node: Node, key?: Key) {
   return importSingleNode(node, key);
 }
 
+function getKey(node: Node) {
+  assert(node['__incrementalDOMData']);
+  return getData(node).key;
+}
 
 /**
  * Imports single node and its subtree, initializing caches.
@@ -163,6 +168,7 @@ function recordAttributes(node: Element, data: NodeData) {
 /** */
 export {
   getData,
+  getKey,
   initData,
   importNode,
   clearCache,
