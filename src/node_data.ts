@@ -115,19 +115,12 @@ function importSingleNode(node: Node, fallbackKey?: Key) {
 }
 
 /**
- * In lib.dom.d.ts in typescript v3.03 and before both Node.firstChild and Node.nextSibling were of type Node
- * Starting in v3.1 firstChild is of type ChildNode, causing a type error.  Asserting that the type of child
- * is NodeOrNull allows the code to compile under both versions.
- */
-type NodeOrNull = Node | null;
-
-/**
  * Imports node and its subtree, initializing caches.
  */
 function importNode(node: Node) {
   importSingleNode(node);
 
-  for (let child:NodeOrNull = node.firstChild; child; child = child.nextSibling) {
+  for (let child: Node|null = node.firstChild; child; child = child.nextSibling) {
     importNode(child);
   }
 }
@@ -138,7 +131,7 @@ function importNode(node: Node) {
 function clearCache(node: Node) {
   node['__incrementalDOMData'] = null;
 
-  for (let child:NodeOrNull = node.firstChild; child; child = child.nextSibling) {
+  for (let child: Node|null = node.firstChild; child; child = child.nextSibling) {
     clearCache(child);
   }
 }
