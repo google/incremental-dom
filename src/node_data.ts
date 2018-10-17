@@ -120,7 +120,7 @@ function importSingleNode(node: Node, fallbackKey?: Key) {
 function importNode(node: Node) {
   importSingleNode(node);
 
-  for (let child = node.firstChild; child; child = child.nextSibling) {
+  for (let child: Node|null = node.firstChild; child; child = child.nextSibling) {
     importNode(child);
   }
 }
@@ -131,11 +131,10 @@ function importNode(node: Node) {
 function clearCache(node: Node) {
   node['__incrementalDOMData'] = null;
 
-  for (let child = node.firstChild; child; child = child.nextSibling) {
+  for (let child: Node|null = node.firstChild; child; child = child.nextSibling) {
     clearCache(child);
   }
 }
-
 
 /**
  * Records the element's attributes.
