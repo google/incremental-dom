@@ -89,6 +89,10 @@ function getData(node: Node, key?: Key) {
   return importSingleNode(node, key);
 }
 
+function isDataInitialized(node: Node): boolean {
+  return Boolean(node['__incrementalDOMData']);
+}
+
 function getKey(node: Node) {
   assert(node['__incrementalDOMData']);
   return getData(node).key;
@@ -170,5 +174,6 @@ export {
   getKey,
   initData,
   importNode,
+  isDataInitialized,
   clearCache,
 };

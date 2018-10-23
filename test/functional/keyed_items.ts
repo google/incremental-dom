@@ -18,7 +18,7 @@
 // taze: mocha from //third_party/javascript/typings/mocha
 // taze: chai from //third_party/javascript/typings/chai
 
-import {currentElement, currentPointer, elementClose, elementOpen, elementVoid, getKey, patch, skip, text, clearCache} from '../../index';
+import {currentElement, currentPointer, elementClose, elementOpen, elementVoid, getKey, isDataInitialized, patch, skip, text, clearCache} from '../../index';
 import {assertHTMLElement, attachShadow, BROWSER_SUPPORTS_SHADOW_DOM,} from '../util/dom';
 const {expect} = chai;
 
@@ -371,6 +371,21 @@ describe('rendering with keys', () => {
         expect(shadowRoot.activeElement).to.equal(shadowEl);
       });
     }
+  });
+});
+
+describe('isDataInitialized', () => {
+  it('should return false if the element has no data', () => {
+    const div = document.createElement('div');
+    expect(isDataInitialized(div)).to.be.false;
+  });
+
+  it('should return true if the element has initialized data', () => {
+    const div = document.createElement('div');
+    patch(div, () => {
+      elementVoid('div', '3');
+    });
+    expect(isDataInitialized(div.firstChild!)).to.be.true;
   });
 });
 
