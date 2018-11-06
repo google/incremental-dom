@@ -2,7 +2,10 @@ language: node_js
 sudo: required
 dist: trusty
 node_js:
+  - 6
   - 8
+  - 10
+  - node
 before_install:
   - export CHROME_BIN=google-chrome
   - export DISPLAY=:99.0
