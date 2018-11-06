@@ -14,5 +14,6 @@ before_install:
   - sudo dpkg -i google-chrome*.deb
 # This is basically redundant (ends up getting run twice) as this gets called
 # by npm on install due to the prepublish script in package.json.
+install: npm install
 script:
   - gulp dist
