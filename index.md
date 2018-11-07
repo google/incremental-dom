@@ -205,6 +205,35 @@ elementOpenStart('div');
 elementOpenEnd('div');
 ```
 
+## Rendering HTML Blobs
+
+Incremental DOM does not have a way of rendering blobs of HTML itself, but it can be implemented on top of the existing APIs. Depending on the complexity of what you need, a simple function like the following might suffice:
+
+```javascript
+function html(content) {
+  const el = elementOpen('html-blob');
+  if (el.__cachedInnerHtml !== content) {
+    el.__cachedInnerHtml = content;
+    el.innerHTML = content;
+  }
+  skip()
+  elementClose('html-blob');
+}
+```
+
+which could then be used as follows:
+
+```javascript
+elementOpen('div');
+  text('Hello ');
+  html('<em>world</em>');
+elementClose('div');
+```
+
+You may want something more advanced for your html rendering function. For example, you may want to make sure that the content is safe to render if it originates from a user (e.g. if it contains an anchor tag, the `href `does not start with `javascript:`) or that it is only called with strings that have already be sanitized (either on the backend or frontend).
+
+Additionally, you may want to diff the HTML content rather than simply overwriting the existing content with `innerHTML`.
+
 ## Passing Functions
 
 The incremental node functions are evaluated when they are called. If you do not want to have them appear in the current location (e.g. to pass them to another function), simply wrap the statements in a function which can be called later.
