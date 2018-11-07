@@ -207,7 +207,7 @@ elementOpenEnd('div');
 
 ## Rendering HTML Blobs
 
-Incremental DOM does not have a way of rendering blobs of HTML itself, but it can be implemented on top of the existing APIs. Depending on the complexity of what you need, a simple function like the following might suffice:
+Incremental DOM does not have a way of rendering blobs of HTML itself, but it can be implemented using the [`skip`](#skip) function. Depending on the complexity of what you need, a simple function like the following might suffice:
 
 ```javascript
 function html(content) {
@@ -468,7 +468,7 @@ elementVoid('div', item.key, ['staticAttr', 'staticValue'],
 
 #### Description
 
-Declares a Text node, with the specified text, should appear at the current location in the document tree.
+Declares a `Text` node, with the specified text, should appear at the current location in the document tree.
 
 #### Parameters
 
@@ -504,7 +504,7 @@ text('hello world', toUpperCase);
 
 #### Description
 
-Updates the provided Node with a function containing zero or more calls to elementOpen, text and elementClose. The provided callback function may call other such functions. The patch function may be called with a new Node while a call to patch is already executing.
+Updates the provided Node with a function containing zero or more calls to `elementOpen`, `text` and `elementClose`. The provided callback function may call other such functions. The patch function may be called with a new Node while a call to patch is already executing.
 
 #### Parameters
 
@@ -531,6 +531,116 @@ function render(data) {
 const myElement = document.getElementById(…);
 const someData = {…};
 patch(myElement, render, someData);
+```
+</div>
+### currentElement
+<div class="api-fn" markdown="1">
+
+#### Description
+
+Provides a way to get the currently open element.
+
+#### Returns
+
+`Element` The currently open element.
+
+#### Usage
+
+```javascript
+import { elementOpen, elementClose, currentElement } from 'incremental-dom';
+
+…
+
+const element = elementOpen('div');
+console.log(element === currentElement()); // true
+elementOpen('span');
+console.log(element === currentElement()); // false
+elementClose('span');
+console.log(element === currentElement()); // true
+elementClose('div');
+```
+### currentPointer
+<div class="api-fn" markdown="1">
+
+#### Description
+
+The current location in the DOM that Incremental DOM is looking at. This will be the next `Node` that will be compared against for the next `elementOpen` or `text` call.
+
+#### Returns
+
+`Node` The next node that will be compared.
+
+#### Usage
+
+This can be used to look at the next `Node` to be diffed and perform some action (e.g. skip the node).
+
+```javascript
+import { elementOpen, currentPointer, skipNode } from 'incremental-dom';
+
+function myElementOpen(...args) {
+  // Skip over all nodes with _isExternal.
+  let pointer;
+  while (pointer = currentPointer() && pointer._isExternal) {
+    skipNode();
+  }
+  elementOpen(...args);
+}
+```
+### skip
+<div class="api-fn" markdown="1">
+
+#### Description
+
+Moves the current pointer to the end of the currently open element. This prevents Incremental DOM from removing any children of the currently open element. When calling `skip`, there should be no calls to `elementOpen` (or similiar) prior to the `elementClose` call for the currently open element.
+
+#### Usage
+
+```javascript
+import { patch, elementOpen, elementClose, skip } from 'incremental-dom';
+
+function render(data) {
+  const element = elementOpen('div');
+  if (shouldUpdate(element._data, data)) {
+    element._data = data;
+    // Make calls to elementOpen, etc.
+    …
+  } else {
+    skip();
+  }
+  elementClose('div');
+}
+
+const myElement = document.getElementById(…);
+const someData = {…};
+patch(myElement, render, someData);
+```
+</div>
+### skipNode
+<div class="api-fn" markdown="1">
+
+#### Description
+
+Moves the current patch pointer forward by one node. This can be used to skip over elements declared outside of Incremental DOM.
+#### Usage
+
+If you have a DOM structure like:
+
+```html
+<div id="one"><!-- managed by Incremental DOM --></div>
+<div id="two"><!-- maintained externally --></div>
+<div id="three"><!-- managed by Incremental DOM --></div>
+```
+
+You can skip over `<div id="two"></div>` as follows:
+
+```javascript
+import { elementVoid, skipNode } from 'incremental-dom';
+
+function render() {
+  elementVoid('div', null, null, 'id', 'one');
+  skipNode();
+  elementVoid('div', null, null, 'id', 'three');
+}
 ```
 </div>
 
