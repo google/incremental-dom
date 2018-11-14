@@ -1,5 +1,17 @@
 # Change Log
 
+## 0.6.0
+
+- Added support for MathML
+- Removed restriction that keys are unique within a parent Element
+- Added better handling of statics when importing an Element
+- Allow importing of server-side rendered DOM without transmitting keys
+  - This relies on the first patch being a no-op in order for things to line up
+    correctly
+- `elementOpen` and friends can now take a CustomElement constructor instead of
+  a tag name
+- Added an output target that generates Closure Compiler typed code
+
 ## 0.5.0
 
 - Removed `symbols.placeholder`
