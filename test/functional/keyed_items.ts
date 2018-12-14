@@ -18,7 +18,20 @@
 // taze: mocha from //third_party/javascript/typings/mocha
 // taze: chai from //third_party/javascript/typings/chai
 
-import {currentElement, currentPointer, elementClose, elementOpen, elementVoid, getKey, isDataInitialized, patch, skip, text, clearCache} from '../../index';
+import {
+  currentElement,
+  currentPointer,
+  elementClose,
+  elementOpen,
+  elementVoid,
+  getKey,
+  isDataInitialized,
+  patch,
+  setKeyAttributeName,
+  skip,
+  text,
+  clearCache,
+} from '../../index';
 import {assertHTMLElement, attachShadow, BROWSER_SUPPORTS_SHADOW_DOM,} from '../util/dom';
 const {expect} = chai;
 
@@ -411,5 +424,50 @@ describe('getKey', () => {
       elementVoid('div', '3');
     });
     expect(getKey(div.firstChild!)).to.equal('3')
+  });
+});
+
+describe('setKeyAttributeName', () => {
+  let container: HTMLElement;
+  let keyedEl: HTMLElement;
+
+  beforeEach(() => {
+    container = document.createElement('div');
+    keyedEl = document.createElement('div');
+    keyedEl.setAttribute('key', 'foo');
+    keyedEl.setAttribute('secondaryKey', 'bar');
+    container.appendChild(keyedEl);
+    document.body.appendChild(container);
+  });
+
+  afterEach(() => {
+    document.body.removeChild(container);
+    setKeyAttributeName('key'); // Default.
+  });
+
+  it('should use the default `key` attribute', () => {
+    patch(container, () => {
+      elementVoid('div', 'baz');
+    });
+    expect(getKey(keyedEl)).to.equal('foo')
+  });
+
+  it('should use the `secondaryKey` attribute if keyAttributeName is set to ' +
+      '`secondaryKey`', () => {
+    setKeyAttributeName('secondaryKey');
+
+    patch(container, () => {
+      elementVoid('div', 'baz');
+    });
+    expect(getKey(keyedEl)).to.equal('bar')
+  });
+
+  it('should use the given key if `keyAttributeName` is set to null', () => {
+    setKeyAttributeName(null);
+
+    patch(container, () => {
+      elementVoid('div', 'baz');
+    });
+    expect(getKey(keyedEl)).to.equal('baz')
   });
 });

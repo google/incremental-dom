@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+import {getKeyAttributeName} from './global';
 import {Key, NameOrCtorDef} from './types';
 import {assert} from './assertions';
 import {isElement, isText} from './dom_util';
@@ -107,7 +108,10 @@ function importSingleNode(node: Node, fallbackKey?: Key) {
   }
 
   const nodeName = isElement(node) ? node.localName : node.nodeName;
-  const key = isElement(node) ? (node.getAttribute('key') || fallbackKey) : null;
+  const keyAttrName = getKeyAttributeName();
+  const keyAttr = isElement(node) && keyAttrName != null ?
+      node.getAttribute(keyAttrName) : null;
+  const key = isElement(node) ? keyAttr || fallbackKey : null;
   const text = isText(node) ? node.data : undefined;
   const data = initData(node, nodeName!, key, text);
 
