@@ -445,22 +445,27 @@ describe('setKeyAttributeName', () => {
     setKeyAttributeName('key'); // Default.
   });
 
-  it('should use the default `key` attribute', () => {
-    patch(container, () => {
-      elementVoid('div', 'baz');
+  it('should use the default `key` attribute as the source-of-truth key',
+    () => {
+      patch(container, () => {
+        elementVoid('div', 'baz');
+      });
+      expect(getKey(keyedEl)).to.equal('foo');
+      // The original keyedEl should have been removed and replaced by a new
+      // element, since keyedEl did not have a matching key.
+      expect(container.firstChild).to.not.equal(keyedEl);
     });
-    expect(getKey(keyedEl)).to.equal('foo')
-  });
 
   it('should use the `secondaryKey` attribute if keyAttributeName is set to ' +
-      '`secondaryKey`', () => {
-    setKeyAttributeName('secondaryKey');
+      '`secondaryKey`',
+     () => {
+       setKeyAttributeName('secondaryKey');
 
-    patch(container, () => {
-      elementVoid('div', 'baz');
-    });
-    expect(getKey(keyedEl)).to.equal('bar')
-  });
+       patch(container, () => {
+         elementVoid('div', 'baz');
+       });
+       expect(getKey(keyedEl)).to.equal('bar');
+     });
 
   it('should use the given key if `keyAttributeName` is set to null', () => {
     setKeyAttributeName(null);
@@ -468,6 +473,7 @@ describe('setKeyAttributeName', () => {
     patch(container, () => {
       elementVoid('div', 'baz');
     });
-    expect(getKey(keyedEl)).to.equal('baz')
+    expect(getKey(keyedEl)).to.equal('baz');
+    expect(container.firstChild).to.equal(keyedEl);
   });
 });
