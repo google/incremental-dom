@@ -465,9 +465,9 @@ describe('setKeyAttributeName', () => {
          elementVoid('div', 'baz');
        });
        expect(getKey(keyedEl)).to.equal('bar');
-      // The original keyedEl should have been removed and replaced by a new
-      // element, since keyedEl did not have a matching key.
-      expect(container.firstChild).to.not.equal(keyedEl);
+       // The original keyedEl should have been removed and replaced by a new
+       // element, since keyedEl did not have a matching key.
+       expect(container.firstChild).to.not.equal(keyedEl);
      });
 
   it('should use the given key if `keyAttributeName` is set to null', () => {
