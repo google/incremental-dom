@@ -18,7 +18,20 @@
 // taze: mocha from //third_party/javascript/typings/mocha
 // taze: chai from //third_party/javascript/typings/chai
 
-import {currentElement, currentPointer, elementClose, elementOpen, elementVoid, getKey, isDataInitialized, patch, skip, text, clearCache} from '../../index';
+import {
+  currentElement,
+  currentPointer,
+  elementClose,
+  elementOpen,
+  elementVoid,
+  getKey,
+  isDataInitialized,
+  patch,
+  setKeyAttributeName,
+  skip,
+  text,
+  clearCache,
+} from '../../index';
 import {assertHTMLElement, attachShadow, BROWSER_SUPPORTS_SHADOW_DOM,} from '../util/dom';
 const {expect} = chai;
 
@@ -411,5 +424,59 @@ describe('getKey', () => {
       elementVoid('div', '3');
     });
     expect(getKey(div.firstChild!)).to.equal('3')
+  });
+});
+
+describe('setKeyAttributeName', () => {
+  let container: HTMLElement;
+  let keyedEl: HTMLElement;
+
+  beforeEach(() => {
+    container = document.createElement('div');
+    keyedEl = document.createElement('div');
+    keyedEl.setAttribute('key', 'foo');
+    keyedEl.setAttribute('secondaryKey', 'bar');
+    container.appendChild(keyedEl);
+    document.body.appendChild(container);
+  });
+
+  afterEach(() => {
+    document.body.removeChild(container);
+    setKeyAttributeName('key'); // Default.
+  });
+
+  it('should use the default `key` attribute as the source-of-truth key',
+    () => {
+      patch(container, () => {
+        elementVoid('div', 'baz');
+      });
+      expect(getKey(keyedEl)).to.equal('foo');
+      // The original keyedEl should have been removed and replaced by a new
+      // element, since keyedEl did not have a matching key.
+      expect(container.firstChild).to.not.equal(keyedEl);
+    });
+
+  it('should use the `secondaryKey` attribute if keyAttributeName is set to ' +
+      '`secondaryKey`',
+     () => {
+       setKeyAttributeName('secondaryKey');
+
+       patch(container, () => {
+         elementVoid('div', 'baz');
+       });
+       expect(getKey(keyedEl)).to.equal('bar');
+       // The original keyedEl should have been removed and replaced by a new
+       // element, since keyedEl did not have a matching key.
+       expect(container.firstChild).to.not.equal(keyedEl);
+     });
+
+  it('should use the given key if `keyAttributeName` is set to null', () => {
+    setKeyAttributeName(null);
+
+    patch(container, () => {
+      elementVoid('div', 'baz');
+    });
+    expect(getKey(keyedEl)).to.equal('baz');
+    expect(container.firstChild).to.equal(keyedEl);
   });
 });
