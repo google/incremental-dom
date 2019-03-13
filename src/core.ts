@@ -406,6 +406,7 @@ function skip() {
 
 /** */
 export {
+  alignWithDOM,
   getArgsBuilder,
   text,
   patchInner,
