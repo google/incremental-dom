@@ -241,6 +241,7 @@ function createNode(nameOrCtor: NameOrCtorDef, key:Key): Node {
  * @param key The key used to identify the Node.
  */
 function alignWithDOM(nameOrCtor: NameOrCtorDef, key: Key) {
+  nextNode();
   const existingNode = getMatchingNode(currentNode, nameOrCtor, key);
   const node = existingNode || createNode(nameOrCtor, key);
 
@@ -334,7 +335,6 @@ function exitNode() {
  * @return The corresponding Element.
  */
 function open(nameOrCtor: NameOrCtorDef, key?: Key): HTMLElement {
-  nextNode();
   alignWithDOM(nameOrCtor, key);
   enterNode();
   return (currentParent as HTMLElement);
@@ -360,7 +360,6 @@ function close() {
  * not.
  */
 function text(): Text {
-  nextNode();
   alignWithDOM('#text', null);
   return (currentNode) as Text;
 }
@@ -406,6 +405,7 @@ function skip() {
 
 /** */
 export {
+  alignWithDOM,
   getArgsBuilder,
   text,
   patchInner,
