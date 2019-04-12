@@ -10,7 +10,7 @@
     "url": "https://github.com/google/incremental-dom.git"
   },
   "files": [
-    "index.js",
+    "index.ts",
     "src",
     "dist"
   ],
