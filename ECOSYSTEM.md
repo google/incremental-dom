@@ -120,6 +120,45 @@ module.exports = function(state) {
 }
 ```
 
+###
+[Towser](https://github.com/PongoEngine/Towser) is a web framework heavily inspiried by the Elm Architechture using Google's Incremental-Dom. It is built to easily nest and compose Render Functions.
+
+```haxe
+
+class Main {
+	static function main() {
+		new Towser("app", update, view, {name: "Perdita"});
+	}
+
+	public static function view(model:Model) : RenderFunction<Model, Msg>
+	{
+		return div([class_("full-screen"), onclick(SayName.bind(model.name))], [
+			h1([], [text("Hello")]),
+			p([], [text(model.name)])
+		]);
+	}
+
+	public static function update(msg:Msg, model:Model):Bool {
+		switch msg {
+			case SayName(name, e): trace(name);
+		}
+		return true;
+	}
+}
+
+enum Msg {
+	SayName(name :String, e :MouseEvent);
+}
+
+typedef Model =
+{
+	var name :String;
+}
+
+```
+Towser can easlily be integrated with your favorite node framework by compiling it with the flag 'backend'.
+
+
 ### Create your own
 
 If you work on a templating language we'd love to see Incremental DOM adopted as
