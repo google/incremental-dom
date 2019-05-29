@@ -360,7 +360,8 @@ function text(value: string|number|boolean, ...varArgs: Array<(a: {}) => string>
       formatted = fn(formatted);
     }
 
-    node.data = formatted as string;
+    // Setting node.data resets the cursor in IE/Edge.
+    if (node.data !== formatted) node.data = formatted as string;
   }
 
   return node;
