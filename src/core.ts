@@ -119,7 +119,11 @@ function createPatcher<T, R>(
  * Patches the document starting at node with the provided function. This
  * function may be called during an existing patch operation.
  */
-const runPatchInner = function(node, fn, data) {
+const runPatchInner = function<T>(
+    node: Element|DocumentFragment,
+    fn: (a: T|undefined) => void,
+    data?: T|undefined
+) : Node {
   currentNode = node;
 
   enterNode();
@@ -138,7 +142,11 @@ const runPatchInner = function(node, fn, data) {
  * Patches an Element with the the provided function. Exactly one top level
  * element call should be made corresponding to `node`.
  */
-const runPatchOuter = function(node, fn, data) {
+const runPatchOuter = function<T>(
+    node: Element|DocumentFragment,
+    fn: (a: T|undefined) => void,
+    data?: T|undefined
+) : Node|null {
   // tslint:disable-next-line:no-any
   const startNode = (({nextSibling: node}) as any) as Element;
   let expectedNextNode: Node|null = null;

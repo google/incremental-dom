@@ -29,7 +29,7 @@ export type Key = string|number|null|undefined;
 export type Statics = Array<{}>|null|undefined;
 
 export type PatchFunction<T, R> = (
-    el: Element|DocumentFragment,
+    node: Element|DocumentFragment,
     template: (a: T|undefined) => void,
     data?: T|undefined
 ) => R;
