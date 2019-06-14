@@ -1,0 +1,147 @@
+/**
+ * @license
+ * Copyright 2018 The Incremental DOM Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS-IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+// taze: mocha from //third_party/javascript/typings/mocha
+// taze: chai from //third_party/javascript/typings/chai
+
+import {
+  elementVoid,
+  createPatcher,
+  runPatchInner,
+  patchInner,
+} from '../../index';
+import { text } from '../../src/virtual_elements';
+const {expect} = chai;
+
+describe('createPatcher\'s matches option', () => {
+  let container: HTMLElement;
+
+  beforeEach(() => {
+    container = document.createElement('div');
+    document.body.appendChild(container);
+  });
+
+  afterEach(() => {
+    document.body.removeChild(container);
+  });
+
+  describe('default matches', () => {
+    it('should match with the same key and node name', () => {
+      const patch = createPatcher(runPatchInner);
+
+      patch(container, () => elementVoid('div', 'foo'));
+      const postPatchOneChild = container.firstChild;
+      patch(container, () => elementVoid('div', 'foo'));
+
+      expect(container.childNodes).to.have.length(1);
+      expect(container.firstChild).to.equal(postPatchOneChild);
+    });
+
+    it('should match for text nodes', () => {
+      const patch = createPatcher(runPatchInner);
+
+      patch(container, () => text('foo'));
+      const postPatchOneChild = container.firstChild;
+      patch(container, () => text('foo'));
+
+      expect(container.childNodes).to.have.length(1);
+      expect(container.firstChild).to.equal(postPatchOneChild);
+    });
+
+    it('should not match with different tags', () => {
+      const patch = createPatcher(runPatchInner);
+
+      patch(container, () => elementVoid('div', 'foo'));
+      const postPatchOneChild = container.firstChild;
+      patch(container, () => elementVoid('span', 'foo'));
+
+      expect(container.childNodes).to.have.length(1);
+      expect(container.firstChild).to.not.equal(postPatchOneChild);
+    });
+
+    it('should not match with different keys', () => {
+      const patch = createPatcher(runPatchInner);
+
+      patch(container, () => elementVoid('div', 'foo'));
+      const postPatchOneChild = container.firstChild;
+      patch(container, () => elementVoid('div', 'bar'));
+
+      expect(container.childNodes).to.have.length(1);
+      expect(container.firstChild).to.not.equal(postPatchOneChild);
+    });
+
+    it('should default when a config is specified', () => {
+      const patch = createPatcher(runPatchInner, {});
+
+      patch(container, () => elementVoid('div', 'foo'));
+      const postPatchOneChild = container.firstChild;
+      patch(container, () => elementVoid('div', 'foo'));
+
+      expect(container.childNodes).to.have.length(1);
+      expect(container.firstChild).to.equal(postPatchOneChild);
+    });
+  });
+
+  describe('custom matches', () => {
+    // For the sake of example, uses a matches function 
+    const patchTripleEquals = createPatcher(runPatchInner, {
+      matches: (node, nameOrCtor, expectedNameOrCtor, key, expectedKey) => {
+        return nameOrCtor == expectedNameOrCtor && key === expectedKey;
+      },
+    });
+
+    it('should reuse nodes when matching', () => {
+      patchTripleEquals(container, () => elementVoid('div', null));
+      const postPatchOneChild = container.firstChild;
+      patchTripleEquals(container, () => elementVoid('div', null));
+
+      expect(container.childNodes).to.have.length(1);
+      expect(container.firstChild).to.equal(postPatchOneChild);
+    });
+
+    it('should reuse nodes when matching', () => {
+      patchTripleEquals(container, () => elementVoid('div', null));
+      const postPatchOneChild = container.firstChild;
+      patchTripleEquals(container, () => elementVoid('div', undefined));
+
+      expect(container.childNodes).to.have.length(1);
+      expect(container.firstChild).to.not.equal(postPatchOneChild);
+    });
+
+    it('should not effect the default patcher', () => {
+      patchTripleEquals(container, () => elementVoid('div', null));
+      const postPatchOneChild = container.firstChild;
+      patchInner(container, () => elementVoid('div', undefined));
+
+      expect(container.childNodes).to.have.length(1);
+      expect(container.firstChild).to.equal(postPatchOneChild);
+    });
+
+    it('should not effect other patchers', () => {
+      const patchNeverEquals = createPatcher(runPatchInner, {
+        matches: () => false,
+      });
+
+      patchTripleEquals(container, () => elementVoid('div', null));
+      const postPatchOneChild = container.firstChild;
+      patchNeverEquals(container, () => elementVoid('div', null));
+
+      expect(container.childNodes).to.have.length(1);
+      expect(container.firstChild).to.not.equal(postPatchOneChild);
+    });
+  });
+});

@@ -27,3 +27,18 @@ export type NameOrCtorDef = string|ElementConstructor;
 export type Key = string|number|null|undefined;
 
 export type Statics = Array<{}>|null|undefined;
+
+export type PatchFunction<T, R> = (
+    el: Element|DocumentFragment,
+    template: (a: T|undefined) => void,
+    data?: T|undefined
+) => R;
+
+
+export type MatchFnDef = (
+    matchNode: Node,
+    nameOrCtor: NameOrCtorDef,
+    expectedNameOrCtor: NameOrCtorDef,
+    key: Key,
+    expectedKey: Key
+) =>  boolean;

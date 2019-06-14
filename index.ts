@@ -16,7 +16,7 @@
  */
 
 export {applyAttr, applyProp, attributes,} from './src/attributes';
-export {alignWithDOM, close, currentElement, currentPointer, open, patchInner as patch, patchInner, patchOuter, skip, skipNode} from './src/core';
+export {alignWithDOM, close, createPatcher, currentElement, currentPointer, open, patchInner as patch, patchInner, patchOuter, runPatchInner, runPatchOuter, skip, skipNode} from './src/core';
 export {setKeyAttributeName} from './src/global';
 export {clearCache,getKey, importNode, isDataInitialized} from './src/node_data';
 export {notifications} from './src/notifications';

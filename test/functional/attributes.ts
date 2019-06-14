@@ -22,6 +22,13 @@
 import {attr, elementClose, elementOpen, elementOpenEnd, elementOpenStart, elementVoid, importNode, patch} from '../../index';
 const {expect} = chai;
 
+declare global {
+  interface HTMLElement {
+    fn: Function|undefined;
+    obj: object|undefined;
+  }
+}
+
 describe('attribute updates', () => {
   let container: HTMLElement;
 
