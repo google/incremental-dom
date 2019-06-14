@@ -34,7 +34,6 @@ export type PatchFunction<T, R> = (
     data?: T|undefined
 ) => R;
 
-
 export type MatchFnDef = (
     matchNode: Node,
     nameOrCtor: NameOrCtorDef,
@@ -42,3 +41,7 @@ export type MatchFnDef = (
     key: Key,
     expectedKey: Key
 ) =>  boolean;
+
+export type PatchConfig = {
+  matches?: MatchFnDef,
+};

@@ -21,7 +21,7 @@ import {getFocusedPath, moveBefore} from './dom_util';
 import {DEBUG} from './global';
 import {getData} from './node_data';
 import {createElement, createText} from './nodes';
-import {Key, MatchFnDef, NameOrCtorDef, PatchFunction} from './types';
+import {Key, MatchFnDef, NameOrCtorDef, PatchConfig, PatchFunction} from './types';
 
 let context: Context|null = null;
 
@@ -56,13 +56,11 @@ function getArgsBuilder(): Array<{}|null|undefined>{
  */
 function createPatcher<T, R>(
     run: PatchFunction<T, R>,
-    config: {
-      matches?: MatchFnDef
-    } = {}
-) : PatchFunction<T, R> {
+    patchConfig: PatchConfig = {},
+): PatchFunction<T, R> {
   const {
     matches = defaultMatchFn,
-  } = config;
+  } = patchConfig;
 
   const f: PatchFunction<T, R> = (node, fn, data) => {
     const prevContext = context;
@@ -116,25 +114,24 @@ function createPatcher<T, R>(
 
 
 /**
- * Patches the document starting at node with the provided function. This
- * function may be called during an existing patch operation.
+ * Creates a patcher that patches the document starting at node with a
+ * provided function. This function may be called during an existing patch operation.
  */
-const runPatchInner = function<T>(
-    node: Element|DocumentFragment,
-    fn: (a: T|undefined) => void,
-    data?: T|undefined
-) : Node {
-  currentNode = node;
+function createPatchInner<T>(patchConfig?: PatchConfig):
+    PatchFunction<T, Node> {
+  return createPatcher((node, fn, data) => {
+    currentNode = node;
 
-  enterNode();
-  fn(data);
-  exitNode();
+    enterNode();
+    fn(data);
+    exitNode();
 
-  if (DEBUG) {
-    assertNoUnclosedTags(currentNode, node);
-  }
+    if (DEBUG) {
+      assertNoUnclosedTags(currentNode, node);
+    }
 
-  return node;
+    return node;
+  }, patchConfig);
 }
 
 
@@ -142,35 +139,34 @@ const runPatchInner = function<T>(
  * Patches an Element with the the provided function. Exactly one top level
  * element call should be made corresponding to `node`.
  */
-const runPatchOuter = function<T>(
-    node: Element|DocumentFragment,
-    fn: (a: T|undefined) => void,
-    data?: T|undefined
-) : Node|null {
-  // tslint:disable-next-line:no-any
-  const startNode = (({nextSibling: node}) as any) as Element;
-  let expectedNextNode: Node|null = null;
-  let expectedPrevNode: Node|null = null;
+function createPatchOuter<T>(patchConfig?: PatchConfig):
+    PatchFunction<T, Node|null> {
+  return createPatcher((node, fn, data) => {
+    // tslint:disable-next-line:no-any
+    const startNode = (({nextSibling: node}) as any) as Element;
+    let expectedNextNode: Node|null = null;
+    let expectedPrevNode: Node|null = null;
 
-  if (DEBUG) {
-    expectedNextNode = node.nextSibling;
-    expectedPrevNode = node.previousSibling;
-  }
+    if (DEBUG) {
+      expectedNextNode = node.nextSibling;
+      expectedPrevNode = node.previousSibling;
+    }
 
-  currentNode = startNode;
-  fn(data);
+    currentNode = startNode;
+    fn(data);
 
-  if (DEBUG) {
-    assertPatchOuterHasParentNode(currentParent);
-    assertPatchElementNoExtras(
-        startNode, currentNode, expectedNextNode, expectedPrevNode);
-  }
+    if (DEBUG) {
+      assertPatchOuterHasParentNode(currentParent);
+      assertPatchElementNoExtras(
+          startNode, currentNode, expectedNextNode, expectedPrevNode);
+    }
 
-  if (currentParent) {
-    clearUnvisitedDOM(currentParent, getNextNode(), node.nextSibling);
-  }
+    if (currentParent) {
+      clearUnvisitedDOM(currentParent, getNextNode(), node.nextSibling);
+    }
 
-  return (startNode === currentNode) ? null : currentNode;
+    return (startNode === currentNode) ? null : currentNode;
+  }, patchConfig);
 }
 
 
@@ -183,7 +179,7 @@ const runPatchOuter = function<T>(
  * @return True if the node matches, false otherwise.
  */
 function matches(
-    matchNode: Node, nameOrCtor: NameOrCtorDef, key: Key) : boolean {
+    matchNode: Node, nameOrCtor: NameOrCtorDef, key: Key): boolean {
   const data = getData(matchNode, key);
 
   return matchFn(matchNode, nameOrCtor, data.nameOrCtor, key, data.key);
@@ -433,17 +429,16 @@ function skip() {
 }
 
 
-const patchInner = createPatcher(runPatchInner);
-const patchOuter = createPatcher(runPatchOuter);
+const patchInner = createPatchInner();
+const patchOuter = createPatchOuter();
 
 /** */
 export {
   alignWithDOM,
   getArgsBuilder,
   text,
-  createPatcher,
-  runPatchInner,
-  runPatchOuter,
+  createPatchInner,
+  createPatchOuter,
   patchInner,
   patchOuter,
   open,
