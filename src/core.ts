@@ -201,7 +201,7 @@ function defaultMatchFn(
     expectedNameOrCtor: NameOrCtorDef,
     key: Key,
     expectedKey: Key,
-) : boolean {
+): boolean {
   // Key check is done using double equals as we want to treat a null key the
   // same as undefined. This should be okay as the only values allowed are
   // strings, null and undefined so the == semantics are not too weird.
