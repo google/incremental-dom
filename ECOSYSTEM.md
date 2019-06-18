@@ -120,7 +120,29 @@ module.exports = function(state) {
 }
 ```
 
-###
+### Create your own
+
+If you work on a templating language we'd love to see Incremental DOM adopted as
+an alternative backend for it. This isn’t easy, we are still working on ours and
+will for a while, but we're super happy to help with it.
+
+Here's an [example](https://gist.github.com/sparhami/197f3b947712998639eb).
+
+## Libraries
+
+### Skate
+
+[Skate](https://github.com/skatejs/skatejs) is library that leverages [Incremental DOM](https://github.com/google/incremental-dom) to encourage functional [web components](http://w3c.github.io/webcomponents/explainer/).
+
+### FerrugemJS
+
+[FerrugemJS](https://ferrugemjs.github.io/home-page/) is a library inspired by Aurelia and React using [Incremental DOM](https://github.com/google/incremental-dom) with a easy and intuitive template language.
+
+### Metal.js
+
+[Metal.js](https://github.com/metal/metal.js) is a JavaScript library for building UI components in a solid, flexible way. It leverages [Incremental DOM](https://github.com/google/incremental-dom) and currently supports both [Closure Templates](https://developers.google.com/closure/templates/) and [JSX syntax](https://facebook.github.io/jsx/).
+
+### Towser
 [Towser](https://github.com/PongoEngine/Towser) is a web framework heavily inspiried by the Elm Architechture using Google's Incremental-Dom. It is built to easily nest and compose Render Functions.
 
 ```haxe
@@ -157,26 +179,3 @@ typedef Model =
 
 ```
 Towser can easlily be integrated with your favorite node framework by compiling it with the flag 'backend'.
-
-
-### Create your own
-
-If you work on a templating language we'd love to see Incremental DOM adopted as
-an alternative backend for it. This isn’t easy, we are still working on ours and
-will for a while, but we're super happy to help with it.
-
-Here's an [example](https://gist.github.com/sparhami/197f3b947712998639eb).
-
-## Libraries
-
-### Skate
-
-[Skate](https://github.com/skatejs/skatejs) is library that leverages [Incremental DOM](https://github.com/google/incremental-dom) to encourage functional [web components](http://w3c.github.io/webcomponents/explainer/).
-
-### FerrugemJS
-
-[FerrugemJS](https://ferrugemjs.github.io/home-page/) is a library inspired by Aurelia and React using [Incremental DOM](https://github.com/google/incremental-dom) with a easy and intuitive template language.
-
-### Metal.js
-
-[Metal.js](https://github.com/metal/metal.js) is a JavaScript library for building UI components in a solid, flexible way. It leverages [Incremental DOM](https://github.com/google/incremental-dom) and currently supports both [Closure Templates](https://developers.google.com/closure/templates/) and [JSX syntax](https://facebook.github.io/jsx/).
