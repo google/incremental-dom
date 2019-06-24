@@ -10,7 +10,7 @@
     "url": "https://github.com/google/incremental-dom.git"
   },
   "files": [
-    "index.js",
+    "index.ts",
     "src",
     "dist"
   ],
@@ -66,10 +66,10 @@
     "typescript": "^2.8.1",
     "vinyl-buffer": "^1.0.1",
     "vinyl-source-stream": "1.1.0",
-    "webcomponents.js": "0.7.2"
-  },
-  "dependencies": {
+    "webcomponents.js": "0.7.2",
     "@types/webcomponents.js": "^0.6.32",
     "npm-check": "^5.6.0"
+  },
+  "dependencies": {
   }
 }
