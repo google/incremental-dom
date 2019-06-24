@@ -15,9 +15,10 @@
  * limitations under the License.
  */
 
-import {Key, NameOrCtorDef} from './types';
 import {assert} from './assertions';
 import {isElement, isText} from './dom_util';
+import {getKeyAttributeName} from './global';
+import {Key, NameOrCtorDef} from './types';
 
 
 /**
@@ -76,7 +77,8 @@ declare global {
  * Initializes a NodeData object for a Node.
  */
 function initData(
-    node: Node, nameOrCtor: NameOrCtorDef, key: Key, text?: string|undefined): NodeData {
+    node: Node, nameOrCtor: NameOrCtorDef, key: Key,
+    text?: string|undefined): NodeData {
   const data = new NodeData(nameOrCtor, key, text);
   node['__incrementalDOMData'] = data;
   return data;
@@ -87,6 +89,10 @@ function initData(
  */
 function getData(node: Node, key?: Key) {
   return importSingleNode(node, key);
+}
+
+function isDataInitialized(node: Node): boolean {
+  return Boolean(node['__incrementalDOMData']);
 }
 
 function getKey(node: Node) {
@@ -103,9 +109,12 @@ function importSingleNode(node: Node, fallbackKey?: Key) {
   }
 
   const nodeName = isElement(node) ? node.localName : node.nodeName;
-  const key = isElement(node) ? (node.getAttribute('key') || fallbackKey) : null;
-  const text = isText(node) ? node.data : undefined;
-  const data = initData(node, nodeName!, key, text);
+  const keyAttrName = getKeyAttributeName();
+  const keyAttr = isElement(node) && keyAttrName != null ?
+      node.getAttribute(keyAttrName) :
+      null;
+  const key = isElement(node) ? keyAttr || fallbackKey : null;
+  const data = initData(node, nodeName!, key);
 
   if (isElement(node)) {
     recordAttributes(node, data);
@@ -120,7 +129,8 @@ function importSingleNode(node: Node, fallbackKey?: Key) {
 function importNode(node: Node) {
   importSingleNode(node);
 
-  for (let child: Node|null = node.firstChild; child; child = child.nextSibling) {
+  for (let child: Node|null = node.firstChild; child;
+       child = child.nextSibling) {
     importNode(child);
   }
 }
@@ -131,7 +141,8 @@ function importNode(node: Node) {
 function clearCache(node: Node) {
   node['__incrementalDOMData'] = null;
 
-  for (let child: Node|null = node.firstChild; child; child = child.nextSibling) {
+  for (let child: Node|null = node.firstChild; child;
+       child = child.nextSibling) {
     clearCache(child);
   }
 }
@@ -170,5 +181,6 @@ export {
   getKey,
   initData,
   importNode,
+  isDataInitialized,
   clearCache,
 };

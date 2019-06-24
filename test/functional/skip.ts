@@ -18,7 +18,7 @@
 // taze: mocha from //third_party/javascript/typings/mocha
 // taze: chai from //third_party/javascript/typings/chai
 
-import {elementClose, elementOpen, elementVoid, patch, skip, text} from '../../index';
+import {alignWithDOM, elementClose, elementOpen, elementVoid, patch, skip, text, skipNode} from '../../index';
 const {expect} = chai;
 
 describe('skip', () => {
@@ -97,5 +97,46 @@ describe('skip', () => {
         .to.throw(
             'skip() must come before any child declarations' +
             ' inside the current element.');
+  });
+});
+
+describe('alignWithDOM', () => {
+  let container:HTMLElement;
+
+  beforeEach(() => {
+    container = document.createElement('div');
+    document.body.appendChild(container);
+  });
+
+  afterEach(() => {
+    document.body.removeChild(container);
+  });
+
+  function render(condition: boolean, shouldSkip: boolean) {
+    if (condition) {
+      elementVoid('img');
+    }
+    if (shouldSkip) {
+      alignWithDOM('div', 1);
+    } else {
+      elementOpen('div', 1);
+        text('Hello');
+      elementClose('div');
+    }
+  }
+  it('should skip the correct element when used with conditional elements', () => {
+    patch(container, () => {
+      render(true, false);
+    });
+    expect(container.children[1]!.innerHTML).to.equal('Hello');
+    container.children[1]!.innerHTML = 'Hola';
+    patch(container, () => {
+      render(false, true);
+    });
+    expect(container.childElementCount).to.equal(1);
+    // When condition is false, the current node will be at <img>
+    // alignWithDOM will then pull the second <div> up to the
+    // current position and diff it. The <img> will then be deleted.
+    expect(container.children[0]!.innerHTML).to.equal('Hola');
   });
 });

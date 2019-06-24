@@ -37,7 +37,6 @@ describe('formatters', () => {
   });
 
   describe('for newly created Text nodes', () => {
-
     function sliceOne(str: {}): string {
       return ('' + str).slice(1);
     }
@@ -85,6 +84,16 @@ describe('formatters', () => {
 
       expect(node.textContent).to.equal('stubValueTwo');
       expect(stub).to.have.been.calledTwice;
+    });
+
+    it('should call the formatter even if the initial value matches', () => {
+      container.textContent = 'test';
+
+      patch(container, () => {
+        text('test', s => s + 'Z');
+      });
+
+      expect(container.textContent).to.equal('testZ');
     });
   });
 

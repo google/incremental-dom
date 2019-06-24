@@ -22,7 +22,7 @@ const {expect} = chai;
 
 
 describe('text nodes', () => {
-  let container;
+  let container: HTMLDivElement;
 
   beforeEach(() => {
     container = document.createElement('div');
@@ -64,6 +64,23 @@ describe('text nodes', () => {
           .to.throw(
               'text() can not be called between elementOpenStart()' +
               ' and elementOpenEnd().');
+    });
+  });
+
+  describe('when updated after the DOM is updated', () => {
+    // This avoids an Edge bug; see
+    // https://github.com/google/incremental-dom/pull/398#issuecomment-497339108
+    it('should do nothng', () => {
+      patch(container, () => text('Hello'));
+
+      container.firstChild!.nodeValue = 'Hello World!';
+
+      const mo = new MutationObserver(() => {});
+      mo.observe(container, {subtree: true, characterData: true});
+
+      patch(container, () => text('Hello World!'));
+      expect(mo.takeRecords()).to.be.empty;
+      expect(container.textContent).to.equal('Hello World!');
     });
   });
 
