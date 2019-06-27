@@ -18,7 +18,9 @@
     "test": "gulp unit",
     "build": "gulp build",
     "dist": "gulp dist",
-    "update": "npm-check -u"
+    "update": "npm-check -u",
+    "prepack": "gulp dist",
+    "bazel": "bazel build :bundle"
   },
   "devDependencies": {
     "@types/mocha": "^5.0.0",
