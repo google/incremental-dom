@@ -151,23 +151,9 @@ function jsCommonJS() {
       .pipe(gulp.dest('dist'));
 }
 
-function jsClosure() {
-  return exec('npx tsickle').then(() => {
-    return gulp.src(['build/index.js*', 'build/src/*.js*'])
-      .pipe(replace('DEBUG = true', 'DEBUG = goog.DEBUG'))
-      .pipe(replace('goog.module(\'index\')', 'goog.module(\'incrementaldom\')'))
-      .pipe(replace('goog.module(\'src.', 'goog.module(\'incrementaldom.src.'))
-      .pipe(replace('goog.require(\'src.', 'goog.require(\'incrementaldom.src.'))
-      .pipe(replace('goog.require("src.', 'goog.require("incrementaldom.src.'))
-      .pipe(replace('goog.forwardDeclare("src.', 'goog.forwardDeclare("incrementaldom.src.'))
-      .pipe(gulp.dest('dist/closure'));
-  });
-}
-
 function jsDist() {
   return clean().then(() => {
     return Promise.all([
-      jsClosure(),
       jsCommonJS(),
       js(),
       jsMin(),
@@ -180,12 +166,11 @@ gulp.task('unit', unit);
 gulp.task('unit-dist', unitDist);
 gulp.task('unit-watch', unitWatch);
 gulp.task('js', js);
-gulp.task('js-closure', jsClosure);
-gulp.task('js-watch', ['js'], jsWatch);
+gulp.task('js-watch', gulp.series('js', jsWatch));
 gulp.task('js-min', jsMin);
-gulp.task('js-min-watch', ['js-min'], jsMinWatch);
+gulp.task('js-min-watch', gulp.series('js-min', jsMinWatch));
 gulp.task('js-dist', jsDist);
-gulp.task('build', ['unit'], js);
-gulp.task('dist', ['unit-dist'], jsDist);
+gulp.task('build', gulp.series('unit', js));
+gulp.task('dist', gulp.series('unit-dist', jsDist));
 
-gulp.task('default', ['build']);
+gulp.task('default', gulp.series('build', () => {}));
