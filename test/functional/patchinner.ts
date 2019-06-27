@@ -129,11 +129,10 @@ describe('patching an element\'s children', () => {
   });
 
   it('should pass third argument to render function', () => {
-    function render(content:{}|undefined) {
-      text(content as string);
-    }
 
-    patchInner(container, render, 'foobar');
+    patchInner(container, () => {
+      text('foobar');
+    });
 
     expect(container.textContent).to.equal('foobar');
   });
