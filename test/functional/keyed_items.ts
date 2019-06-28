@@ -188,7 +188,7 @@ describe('rendering with keys', () => {
 
     container.removeChild(firstNode);
 
-    patch(container, () => elementVoid('span'));
+    patch(container, () => elementVoid('span', 'key'));
     const newNode = container.firstChild;
     expect(newNode!.nodeName).to.equal('SPAN');
   });
