@@ -131,7 +131,7 @@ describe('element creation', () => {
     });
 
     it('should use createElement if no namespace has been specified', () => {
-      const doc = container.ownerDocument;
+      const doc = container.ownerDocument!;
       const div = doc.createElement('div');
       let el: HTMLElement;
       sandbox.stub(doc, 'createElement').returns(div);

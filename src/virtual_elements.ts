@@ -278,7 +278,7 @@ function elementOpenEnd(): HTMLElement {
   }
 
   assert(argsBuilder);
-  const node = elementOpen.apply(null, argsBuilder!);
+  const node = elementOpen.apply(null, argsBuilder as any);
   truncateArray(argsBuilder, 0);
   return node;
 }
@@ -325,7 +325,7 @@ function elementVoid(
     // element is a string and every even element is any, but this is hard.
     // tslint:disable-next-line:no-any
     statics?: Statics, ...varArgs: any[]) {
-  elementOpen.apply(null, arguments);
+  elementOpen.apply(null, arguments as any);
   return elementClose(nameOrCtor);
 }
 
