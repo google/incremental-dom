@@ -16,8 +16,9 @@
  */
 
 import {AttrMutatorConfig} from './types';
-import {symbols} from './symbols';
+import {assert} from './assertions';
 import {createMap, has} from './util';
+import {symbols} from './symbols';
 
 
 /**
@@ -90,12 +91,15 @@ function setStyleValue(
  *     containing property-value pairs.
  */
 function applyStyle(
-    el: HTMLElement, name: string, style: string|{[k: string]: string}) {
+    el: Element, name: string, style: string|{[k: string]: string}) {
+  // MathML elements inherit from Element, which does not have style.
+  assert(el instanceof HTMLElement || el instanceof SVGElement);
+  const elStyle = (<HTMLElement|SVGElement>el).style;
+
   if (typeof style === 'string') {
-    el.style.cssText = style;
+    elStyle.cssText = style;
   } else {
-    el.style.cssText = '';
-    const elStyle = el.style;
+    elStyle.cssText = '';
 
     for (const prop in style) {
       if (has(style, prop)) {
@@ -114,7 +118,7 @@ function applyStyle(
  *     function it is set on the Element, otherwise, it is set as an HTML
  *     attribute.
  */
-function applyAttributeTyped(el: HTMLElement, name: string, value: {}) {
+function applyAttributeTyped(el: Element, name: string, value: {}) {
   const type = typeof value;
 
   if (type === 'object' || type === 'function') {
@@ -141,8 +145,7 @@ attributes['style'] = applyStyle;
 /**
  * Calls the appropriate attribute mutator for this attribute.
  */
-function updateAttribute(
-    el: HTMLElement, name: string, value: {}|null|undefined) {
+function updateAttribute(el: Element, name: string, value: {}|null|undefined) {
   const mutator = attributes[name] || attributes[symbols.default];
   mutator(el, name, value);
 }

@@ -18,7 +18,7 @@
 export interface ElementConstructor {new(): Element};
 
 // tslint:disable-next-line:no-any
-export type AttrMutator = (a: HTMLElement, b: string, c: any) => void;
+export type AttrMutator = (a: Element, b: string, c: any) => void;
 
 export type AttrMutatorConfig = {[x: string]: AttrMutator};
 

@@ -15,13 +15,14 @@
  * limitations under the License.
  */
 
-import {assert, assertCloseMatchesOpenTag, assertInAttributes, assertNotInAttributes, assertNotInSkip, setInAttributes} from './assertions';
+import {assert, assertCloseMatchesOpenTag, assertInAttributes, assertInPatch, assertNotInAttributes, assertNotInSkip, setInAttributes} from './assertions';
 import {updateAttribute} from './attributes';
-import {getArgsBuilder, close, open, text as coreText} from './core';
+import {getArgsBuilder, getAttrsBuilder, close, open, text as coreText, currentElement} from './core';
 import {DEBUG} from './global';
 import {getData, NodeData} from './node_data';
 import {Key, NameOrCtorDef, Statics} from './types';
 import {createMap, truncateArray} from './util';
+import {calculateDiff} from './diff';
 
 
 /**
@@ -39,15 +40,31 @@ const ATTRIBUTES_OFFSET = 3;
  */
 const prevAttrsMap = createMap();
 
+/**
+ * @param element The Element to diff the attrs for.
+ * @param data The NodeData associated with the Element.
+ */
+function diffAttrs(element: Element, data: NodeData) {
+  const attrsBuilder = getAttrsBuilder();
+  const prevAttrsArr = data.getAttrsArr(attrsBuilder.length);
+
+  calculateDiff(prevAttrsArr, attrsBuilder, element, updateAttribute);
+  truncateArray(attrsBuilder, 0);
+}
+
 
 /**
  * Applies the statics. When importing an Element, any existing attributes that
  * match a static are converted into a static attribute.
  * @param node The Element to apply statics for.
- * @param data The Element's data
- * @param statics The statics array,
+ * @param data The NodeData associated with the Element.
+ * @param statics The statics array.
  */
-function applyStatics(node: HTMLElement, data: NodeData, statics: Statics) {
+function diffStatics(node: HTMLElement, data: NodeData, statics: Statics) {
+  if (data.staticsApplied) {
+    return;
+  }
+
   data.staticsApplied = true;
 
   if (!statics || !statics.length) {
@@ -120,88 +137,14 @@ function elementOpen(
     assertNotInSkip('elementOpen');
   }
 
-  const node = open(nameOrCtor, key);
-  const data = getData(node);
+  elementOpenStart(nameOrCtor, key, statics);
 
-  if (!data.staticsApplied) {
-    applyStatics(node, data, statics);
+  for (let i = ATTRIBUTES_OFFSET; i < arguments.length; i += 2) {
+    attr(arguments[i], arguments[i+1]);
   }
 
-  const attrsLength = Math.max(0, arguments.length - ATTRIBUTES_OFFSET);
-  const hadNoAttrs = data.hasEmptyAttrsArr();
-
-  if (!attrsLength && hadNoAttrs) {
-    return node;
-  }
-
-  const attrsArr = data.getAttrsArr(attrsLength);
-
-  /*
-   * Checks to see if one or more attributes have changed for a given Element.
-   * When no attributes have changed, this is much faster than checking each
-   * individual argument. When attributes have changed, the overhead of this is
-   * minimal.
-   */
-  let i = ATTRIBUTES_OFFSET;
-  let j = 0;
-
-  for (; i < arguments.length; i += 2, j += 2) {
-    const name = arguments[i];
-    if (hadNoAttrs) {
-      attrsArr[j] = name;
-    } else if (attrsArr[j] !== name) {
-      break;
-    }
-
-    const value = arguments[i + 1];
-    if (hadNoAttrs || attrsArr[j + 1] !== value) {
-      attrsArr[j + 1] = value;
-      updateAttribute(node, name, value);
-    }
-  }
-
-  /*
-   * Items did not line up exactly as before, need to make sure old items are
-   * removed. This can happen if using conditional logic when declaring
-   * attrs through the elementOpenStart flow or if one element is reused in
-   * the place of another.
-   */
-  if (i < arguments.length || j < attrsArr.length) {
-    const attrsStart = j;
-
-    for (; j < attrsArr.length; j += 2) {
-      prevAttrsMap[attrsArr[j]] = attrsArr[j + 1];
-    }
-
-    for (j = attrsStart; i < arguments.length; i += 2, j += 2) {
-      const name = arguments[i];
-      const value = arguments[i + 1];
-
-      if (prevAttrsMap[name] !== value) {
-        updateAttribute(node, name, value);
-      }
-
-      attrsArr[j] = name;
-      attrsArr[j + 1] = value;
-
-      delete prevAttrsMap[name];
-    }
-
-    truncateArray(attrsArr, j);
-
-    /*
-     * At this point, only have attributes that were present before, but have
-     * been removed.
-     */
-    for (const name in prevAttrsMap) {
-      updateAttribute(node, name, undefined);
-      delete prevAttrsMap[name];
-    }
-  }
-
-  return node;
+  return elementOpenEnd();
 }
-
 
 /**
  * Declares a virtual Element at the current location in the document. This
@@ -249,19 +192,19 @@ function key(key:string) {
 
 
 /***
- * Defines a virtual attribute at this point of the DOM. This is only valid
- * when called between elementOpenStart and elementOpenEnd.
+ * Buffers an attribute, which will get applied during the next call to
+ * `elementOpen`, `elementOpenEnd` or `applyAttrs`.
  */
 // tslint:disable-next-line:no-any
 function attr(name: string, value: any) {
-  const argsBuilder = getArgsBuilder();
+  const attrsBuilder = getAttrsBuilder();
 
   if (DEBUG) {
-    assertInAttributes('attr');
+    assertInPatch('attr');
   }
 
-  argsBuilder.push(name);
-  argsBuilder.push(value);
+  attrsBuilder.push(name);
+  attrsBuilder.push(value);
 }
 
 
@@ -277,10 +220,37 @@ function elementOpenEnd(): HTMLElement {
     setInAttributes(false);
   }
 
-  assert(argsBuilder);
-  const node = elementOpen.apply(null, argsBuilder as any);
+  const node = open(<NameOrCtorDef>argsBuilder[0], <Key>argsBuilder[1]);
+  const data = getData(node);
+
+  diffStatics(node, data, <Statics>argsBuilder[2]);
+  diffAttrs(node, data);
   truncateArray(argsBuilder, 0);
+
   return node;
+}
+
+/**
+ * Applies the currently buffered attrs to the currently open element. This
+ * clears the buffered attributes.
+ */
+function applyAttrs() {
+  const node = currentElement();
+  const data = getData(node);
+
+  diffAttrs(node, data);
+}
+
+/**
+ * Applies the current static attributes to the currently open element. Note:
+ * statics should be applied before apply attrs.
+ */
+function applyStatics() {
+  const argsBuilder = getArgsBuilder();
+  const node = currentElement();
+  const data = getData(node);
+
+  diffStatics(node, data, <Statics>argsBuilder[2]);
 }
 
 
@@ -372,6 +342,8 @@ function text(value: string|number|boolean, ...varArgs: Array<(a: {}) => string>
 
 /** */
 export {
+  applyAttrs,
+  applyStatics,
   elementOpenStart,
   elementOpenEnd,
   elementOpen,

@@ -32,12 +32,17 @@ let inAttributes = false;
  */
 let inSkip = false;
 
+/**
+ * Keeps track of the current patch context.
+ */
+let patchContext: {}|null = null;
+
 
 /**
  * Makes sure that there is a current patch context.
  */
-function assertInPatch(functionName: string, context: Document) {
-  if (!context) {
+function assertInPatch(functionName: string) {
+  if (!patchContext) {
     throw new Error('Cannot call ' + functionName + '() unless in patch.');
   }
 }
@@ -183,6 +188,14 @@ function assertPatchElementNoExtras(
 
 
 /**
+ * @param newContext The current patch context.
+ */
+function updatePatchContext(newContext: {}|null) {
+  patchContext = newContext;
+}
+
+
+/**
  * Updates the state of being in an attribute declaration.
  * @return the previous value.
  */
@@ -229,4 +242,5 @@ export {
   assertPatchOuterHasParentNode,
   setInAttributes,
   setInSkip,
+  updatePatchContext,
 };

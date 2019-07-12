@@ -15,9 +15,6 @@
  * limitations under the License.
  */
 
-// taze: mocha from //third_party/javascript/typings/mocha
-// taze: chai from //third_party/javascript/typings/chai
-
 import {currentPointer, elementClose, elementOpenEnd, elementOpenStart, elementVoid, patch} from '../../index';
 import {assertHTMLElement,} from '../util/dom';
 const {expect} = chai;

@@ -15,10 +15,6 @@
  * limitations under the License.
  */
 
-// taze: Sinon.chai from //third_party/javascript/typings/Sinon.chai
-// taze: mocha from //third_party/javascript/typings/mocha
-// taze: chai from //third_party/javascript/typings/chai
-
 import * as Sinon from 'sinon';
 
 import {patch, text} from '../../index';

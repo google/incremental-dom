@@ -15,12 +15,6 @@
  * limitations under the License.
  */
 
-
-// taze: Sinon.chai from //third_party/javascript/typings/Sinon.chai
-// taze: mocha from //third_party/javascript/typings/mocha
-// taze: chai from //third_party/javascript/typings/chai
-
-
 import {currentElement, elementClose, elementOpen, elementOpenEnd, elementOpenStart, elementVoid, patch} from '../../index';
 const {expect} = chai;
 
