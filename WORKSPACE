@@ -8,8 +8,8 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 # Fetch rules_nodejs so we can install our npm dependencies
 http_archive(
     name = "build_bazel_rules_nodejs",
-    sha256 = "6d4edbf28ff6720aedf5f97f9b9a7679401bf7fca9d14a0fff80f644a99992b4",
-    urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/0.32.2/rules_nodejs-0.32.2.tar.gz"],
+    sha256 = "3b0116a8a91a75678a57ba676c246ac0fa9c90dc3d46daef305b11b54ed4467e",
+    urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/0.33.1/rules_nodejs-0.33.1.tar.gz"],
 )
 
 # Check the bazel version and download npm dependencies
@@ -44,3 +44,16 @@ install_bazel_dependencies()
 load("@npm_bazel_typescript//:defs.bzl", "ts_setup_workspace")
 
 ts_setup_workspace()
+
+# Fetch transitive Bazel dependencies of npm_bazel_karma 
+load("@npm_bazel_karma//:package.bzl", "rules_karma_dependencies")
+
+rules_karma_dependencies()
+
+# Setup web testing, choose browsers we can test on 
+load("@io_bazel_rules_webtesting//web:repositories.bzl", "web_test_repositories")
+ 
+web_test_repositories()
+
+load("@npm_bazel_karma//:browser_repositories.bzl", "browser_repositories")
+browser_repositories()
