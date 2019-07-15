@@ -1,0 +1,10 @@
+diff --git a/third_party/github.com/browserify/browserify/main.js b/third_party/github.com/browserify/browserify/main.js
+index 38c058f..7671ab3 100644
+--- a/third_party/github.com/browserify/browserify/main.js
++++ b/third_party/github.com/browserify/browserify/main.js
+@@ -1,4 +1,4 @@
+-var nextTick = require('process/browser.js').nextTick;
++var nextTick = require('./browser1').nextTick;
+ var apply = Function.prototype.apply;
+ var slice = Array.prototype.slice;
+ var immediateIds = {};
