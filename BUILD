@@ -13,5 +13,6 @@ load("@build_bazel_rules_nodejs//:defs.bzl", "rollup_bundle")
 rollup_bundle(
   name = "bundle",
   entry_point = ":index.ts",
+  license_banner = "//conf:license_header.txt",
   deps = [":app"],
 )
