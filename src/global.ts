@@ -1,4 +1,4 @@
-const DEBUG = false;
+const DEBUG = true;
 
 /**
  * The name of the HTML attribute that holds the element key
