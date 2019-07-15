@@ -15,12 +15,10 @@
     "dist"
   ],
   "scripts": {
-    "test": "gulp unit",
-    "build": "gulp build",
-    "dist": "gulp dist",
-    "update": "npm-check -u",
-    "prepack": "gulp dist",
-    "bazel": "bazel build :bundle"
+    "test": "bazel test test:unit_tests",
+    "build": "bazel build :app",
+    "dist": "npm run test && bazel build :bundle",
+    "update": "npm-check -u"
   },
   "devDependencies": {
     "@bazel/bazel": "^0.27.0",
