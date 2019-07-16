@@ -190,7 +190,6 @@ function key(key:string) {
   argsBuilder[1] = key;
 }
 
-
 /***
  * Buffers an attribute, which will get applied during the next call to
  * `elementOpen`, `elementOpenEnd` or `applyAttrs`.
@@ -243,14 +242,14 @@ function applyAttrs() {
 
 /**
  * Applies the current static attributes to the currently open element. Note:
- * statics should be applied before apply attrs.
+ * statics should be applied before calling `applyAtrs`.
+ * @param statics The statics to apply to the current element.
  */
-function applyStatics() {
-  const argsBuilder = getArgsBuilder();
+function applyStatics(statics: Statics) {
   const node = currentElement();
   const data = getData(node);
 
-  diffStatics(node, data, <Statics>argsBuilder[2]);
+  diffStatics(node, data, statics);
 }
 
 
