@@ -33,11 +33,6 @@ describe('buffered attributes', () => {
   it('should add attributes to the current element', () => {
     patch(container, () => {
       open('div');
-      // Attrs below will still apply to the current pointer, even though
-      // another element was opened/closed in the mean time.
-      open('span');
-      close();
-
       attr('nameOne', 'valueOne');
       attr('nameTwo', 'valueTwo');
       applyAttrs();
@@ -56,6 +51,24 @@ describe('buffered attributes', () => {
     expect(firstChild.getAttribute('nameTwo')).to.equal('valueTwo');
     expect(secondChild.attributes).to.have.length(1);
     expect(secondChild.getAttribute('nameThree')).to.equal('valueThree');
+  });
+
+  it('should add attributes even when a subtree has been open/closed', () => {
+    patch(container, () => {
+      open('div');
+      open('span');
+      close();
+
+      attr('nameOne', 'valueOne');
+      attr('nameTwo', 'valueTwo');
+      applyAttrs();
+      close();
+    });
+
+    const firstChild = container.children[0];
+    expect(firstChild.attributes).to.have.length(2);
+    expect(firstChild.getAttribute('nameOne')).to.equal('valueOne');
+    expect(firstChild.getAttribute('nameTwo')).to.equal('valueTwo');
   });
   
   it('should not be left over between patches', () => {

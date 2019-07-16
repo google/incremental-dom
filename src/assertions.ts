@@ -33,16 +33,16 @@ let inAttributes = false;
 let inSkip = false;
 
 /**
- * Keeps track of the current patch context.
+ * Keeps track of whether or not we are in a patch.
  */
-let patchContext: {}|null = null;
+let inPatch: boolean = false;
 
 
 /**
  * Makes sure that there is a current patch context.
  */
 function assertInPatch(functionName: string) {
-  if (!patchContext) {
+  if (!inPatch) {
     throw new Error('Cannot call ' + functionName + '() unless in patch.');
   }
 }
@@ -191,7 +191,7 @@ function assertPatchElementNoExtras(
  * @param newContext The current patch context.
  */
 function updatePatchContext(newContext: {}|null) {
-  patchContext = newContext;
+  inPatch = newContext != null;
 }
 
 

@@ -42,8 +42,7 @@ function getNamespace(name: string): string|undefined {
  * or undefined, it is removed from the Element. Otherwise, the value is set
  * as an attribute.
  */
-// tslint:disable-next-line:no-any
-function applyAttr(el: Element, name: string, value: any) {
+function applyAttr(el: Element, name: string, value: unknown) {
   if (value == null) {
     el.removeAttribute(name);
   } else {
@@ -59,8 +58,7 @@ function applyAttr(el: Element, name: string, value: any) {
 /**
  * Applies a property to a given Element.
  */
-// tslint:disable-next-line:no-any
-function applyProp(el: Element, name: string, value: any) {
+function applyProp(el: Element, name: string, value: unknown) {
   // tslint:disable-next-line:no-any
   (el as any)[name] = value;
 }
@@ -118,7 +116,7 @@ function applyStyle(
  *     function it is set on the Element, otherwise, it is set as an HTML
  *     attribute.
  */
-function applyAttributeTyped(el: Element, name: string, value: {}) {
+function applyAttributeTyped(el: Element, name: string, value: unknown) {
   const type = typeof value;
 
   if (type === 'object' || type === 'function') {
@@ -145,7 +143,7 @@ attributes['style'] = applyStyle;
 /**
  * Calls the appropriate attribute mutator for this attribute.
  */
-function updateAttribute(el: Element, name: string, value: {}|null|undefined) {
+function updateAttribute(el: Element, name: string, value: unknown) {
   const mutator = attributes[name] || attributes[symbols.default];
   mutator(el, name, value);
 }

@@ -57,7 +57,7 @@ function getArgsBuilder(): Array<{}|null|undefined> {
 
 
 /**
- * TODO(sparhami) We should just export argsBuilder directly when Closure
+ * TODO(sparhami) We should just export attrsBuilder directly when Closure
  * Compiler supports ES6 directly.
  */
 function getAttrsBuilder(): Array<any> {
