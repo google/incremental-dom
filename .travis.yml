@@ -19,7 +19,7 @@ before_install:
   - sudo dpkg -i google-chrome*.deb
   - sudo apt-get purge openjdk-9*
   - sudo apt-get purge oracle-java9*
-  - wget 'https://github.com/bazelbuild/bazel/releases/download/0.20.0/bazel_0.20.0-linux-x86_64.deb'
+  - wget 'https://github.com/bazelbuild/bazel/releases/download/0.27.0/bazel_0.27.0-linux-x86_64.deb'
   - chmod +x bazel_0.20.0-linux-x86_64.deb
   - sudo dpkg -i bazel_0.20.0-linux-x86_64.deb
 script:
