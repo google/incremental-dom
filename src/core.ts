@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {assertInPatch, assertNoChildrenDeclaredYet, assertNotInAttributes, assertNoUnclosedTags, assertPatchElementNoExtras, assertPatchOuterHasParentNode, assertVirtualAttributesClosed, setInAttributes, setInSkip} from './assertions';
+import {assertInPatch, assertNoChildrenDeclaredYet, assertNotInAttributes, assertNoUnclosedTags, assertPatchElementNoExtras, assertPatchOuterHasParentNode, assertVirtualAttributesClosed, setInAttributes, setInSkip, updatePatchContext} from './assertions';
 import {Context} from './context';
 import {getFocusedPath, moveBefore} from './dom_util';
 import {DEBUG} from './global';
@@ -41,13 +41,27 @@ let matchFn: MatchFnDef = defaultMatchFn;
 let argsBuilder: Array<{}|null|undefined> = [];
 
 /**
+ * Used to build up attrs for the an element.
+ */
+let attrsBuilder: Array<any> = [];
+
+
+/**
  * TODO(sparhami) We should just export argsBuilder directly when Closure
  * Compiler supports ES6 directly.
  */
-function getArgsBuilder(): Array<{}|null|undefined>{
+function getArgsBuilder(): Array<{}|null|undefined> {
   return argsBuilder;
 }
 
+
+/**
+ * TODO(sparhami) We should just export attrsBuilder directly when Closure
+ * Compiler supports ES6 directly.
+ */
+function getAttrsBuilder(): Array<any> {
+  return attrsBuilder;
+}
 
 /**
  * Returns a patcher function that sets up and restores a patch context,
@@ -66,6 +80,7 @@ function createPatcher<T, R>(
     const prevDoc = doc;
     const prevFocusPath = focusPath;
     const prevArgsBuilder = argsBuilder;
+    const prevAttrsBuilder = attrsBuilder;
     const prevCurrentNode = currentNode;
     const prevCurrentParent = currentParent;
     const prevMatchFn = matchFn;
@@ -76,6 +91,7 @@ function createPatcher<T, R>(
     context = new Context();
     matchFn = matches;
     argsBuilder = [];
+    attrsBuilder = [];
     currentNode = null;
     currentParent = node.parentNode;
     focusPath = getFocusedPath(node, currentParent);
@@ -83,6 +99,7 @@ function createPatcher<T, R>(
     if (DEBUG) {
       previousInAttributes = setInAttributes(false);
       previousInSkip = setInSkip(false);
+      updatePatchContext(context);
     }
 
     try {
@@ -93,19 +110,24 @@ function createPatcher<T, R>(
 
       return retVal;
     } finally {
-      argsBuilder = prevArgsBuilder;
-      currentNode = prevCurrentNode;
-      currentParent = prevCurrentParent;
-      focusPath = prevFocusPath;
       context.notifyChanges();
 
-      // Needs to be done after assertions because assertions rely on state
-      // from these methods.
-      setInAttributes(previousInAttributes);
-      setInSkip(previousInSkip);
       doc = prevDoc;
       context = prevContext;
       matchFn = prevMatchFn;
+      argsBuilder = prevArgsBuilder;
+      attrsBuilder = prevAttrsBuilder;
+      currentNode = prevCurrentNode;
+      currentParent = prevCurrentParent;
+      focusPath = prevFocusPath;
+
+      // Needs to be done after assertions because assertions rely on state
+      // from these methods.
+      if (DEBUG) {
+        setInAttributes(previousInAttributes);
+        setInSkip(previousInSkip);
+        updatePatchContext(context);
+      }
     }
   };
   return f;
@@ -395,7 +417,7 @@ function text(): Text {
  */
 function currentElement(): HTMLElement {
   if (DEBUG) {
-    assertInPatch('currentElement', doc!);
+    assertInPatch('currentElement');
     assertNotInAttributes('currentElement');
   }
   return (currentParent) as HTMLElement;
@@ -407,7 +429,7 @@ function currentElement(): HTMLElement {
  */
 function currentPointer(): Node {
   if (DEBUG) {
-    assertInPatch('currentPointer', doc!);
+    assertInPatch('currentPointer');
     assertNotInAttributes('currentPointer');
   }
   // TODO(tomnguyen): assert that this is not null
@@ -435,6 +457,7 @@ const patchOuter = createPatchOuter();
 export {
   alignWithDOM,
   getArgsBuilder,
+  getAttrsBuilder,
   text,
   createPatchInner,
   createPatchOuter,

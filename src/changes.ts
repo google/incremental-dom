@@ -27,7 +27,7 @@ let bufferStart = 0;
  * TODO(tomnguyen): This is a bit silly and really needs to be better typed.
  */
 function queueChange<A, B, C>(
-    fn: (a: A, b: B, c: C) => undefined, a: A, b: B, c: C) {
+    fn: (a: A, b: B, c: C) => void, a: A, b: B, c: C) {
   buffer.push(fn);
   buffer.push(a);
   buffer.push(b);

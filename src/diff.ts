@@ -15,6 +15,7 @@
  */
 
 import {createMap, truncateArray} from './util';
+import {flush, queueChange} from './changes';
 
 
 /**
@@ -36,7 +37,7 @@ const prevValuesMap = createMap();
  */
 function calculateDiff<T>(
     prev: string[], next: string[], updateCtx: T,
-    updateFn: (ctx: T, x: string, y: {}|undefined) => undefined) {
+    updateFn: (ctx: T, x: string, y: {}|undefined) => void) {
   const isNew = !prev.length;
   let i = 0;
 
@@ -51,7 +52,7 @@ function calculateDiff<T>(
     const value = next[i + 1];
     if (isNew || prev[i + 1] !== value) {
       prev[i + 1] = value;
-      updateFn(updateCtx, name, value);
+      queueChange(updateFn, updateCtx, name, value);
     }
   }
 
@@ -69,7 +70,7 @@ function calculateDiff<T>(
       const value = next[i + 1];
 
       if (prevValuesMap[name] !== value) {
-        updateFn(updateCtx, name, value);
+        queueChange(updateFn, updateCtx, name, value);
       }
 
       prev[i] = name;
@@ -81,10 +82,12 @@ function calculateDiff<T>(
     truncateArray(prev, next.length);
 
     for (const name in prevValuesMap) {
-      updateFn(updateCtx, name, undefined);
+      queueChange(updateFn, updateCtx, name, undefined);
       delete prevValuesMap[name];
     }
   }
+
+  flush();
 }
 
 
