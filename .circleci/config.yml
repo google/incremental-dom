@@ -1,0 +1,35 @@
+# Cache key for CircleCI. We want to invalidate the cache whenever the Bazel workspace or the
+# NPM dependencies changed.
+var_1: &cache_key incremental-dom-{{ checksum "WORKSPACE" }}-{{ checksum "package-lock.json" }}
+# Default docker image for CircleCI jobs with Bazel installed. The version of Bazel is controlled
+# by the docker image version. e.g "google/bazel:0.22.0" installs Bazel v0.22.0. When updating this
+# version, consider updating the minimum required Bazel version in the "WORKSPACE" file.
+var_2: &default_docker_image l.gcr.io/google/bazel:0.28.0
+
+# Settings common to each job
+var_3: &job_defaults
+  working_directory: ~/incremental-dom
+  docker:
+  - image: *default_docker_image
+
+# Saves the cache for the current cache key. We store the installed "node_modules" and the Bazel
+# repository cache in order to make subsequent builds faster.
+var_4: &save_cache
+  save_cache:
+    key: *cache_key
+    paths:
+      - "node_modules"
+      - "~/bazel_repository_cache"
+
+version: 2
+
+jobs:
+  build:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - restore_cache:
+          key: *cache_key
+      - run: bazel build ...
+      - run: bazel test ...
+      - *save_cache
