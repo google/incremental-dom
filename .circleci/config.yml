@@ -30,6 +30,7 @@ jobs:
       - checkout
       - restore_cache:
           key: *cache_key
+      - run: npm install
       - run: bazel build ...
       - run: bazel test ...
       - *save_cache
