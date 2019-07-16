@@ -16,6 +16,7 @@ ts_web_test(
     # chai and sinon-chai are not require()d in the code, we expect them to be globals
     # bootstrap their distro first on the page.
     bootstrap = [
+        "util/globals.js",
         "@npm//:node_modules/chai/chai.js",
         "@npm//:node_modules/sinon-chai/lib/sinon-chai.js",
     ],
