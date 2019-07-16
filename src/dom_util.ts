@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import { assert } from "./assertions";
+
 /**
  * Checks if the node is the root of a document. This is either a Document
  * or ShadowRoot. DocumentFragments are included for simplicity of the
@@ -21,7 +23,7 @@
  * @param node The node to check.
  * @return True if the node the root of a document, false otherwise.
  */
-function isDocumentRoot(node: Node): node is Document|ShadowRoot {
+function isDocumentRoot(node: Node): node is Document | ShadowRoot {
   return node.nodeType === 11 || node.nodeType === 9;
 }
 
@@ -33,7 +35,6 @@ function isDocumentRoot(node: Node): node is Document|ShadowRoot {
 function isElement(node: Node): node is Element {
   return node.nodeType === 1;
 }
-
 
 /**
  * Checks if the node is a text node. This is faster than an instanceof check.
@@ -49,12 +50,12 @@ function isText(node: Node): node is Text {
  * @param  root The root ancestor to get until, exclusive.
  * @return The ancestry of DOM nodes.
  */
-function getAncestry(node: Node, root: Node|null) {
-  const ancestry: Node[] = [];
-  let cur: Node|null = node;
+function getAncestry(node: Node, root: Node | null) {
+  const ancestry: Array<Node> = [];
+  let cur: Node | null = node;
 
   while (cur !== root) {
-    const n: Node = cur!;
+    const n: Node = assert(cur);
     ancestry.push(n);
     cur = n.parentNode;
   }
@@ -63,42 +64,41 @@ function getAncestry(node: Node, root: Node|null) {
 }
 
 /**
- * return The root node of the DOM tree that contains this node.
+ * @param this
+ * @returns The root node of the DOM tree that contains this node.
  */
 const getRootNode =
-    // tslint:disable-next-line:no-any b/79476176
-    (Node as any).prototype.getRootNode || function(this: Node) {
-      // tslint:disable-next-line:no-unnecessary-type-assertion b/77361044
-      let cur: Node|null = this as Node;
-      let prev = cur;
+  (Node as any).prototype.getRootNode ||
+  function(this: Node) {
+    let cur: Node | null = this as Node;
+    let prev = cur;
 
-      while (cur) {
-        prev = cur;
-        cur = cur.parentNode;
-      }
+    while (cur) {
+      prev = cur;
+      cur = cur.parentNode;
+    }
 
-      return prev;
-    };
-
+    return prev;
+  };
 
 /**
  * @param node The node to get the activeElement for.
- * @return The activeElement in the Document or ShadowRoot
+ * @returns The activeElement in the Document or ShadowRoot
  *     corresponding to node, if present.
  */
-function getActiveElement(node: Node): Element|null {
+function getActiveElement(node: Node): Element | null {
   const root = getRootNode.call(node);
   return isDocumentRoot(root) ? root.activeElement : null;
 }
-
 
 /**
  * Gets the path of nodes that contain the focused node in the same document as
  * a reference node, up until the root.
  * @param node The reference node to get the activeElement for.
  * @param root The root to get the focused path until.
+ * @returns The path of focused parents, if any exist.
  */
-function getFocusedPath(node: Node, root: Node|null): Node[] {
+function getFocusedPath(node: Node, root: Node | null): Array<Node> {
   const activeElement = getActiveElement(node);
 
   if (!activeElement || !node.contains(activeElement)) {
@@ -108,7 +108,6 @@ function getFocusedPath(node: Node, root: Node|null): Node[] {
   return getAncestry(activeElement, root);
 }
 
-
 /**
  * Like insertBefore, but instead instead of moving the desired node, instead
  * moves all the other nodes after.
@@ -116,7 +115,7 @@ function getFocusedPath(node: Node, root: Node|null): Node[] {
  * @param node
  * @param referenceNode
  */
-function moveBefore(parentNode: Node, node: Node, referenceNode: Node|null) {
+function moveBefore(parentNode: Node, node: Node, referenceNode: Node | null) {
   const insertReferenceNode = node.nextSibling;
   let cur = referenceNode;
 
@@ -127,10 +126,4 @@ function moveBefore(parentNode: Node, node: Node, referenceNode: Node|null) {
   }
 }
 
-
-export {
-  isElement,
-  isText,
-  getFocusedPath,
-  moveBefore,
-};
+export { isElement, isText, getFocusedPath, moveBefore };

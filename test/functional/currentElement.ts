@@ -21,7 +21,7 @@ const {expect} = chai;
 
 describe('currentElement', () => {
   let container: HTMLElement;
-  let el: HTMLElement|null;
+  let el: Element|null;
 
   beforeEach(() => {
     container = document.createElement('div');
