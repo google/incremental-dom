@@ -14,32 +14,36 @@
  * limitations under the License.
  */
 
-import {AttrMutatorConfig} from './types';
-import {assert} from './assertions';
-import {createMap, has} from './util';
-import {symbols} from './symbols';
-
+import { AttrMutatorConfig } from "./types";
+import { assert } from "./assertions";
+import { createMap, has } from "./util";
+import { symbols } from "./symbols";
 
 /**
- * Returns the namespace to use for the attribute.
+ * @param name The name of the attribute. For example "tabindex" or
+ *    "xlink:href".
+ * @returns The namespace to use for the attribute, or null if there is
+ * no namespace.
  */
-function getNamespace(name: string): string|undefined {
-  if (name.lastIndexOf('xml:', 0) === 0) {
-    return 'http://www.w3.org/XML/1998/namespace';
+function getNamespace(name: string): string | null {
+  if (name.lastIndexOf("xml:", 0) === 0) {
+    return "http://www.w3.org/XML/1998/namespace";
   }
 
-  if (name.lastIndexOf('xlink:', 0) === 0) {
-    return 'http://www.w3.org/1999/xlink';
+  if (name.lastIndexOf("xlink:", 0) === 0) {
+    return "http://www.w3.org/1999/xlink";
   }
 
-  return undefined;
+  return null;
 }
-
 
 /**
  * Applies an attribute or property to a given Element. If the value is null
  * or undefined, it is removed from the Element. Otherwise, the value is set
  * as an attribute.
+ * @param el The element to apply the attribute to.
+ * @param name The attribute's name.
+ * @param value The attribute's value.
  */
 function applyAttr(el: Element, name: string, value: unknown) {
   if (value == null) {
@@ -56,47 +60,56 @@ function applyAttr(el: Element, name: string, value: unknown) {
 
 /**
  * Applies a property to a given Element.
+ * @param el The element to apply the property to.
+ * @param name The property's name.
+ * @param value The property's value.
  */
 function applyProp(el: Element, name: string, value: unknown) {
-  // tslint:disable-next-line:no-any
   (el as any)[name] = value;
 }
-
 
 /**
  * Applies a value to a style declaration. Supports CSS custom properties by
  * setting properties containing a dash using CSSStyleDeclaration.setProperty.
+ * @param style A style declaration.
+ * @param prop The property to apply. This can be either camelcase or dash
+ *    separated. For example: "backgroundColor" and "background-color" are both
+ *    supported.
+ * @param value The value of the property.
  */
 function setStyleValue(
-    style: CSSStyleDeclaration, prop: string, value: string) {
-  if (prop.indexOf('-') >= 0) {
+  style: CSSStyleDeclaration,
+  prop: string,
+  value: string
+) {
+  if (prop.indexOf("-") >= 0) {
     style.setProperty(prop, value);
   } else {
-    // TODO(tomnguyen) Figure out why this is necessary.
-    // tslint:disable-next-line:no-any
     (style as any)[prop] = value;
   }
 }
 
-
 /**
  * Applies a style to an Element. No vendor prefix expansion is done for
  * property names/values.
- * @param el
+ * @param el The Element to apply the style for.
  * @param name The attribute's name.
  * @param  style The style to set. Either a string of css or an object
  *     containing property-value pairs.
  */
 function applyStyle(
-    el: Element, name: string, style: string|{[k: string]: string}) {
+  el: Element,
+  name: string,
+  style: string | { [k: string]: string }
+) {
   // MathML elements inherit from Element, which does not have style.
   assert(el instanceof HTMLElement || el instanceof SVGElement);
-  const elStyle = (<HTMLElement|SVGElement>el).style;
+  const elStyle = (<HTMLElement | SVGElement>el).style;
 
-  if (typeof style === 'string') {
+  if (typeof style === "string") {
     elStyle.cssText = style;
   } else {
-    elStyle.cssText = '';
+    elStyle.cssText = "";
 
     for (const prop in style) {
       if (has(style, prop)) {
@@ -106,10 +119,9 @@ function applyStyle(
   }
 }
 
-
 /**
  * Updates a single attribute on an Element.
- * @param el
+ * @param el The Element to apply the attribute to.
  * @param name The attribute's name.
  * @param value The attribute's value. If the value is an object or
  *     function it is set on the Element, otherwise, it is set as an HTML
@@ -118,7 +130,7 @@ function applyStyle(
 function applyAttributeTyped(el: Element, name: string, value: unknown) {
   const type = typeof value;
 
-  if (type === 'object' || type === 'function') {
+  if (type === "object" || type === "function") {
     applyProp(el, name, value);
   } else {
     applyAttr(el, name, value);
@@ -131,27 +143,25 @@ function applyAttributeTyped(el: Element, name: string, value: unknown) {
  * will just assume attributes is "any" otherwise and throws away
  * the type annotation set by tsickle.
  */
-const attributes: AttrMutatorConfig = (createMap() as AttrMutatorConfig);
+const attributes: AttrMutatorConfig = createMap() as AttrMutatorConfig;
 
 // Special generic mutator that's called for any attribute that does not
 // have a specific mutator.
 attributes[symbols.default] = applyAttributeTyped;
 
-attributes['style'] = applyStyle;
+attributes["style"] = applyStyle;
 
 /**
  * Calls the appropriate attribute mutator for this attribute.
+ * @param el The Element to apply the attribute to.
+ * @param name The attribute's name.
+ * @param value The attribute's value. If the value is an object or
+ *     function it is set on the Element, otherwise, it is set as an HTML
+ *     attribute.
  */
 function updateAttribute(el: Element, name: string, value: unknown) {
   const mutator = attributes[name] || attributes[symbols.default];
   mutator(el, name, value);
 }
 
-
-
-export {
-  updateAttribute,
-  applyProp,
-  applyAttr,
-  attributes,
-};
+export { updateAttribute, applyProp, applyAttr, attributes };
