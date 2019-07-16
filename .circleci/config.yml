@@ -10,7 +10,7 @@ var_2: &default_docker_image l.gcr.io/google/bazel:0.28.0
 var_3: &job_defaults
   working_directory: ~/incremental-dom
   docker:
-  - image: *default_docker_image
+    - image: circleci/node:current-browsers
 
 # Saves the cache for the current cache key. We store the installed "node_modules" and the Bazel
 # repository cache in order to make subsequent builds faster.
