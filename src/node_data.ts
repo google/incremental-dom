@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-import {assert} from './assertions';
-import {isElement, isText} from './dom_util';
-import {getKeyAttributeName} from './global';
 import {Key, NameOrCtorDef} from './types';
+import {assert} from './assertions';
+import {createArray} from './util';
+import {isElement} from './dom_util';
+import {getKeyAttributeName} from './global';
 
 
 /**
@@ -62,7 +63,7 @@ export class NodeData {
   }
 
   getAttrsArr(length: number): any[] {
-    return this._attrsArr || (this._attrsArr = new Array(length));
+    return this._attrsArr || (this._attrsArr = createArray(length));
   }
 }
 

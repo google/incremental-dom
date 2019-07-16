@@ -60,4 +60,20 @@ function truncateArray(arr: Array<{}|null|undefined>, length: number) {
   }
 }
 
-export {createMap, has, truncateArray,};
+
+/**
+ * Creates an array for a desired initial size. Note that the array will still
+ * be empty.
+ */
+function createArray<T>(initialAllocationSize: number): Array<T> {
+  const arr = new Array(initialAllocationSize);
+  truncateArray(arr, 0);
+  return arr;
+}
+
+export {
+  createArray,
+  createMap,
+  has,
+  truncateArray,
+};

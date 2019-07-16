@@ -21,5 +21,5 @@ export {setKeyAttributeName} from './src/global';
 export {clearCache,getKey, importNode, isDataInitialized} from './src/node_data';
 export {notifications} from './src/notifications';
 export {symbols} from './src/symbols';
-export {attr, elementClose, elementOpen, elementOpenEnd, elementOpenStart, elementVoid, key, text} from './src/virtual_elements';
+export {applyAttrs, applyStatics, attr, elementClose, elementOpen, elementOpenEnd, elementOpenStart, elementVoid, key, text} from './src/virtual_elements';
 export * from './src/types';
