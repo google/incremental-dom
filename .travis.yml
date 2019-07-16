@@ -3,13 +3,24 @@ sudo: required
 dist: trusty
 node_js:
   - 8
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - wget
+      - gcc-5
+      - g++-5
 before_install:
   - export CHROME_BIN=google-chrome
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
   - wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
   - sudo dpkg -i google-chrome*.deb
-# This is basically redundant (ends up getting run twice) as this gets called
-# by npm on install due to the prepublish script in package.json.
+  - sudo apt-get purge openjdk-9*
+  - sudo apt-get purge oracle-java9*
+  - wget 'https://github.com/bazelbuild/bazel/releases/download/0.27.0/bazel_0.27.0-linux-x86_64.deb'
+  - chmod +x bazel_0.27.0-linux-x86_64.deb
+  - sudo dpkg -i bazel_0.27.0-linux-x86_64.deb
 script:
   - npm run dist
