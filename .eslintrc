@@ -1,9 +1,17 @@
 {
-  "extends": "eslint:recommended",
+  "extends": [
+    "plugin:@typescript-eslint/recommended",
+    "prettier/@typescript-eslint",
+    "plugin:prettier/recommended"
+  ],
   "parserOptions": {
     "ecmaVersion": 6,
     "sourceType": "module"
   },
+  "plugins": [
+    "@typescript-eslint",
+    "prettier"
+  ],
   "env": {
     "browser": true
   },
@@ -12,20 +20,28 @@
     "global": true
   },
   "rules": {
-    "no-unused-vars": [2, {
+    "@typescript-eslint/array-type": [2, "generic"],
+    "@typescript-eslint/explicit-function-return-type": 0,
+    "@typescript-eslint/no-angle-bracket-type-assertion": 0,
+    "@typescript-eslint/no-non-null-assertion": 0,
+    "@typescript-eslint/no-unused-vars": ["warn", {
       "varsIgnorePattern": "Def$",
-      "argsIgnorePattern": "var_args"
+      "argsIgnorePattern": "varArgs"
     }],
+    "indent": "off",
+    "keyword-spacing": [2, {"before": true, "after": true}],
     "no-trailing-spaces": 2,
     "no-irregular-whitespace": 2,
     "no-param-reassign": 2,
+    "prettier/prettier": "error",
     "space-before-blocks": [2, "always"],
     "space-before-function-paren": [2, "never"],
-    "keyword-spacing": [2, {"before": true, "after": true}],
     "valid-jsdoc": ["error", {
-      "requireReturn": false,
       "requireParamDescription": false,
-      "requireReturnDescription": false
+      "requireParamType": false,
+      "requireReturn": false,
+      "requireReturnDescription": false,
+      "requireReturnType": false
     }]
   }
 }
