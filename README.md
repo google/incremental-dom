@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/google/incremental-dom.svg?branch=master)](https://travis-ci.org/google/incremental-dom) 
+[![CircleCI](https://circleci.com/gh/iteriani/incremental-dom.svg?style=svg)](https://circleci.com/gh/iteriani/incremental-dom)
 
 # Incremental DOM
 
