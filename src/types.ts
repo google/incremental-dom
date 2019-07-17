@@ -1,5 +1,4 @@
 /**
- * @license
  * Copyright 2018 The Incremental DOM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,33 +14,36 @@
  * limitations under the License.
  */
 
-export interface ElementConstructor {new(): Element};
+export interface ElementConstructor {
+  new (): Element;
+}
 
-// tslint:disable-next-line:no-any
-export type AttrMutator = (a: HTMLElement, b: string, c: any) => void;
+export type AttrMutator = (a: Element, b: string, c: any) => void;
 
-export type AttrMutatorConfig = {[x: string]: AttrMutator};
+export interface AttrMutatorConfig {
+  [x: string]: AttrMutator;
+}
 
-export type NameOrCtorDef = string|ElementConstructor;
+export type NameOrCtorDef = string | ElementConstructor;
 
-export type Key = string|number|null|undefined;
+export type Key = string | number | null | undefined;
 
-export type Statics = Array<{}>|null|undefined;
+export type Statics = Array<{}> | null | undefined;
 
 export type PatchFunction<T, R> = (
-    node: Element|DocumentFragment,
-    template: (a: T|undefined) => void,
-    data?: T|undefined
+  node: Element | DocumentFragment,
+  template: (a: T | undefined) => void,
+  data?: T | undefined
 ) => R;
 
 export type MatchFnDef = (
-    matchNode: Node,
-    nameOrCtor: NameOrCtorDef,
-    expectedNameOrCtor: NameOrCtorDef,
-    key: Key,
-    expectedKey: Key
-) =>  boolean;
+  matchNode: Node,
+  nameOrCtor: NameOrCtorDef,
+  expectedNameOrCtor: NameOrCtorDef,
+  key: Key,
+  expectedKey: Key
+) => boolean;
 
-export type PatchConfig = {
-  matches?: MatchFnDef,
-};
+export interface PatchConfig {
+  matches?: MatchFnDef;
+}

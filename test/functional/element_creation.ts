@@ -15,9 +15,6 @@
  * limitations under the License.
  */
 
-// taze: mocha from //third_party/javascript/typings/mocha
-// taze: chai from //third_party/javascript/typings/chai
-
 import * as Sinon from 'sinon';
 
 import {elementClose, elementOpen, elementOpenEnd, elementOpenStart, elementVoid, patch} from '../../index';
@@ -131,7 +128,7 @@ describe('element creation', () => {
     });
 
     it('should use createElement if no namespace has been specified', () => {
-      const doc = container.ownerDocument;
+      const doc = container.ownerDocument!;
       const div = doc.createElement('div');
       let el: HTMLElement;
       sandbox.stub(doc, 'createElement').returns(div);

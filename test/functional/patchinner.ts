@@ -129,7 +129,8 @@ describe('patching an element\'s children', () => {
   });
 
   it('should pass third argument to render function', () => {
-    function render(content:{}|undefined) {
+
+    function render(content:unknown) {
       text(content as string);
     }
 

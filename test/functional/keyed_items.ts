@@ -165,12 +165,12 @@ describe('rendering with keys', () => {
   });
 
   it('should update the mapping when a keyed item does not match', () => {
-    function renderOne(tag: {}|undefined) {
+    function renderOne(tag: unknown) {
       elementVoid('div', 'keyOne');
       elementVoid(tag as string, 'keyTwo');
     }
 
-    function renderTwo(tag: {}|undefined) {
+    function renderTwo(tag: unknown) {
       elementVoid(tag as string, 'keyTwo');
     }
 
@@ -183,16 +183,12 @@ describe('rendering with keys', () => {
   });
 
   it('should patch correctly when child in key map is manually removed', () => {
-    function render(tag: {}|undefined) {
-      elementVoid(tag as string, 'key');
-    }
-
-    patch(container, render, 'div');
+    patch(container, () => elementVoid('div', 'key'));
     const firstNode = container.firstChild!;
 
     container.removeChild(firstNode);
 
-    patch(container, render, 'span');
+    patch(container, () => elementVoid('span', 'key'));
     const newNode = container.firstChild;
     expect(newNode!.nodeName).to.equal('SPAN');
   });

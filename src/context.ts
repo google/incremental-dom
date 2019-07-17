@@ -1,5 +1,4 @@
 /**
- * @license
  * Copyright 2018 The Incremental DOM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,29 +14,27 @@
  * limitations under the License.
  */
 
-import {notifications} from './notifications';
-
+import { notifications } from "./notifications";
 
 /**
  * A context object keeps track of the state of a patch.
  */
 class Context {
-  private created: Node[] = [];
-  private deleted: Node[] = [];
+  private created: Array<Node> = [];
+  private deleted: Array<Node> = [];
 
-  markCreated(node: Node) {
+  public markCreated(node: Node) {
     this.created.push(node);
   }
 
-  markDeleted(node: Node) {
+  public markDeleted(node: Node) {
     this.deleted.push(node);
   }
-
 
   /**
    * Notifies about nodes that were created during the patch operation.
    */
-  notifyChanges() {
+  public notifyChanges() {
     if (notifications.nodesCreated && this.created.length > 0) {
       notifications.nodesCreated(this.created);
     }
@@ -48,7 +45,4 @@ class Context {
   }
 }
 
-
-export {
-  Context,
-};
+export { Context };

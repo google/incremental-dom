@@ -91,16 +91,6 @@ describe('virtual attribute updates', () => {
       expect(childAttributes).to.have.length(1);
       expect(childAttributes['childAttrOne'].value).to.equal('cOne');
     });
-
-    it('should throw when defined outside virtual attributes element', () => {
-      expect(() => {
-        patch(container, () => {
-          attr('data-expanded', true);
-        });
-      })
-          .to.throw(
-              'attr() can only be called after calling elementOpenStart().');
-    });
   });
 
   it('should throw when a virtual attributes element is unclosed', () => {

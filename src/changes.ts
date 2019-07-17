@@ -1,5 +1,4 @@
 /**
- * @license
  * Copyright 2018 The Incremental DOM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,26 +14,30 @@
  * limitations under the License.
  */
 
-import {truncateArray} from './util';
+import { truncateArray } from "./util";
 
-
-// tslint:disable-next-line:no-any TODO(tomnguyen): Make this a struct[].
-const buffer: any[] = [];
+const buffer: Array<any> = [];
 
 let bufferStart = 0;
 
-
 /**
  * TODO(tomnguyen): This is a bit silly and really needs to be better typed.
+ * @param fn A function to call.
+ * @param a The first argument to the function.
+ * @param b The second argument to the function.
+ * @param c The third argument to the function.
  */
 function queueChange<A, B, C>(
-    fn: (a: A, b: B, c: C) => undefined, a: A, b: B, c: C) {
+  fn: (a: A, b: B, c: C) => void,
+  a: A,
+  b: B,
+  c: C
+) {
   buffer.push(fn);
   buffer.push(a);
   buffer.push(b);
   buffer.push(c);
 }
-
 
 /**
  * Flushes the changes buffer, calling the functions for each change.
@@ -49,7 +52,6 @@ function flush() {
   bufferStart = end;
 
   for (let i = start; i < end; i += 4) {
-    // tslint:disable-next-line:no-any
     const fn = buffer[i] as (a: any, b: any, c: any) => undefined;
     fn(buffer[i + 1], buffer[i + 2], buffer[i + 3]);
   }
@@ -58,8 +60,4 @@ function flush() {
   truncateArray(buffer, start);
 }
 
-
-export {
-  queueChange,
-  flush,
-};
+export { queueChange, flush };

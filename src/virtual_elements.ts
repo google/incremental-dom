@@ -1,5 +1,4 @@
 /**
- * @license
  * Copyright 2018 The Incremental DOM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,21 +14,35 @@
  * limitations under the License.
  */
 
-import {assert, assertCloseMatchesOpenTag, assertInAttributes, assertNotInAttributes, assertNotInSkip, setInAttributes} from './assertions';
-import {updateAttribute} from './attributes';
-import {getArgsBuilder, close, open, text as coreText} from './core';
-import {DEBUG} from './global';
-import {getData, NodeData} from './node_data';
-import {Key, NameOrCtorDef, Statics} from './types';
-import {createMap, truncateArray} from './util';
-
+import {
+  assert,
+  assertCloseMatchesOpenTag,
+  assertInAttributes,
+  assertInPatch,
+  assertNotInAttributes,
+  assertNotInSkip,
+  setInAttributes
+} from "./assertions";
+import { updateAttribute } from "./attributes";
+import {
+  getArgsBuilder,
+  getAttrsBuilder,
+  close,
+  open,
+  text as coreText,
+  currentElement
+} from "./core";
+import { DEBUG } from "./global";
+import { getData, NodeData } from "./node_data";
+import { Key, NameOrCtorDef, Statics } from "./types";
+import { createMap, truncateArray } from "./util";
+import { calculateDiff } from "./diff";
 
 /**
  * The offset in the virtual element declaration where the attributes are
  * specified.
  */
 const ATTRIBUTES_OFFSET = 3;
-
 
 /**
  * Used to keep track of the previous values when a 2-way diff is necessary.
@@ -39,15 +52,30 @@ const ATTRIBUTES_OFFSET = 3;
  */
 const prevAttrsMap = createMap();
 
+/**
+ * @param element The Element to diff the attrs for.
+ * @param data The NodeData associated with the Element.
+ */
+function diffAttrs(element: Element, data: NodeData) {
+  const attrsBuilder = getAttrsBuilder();
+  const prevAttrsArr = data.getAttrsArr(attrsBuilder.length);
+
+  calculateDiff(prevAttrsArr, attrsBuilder, element, updateAttribute);
+  truncateArray(attrsBuilder, 0);
+}
 
 /**
  * Applies the statics. When importing an Element, any existing attributes that
  * match a static are converted into a static attribute.
  * @param node The Element to apply statics for.
- * @param data The Element's data
- * @param statics The statics array,
+ * @param data The NodeData associated with the Element.
+ * @param statics The statics array.
  */
-function applyStatics(node: HTMLElement, data: NodeData, statics: Statics) {
+function diffStatics(node: Element, data: NodeData, statics: Statics) {
+  if (data.staticsApplied) {
+    return;
+  }
+
   data.staticsApplied = true;
 
   if (!statics || !statics.length) {
@@ -96,113 +124,6 @@ function applyStatics(node: HTMLElement, data: NodeData, statics: Statics) {
   }
 }
 
-
-/**
- * @param  nameOrCtor The Element's tag or constructor.
- * @param  key The key used to identify this element. This can be an
- *     empty string, but performance may be better if a unique value is used
- *     when iterating over an array of items.
- * @param statics An array of attribute name/value pairs of the static
- *     attributes for the Element. Attributes will only be set once when the
- *     Element is created.
- * @param varArgs, Attribute name/value pairs of the dynamic attributes
- *     for the Element.
- * @return The corresponding Element.
- */
-function elementOpen(
-    nameOrCtor: NameOrCtorDef, key?: Key,
-    // Ideally we could tag statics and varArgs as an array where every odd
-    // element is a string and every even element is any, but this is hard.
-    // tslint:disable-next-line:no-any
-    statics?: Statics, ...varArgs: any[]) {
-  if (DEBUG) {
-    assertNotInAttributes('elementOpen');
-    assertNotInSkip('elementOpen');
-  }
-
-  const node = open(nameOrCtor, key);
-  const data = getData(node);
-
-  if (!data.staticsApplied) {
-    applyStatics(node, data, statics);
-  }
-
-  const attrsLength = Math.max(0, arguments.length - ATTRIBUTES_OFFSET);
-  const hadNoAttrs = data.hasEmptyAttrsArr();
-
-  if (!attrsLength && hadNoAttrs) {
-    return node;
-  }
-
-  const attrsArr = data.getAttrsArr(attrsLength);
-
-  /*
-   * Checks to see if one or more attributes have changed for a given Element.
-   * When no attributes have changed, this is much faster than checking each
-   * individual argument. When attributes have changed, the overhead of this is
-   * minimal.
-   */
-  let i = ATTRIBUTES_OFFSET;
-  let j = 0;
-
-  for (; i < arguments.length; i += 2, j += 2) {
-    const name = arguments[i];
-    if (hadNoAttrs) {
-      attrsArr[j] = name;
-    } else if (attrsArr[j] !== name) {
-      break;
-    }
-
-    const value = arguments[i + 1];
-    if (hadNoAttrs || attrsArr[j + 1] !== value) {
-      attrsArr[j + 1] = value;
-      updateAttribute(node, name, value);
-    }
-  }
-
-  /*
-   * Items did not line up exactly as before, need to make sure old items are
-   * removed. This can happen if using conditional logic when declaring
-   * attrs through the elementOpenStart flow or if one element is reused in
-   * the place of another.
-   */
-  if (i < arguments.length || j < attrsArr.length) {
-    const attrsStart = j;
-
-    for (; j < attrsArr.length; j += 2) {
-      prevAttrsMap[attrsArr[j]] = attrsArr[j + 1];
-    }
-
-    for (j = attrsStart; i < arguments.length; i += 2, j += 2) {
-      const name = arguments[i];
-      const value = arguments[i + 1];
-
-      if (prevAttrsMap[name] !== value) {
-        updateAttribute(node, name, value);
-      }
-
-      attrsArr[j] = name;
-      attrsArr[j + 1] = value;
-
-      delete prevAttrsMap[name];
-    }
-
-    truncateArray(attrsArr, j);
-
-    /*
-     * At this point, only have attributes that were present before, but have
-     * been removed.
-     */
-    for (const name in prevAttrsMap) {
-      updateAttribute(node, name, undefined);
-      delete prevAttrsMap[name];
-    }
-  }
-
-  return node;
-}
-
-
 /**
  * Declares a virtual Element at the current location in the document. This
  * corresponds to an opening tag and a elementClose tag is required. This is
@@ -218,11 +139,14 @@ function elementOpen(
  *     Element is created.
  */
 function elementOpenStart(
-  nameOrCtor: NameOrCtorDef, key?: Key, statics?: Statics) {
+  nameOrCtor: NameOrCtorDef,
+  key?: Key,
+  statics?: Statics
+) {
   const argsBuilder = getArgsBuilder();
 
   if (DEBUG) {
-    assertNotInAttributes('elementOpenStart');
+    assertNotInAttributes("elementOpenStart");
     setInAttributes(true);
   }
 
@@ -231,39 +155,38 @@ function elementOpenStart(
   argsBuilder[2] = statics;
 }
 
-
 /**
  * Allows you to define a key after an elementOpenStart. This is useful in
  * templates that define key after an element has been opened ie
  * `<div key('foo')></div>`.
+ * @param key The key to use for the next call.
  */
-function key(key:string) {
+function key(key: string) {
   const argsBuilder = getArgsBuilder();
 
   if (DEBUG) {
-    assertInAttributes('key');
+    assertInAttributes("key");
     assert(argsBuilder);
   }
   argsBuilder[1] = key;
 }
 
-
-/***
- * Defines a virtual attribute at this point of the DOM. This is only valid
- * when called between elementOpenStart and elementOpenEnd.
+/**
+ * Buffers an attribute, which will get applied during the next call to
+ * `elementOpen`, `elementOpenEnd` or `applyAttrs`.
+ * @param name The of the attribute to buffer.
+ * @param value The value of the attribute to buffer.
  */
-// tslint:disable-next-line:no-any
 function attr(name: string, value: any) {
-  const argsBuilder = getArgsBuilder();
+  const attrsBuilder = getAttrsBuilder();
 
   if (DEBUG) {
-    assertInAttributes('attr');
+    assertInPatch("attr");
   }
 
-  argsBuilder.push(name);
-  argsBuilder.push(value);
+  attrsBuilder.push(name);
+  attrsBuilder.push(value);
 }
-
 
 /**
  * Closes an open tag started with elementOpenStart.
@@ -273,16 +196,76 @@ function elementOpenEnd(): HTMLElement {
   const argsBuilder = getArgsBuilder();
 
   if (DEBUG) {
-    assertInAttributes('elementOpenEnd');
+    assertInAttributes("elementOpenEnd");
     setInAttributes(false);
   }
 
-  assert(argsBuilder);
-  const node = elementOpen.apply(null, argsBuilder!);
+  const node = open(<NameOrCtorDef>argsBuilder[0], <Key>argsBuilder[1]);
+  const data = getData(node);
+
+  diffStatics(node, data, <Statics>argsBuilder[2]);
+  diffAttrs(node, data);
   truncateArray(argsBuilder, 0);
+
   return node;
 }
 
+/**
+ * @param  nameOrCtor The Element's tag or constructor.
+ * @param  key The key used to identify this element. This can be an
+ *     empty string, but performance may be better if a unique value is used
+ *     when iterating over an array of items.
+ * @param statics An array of attribute name/value pairs of the static
+ *     attributes for the Element. Attributes will only be set once when the
+ *     Element is created.
+ * @param varArgs, Attribute name/value pairs of the dynamic attributes
+ *     for the Element.
+ * @return The corresponding Element.
+ */
+function elementOpen(
+  nameOrCtor: NameOrCtorDef,
+  key?: Key,
+  // Ideally we could tag statics and varArgs as an array where every odd
+  // element is a string and every even element is any, but this is hard.
+  statics?: Statics,
+  ...varArgs: Array<any>
+) {
+  if (DEBUG) {
+    assertNotInAttributes("elementOpen");
+    assertNotInSkip("elementOpen");
+  }
+
+  elementOpenStart(nameOrCtor, key, statics);
+
+  for (let i = ATTRIBUTES_OFFSET; i < arguments.length; i += 2) {
+    attr(arguments[i], arguments[i + 1]);
+  }
+
+  return elementOpenEnd();
+}
+
+/**
+ * Applies the currently buffered attrs to the currently open element. This
+ * clears the buffered attributes.
+ */
+function applyAttrs() {
+  const node = currentElement();
+  const data = getData(node);
+
+  diffAttrs(node, data);
+}
+
+/**
+ * Applies the current static attributes to the currently open element. Note:
+ * statics should be applied before calling `applyAtrs`.
+ * @param statics The statics to apply to the current element.
+ */
+function applyStatics(statics: Statics) {
+  const node = currentElement();
+  const data = getData(node);
+
+  diffStatics(node, data, statics);
+}
 
 /**
  * Closes an open virtual Element.
@@ -292,7 +275,7 @@ function elementOpenEnd(): HTMLElement {
  */
 function elementClose(nameOrCtor: NameOrCtorDef): Element {
   if (DEBUG) {
-    assertNotInAttributes('elementClose');
+    assertNotInAttributes("elementClose");
   }
 
   const node = close();
@@ -303,7 +286,6 @@ function elementClose(nameOrCtor: NameOrCtorDef): Element {
 
   return node;
 }
-
 
 /**
  * Declares a virtual Element at the current location in the document that has
@@ -320,12 +302,14 @@ function elementClose(nameOrCtor: NameOrCtorDef): Element {
  * @return The corresponding Element.
  */
 function elementVoid(
-    nameOrCtor: NameOrCtorDef, key?: Key,
-    // Ideally we could tag statics and varArgs as an array where every odd
-    // element is a string and every even element is any, but this is hard.
-    // tslint:disable-next-line:no-any
-    statics?: Statics, ...varArgs: any[]) {
-  elementOpen.apply(null, arguments);
+  nameOrCtor: NameOrCtorDef,
+  key?: Key,
+  // Ideally we could tag statics and varArgs as an array where every odd
+  // element is a string and every even element is any, but this is hard.
+  statics?: Statics,
+  ...varArgs: Array<any>
+) {
+  elementOpen.apply(null, arguments as any);
   return elementClose(nameOrCtor);
 }
 
@@ -338,17 +322,20 @@ function elementVoid(
  *     changed.
  * @return The corresponding text node.
  */
-function text(value: string|number|boolean, ...varArgs: Array<(a: {}) => string>) {
+function text(
+  value: string | number | boolean,
+  ...varArgs: Array<(a: {}) => string>
+) {
   if (DEBUG) {
-    assertNotInAttributes('text');
-    assertNotInSkip('text');
+    assertNotInAttributes("text");
+    assertNotInSkip("text");
   }
 
   const node = coreText();
   const data = getData(node);
 
   if (data.text !== value) {
-    data.text = (value) as string;
+    data.text = value as string;
 
     let formatted = value;
     for (let i = 1; i < arguments.length; i += 1) {
@@ -369,9 +356,10 @@ function text(value: string|number|boolean, ...varArgs: Array<(a: {}) => string>
   return node;
 }
 
-
 /** */
 export {
+  applyAttrs,
+  applyStatics,
   elementOpenStart,
   elementOpenEnd,
   elementOpen,
@@ -379,5 +367,5 @@ export {
   elementClose,
   text,
   attr,
-  key,
+  key
 };

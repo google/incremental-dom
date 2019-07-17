@@ -1,5 +1,4 @@
 /**
- * @license
  * Copyright 2018 The Incremental DOM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,16 +14,14 @@
  * limitations under the License.
  */
 
-
-import {createMap, truncateArray} from './util';
-
+import { createMap, truncateArray } from "./util";
+import { flush, queueChange } from "./changes";
 
 /**
  * Used to keep track of the previous values when a 2-way diff is necessary.
  * This object is cleared out and reused.
  */
 const prevValuesMap = createMap();
-
 
 /**
  * Calculates the diff between previous and next values, calling the update
@@ -37,8 +34,11 @@ const prevValuesMap = createMap();
  * @param updateFn A function to call when a value has changed.
  */
 function calculateDiff<T>(
-    prev: string[], next: string[], updateCtx: T,
-    updateFn: (ctx: T, x: string, y: {}|undefined) => undefined) {
+  prev: Array<string>,
+  next: Array<string>,
+  updateCtx: T,
+  updateFn: (ctx: T, x: string, y: {} | undefined) => void
+) {
   const isNew = !prev.length;
   let i = 0;
 
@@ -53,7 +53,7 @@ function calculateDiff<T>(
     const value = next[i + 1];
     if (isNew || prev[i + 1] !== value) {
       prev[i + 1] = value;
-      updateFn(updateCtx, name, value);
+      queueChange(updateFn, updateCtx, name, value);
     }
   }
 
@@ -67,11 +67,11 @@ function calculateDiff<T>(
     }
 
     for (i = startIndex; i < next.length; i += 2) {
-      const name = (next[i]) as string;
+      const name = next[i] as string;
       const value = next[i + 1];
 
       if (prevValuesMap[name] !== value) {
-        updateFn(updateCtx, name, value);
+        queueChange(updateFn, updateCtx, name, value);
       }
 
       prev[i] = name;
@@ -83,11 +83,12 @@ function calculateDiff<T>(
     truncateArray(prev, next.length);
 
     for (const name in prevValuesMap) {
-      updateFn(updateCtx, name, undefined);
+      queueChange(updateFn, updateCtx, name, undefined);
       delete prevValuesMap[name];
     }
   }
+
+  flush();
 }
 
-
-export {calculateDiff,};
+export { calculateDiff };

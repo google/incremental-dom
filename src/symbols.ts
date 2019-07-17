@@ -1,5 +1,4 @@
 /**
- * @license
  * Copyright 2018 The Incremental DOM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +15,7 @@
  */
 
 const symbols = {
-  default: '__default'
+  default: "__default"
 };
 
-export {symbols,};
+export { symbols };
