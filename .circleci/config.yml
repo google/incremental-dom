@@ -31,6 +31,7 @@ jobs:
       - restore_cache:
           key: *cache_key
       - run: npm install
+      - run: npm run lint
       - run: ./node_modules/.bin/bazel build ...
       - run: ./node_modules/.bin/bazel test ...
       - *save_cache
