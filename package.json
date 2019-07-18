@@ -16,8 +16,9 @@
   ],
   "scripts": {
     "test": "bazel test test:unit_tests",
-    "build": "bazel build :app",
-    "dist": "npm run test && bazel build :bundle",
+    "build": "bazel build :dev",
+    "dist": "npm run lint && bazel build :npm",
+    "prepack": "bazel build :npm",
     "update": "npm-check -u",
     "lint": "eslint src/**.ts"
   },

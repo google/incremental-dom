@@ -10,3 +10,8 @@ ts_library(
     ],
     tsickle_typed = True,
 )
+
+filegroup(
+    name = "files",
+    srcs = RELEASE_FILES,
+)
