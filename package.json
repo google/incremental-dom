@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "@bazel/bazel": "^0.27.0",
+    "@bazel/ibazel": "^0.10.3",
     "@bazel/karma": "^0.33.0",
     "@bazel/typescript": "^0.33.0",
     "@types/mocha": "^5.0.0",

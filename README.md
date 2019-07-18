@@ -18,15 +18,19 @@ Incremental DOM supports IE9 and above.
 HTML is expressed in Incremental DOM using the `elementOpen`, `elementClose`, `elementVoid` and `text` methods. Consider the following example:
 
 ```javascript
-const {open, close, elementVoid, text} = require('incremental-dom');
+var IncrementalDOM = require('incremental-dom'),
+    elementOpen = IncrementalDOM.elementOpen,
+    elementClose = IncrementalDOM.elementClose,
+    elementVoid = IncrementalDOM.elementVoid,
+    text = IncrementalDOM.text;
 
 function render(data) {
   elementVoid('input', '', [ 'type', 'text' ]);
-  open('div', '', null);
+  elementOpen('div', '', null);
     if (data.someCondition) {
       text(data.text);
     }
-  close();
+  elementClose('div');
 }
 ```
 
