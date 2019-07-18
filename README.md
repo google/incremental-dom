@@ -18,19 +18,15 @@ Incremental DOM supports IE9 and above.
 HTML is expressed in Incremental DOM using the `elementOpen`, `elementClose`, `elementVoid` and `text` methods. Consider the following example:
 
 ```javascript
-var IncrementalDOM = require('incremental-dom'),
-    elementOpen = IncrementalDOM.elementOpen,
-    elementClose = IncrementalDOM.elementClose,
-    elementVoid = IncrementalDOM.elementVoid,
-    text = IncrementalDOM.text;
+const {open, close, elementVoid, text} = require('incremental-dom');
 
 function render(data) {
   elementVoid('input', '', [ 'type', 'text' ]);
-  elementOpen('div', '', null);
+  open('div', '', null);
     if (data.someCondition) {
       text(data.text);
     }
-  elementClose('div');
+  close();
 }
 ```
 
@@ -91,13 +87,13 @@ npm i
 To run once:
 
 ```sh
-gulp unit
+./node_modules/.bin/bazel test ...
 ```
 
 To run on change:
 
 ```sh
-gulp unit-watch
+./node_modules/.bin/ibazel run ...
 ```
 
 ### Building
@@ -105,11 +101,11 @@ gulp unit-watch
 To build once:
 
 ```sh
-gulp js
+./node_modules/.bin/bazel build ...
 ```
 
 To build on change:
 
 ```sh
-gulp js-watch
+./node_modules/.bin/ibazel ...
 ```

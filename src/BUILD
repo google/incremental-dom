@@ -10,6 +10,7 @@ ts_library(
         "changes.ts",
         "context.ts",
         "core.ts",
+        "debug.ts",
         "diff.ts",
         "dom_util.ts",
         "global.ts",
@@ -21,4 +22,9 @@ ts_library(
         "util.ts",
         "virtual_elements.ts",
     ],
+)
+
+filegroup(
+    name = "files",
+    srcs = glob(["*.ts"])
 )

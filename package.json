@@ -77,6 +77,5 @@
     "vinyl-source-stream": "2.0.0",
     "webcomponents.js": "0.7.2"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }
