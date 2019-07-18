@@ -18,6 +18,7 @@ rollup_bundle(
   entry_point = ":index.ts",
   deps = [":dev"],
   global_name = "IncrementalDOM",
+  license_banner = "conf/license_header.txt",
 )
 
 genrule(
@@ -56,7 +57,7 @@ npm_package(
 
 ### Produce minified bundle
 
-## Crease a second index so that it can have a reference to the release/ directory.
+## Create a second index so that it can have a reference to the release/ directory.
 ## Using the same index.ts would cause issues with index.closure.js being created twice.
 genrule(
     name = "release_index",
@@ -77,6 +78,7 @@ rollup_bundle(
   entry_point = ":release_index.ts",
   deps = [":release"],
   global_name = "IncrementalDOM",
+  license_banner = "conf/license_header.txt",
 )
 
 genrule(
@@ -97,7 +99,6 @@ npm_package(
 
 npm_package(
   name = "npm",
-  srcs = ["package.json", "index.ts", "//src:all_files"],
   packages = [
     ":npm-min",
     ":npm-umd",
