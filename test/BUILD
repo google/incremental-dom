@@ -5,7 +5,7 @@ ts_library(
     name = "test_lib",
     srcs = glob(["**/*.ts"]),
     deps = [
-        "//:app",
+        "//:dev",
         "//src",
         "@npm//@types",
     ]
