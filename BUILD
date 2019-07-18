@@ -24,7 +24,7 @@ rollup_bundle(
 genrule(
   name = "incremental-dom",
   srcs = [":bundle.umd.js"],
-  outs = ["incremental-dom.js"],
+  outs = ["dist/incremental-dom.js"],
   cmd = "cp $(locations :bundle.umd.js) $@",
 )
 
@@ -41,7 +41,7 @@ npm_package(
 genrule(
   name = "incremental-dom-cjs",
   srcs = [":bundle.cjs.js"],
-  outs = ["incremental-dom-cjs.js"],
+  outs = ["dist/incremental-dom-cjs.js"],
   cmd = "cp $(locations :bundle.cjs.js) $@",
 )
 
@@ -84,7 +84,7 @@ rollup_bundle(
 genrule(
   name = "incremental-dom-min",
   srcs = [":min-bundle.min.js"],
-  outs = ["incremental-dom-min.js"],
+  outs = ["dist/incremental-dom-min.js"],
   cmd = "cp $(locations :min-bundle.min.js) $@",
 )
 
@@ -99,6 +99,7 @@ npm_package(
 
 npm_package(
   name = "npm",
+  srcs = ["package.json", "index.ts", "//src:all_files"],
   packages = [
     ":npm-min",
     ":npm-umd",

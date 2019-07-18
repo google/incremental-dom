@@ -5,12 +5,12 @@
 # The full list of Bazel options: https://docs.bazel.build/versions/master/command-line-reference.html
 
 # Bazel will create symlinks from the workspace directory to output artifacts.
-# Build results will be placed in a directory called "build/bin"
-# Other directories will be created like "build/testlogs"
+# Build results will be placed in a directory called "dist/bin"
+# Other directories will be created like "dist/testlogs"
 # Be aware that this will still create a bazel-out symlink in
 # your project directory, which you must exclude from version control and your
 # editor's search path.
-build --symlink_prefix=build/
+build --symlink_prefix=dist/
 # To disable the symlinks altogether (including bazel-out) you can use
 # build --symlink_prefix=/
 # however this makes it harder to find outputs.

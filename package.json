@@ -17,9 +17,7 @@
   "scripts": {
     "test": "bazel test test:unit_tests",
     "build": "bazel build :dev",
-    "dist": "npm run lint && npm run test && npm run dist-build",
-    "dist-build": "bazel build :npm && rm -rf dist && mkdir -p dist && cp build/bin/npm/* dist",
-    "prepack": "npm run dist",
+    "dist": "npm run lint && npm run test && bazel build :npm",
     "update": "npm-check -u",
     "lint": "eslint src/**.ts"
   },
