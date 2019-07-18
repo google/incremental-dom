@@ -5,13 +5,21 @@ load("//:constants.bzl", "RELEASE_FILES")
 
 ts_library(
     name = "src",
-    srcs = RELEASE_FILES + [
-        "debug.ts",
+    srcs = [
+      ":all_files",
     ],
     tsickle_typed = True,
 )
 
 filegroup(
-    name = "files",
+    name = "release_files",
     srcs = RELEASE_FILES,
+)
+
+filegroup(
+    name = "all_files",
+    srcs = [
+        ":release_files",
+        "debug.ts",
+    ],
 )

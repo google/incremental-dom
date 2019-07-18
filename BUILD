@@ -33,7 +33,7 @@ npm_package(
       ":incremental-dom",
   ],
   replacements = {
-    "DEBUG" : "false"
+    "DEBUG" : "true"
   }
 )
  
@@ -97,8 +97,7 @@ npm_package(
 
 npm_package(
   name = "npm",
-  srcs = ["package.json"],
-  deps = [":dev",],
+  srcs = ["package.json", "index.ts", "//src:all_files"],
   packages = [
     ":npm-min",
     ":npm-umd",

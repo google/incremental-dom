@@ -5,7 +5,7 @@ load("@npm_bazel_typescript//:defs.bzl", "ts_library")
 
 genrule(
     name = "release_files",
-    srcs = ["//src:files"],
+    srcs = ["//src:release_files"],
     outs = RELEASE_FILES,
     cmd = (
         "cp $(SRCS) $(@D)"
