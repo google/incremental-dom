@@ -14,6 +14,4 @@
  * limitations under the License.
  */
 
-const DEBUG = false;
-
-export {DEBUG};
+export const DEBUG = true;
