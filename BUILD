@@ -23,9 +23,9 @@ rollup_bundle(
 
 genrule(
   name = "incremental-dom",
-  srcs = [":bundle.umd.js"],
+  srcs = [":bundle.es5umd.js"],
   outs = ["dist/incremental-dom.js"],
-  cmd = "cp $(locations :bundle.umd.js) $@",
+  cmd = "cp $(locations :bundle.es5umd.js) $@",
 )
 
 npm_package(
