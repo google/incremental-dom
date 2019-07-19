@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/google/incremental-dom.svg?branch=master)](https://travis-ci.org/google/incremental-dom) 
+[![CircleCI](https://circleci.com/gh/iteriani/incremental-dom.svg?style=svg)](https://circleci.com/gh/iteriani/incremental-dom)
 
 # Incremental DOM
 
@@ -91,13 +91,13 @@ npm i
 To run once:
 
 ```sh
-gulp unit
+./node_modules/.bin/bazel test ...
 ```
 
 To run on change:
 
 ```sh
-gulp unit-watch
+./node_modules/.bin/ibazel run ...
 ```
 
 ### Building
@@ -105,11 +105,11 @@ gulp unit-watch
 To build once:
 
 ```sh
-gulp js
+./node_modules/.bin/bazel build ...
 ```
 
 To build on change:
 
 ```sh
-gulp js-watch
+./node_modules/.bin/ibazel ...
 ```

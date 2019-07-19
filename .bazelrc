@@ -59,3 +59,12 @@ run --incompatible_strict_action_env
 # (Note that we use .bazelrc.user so the file appears next to .bazelrc in directory listing,
 # rather than user.bazelrc as suggested in the Bazel docs)
 try-import %workspace%/.bazelrc.user
+
+# Turn on managed directories feature in Bazel
+# This allows us to avoid installing a second copy of node_modules
+common --experimental_allow_incremental_repository_updates
+
+# Prevent TS worker from trying to expand the `includes` section in tsconfig.json.
+# It would find the "test/*.ts" reference when compiling //src:src, and the FileCache will then error
+# when TS attempts to read one of these files that doesn't belong in the compilation.
+build --worker_sandboxing

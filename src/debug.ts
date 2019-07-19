@@ -1,5 +1,4 @@
 /**
- * @license
  * Copyright 2018 The Incremental DOM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,19 +14,4 @@
  * limitations under the License.
  */
 
-// This is in a separate file as a global to prevent Babel from transpiling
-// classes. Transpiled classes do not work with customElements.define.
-if (window.customElements) {
-  window.MyElementDefine = class extends HTMLElement {
-    constructor() {
-      super();
-    }
-  };
-
-  window.customElements.define('my-element-define', window.MyElementDefine);
-}
-
-if (document.registerElement) {
-  window.MyElementRegister = document.registerElement(
-      'my-element-register', {prototype: Object.create(HTMLElement.prototype)});
-}
+export const DEBUG = true;
