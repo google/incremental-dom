@@ -18,12 +18,13 @@ rollup_bundle(
   entry_point = ":index.ts",
   deps = [":dev"],
   global_name = "IncrementalDOM",
+  license_banner = "conf/license_header.txt",
 )
 
 genrule(
   name = "incremental-dom",
   srcs = [":bundle.umd.js"],
-  outs = ["incremental-dom.js"],
+  outs = ["dist/incremental-dom.js"],
   cmd = "cp $(locations :bundle.umd.js) $@",
 )
 
@@ -40,7 +41,7 @@ npm_package(
 genrule(
   name = "incremental-dom-cjs",
   srcs = [":bundle.cjs.js"],
-  outs = ["incremental-dom-cjs.js"],
+  outs = ["dist/incremental-dom-cjs.js"],
   cmd = "cp $(locations :bundle.cjs.js) $@",
 )
 
@@ -56,7 +57,7 @@ npm_package(
 
 ### Produce minified bundle
 
-## Crease a second index so that it can have a reference to the release/ directory.
+## Create a second index so that it can have a reference to the release/ directory.
 ## Using the same index.ts would cause issues with index.closure.js being created twice.
 genrule(
     name = "release_index",
@@ -77,13 +78,18 @@ rollup_bundle(
   entry_point = ":release_index.ts",
   deps = [":release"],
   global_name = "IncrementalDOM",
+  license_banner = "conf/license_header.txt",
 )
 
+## Need to run uglify to minify instead of using .min.es5umd.js, since it uses
+## Terser, which has some performance issues with the output in how it inlines
+## functions.
 genrule(
   name = "incremental-dom-min",
-  srcs = [":min-bundle.min.js"],
-  outs = ["incremental-dom-min.js"],
-  cmd = "cp $(locations :min-bundle.min.js) $@",
+  srcs = [":min-bundle.es5umd.js"],
+  outs = ["dist/incremental-dom-min.js"],
+  cmd = "$(location node_modules/.bin/uglifyjs) --source-map=url -m -o $@ $(location min-bundle.es5umd.js)",
+  tools = ["node_modules/.bin/uglifyjs"],
 )
 
 npm_package(
