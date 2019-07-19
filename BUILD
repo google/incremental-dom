@@ -81,11 +81,15 @@ rollup_bundle(
   license_banner = "conf/license_header.txt",
 )
 
+## Need to run uglify to minify instead of using .min.es5umd.js, since it uses
+## Terser, which has some performance issues with the output in how it inlines
+## functions.
 genrule(
   name = "incremental-dom-min",
-  srcs = [":min-bundle.min.js"],
+  srcs = [":min-bundle.es5umd.js"],
   outs = ["dist/incremental-dom-min.js"],
-  cmd = "cp $(locations :min-bundle.min.js) $@",
+  cmd = "$(location node_modules/.bin/uglifyjs) --source-map=url -m -o $@ $(location min-bundle.es5umd.js)",
+  tools = ["node_modules/.bin/uglifyjs"],
 )
 
 npm_package(
