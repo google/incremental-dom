@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/iteriani/incremental-dom.svg?style=svg)](https://circleci.com/gh/iteriani/incremental-dom)
+[![CircleCI](https://circleci.com/gh/iteriani/incremental-dom.svg?style=svg)](https://circleci.com/gh/google/incremental-dom)
 
 # Incremental DOM
 
