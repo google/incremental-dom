@@ -102,8 +102,10 @@ function applyStyle(
   name: string,
   style: string | { [k: string]: string }
 ) {
-  // MathML elements inherit from Element, which does not have style.
-  assert(el instanceof HTMLElement || el instanceof SVGElement);
+  // MathML elements inherit from Element, which does not have style. We cannot
+  // do `instanceof HTMLElement` / `instanceof SVGElement`, since el can belong
+  // to a different document, so just check that it has a style.
+  assert("style" in el);
   const elStyle = (<HTMLElement | SVGElement>el).style;
 
   if (typeof style === "string") {
