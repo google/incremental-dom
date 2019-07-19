@@ -47,7 +47,6 @@
     "prettier": "^1.18.2",
     "sinon": "^4.0.0",
     "sinon-chai": "^2.9.0",
-    "terser": "^4.1.2",
     "typescript": "~3.4.1",
     "uglify-js": "^3.6.0"
   },
