@@ -24,14 +24,53 @@ var_4: &save_cache
 version: 2
 
 jobs:
-  build:
+  setup:
     <<: *job_defaults
     steps:
       - checkout
       - restore_cache:
           key: *cache_key
       - run: npm install
-      - run: npm run lint
+      - *save_cache
+
+  build:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - restore_cache:
+          key: *cache_key
       - run: ./node_modules/.bin/bazel build ...
+      - *save_cache
+
+  lint:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - restore_cache:
+          key: *cache_key
+      - run: npm run lint
+
+  test:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - restore_cache:
+          key: *cache_key
       - run: ./node_modules/.bin/bazel test ...
       - *save_cache
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - setup
+      - lint:
+          requires:
+            - setup
+      - build:
+          requires:
+            - setup
+      - test:
+          requires:
+            - setup
+
