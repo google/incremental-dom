@@ -179,3 +179,34 @@ typedef Model =
 
 ```
 Towser can easlily be integrated with your favorite node framework by compiling it with the flag 'backend'.
+
+### Falak JS
+[Falak JS](https://github.com/falakjs/Falak) is a framework "**for lazy people**" built on top of Incremental Dom with a fully maximized and easy usage.
+
+```html
+<!-- home-page.component.html -->
+<!-- If statements -->
+<h1 *if="this.accountType == 'admin'">Welcome boss</h1>
+
+<h1 *elseif="this.accountType == 'moderator'">Welcome {{ this.user.name }}</h1>
+
+<h1 *else>Welcome visitor</h1>
+
+<!-- Loops -->
+<ul class="list-items">
+  <li *for="let user of this.users">
+    {{ user.name }}
+  </li>
+  <!-- Using the [html] directive as an alias -->
+  <li *for="let user of this.users" [html]="user.name"></li>
+  <!-- Using index -->
+  <li *for="let user, index of this.users">
+   {{ index }}- {{ user.name }}
+  </li>
+  <!-- Combining if with for loop -->
+  <li *if="this.users.length > 0" *for="let user of this.users">...</li>
+</ul>
+
+<!-- Calling other components -->
+<hello-world [account-type]="this.accountType">....</hello-world>
+```
