@@ -465,8 +465,8 @@ function createPatchOuter<T>(
   }, patchConfig);
 }
 
-const patchInner = createPatchInner();
-const patchOuter = createPatchOuter();
+const patchInner: PatchFunction<{}, Node> = createPatchInner();
+const patchOuter: PatchFunction<{}, Node | null> = createPatchOuter();
 
 export {
   alignWithDOM,
