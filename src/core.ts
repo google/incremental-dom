@@ -465,12 +465,12 @@ function createPatchOuter<T>(
   }, patchConfig);
 }
 
-const patchInner: <T, R>(
+const patchInner: <T>(
     node: Element|DocumentFragment, template: (a: T|undefined) => void,
-    data?: T|undefined) => R = createPatchInner();
-const patchOuter: <T, R>(
+    data?: T|undefined) => Node = createPatchInner();
+const patchOuter: <T>(
     node: Element|DocumentFragment, template: (a: T|undefined) => void,
-    data?: T|undefined) => R = createPatchOuter();
+    data?: T|undefined) => Node|null = createPatchOuter();
 
 export {
   alignWithDOM,
