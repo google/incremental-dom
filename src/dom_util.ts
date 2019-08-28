@@ -68,7 +68,7 @@ function getAncestry(node: Node, root: Node | null) {
  * @returns The root node of the DOM tree that contains this node.
  */
 const getRootNode =
-  (Node as any).prototype.getRootNode ||
+  (typeof Node !== 'undefined' && (Node as any).prototype.getRootNode) ||
   function(this: Node) {
     let cur: Node | null = this as Node;
     let prev = cur;
