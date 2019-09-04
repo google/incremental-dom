@@ -30,7 +30,7 @@ jobs:
       - checkout
       - restore_cache:
           key: *cache_key
-      - run: npm install
+      - run: npm ci
       - *save_cache
 
   build:
