@@ -1,5 +1,22 @@
 # Change Log
 
+## 0.7.0
+
+- Added an option to specify which attribute to use for a key when importing
+  DOM nodes
+- Improve handling of cached value for `Text` nodes when using formatting
+  functions
+- Added an option to specify a custom matching function via `createPatchInner`
+  and `createPatchOuter`
+- Added a call flow to open an element, then apply attributes using the new
+  `applyStatics` and `applyAttrs` functions along with the existing `open` and
+  `close` calls, allowing you to use information from the element in when
+  specifying the attributes
+- Improved performance of the `elementOpenStart`, `attr`, `elementOpenEnd` call
+  sequence
+- Fix assertion when updating the `style` of an element from another `Document`
+
+
 ## 0.6.0
 
 - Added support for MathML
