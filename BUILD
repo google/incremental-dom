@@ -88,7 +88,7 @@ genrule(
   name = "incremental-dom-min",
   srcs = [":min-bundle.es5umd.js"],
   outs = ["dist/incremental-dom-min.js"],
-  cmd = "$(location node_modules/.bin/uglifyjs) --source-map=url -m -o $@ $(location min-bundle.es5umd.js)",
+  cmd = "$(location node_modules/.bin/uglifyjs) --comments --source-map=url -m -o $@ $(location min-bundle.es5umd.js)",
   tools = ["node_modules/.bin/uglifyjs"],
 )
 
