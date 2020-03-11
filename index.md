@@ -175,7 +175,7 @@ to:
 1. Prevent the treating of newly added or moved items as a diff that needs to be reconciled.
 1. Correctly maintain focus on any input fields, buttons or other items that may receive focus that have moved.
 
-Keys do not need to be unqiue. One strategy might be to simple autogenerate a
+Keys do not need to be unique. One strategy might be to simply autogenerate a
 key for every logical statement in the source.
 
 #### Keys and Arrays
@@ -453,7 +453,7 @@ A combination of [`elementOpen`](#elementopen), followed by [`elementClose`](#el
 #### Usage
 
 ```javascript
-import { elementClose } from 'incremental-dom';
+import { elementVoid } from 'incremental-dom';
 
 …
 
