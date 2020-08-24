@@ -318,6 +318,10 @@ function currentPointer(): Node {
   return getNextNode()!;
 }
 
+function currentContext() {
+  return context;
+}
+
 /**
  * Skips the children in a subtree, allowing an Element to be closed without
  * clearing out the children.
@@ -356,7 +360,7 @@ function createPatcher<T, R>(
     let previousInSkip = false;
 
     doc = node.ownerDocument;
-    context = new Context();
+    context = new Context(node);
     matchFn = matches;
     argsBuilder = [];
     attrsBuilder = [];
@@ -488,6 +492,7 @@ export {
   open,
   close,
   currentElement,
+  currentContext,
   currentPointer,
   skip,
   nextNode as skipNode
