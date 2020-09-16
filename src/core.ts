@@ -148,6 +148,15 @@ function getMatchingNode(
 
   return null;
 }
+
+/**
+ * Updates the internal structure of a DOM node in the case that an external
+ * framework tries to modify a DOM element.
+ */
+function alwaysDiffAttributes(el: Element) {
+  getData(el).alwaysDiffAttributes = true;
+}
+
 /**
  * Clears out any unvisited Nodes in a given range.
  * @param maybeParentNode
@@ -482,6 +491,7 @@ const patchOuter: <T>(
 
 export {
   alignWithDOM,
+  alwaysDiffAttributes,
   getArgsBuilder,
   getAttrsBuilder,
   text,

@@ -60,7 +60,8 @@ function diffAttrs(element: Element, data: NodeData) {
   const attrsBuilder = getAttrsBuilder();
   const prevAttrsArr = data.getAttrsArr(attrsBuilder.length);
 
-  calculateDiff(prevAttrsArr, attrsBuilder, element, updateAttribute);
+  calculateDiff(prevAttrsArr, attrsBuilder, element, updateAttribute,
+                data.alwaysDiffAttributes);
   truncateArray(attrsBuilder, 0);
 }
 
