@@ -39,7 +39,7 @@ function calculateDiff<T>(
   next: Array<string>,
   updateCtx: T,
   updateFn: (ctx: T, x: string, y: {} | undefined) => void,
-  alwaysDiffAttributes: boolean
+  alwaysDiffAttributes: boolean = false
 ) {
   const isNew = !prev.length || alwaysDiffAttributes;
   let i = 0;
