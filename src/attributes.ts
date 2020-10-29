@@ -51,9 +51,9 @@ function applyAttr(el: Element, name: string, value: unknown) {
   } else {
     const attrNS = getNamespace(name);
     if (attrNS) {
-      el.setAttributeNS(attrNS, name, String(value));
+      el.setAttributeNS(attrNS, name, value as string);
     } else {
-      el.setAttribute(name, String(value));
+      el.setAttribute(name, value as string);
     }
   }
 }
