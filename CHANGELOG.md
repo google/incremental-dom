@@ -1,5 +1,9 @@
 # Change Log
 
+## Unreleased
+
+- Added `patchBetween` to be able to run a patch function between to sibling ndoes.
+
 ## 0.7.0
 
 - Added an option to specify which attribute to use for a key when importing

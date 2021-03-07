@@ -68,6 +68,8 @@ let currentNode: Node | null = null;
 
 let currentParent: Node | null = null;
 
+let currentEndNode: Node | null = null;
+
 let doc: Document | null = null;
 
 let focusPath: Array<Node> = [];
@@ -141,6 +143,9 @@ function getMatchingNode(
   let cur: Node | null = matchNode;
 
   do {
+    if (cur === currentEndNode) {
+      return null;    
+    }
     if (matches(cur, nameOrCtor, key)) {
       return cur;
     }
@@ -364,6 +369,7 @@ function createPatcher<T, R>(
     const prevAttrsBuilder = attrsBuilder;
     const prevCurrentNode = currentNode;
     const prevCurrentParent = currentParent;
+    const prevCurrentEndNode = currentEndNode;
     const prevMatchFn = matchFn;
     let previousInAttributes = false;
     let previousInSkip = false;
@@ -400,6 +406,8 @@ function createPatcher<T, R>(
       attrsBuilder = prevAttrsBuilder;
       currentNode = prevCurrentNode;
       currentParent = prevCurrentParent;
+      currentEndNode = prevCurrentEndNode;
+
       focusPath = prevFocusPath;
 
       // Needs to be done after assertions because assertions rely on state
@@ -478,6 +486,40 @@ function createPatchOuter<T>(
   }, patchConfig);
 }
 
+/**
+ * Creates a patcher that patches the document starting at node with a
+ * provided function. This function may be called during an existing patch operation.
+ * @param patchConfig The config to use for the patch.
+ * @returns The created function for patching an Element's children.
+ */
+function createPatchBetween<T, R>(patchConfig?: PatchConfig) {
+  return (startNode: Node, endNode: Node, template: (a: T | undefined) => void,
+  data?: T | undefined) => {
+    const patcher = createPatcher<T, R>((node, fn, data) => {
+      currentNode = startNode;
+      currentParent = startNode.parentNode;
+      currentEndNode = endNode;
+
+      fn(data);
+      if (DEBUG) {
+        if (currentNode === null) {
+          assertNoUnclosedTags(currentParent, endNode);
+        }
+      }
+      if (currentNode && currentNode.nextSibling !== endNode) {
+        clearUnvisitedDOM(startNode.parentNode, currentNode.nextSibling, endNode);
+      }
+      if (DEBUG) {
+        if (currentNode && currentNode.nextSibling !== endNode) {
+          throw new Error("Leftover elements after patchBetween");
+        }
+      }
+      return node as unknown as R;
+    }, patchConfig);
+    return patcher(startNode as Element, template, data);
+  };
+}
+
 const patchInner: <T>(
   node: Element | DocumentFragment,
   template: (a: T | undefined) => void,
@@ -488,6 +530,7 @@ const patchOuter: <T>(
   template: (a: T | undefined) => void,
   data?: T | undefined
 ) => Node | null = createPatchOuter();
+const patchBetween = createPatchBetween();
 
 export {
   alignWithDOM,
@@ -497,8 +540,10 @@ export {
   text,
   createPatchInner,
   createPatchOuter,
+  createPatchBetween,
   patchInner,
   patchOuter,
+  patchBetween,
   open,
   close,
   currentElement,
