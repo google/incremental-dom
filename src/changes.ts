@@ -26,17 +26,20 @@ let bufferStart = 0;
  * @param a The first argument to the function.
  * @param b The second argument to the function.
  * @param c The third argument to the function.
+ * @param d The fourth argument to the function
  */
-function queueChange<A, B, C>(
-  fn: (a: A, b: B, c: C) => void,
+function queueChange<A, B, C, D>(
+  fn: (a: A, b: B, c: C, d: D) => void,
   a: A,
   b: B,
-  c: C
+  c: C,
+  d: D,
 ) {
   buffer.push(fn);
   buffer.push(a);
   buffer.push(b);
   buffer.push(c);
+  buffer.push(d);
 }
 
 /**
@@ -51,9 +54,9 @@ function flush() {
 
   bufferStart = end;
 
-  for (let i = start; i < end; i += 4) {
-    const fn = buffer[i] as (a: any, b: any, c: any) => undefined;
-    fn(buffer[i + 1], buffer[i + 2], buffer[i + 3]);
+  for (let i = start; i < end; i += 5) {
+    const fn = buffer[i] as (a: any, b: any, c: any, d:any) => undefined;
+    fn(buffer[i + 1], buffer[i + 2], buffer[i + 3], buffer[i + 4]);
   }
 
   bufferStart = start;
