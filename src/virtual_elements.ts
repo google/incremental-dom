@@ -23,7 +23,7 @@ import {
   assertNotInSkip,
   setInAttributes
 } from "./assertions";
-import { updateAttribute } from "./attributes";
+import {attributes, updateAttribute } from "./attributes";
 import {
   getArgsBuilder,
   getAttrsBuilder,
@@ -62,7 +62,7 @@ function diffAttrs(element: Element, data: NodeData, attrs: AttrMutatorConfig) {
   const prevAttrsArr = data.getAttrsArr(attrsBuilder.length);
 
   calculateDiff(prevAttrsArr, attrsBuilder, element, updateAttribute,
-                data.alwaysDiffAttributes, attrs);
+                attrs, data.alwaysDiffAttributes);
   truncateArray(attrsBuilder, 0);
 }
 

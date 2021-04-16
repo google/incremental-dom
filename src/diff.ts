@@ -76,7 +76,7 @@ function calculateDiff<T>(
       const value = next[i + 1];
 
       if (prevValuesMap[name] !== value) {
-        queueChange(updateFn, updateCtx, name, value, attires);
+        queueChange(updateFn, updateCtx, name, value, attrs);
       }
 
       prev[i] = name;
