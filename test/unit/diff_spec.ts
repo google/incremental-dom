@@ -18,7 +18,7 @@
 // taze: chai from //third_party/javascript/typings/chai
 import * as Sinon from 'sinon';
 import {calculateDiff} from '../../src/diff';
-
+import {attributes} from '../../src/attributes';
 const {expect} = chai;
 
 describe('calculateDiff', () => {
@@ -33,7 +33,7 @@ describe('calculateDiff', () => {
     const prev: string[] = [];
     const next = ['name1', 'value1', 'name2', 'value2'];
 
-    calculateDiff(prev, next, updateCtx, updateFn);
+    calculateDiff(prev, next, updateCtx, updateFn, attributes);
 
     expect(updateFn)
         .to.have.been.calledTwice.to.have.been
@@ -45,7 +45,7 @@ describe('calculateDiff', () => {
     const prev = ['name1', 'value1', 'name2', 'value2'];
     const next: string[] = [];
 
-    calculateDiff(prev, next, updateCtx, updateFn);
+    calculateDiff(prev, next, updateCtx, updateFn, attributes);
 
     expect(updateFn)
         .to.have.been.calledTwice.to.have.been
@@ -57,7 +57,7 @@ describe('calculateDiff', () => {
     const prev = ['name', 'value'];
     const next = ['name', 'value'];
 
-    calculateDiff(prev, next, updateCtx, updateFn);
+    calculateDiff(prev, next, updateCtx, updateFn, attributes);
 
     expect(updateFn).to.have.been.not.called;
   });
@@ -66,7 +66,7 @@ describe('calculateDiff', () => {
     const prev = ['name1', 'value1'];
     const next = ['name2', 'value2', 'name1', 'value1'];
 
-    calculateDiff(prev, next, updateCtx, updateFn);
+    calculateDiff(prev, next, updateCtx, updateFn, attributes);
 
     expect(updateFn).to.have.been.calledOnce.to.have.been.calledWith(
         updateCtx, 'name2', 'value2');
@@ -76,7 +76,7 @@ describe('calculateDiff', () => {
     const prev = ['name1', 'value1', 'name2', 'value2'];
     const next = ['name2', 'value2', 'name1', 'value1'];
 
-    calculateDiff(prev, next, updateCtx, updateFn);
+    calculateDiff(prev, next, updateCtx, updateFn, attributes);
 
     expect(updateFn).to.have.been.not.called;
   });
