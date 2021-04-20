@@ -221,13 +221,16 @@ function nextNode() {
  * @param key The key used to identify the Node.
  * @return The newly created node.
  */
-function createNode(nameOrCtor: NameOrCtorDef, key: Key): Node {
+function createNode(nameOrCtor: NameOrCtorDef, key: Key, nonce?: string): Node {
   let node;
 
   if (nameOrCtor === "#text") {
     node = createText(doc!);
   } else {
     node = createElement(doc!, currentParent!, nameOrCtor, key);
+    if (nonce) {
+      node.setAttribute('nonce', nonce);
+    }
   }
 
   context!.markCreated(node);
@@ -241,10 +244,10 @@ function createNode(nameOrCtor: NameOrCtorDef, key: Key): Node {
  * @param nameOrCtor The name or constructor for the Node.
  * @param key The key used to identify the Node.
  */
-function alignWithDOM(nameOrCtor: NameOrCtorDef, key: Key) {
+function alignWithDOM(nameOrCtor: NameOrCtorDef, key: Key, nonce?: string) {
   nextNode();
   const existingNode = getMatchingNode(currentNode, nameOrCtor, key);
-  const node = existingNode || createNode(nameOrCtor, key);
+  const node = existingNode || createNode(nameOrCtor, key, nonce);
 
   // If we are at the matching node, then we are done.
   if (node === currentNode) {
@@ -274,8 +277,9 @@ function alignWithDOM(nameOrCtor: NameOrCtorDef, key: Key) {
  *     when iterating over an array of items.
  * @return The corresponding Element.
  */
-function open(nameOrCtor: NameOrCtorDef, key?: Key): HTMLElement {
-  alignWithDOM(nameOrCtor, key);
+function open(
+    nameOrCtor: NameOrCtorDef, key?: Key, nonce?: string): HTMLElement {
+  alignWithDOM(nameOrCtor, key, nonce);
   enterNode();
   return currentParent as HTMLElement;
 }

@@ -202,7 +202,8 @@ function elementOpenEnd(): HTMLElement {
     setInAttributes(false);
   }
 
-  const node = open(<NameOrCtorDef>argsBuilder[0], <Key>argsBuilder[1]);
+  const node =
+      open(<NameOrCtorDef>argsBuilder[0], <Key>argsBuilder[1], getNonce());
   const data = getData(node);
 
   diffStatics(node, data, <Statics>argsBuilder[2], attributes);
@@ -210,6 +211,20 @@ function elementOpenEnd(): HTMLElement {
   truncateArray(argsBuilder, 0);
 
   return node;
+}
+
+/** Gets the value of the nonce attribute. */
+function getNonce(): string {
+  const argsBuilder = getArgsBuilder();
+  const statics = <Statics>argsBuilder[2];
+  if (statics) {
+    for (let i = 0; i < statics.length; i += 2) {
+      if (statics[i] === 'nonce') {
+        return statics[i + 1] as string;
+      }
+    }
+  }
+  return '';
 }
 
 /**
