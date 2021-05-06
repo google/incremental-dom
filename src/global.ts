@@ -30,5 +30,5 @@ function setKeyAttributeName(name: string | null) {
   keyAttributeName = name;
 }
 
-export { DEBUG } from "./debug";
+export { DEBUG } from "./debug.ts";
 export { getKeyAttributeName, setKeyAttributeName };

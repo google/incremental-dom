@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { DEBUG } from "./global";
-import { NameOrCtorDef } from "./types";
+import { DEBUG } from "./global.ts";
+import { NameOrCtorDef } from "./types.ts";
 
 /**
  * Keeps track whether or not we are in an attributes declaration (after

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { createMap, truncateArray } from "./util";
-import { flush, queueChange } from "./changes";
+import { createMap, truncateArray } from "./util.ts";
+import { flush, queueChange } from "./changes.ts";
 
 /**
  * Used to keep track of the previous values when a 2-way diff is necessary.

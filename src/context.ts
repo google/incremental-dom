@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { notifications } from "./notifications";
+import { notifications } from "./notifications.ts";
 
 /**
  * A context object keeps track of the state of a patch.

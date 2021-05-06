@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { Key, NameOrCtorDef } from "./types";
-import { assert } from "./assertions";
-import { createArray } from "./util";
-import { isElement } from "./dom_util";
-import { getKeyAttributeName } from "./global";
+import { Key, NameOrCtorDef } from "./types.ts";
+import { assert } from "./assertions.ts";
+import { createArray } from "./util.ts";
+import { isElement } from "./dom_util.ts";
+import { getKeyAttributeName } from "./global.ts";
 
 declare global {
   interface Node {

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { getData, initData } from "./node_data";
-import { Key, NameOrCtorDef } from "./types";
+import { getData, initData } from "./node_data.ts";
+import { Key, NameOrCtorDef } from "./types.ts";
 
 /**
  * Gets the namespace to create an element (of a given tag) in.

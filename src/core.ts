@@ -25,19 +25,19 @@ import {
   setInAttributes,
   setInSkip,
   updatePatchContext
-} from "./assertions";
-import { Context } from "./context";
-import { getFocusedPath, moveBefore } from "./dom_util";
-import { DEBUG } from "./global";
-import { getData } from "./node_data";
-import { createElement, createText } from "./nodes";
+} from "./assertions.ts";
+import { Context } from "./context.ts";
+import { getFocusedPath, moveBefore } from "./dom_util.ts";
+import { DEBUG } from "./global.ts";
+import { getData } from "./node_data.ts";
+import { createElement, createText } from "./nodes.ts";
 import {
   Key,
   MatchFnDef,
   NameOrCtorDef,
   PatchConfig,
   PatchFunction
-} from "./types";
+} from "./types.ts";
 
 /**
  * The default match function to use, if one was not specified when creating

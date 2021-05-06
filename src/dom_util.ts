@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { assert } from "./assertions";
+import { assert } from "./assertions.ts";
 
 /**
  * Checks if the node is the root of a document. This is either a Document

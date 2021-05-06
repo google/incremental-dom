@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { AttrMutatorConfig } from "./types";
-import { assert } from "./assertions";
-import { createMap, has } from "./util";
-import { symbols } from "./symbols";
+import { AttrMutatorConfig } from "./types.ts";
+import { assert } from "./assertions.ts";
+import { createMap, has } from "./util.ts";
+import { symbols } from "./symbols.ts";
 
 /**
  * @param name The name of the attribute. For example "tabindex" or

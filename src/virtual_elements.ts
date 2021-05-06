@@ -22,8 +22,8 @@ import {
   assertNotInAttributes,
   assertNotInSkip,
   setInAttributes
-} from "./assertions";
-import { updateAttribute } from "./attributes";
+} from "./assertions.ts";
+import { updateAttribute } from "./attributes.ts";
 import {
   getArgsBuilder,
   getAttrsBuilder,
@@ -31,12 +31,12 @@ import {
   open,
   text as coreText,
   currentElement
-} from "./core";
-import { DEBUG } from "./global";
-import { getData, NodeData } from "./node_data";
-import { Key, NameOrCtorDef, Statics } from "./types";
-import { createMap, truncateArray } from "./util";
-import { calculateDiff } from "./diff";
+} from "./core.ts";
+import { DEBUG } from "./global.ts";
+import { getData, NodeData } from "./node_data.ts";
+import { Key, NameOrCtorDef, Statics } from "./types.ts";
+import { createMap, truncateArray } from "./util.ts";
+import { calculateDiff } from "./diff.ts";
 
 /**
  * The offset in the virtual element declaration where the attributes are
