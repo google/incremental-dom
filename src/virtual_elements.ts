@@ -23,7 +23,7 @@ import {
   assertNotInSkip,
   setInAttributes
 } from "./assertions.ts";
-import { updateAttribute } from "./attributes.ts";
+import {attributes, updateAttribute } from "./attributes.ts";
 import {
   getArgsBuilder,
   getAttrsBuilder,
@@ -34,7 +34,7 @@ import {
 } from "./core.ts";
 import { DEBUG } from "./global.ts";
 import { getData, NodeData } from "./node_data.ts";
-import { Key, NameOrCtorDef, Statics } from "./types.ts";
+import { AttrMutatorConfig, Key, NameOrCtorDef, Statics } from "./types.ts";
 import { createMap, truncateArray } from "./util.ts";
 import { calculateDiff } from "./diff.ts";
 
@@ -55,12 +55,14 @@ const prevAttrsMap = createMap();
 /**
  * @param element The Element to diff the attrs for.
  * @param data The NodeData associated with the Element.
+ * @param attrs The attribute map of mutators
  */
-function diffAttrs(element: Element, data: NodeData) {
+function diffAttrs(element: Element, data: NodeData, attrs: AttrMutatorConfig) {
   const attrsBuilder = getAttrsBuilder();
   const prevAttrsArr = data.getAttrsArr(attrsBuilder.length);
 
-  calculateDiff(prevAttrsArr, attrsBuilder, element, updateAttribute);
+  calculateDiff(prevAttrsArr, attrsBuilder, element, updateAttribute,
+                attrs, data.alwaysDiffAttributes);
   truncateArray(attrsBuilder, 0);
 }
 
@@ -71,7 +73,7 @@ function diffAttrs(element: Element, data: NodeData) {
  * @param data The NodeData associated with the Element.
  * @param statics The statics array.
  */
-function diffStatics(node: Element, data: NodeData, statics: Statics) {
+function diffStatics(node: Element, data: NodeData, statics: Statics, attrs: AttrMutatorConfig) {
   if (data.staticsApplied) {
     return;
   }
@@ -84,7 +86,7 @@ function diffStatics(node: Element, data: NodeData, statics: Statics) {
 
   if (data.hasEmptyAttrsArr()) {
     for (let i = 0; i < statics.length; i += 2) {
-      updateAttribute(node, statics[i] as string, statics[i + 1]);
+      updateAttribute(node, statics[i] as string, statics[i + 1], attrs);
     }
     return;
   }
@@ -119,7 +121,7 @@ function diffStatics(node: Element, data: NodeData, statics: Statics) {
   truncateArray(attrsArr, j);
 
   for (const name in prevAttrsMap) {
-    updateAttribute(node, name, statics[prevAttrsMap[name]]);
+    updateAttribute(node, name, statics[prevAttrsMap[name]], attrs);
     delete prevAttrsMap[name];
   }
 }
@@ -200,14 +202,29 @@ function elementOpenEnd(): HTMLElement {
     setInAttributes(false);
   }
 
-  const node = open(<NameOrCtorDef>argsBuilder[0], <Key>argsBuilder[1]);
+  const node =
+      open(<NameOrCtorDef>argsBuilder[0], <Key>argsBuilder[1], getNonce());
   const data = getData(node);
 
-  diffStatics(node, data, <Statics>argsBuilder[2]);
-  diffAttrs(node, data);
+  diffStatics(node, data, <Statics>argsBuilder[2], attributes);
+  diffAttrs(node, data, attributes);
   truncateArray(argsBuilder, 0);
 
   return node;
+}
+
+/** Gets the value of the nonce attribute. */
+function getNonce(): string {
+  const argsBuilder = getArgsBuilder();
+  const statics = <Statics>argsBuilder[2];
+  if (statics) {
+    for (let i = 0; i < statics.length; i += 2) {
+      if (statics[i] === 'nonce') {
+        return statics[i + 1] as string;
+      }
+    }
+  }
+  return '';
 }
 
 /**
@@ -248,11 +265,11 @@ function elementOpen(
  * Applies the currently buffered attrs to the currently open element. This
  * clears the buffered attributes.
  */
-function applyAttrs() {
+function applyAttrs(attrs = attributes) {
   const node = currentElement();
   const data = getData(node);
 
-  diffAttrs(node, data);
+  diffAttrs(node, data, attrs);
 }
 
 /**
@@ -260,11 +277,11 @@ function applyAttrs() {
  * statics should be applied before calling `applyAtrs`.
  * @param statics The statics to apply to the current element.
  */
-function applyStatics(statics: Statics) {
+function applyStatics(statics: Statics, attrs = attributes) {
   const node = currentElement();
   const data = getData(node);
 
-  diffStatics(node, data, statics);
+  diffStatics(node, data, statics, attrs);
 }
 
 /**

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-export {applyAttr, applyProp, attributes,} from './src/attributes.ts';
-export {alignWithDOM, close, createPatchInner, createPatchOuter, currentElement, currentPointer, open, patchInner as patch, patchInner, patchOuter, skip, skipNode} from './src/core.ts';
+export {applyAttr, applyProp, attributes, createAttributeMap} from './src/attributes.ts';
+export {alignWithDOM, alwaysDiffAttributes, close, createPatchInner, createPatchOuter, currentElement, currentContext, currentPointer, open, patchInner as patch, patchInner, patchOuter, skip, skipNode} from './src/core.ts';
 export {setKeyAttributeName} from './src/global.ts';
 export {clearCache,getKey, importNode, isDataInitialized} from './src/node_data.ts';
 export {notifications} from './src/notifications.ts';

@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { AttrMutatorConfig } from "./types.ts";
 import { createMap, truncateArray } from "./util.ts";
 import { flush, queueChange } from "./changes.ts";
 
@@ -32,14 +33,18 @@ const prevValuesMap = createMap();
  * @param next The next values, alternating name, value pairs.
  * @param updateCtx The context for the updateFn.
  * @param updateFn A function to call when a value has changed.
+ * @param attrs Attribute map for mutators
+ * @param alwaysDiffAttributes Whether to diff attributes unconditionally
  */
 function calculateDiff<T>(
   prev: Array<string>,
   next: Array<string>,
   updateCtx: T,
-  updateFn: (ctx: T, x: string, y: {} | undefined) => void
+  updateFn: (ctx: T, x: string, y: {} | undefined, attrs: AttrMutatorConfig) => void,
+  attrs: AttrMutatorConfig,
+  alwaysDiffAttributes: boolean = false
 ) {
-  const isNew = !prev.length;
+  const isNew = !prev.length || alwaysDiffAttributes;
   let i = 0;
 
   for (; i < next.length; i += 2) {
@@ -53,7 +58,7 @@ function calculateDiff<T>(
     const value = next[i + 1];
     if (isNew || prev[i + 1] !== value) {
       prev[i + 1] = value;
-      queueChange(updateFn, updateCtx, name, value);
+      queueChange(updateFn, updateCtx, name, value, attrs);
     }
   }
 
@@ -71,7 +76,7 @@ function calculateDiff<T>(
       const value = next[i + 1];
 
       if (prevValuesMap[name] !== value) {
-        queueChange(updateFn, updateCtx, name, value);
+        queueChange(updateFn, updateCtx, name, value, attrs);
       }
 
       prev[i] = name;
@@ -83,7 +88,7 @@ function calculateDiff<T>(
     truncateArray(prev, next.length);
 
     for (const name in prevValuesMap) {
-      queueChange(updateFn, updateCtx, name, undefined);
+      queueChange(updateFn, updateCtx, name, undefined, attrs);
       delete prevValuesMap[name];
     }
   }

@@ -148,6 +148,15 @@ function getMatchingNode(
 
   return null;
 }
+
+/**
+ * Updates the internal structure of a DOM node in the case that an external
+ * framework tries to modify a DOM element.
+ */
+function alwaysDiffAttributes(el: Element) {
+  getData(el).alwaysDiffAttributes = true;
+}
+
 /**
  * Clears out any unvisited Nodes in a given range.
  * @param maybeParentNode
@@ -212,13 +221,16 @@ function nextNode() {
  * @param key The key used to identify the Node.
  * @return The newly created node.
  */
-function createNode(nameOrCtor: NameOrCtorDef, key: Key): Node {
+function createNode(nameOrCtor: NameOrCtorDef, key: Key, nonce?: string): Node {
   let node;
 
   if (nameOrCtor === "#text") {
     node = createText(doc!);
   } else {
     node = createElement(doc!, currentParent!, nameOrCtor, key);
+    if (nonce) {
+      node.setAttribute('nonce', nonce);
+    }
   }
 
   context!.markCreated(node);
@@ -232,10 +244,10 @@ function createNode(nameOrCtor: NameOrCtorDef, key: Key): Node {
  * @param nameOrCtor The name or constructor for the Node.
  * @param key The key used to identify the Node.
  */
-function alignWithDOM(nameOrCtor: NameOrCtorDef, key: Key) {
+function alignWithDOM(nameOrCtor: NameOrCtorDef, key: Key, nonce?: string) {
   nextNode();
   const existingNode = getMatchingNode(currentNode, nameOrCtor, key);
-  const node = existingNode || createNode(nameOrCtor, key);
+  const node = existingNode || createNode(nameOrCtor, key, nonce);
 
   // If we are at the matching node, then we are done.
   if (node === currentNode) {
@@ -265,8 +277,9 @@ function alignWithDOM(nameOrCtor: NameOrCtorDef, key: Key) {
  *     when iterating over an array of items.
  * @return The corresponding Element.
  */
-function open(nameOrCtor: NameOrCtorDef, key?: Key): HTMLElement {
-  alignWithDOM(nameOrCtor, key);
+function open(
+    nameOrCtor: NameOrCtorDef, key?: Key, nonce?: string): HTMLElement {
+  alignWithDOM(nameOrCtor, key, nonce);
   enterNode();
   return currentParent as HTMLElement;
 }
@@ -318,6 +331,10 @@ function currentPointer(): Node {
   return getNextNode()!;
 }
 
+function currentContext() {
+  return context;
+}
+
 /**
  * Skips the children in a subtree, allowing an Element to be closed without
  * clearing out the children.
@@ -356,7 +373,7 @@ function createPatcher<T, R>(
     let previousInSkip = false;
 
     doc = node.ownerDocument;
-    context = new Context();
+    context = new Context(node);
     matchFn = matches;
     argsBuilder = [];
     attrsBuilder = [];
@@ -478,6 +495,7 @@ const patchOuter: <T>(
 
 export {
   alignWithDOM,
+  alwaysDiffAttributes,
   getArgsBuilder,
   getAttrsBuilder,
   text,
@@ -488,6 +506,7 @@ export {
   open,
   close,
   currentElement,
+  currentContext,
   currentPointer,
   skip,
   nextNode as skipNode

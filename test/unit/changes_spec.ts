@@ -28,45 +28,45 @@ describe('changes', () => {
     const spyOne = Sinon.spy();
     const spyTwo = Sinon.spy();
 
-    queueChange(spyOne, 'a', 'b', 'c');
-    queueChange(spyTwo, 'd', 'e', 'f');
+    queueChange(spyOne, 'a', 'b', 'c', 'd');
+    queueChange(spyTwo, 'd', 'e', 'f', 'g');
     flush();
 
     expect(spyOne).to.have.been.calledOnce.to.have.been.calledWith(
-	'a', 'b', 'c');
+	'a', 'b', 'c', 'd');
     expect(spyTwo).to.have.been.calledOnce.to.have.been.calledWith(
-	'd', 'e', 'f');
+	'd', 'e', 'f', 'g');
   });
 
   it('should clear the changes after flush', () => {
     const spy = Sinon.spy();
-
-    queueChange(spy, 'a', 'b', 'c');
+    queueChange(spy, 'a', 'b', 'c', 'd');
     flush();
     flush();
 
-    expect(spy).to.have.been.calledOnce.to.have.been.calledWith('a', 'b', 'c');
+    expect(spy).to.have.been.calledOnce.to.have.been.calledWith('a', 'b', 'c', 'd');
   });
 
   it('should allow re-entrant usage', () => {
     const innerSpy = Sinon.spy();
     const outerSpyOne = Sinon.spy(() => {
-      queueChange(innerSpy, 'd', 'e', 'f');
-      queueChange(innerSpy, 'g', 'h', 'i');
+      queueChange(innerSpy, 'd', 'e', 'f', 'g');
+      queueChange(innerSpy, 'g', 'h', 'i', 'j');
       flush();
     });
     const outerSpyTwo = Sinon.spy();
 
-    queueChange(outerSpyOne, 'a', 'b', 'c');
-    queueChange(outerSpyTwo, 'j', 'k', 'l');
+    queueChange(outerSpyOne, 'a', 'b', 'c', 'd');
+
+    queueChange(outerSpyTwo, 'j', 'k', 'l', 'm');
     flush();
 
     expect(innerSpy)
-        .to.have.been.calledTwice.to.have.been.calledWith('d', 'e', 'f')
-        .to.have.been.calledWith('g', 'h', 'i');
+        .to.have.been.calledTwice.to.have.been.calledWith('d', 'e', 'f', 'g')
+        .to.have.been.calledWith('g', 'h', 'i', 'j');
     expect(outerSpyOne)
-        .to.have.been.calledOnce.to.have.been.calledWith('a', 'b', 'c');
+        .to.have.been.calledOnce.to.have.been.calledWith('a', 'b', 'c', 'd');
     expect(outerSpyTwo)
-        .to.have.been.calledOnce.to.have.been.calledWith('j', 'k', 'l');
+        .to.have.been.calledOnce.to.have.been.calledWith('j', 'k', 'l', 'm');
   });
 });

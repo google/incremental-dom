@@ -51,9 +51,9 @@ function applyAttr(el: Element, name: string, value: unknown) {
   } else {
     const attrNS = getNamespace(name);
     if (attrNS) {
-      el.setAttributeNS(attrNS, name, String(value));
+      el.setAttributeNS(attrNS, name, value as string);
     } else {
-      el.setAttribute(name, String(value));
+      el.setAttribute(name, value as string);
     }
   }
 }
@@ -145,13 +145,17 @@ function applyAttributeTyped(el: Element, name: string, value: unknown) {
  * will just assume attributes is "any" otherwise and throws away
  * the type annotation set by tsickle.
  */
-const attributes: AttrMutatorConfig = createMap() as AttrMutatorConfig;
+const attributes = createAttributeMap();
 
-// Special generic mutator that's called for any attribute that does not
-// have a specific mutator.
-attributes[symbols.default] = applyAttributeTyped;
+function createAttributeMap() {
+  const attributes: AttrMutatorConfig = createMap() as AttrMutatorConfig;
+  // Special generic mutator that's called for any attribute that does not
+  // have a specific mutator.
+  attributes[symbols.default] = applyAttributeTyped;
 
-attributes["style"] = applyStyle;
+  attributes["style"] = applyStyle;
+  return attributes;
+}
 
 /**
  * Calls the appropriate attribute mutator for this attribute.
@@ -161,9 +165,10 @@ attributes["style"] = applyStyle;
  *     function it is set on the Element, otherwise, it is set as an HTML
  *     attribute.
  */
-function updateAttribute(el: Element, name: string, value: unknown) {
-  const mutator = attributes[name] || attributes[symbols.default];
+function updateAttribute(
+    el: Element, name: string, value: unknown, attrs: AttrMutatorConfig) {
+  const mutator = attrs[name] || attrs[symbols.default];
   mutator(el, name, value);
 }
 
-export { updateAttribute, applyProp, applyAttr, attributes };
+export { createAttributeMap, updateAttribute, applyProp, applyAttr, attributes };

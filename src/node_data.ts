@@ -58,6 +58,8 @@ export class NodeData {
    */
   public readonly nameOrCtor: NameOrCtorDef;
 
+  public alwaysDiffAttributes = false;
+
   public constructor(
     nameOrCtor: NameOrCtorDef,
     key: Key,
