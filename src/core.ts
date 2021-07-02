@@ -465,7 +465,9 @@ function createPatchOuter<T>(
     fn(data);
 
     if (DEBUG) {
-      assertPatchOuterHasParentNode(currentParent);
+      if (getData(node).key) {
+        assertPatchOuterHasParentNode(currentParent);
+      }
       assertPatchElementNoExtras(
         startNode,
         currentNode,
