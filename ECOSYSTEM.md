@@ -27,6 +27,35 @@ function render() {
 }
 ```
 
+### Remixml
+
+[Remixml](https://github.com/BuGlessRB/remixml)
+ is a sophisticated XML/XHTML macro language/templating compiler engine.
+It supports dynamic scopes, autoescaping, macros, and more.
+The language and primitives used blend in completely with standard XML/XHTML
+syntax and therefore integrate smoothly with existing XML/XHTML syntax
+colouring editors.
+
+Compiling and processing XML, XHTML and Remixml automatically performs sanity
+checks and shows clear and precise warnings about missing opening or
+closing tags.
+
+```html
+  <for from="1" to="42">
+   This is line &_._recno;<br />
+  </for>
+  <set var="_.foo" split=",">aa,b,cc,d,eee,f</set>
+  <for in="_.foo">
+   <if expr="_._recno == 2">
+    <h1>Record 2</h1>
+   </if>
+   This is record &_._recno; value: &_._value;<br />
+  </for>
+```
+
+Remixml even supports creating comment nodes when rendering to the
+incremental-dom.
+
 ### superviews.js
 
 [superviews.js](https://github.com/davidjamesstone/superviews.js) is a template language that closely maps to the incremental-dom API. It includes conditionals, iteration, interpolation and supported output for both ES6 and CommonJS. 
