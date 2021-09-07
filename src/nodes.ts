@@ -41,7 +41,7 @@ function getNamespaceForTag(tag: string, parent: Node | null) {
   }
   
   if (parent instanceof Element) {
-    // namespaceURI is only defined for Attr and Element nodes.
+    // namespaceURI is only defined for Attr and Element nodes
     // but we only consider Element nodes as parents.
     return parent.namespaceURI;
   }
