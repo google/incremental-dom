@@ -21,7 +21,7 @@ import { Key, NameOrCtorDef } from "./types";
  * Gets the namespace to create an element (of a given tag) in.
  * @param tag The tag to get the namespace for.
  * @param parent The current parent Node, if any.
- * @returns The namespace to use,
+ * @returns The namespace to use.
  */
 function getNamespaceForTag(tag: string, parent: Node | null) {
   if (tag === "svg") {
@@ -39,8 +39,13 @@ function getNamespaceForTag(tag: string, parent: Node | null) {
   if (getData(parent).nameOrCtor === "foreignObject") {
     return null;
   }
-
-  return parent.namespaceURI;
+  
+  if (parent instanceof Element) {
+    // namespaceURI is only defined for Attr and Element nodes
+    // but we only consider Element nodes as parents.
+    return parent.namespaceURI;
+  }
+  return null;
 }
 
 /**
