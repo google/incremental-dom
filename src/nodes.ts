@@ -39,13 +39,13 @@ function getNamespaceForTag(tag: string, parent: Node | null) {
   if (getData(parent).nameOrCtor === "foreignObject") {
     return null;
   }
-  
-  if (parent instanceof Element) {
-    // namespaceURI is only defined for Attr and Element nodes
-    // but we only consider Element nodes as parents.
-    return parent.namespaceURI;
-  }
-  return null;
+
+  // Since TypeScript 4.4 namespaceURI is only defined for Attr and Element
+  // nodes. Checking for Element nodes here seems reasonable but breaks SVG
+  // rendering in Chrome in certain cases. The cast to any should be removed
+  // once we know why this happens.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (parent as any).namespaceURI;
 }
 
 /**
