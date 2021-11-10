@@ -126,6 +126,11 @@ function applyAttributeTyped(el: Element, name: string, value: unknown) {
   }
 }
 
+/** Throws an exception for setting forbidden attributes. */
+function applyForbiddenAttribute(el: Element, name: string, value: unknown) {
+  throw new Error("Invalid attribute " + name + ".");
+}
+
 /**
  * A publicly mutable object to provide custom mutators for attributes.
  * NB: The result of createMap() has to be recast since closure compiler
@@ -143,6 +148,12 @@ function createAttributeMap() {
   attributes["style"] = applyStyle;
   return attributes;
 }
+
+attributes["innerHTML"] = applyForbiddenAttribute;
+attributes["innerText"] = applyForbiddenAttribute;
+attributes["outerHTML"] = applyForbiddenAttribute;
+attributes["text"] = applyForbiddenAttribute;
+attributes["textContent"] = applyForbiddenAttribute;
 
 /**
  * Calls the appropriate attribute mutator for this attribute.

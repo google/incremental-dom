@@ -276,6 +276,16 @@ describe('attribute updates', () => {
     });
   });
 
+  describe('for forbidden attributes', () => {
+    function render() {
+      elementVoid('div', null, null, 'innerHTML', 'x');
+    }
+    
+    it('should ban innerHTML', () => {
+      expect(() => patch(container, render)).to.throw('Invalid attribute innerHTML.');
+    });
+  });
+
   describe('for non-Incremental DOM attributes', () => {
     function render() {
       elementVoid('div');
