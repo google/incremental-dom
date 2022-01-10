@@ -27,7 +27,12 @@ function calculateDiff<T>(
   prev: Array<string>,
   next: Array<string>,
   updateCtx: T,
-  updateFn: (ctx: T, x: string, y: {} | undefined, attrs: AttrMutatorConfig) => void,
+  updateFn: (
+    ctx: T,
+    x: string,
+    y: {} | undefined,
+    attrs: AttrMutatorConfig
+  ) => void,
   attrs: AttrMutatorConfig,
   alwaysDiffAttributes: boolean = false
 ) {

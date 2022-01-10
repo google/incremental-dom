@@ -139,6 +139,7 @@ function getMatchingNode(
 /**
  * Updates the internal structure of a DOM node in the case that an external
  * framework tries to modify a DOM element.
+ * @param el The DOM node to update.
  */
 function alwaysDiffAttributes(el: Element) {
   getData(el).alwaysDiffAttributes = true;
@@ -206,6 +207,7 @@ function nextNode() {
  * Creates a Node and marking it as created.
  * @param nameOrCtor The name or constructor for the Node.
  * @param key The key used to identify the Node.
+ * @param nonce The nonce attribute for the element.
  * @return The newly created node.
  */
 function createNode(nameOrCtor: NameOrCtorDef, key: Key, nonce?: string): Node {
@@ -216,7 +218,7 @@ function createNode(nameOrCtor: NameOrCtorDef, key: Key, nonce?: string): Node {
   } else {
     node = createElement(doc!, currentParent!, nameOrCtor, key);
     if (nonce) {
-      node.setAttribute('nonce', nonce);
+      node.setAttribute("nonce", nonce);
     }
   }
 
@@ -230,6 +232,7 @@ function createNode(nameOrCtor: NameOrCtorDef, key: Key, nonce?: string): Node {
  * corresponding DOM node to the correct location or creating it if necessary.
  * @param nameOrCtor The name or constructor for the Node.
  * @param key The key used to identify the Node.
+ * @param nonce The nonce attribute for the element.
  */
 function alignWithDOM(nameOrCtor: NameOrCtorDef, key: Key, nonce?: string) {
   nextNode();
@@ -262,10 +265,14 @@ function alignWithDOM(nameOrCtor: NameOrCtorDef, key: Key, nonce?: string) {
  * @param key The key used to identify this element. This can be an
  *     empty string, but performance may be better if a unique value is used
  *     when iterating over an array of items.
+ * @param nonce The nonce attribute for the element.
  * @return The corresponding Element.
  */
 function open(
-    nameOrCtor: NameOrCtorDef, key?: Key, nonce?: string): HTMLElement {
+  nameOrCtor: NameOrCtorDef,
+  key?: Key,
+  nonce?: string
+): HTMLElement {
   alignWithDOM(nameOrCtor, key, nonce);
   enterNode();
   return currentParent as HTMLElement;
