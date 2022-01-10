@@ -9,7 +9,11 @@ import { notifications } from "./notifications";
 class Context {
   private created: Array<Node> = [];
   private deleted: Array<Node> = [];
-  constructor(readonly node: Element|DocumentFragment) {}
+  public readonly node: Element | DocumentFragment;
+
+  public constructor(node: Element | DocumentFragment) {
+    this.node = node;
+  }
 
   public markCreated(node: Node) {
     this.created.push(node);

@@ -126,14 +126,6 @@ function applyAttributeTyped(el: Element, name: string, value: unknown) {
   }
 }
 
-/**
- * A publicly mutable object to provide custom mutators for attributes.
- * NB: The result of createMap() has to be recast since closure compiler
- * will just assume attributes is "any" otherwise and throws away
- * the type annotation set by tsickle.
- */
-const attributes = createAttributeMap();
-
 function createAttributeMap() {
   const attributes: AttrMutatorConfig = createMap() as AttrMutatorConfig;
   // Special generic mutator that's called for any attribute that does not
@@ -145,17 +137,36 @@ function createAttributeMap() {
 }
 
 /**
+ * A publicly mutable object to provide custom mutators for attributes.
+ * NB: The result of createMap() has to be recast since closure compiler
+ * will just assume attributes is "any" otherwise and throws away
+ * the type annotation set by tsickle.
+ */
+const attributes = createAttributeMap();
+
+/**
  * Calls the appropriate attribute mutator for this attribute.
  * @param el The Element to apply the attribute to.
  * @param name The attribute's name.
  * @param value The attribute's value. If the value is an object or
  *     function it is set on the Element, otherwise, it is set as an HTML
  *     attribute.
+ * @param attrs The attribute map of mutators.
  */
 function updateAttribute(
-    el: Element, name: string, value: unknown, attrs: AttrMutatorConfig) {
+  el: Element,
+  name: string,
+  value: unknown,
+  attrs: AttrMutatorConfig
+) {
   const mutator = attrs[name] || attrs[symbols.default];
   mutator(el, name, value);
 }
 
-export { createAttributeMap, updateAttribute, applyProp, applyAttr, attributes };
+export {
+  createAttributeMap,
+  updateAttribute,
+  applyProp,
+  applyAttr,
+  attributes
+};

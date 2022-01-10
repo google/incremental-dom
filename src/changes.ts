@@ -20,7 +20,7 @@ function queueChange<A, B, C, D>(
   a: A,
   b: B,
   c: C,
-  d: D,
+  d: D
 ) {
   buffer.push(fn);
   buffer.push(a);
@@ -42,7 +42,7 @@ function flush() {
   bufferStart = end;
 
   for (let i = start; i < end; i += 5) {
-    const fn = buffer[i] as (a: any, b: any, c: any, d:any) => undefined;
+    const fn = buffer[i] as (a: any, b: any, c: any, d: any) => undefined;
     fn(buffer[i + 1], buffer[i + 2], buffer[i + 3], buffer[i + 4]);
   }
 
