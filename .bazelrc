@@ -36,12 +36,6 @@ test --nolegacy_external_runfiles
 # Prevent TypeScript worker seeing files not declared as inputs
 build --worker_sandboxing
 
-# Turn on the "Managed Directories" feature.
-# This allows Bazel to share the same node_modules directory with other tools
-# NB: this option was introduced in Bazel 0.26
-# See https://docs.bazel.build/versions/master/command-line-reference.html#flag--experimental_allow_incremental_repository_updates
-common --experimental_allow_incremental_repository_updates
-
 # Turn on --incompatible_strict_action_env which was on by default
 # in Bazel 0.21.0 but turned off again in 0.22.0. Follow
 # https://github.com/bazelbuild/bazel/issues/7026 for more details.
@@ -59,10 +53,6 @@ run --incompatible_strict_action_env
 # (Note that we use .bazelrc.user so the file appears next to .bazelrc in directory listing,
 # rather than user.bazelrc as suggested in the Bazel docs)
 try-import %workspace%/.bazelrc.user
-
-# Turn on managed directories feature in Bazel
-# This allows us to avoid installing a second copy of node_modules
-common --experimental_allow_incremental_repository_updates
 
 # Prevent TS worker from trying to expand the `includes` section in tsconfig.json.
 # It would find the "test/*.ts" reference when compiling //src:src, and the FileCache will then error

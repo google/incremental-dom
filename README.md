@@ -91,13 +91,13 @@ npm i
 To run once:
 
 ```sh
-./node_modules/.bin/bazel test ...
+./node_modules/.bin/bazelisk test ...
 ```
 
 To run on change:
 
 ```sh
-./node_modules/.bin/ibazel run ...
+./node_modules/.bin/ibazel run //test:unit_tests
 ```
 
 ### Building
@@ -105,11 +105,11 @@ To run on change:
 To build once:
 
 ```sh
-./node_modules/.bin/bazel build ...
+./node_modules/.bin/bazelisk build ...
 ```
 
 To build on change:
 
 ```sh
-./node_modules/.bin/ibazel ...
+./node_modules/.bin/ibazel build ...
 ```
