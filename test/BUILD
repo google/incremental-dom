@@ -26,4 +26,5 @@ karma_web_test(
         "@npm//sinon:sinon__umd",
         ":test_lib",
     ],
+    config_file = "karma.conf.js",
 )
