@@ -1,18 +1,5 @@
-/**
- * Copyright 2018 The Incremental DOM Authors. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS-IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+//  Copyright 2018 The Incremental DOM Authors. All Rights Reserved.
+/** @license SPDX-License-Identifier: Apache-2.0 */
 
 import {
   assertInPatch,
@@ -152,6 +139,7 @@ function getMatchingNode(
 /**
  * Updates the internal structure of a DOM node in the case that an external
  * framework tries to modify a DOM element.
+ * @param el The DOM node to update.
  */
 function alwaysDiffAttributes(el: Element) {
   getData(el).alwaysDiffAttributes = true;
@@ -219,6 +207,7 @@ function nextNode() {
  * Creates a Node and marking it as created.
  * @param nameOrCtor The name or constructor for the Node.
  * @param key The key used to identify the Node.
+ * @param nonce The nonce attribute for the element.
  * @return The newly created node.
  */
 function createNode(nameOrCtor: NameOrCtorDef, key: Key, nonce?: string): Node {
@@ -229,7 +218,7 @@ function createNode(nameOrCtor: NameOrCtorDef, key: Key, nonce?: string): Node {
   } else {
     node = createElement(doc!, currentParent!, nameOrCtor, key);
     if (nonce) {
-      node.setAttribute('nonce', nonce);
+      node.setAttribute("nonce", nonce);
     }
   }
 
@@ -243,6 +232,7 @@ function createNode(nameOrCtor: NameOrCtorDef, key: Key, nonce?: string): Node {
  * corresponding DOM node to the correct location or creating it if necessary.
  * @param nameOrCtor The name or constructor for the Node.
  * @param key The key used to identify the Node.
+ * @param nonce The nonce attribute for the element.
  */
 function alignWithDOM(nameOrCtor: NameOrCtorDef, key: Key, nonce?: string) {
   nextNode();
@@ -275,10 +265,14 @@ function alignWithDOM(nameOrCtor: NameOrCtorDef, key: Key, nonce?: string) {
  * @param key The key used to identify this element. This can be an
  *     empty string, but performance may be better if a unique value is used
  *     when iterating over an array of items.
+ * @param nonce The nonce attribute for the element.
  * @return The corresponding Element.
  */
 function open(
-    nameOrCtor: NameOrCtorDef, key?: Key, nonce?: string): HTMLElement {
+  nameOrCtor: NameOrCtorDef,
+  key?: Key,
+  nonce?: string
+): HTMLElement {
   alignWithDOM(nameOrCtor, key, nonce);
   enterNode();
   return currentParent as HTMLElement;

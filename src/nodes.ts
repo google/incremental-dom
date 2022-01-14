@@ -1,18 +1,5 @@
-/**
- * Copyright 2018 The Incremental DOM Authors. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS-IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+//  Copyright 2018 The Incremental DOM Authors. All Rights Reserved.
+/** @license SPDX-License-Identifier: Apache-2.0 */
 
 import { getData, initData } from "./node_data";
 import { Key, NameOrCtorDef } from "./types";
@@ -39,13 +26,13 @@ function getNamespaceForTag(tag: string, parent: Node | null) {
   if (getData(parent).nameOrCtor === "foreignObject") {
     return null;
   }
-  
-  if (parent instanceof Element) {
-    // namespaceURI is only defined for Attr and Element nodes
-    // but we only consider Element nodes as parents.
-    return parent.namespaceURI;
-  }
-  return null;
+
+  // Since TypeScript 4.4 namespaceURI is only defined for Attr and Element
+  // nodes. Checking for Element nodes here seems reasonable but breaks SVG
+  // rendering in Chrome in certain cases. The cast to any should be removed
+  // once we know why this happens.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (parent as any).namespaceURI;
 }
 
 /**

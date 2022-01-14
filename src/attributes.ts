@@ -1,18 +1,5 @@
-/**
- * Copyright 2018 The Incremental DOM Authors. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS-IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+//  Copyright 2018 The Incremental DOM Authors. All Rights Reserved.
+/** @license SPDX-License-Identifier: Apache-2.0 */
 
 import { AttrMutatorConfig } from "./types";
 import { assert } from "./assertions";
@@ -139,14 +126,6 @@ function applyAttributeTyped(el: Element, name: string, value: unknown) {
   }
 }
 
-/**
- * A publicly mutable object to provide custom mutators for attributes.
- * NB: The result of createMap() has to be recast since closure compiler
- * will just assume attributes is "any" otherwise and throws away
- * the type annotation set by tsickle.
- */
-const attributes = createAttributeMap();
-
 function createAttributeMap() {
   const attributes: AttrMutatorConfig = createMap() as AttrMutatorConfig;
   // Special generic mutator that's called for any attribute that does not
@@ -158,17 +137,36 @@ function createAttributeMap() {
 }
 
 /**
+ * A publicly mutable object to provide custom mutators for attributes.
+ * NB: The result of createMap() has to be recast since closure compiler
+ * will just assume attributes is "any" otherwise and throws away
+ * the type annotation set by tsickle.
+ */
+const attributes = createAttributeMap();
+
+/**
  * Calls the appropriate attribute mutator for this attribute.
  * @param el The Element to apply the attribute to.
  * @param name The attribute's name.
  * @param value The attribute's value. If the value is an object or
  *     function it is set on the Element, otherwise, it is set as an HTML
  *     attribute.
+ * @param attrs The attribute map of mutators.
  */
 function updateAttribute(
-    el: Element, name: string, value: unknown, attrs: AttrMutatorConfig) {
+  el: Element,
+  name: string,
+  value: unknown,
+  attrs: AttrMutatorConfig
+) {
   const mutator = attrs[name] || attrs[symbols.default];
   mutator(el, name, value);
 }
 
-export { createAttributeMap, updateAttribute, applyProp, applyAttr, attributes };
+export {
+  createAttributeMap,
+  updateAttribute,
+  applyProp,
+  applyAttr,
+  attributes
+};

@@ -1,5 +1,5 @@
-load("@npm_bazel_karma//:index.bzl", "ts_web_test")
-load("@npm_bazel_typescript//:index.bzl", "ts_library")
+load("@npm//@bazel/concatjs:index.bzl", "karma_web_test")
+load("@npm//@bazel/typescript:index.bzl", "ts_library")
 
 ts_library(
     name = "test_lib",
@@ -8,10 +8,10 @@ ts_library(
         "//:dev",
         "//src",
         "@npm//@types",
-    ]
+    ],
 )
 
-ts_web_test(
+karma_web_test(
     name = "unit_tests",
     # chai and sinon-chai are not require()d in the code, we expect them to be globals
     # bootstrap their distro first on the page.
@@ -26,4 +26,5 @@ ts_web_test(
         "@npm//sinon:sinon__umd",
         ":test_lib",
     ],
+    config_file = "karma.conf.js",
 )

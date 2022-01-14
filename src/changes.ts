@@ -1,18 +1,5 @@
-/**
- * Copyright 2018 The Incremental DOM Authors. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS-IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+//  Copyright 2018 The Incremental DOM Authors. All Rights Reserved.
+/** @license SPDX-License-Identifier: Apache-2.0 */
 
 import { truncateArray } from "./util";
 
@@ -33,7 +20,7 @@ function queueChange<A, B, C, D>(
   a: A,
   b: B,
   c: C,
-  d: D,
+  d: D
 ) {
   buffer.push(fn);
   buffer.push(a);
@@ -55,7 +42,7 @@ function flush() {
   bufferStart = end;
 
   for (let i = start; i < end; i += 5) {
-    const fn = buffer[i] as (a: any, b: any, c: any, d:any) => undefined;
+    const fn = buffer[i] as (a: any, b: any, c: any, d: any) => undefined;
     fn(buffer[i + 1], buffer[i + 2], buffer[i + 3], buffer[i + 4]);
   }
 

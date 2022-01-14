@@ -1,18 +1,5 @@
-/**
- * Copyright 2018 The Incremental DOM Authors. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS-IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+//  Copyright 2018 The Incremental DOM Authors. All Rights Reserved.
+/** @license SPDX-License-Identifier: Apache-2.0 */
 
 import {
   assert,
@@ -23,7 +10,7 @@ import {
   assertNotInSkip,
   setInAttributes
 } from "./assertions";
-import {attributes, updateAttribute } from "./attributes";
+import { attributes, updateAttribute } from "./attributes";
 import {
   getArgsBuilder,
   getAttrsBuilder,
@@ -61,8 +48,14 @@ function diffAttrs(element: Element, data: NodeData, attrs: AttrMutatorConfig) {
   const attrsBuilder = getAttrsBuilder();
   const prevAttrsArr = data.getAttrsArr(attrsBuilder.length);
 
-  calculateDiff(prevAttrsArr, attrsBuilder, element, updateAttribute,
-                attrs, data.alwaysDiffAttributes);
+  calculateDiff(
+    prevAttrsArr,
+    attrsBuilder,
+    element,
+    updateAttribute,
+    attrs,
+    data.alwaysDiffAttributes
+  );
   truncateArray(attrsBuilder, 0);
 }
 
@@ -72,8 +65,14 @@ function diffAttrs(element: Element, data: NodeData, attrs: AttrMutatorConfig) {
  * @param node The Element to apply statics for.
  * @param data The NodeData associated with the Element.
  * @param statics The statics array.
+ * @param attrs The attribute map of mutators.
  */
-function diffStatics(node: Element, data: NodeData, statics: Statics, attrs: AttrMutatorConfig) {
+function diffStatics(
+  node: Element,
+  data: NodeData,
+  statics: Statics,
+  attrs: AttrMutatorConfig
+) {
   if (data.staticsApplied) {
     return;
   }
@@ -190,6 +189,20 @@ function attr(name: string, value: any) {
   attrsBuilder.push(value);
 }
 
+/** @return The value of the nonce attribute. */
+function getNonce(): string {
+  const argsBuilder = getArgsBuilder();
+  const statics = <Statics>argsBuilder[2];
+  if (statics) {
+    for (let i = 0; i < statics.length; i += 2) {
+      if (statics[i] === "nonce") {
+        return statics[i + 1] as string;
+      }
+    }
+  }
+  return "";
+}
+
 /**
  * Closes an open tag started with elementOpenStart.
  * @return The corresponding Element.
@@ -202,8 +215,11 @@ function elementOpenEnd(): HTMLElement {
     setInAttributes(false);
   }
 
-  const node =
-      open(<NameOrCtorDef>argsBuilder[0], <Key>argsBuilder[1], getNonce());
+  const node = open(
+    <NameOrCtorDef>argsBuilder[0],
+    <Key>argsBuilder[1],
+    getNonce()
+  );
   const data = getData(node);
 
   diffStatics(node, data, <Statics>argsBuilder[2], attributes);
@@ -211,20 +227,6 @@ function elementOpenEnd(): HTMLElement {
   truncateArray(argsBuilder, 0);
 
   return node;
-}
-
-/** Gets the value of the nonce attribute. */
-function getNonce(): string {
-  const argsBuilder = getArgsBuilder();
-  const statics = <Statics>argsBuilder[2];
-  if (statics) {
-    for (let i = 0; i < statics.length; i += 2) {
-      if (statics[i] === 'nonce') {
-        return statics[i + 1] as string;
-      }
-    }
-  }
-  return '';
 }
 
 /**
@@ -264,6 +266,7 @@ function elementOpen(
 /**
  * Applies the currently buffered attrs to the currently open element. This
  * clears the buffered attributes.
+ * @param attrs The attributes.
  */
 function applyAttrs(attrs = attributes) {
   const node = currentElement();
@@ -276,6 +279,7 @@ function applyAttrs(attrs = attributes) {
  * Applies the current static attributes to the currently open element. Note:
  * statics should be applied before calling `applyAtrs`.
  * @param statics The statics to apply to the current element.
+ * @param attrs The attributes.
  */
 function applyStatics(statics: Statics, attrs = attributes) {
   const node = currentElement();
