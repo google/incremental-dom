@@ -143,7 +143,7 @@ Here's an [example](https://gist.github.com/sparhami/197f3b947712998639eb).
 [Metal.js](https://github.com/metal/metal.js) is a JavaScript library for building UI components in a solid, flexible way. It leverages [Incremental DOM](https://github.com/google/incremental-dom) and currently supports both [Closure Templates](https://developers.google.com/closure/templates/) and [JSX syntax](https://facebook.github.io/jsx/).
 
 ### Towser
-[Towser](https://github.com/PongoEngine/Towser) is a web framework heavily inspiried by the Elm Architechture using Google's Incremental-Dom. It is built to easily nest and compose Render Functions.
+[Towser](https://github.com/PongoEngine/Towser) is a web framework heavily inspired by the Elm Architechture using Google's Incremental-Dom. It is built to easily nest and compose Render Functions.
 
 ```haxe
 
