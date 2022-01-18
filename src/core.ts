@@ -314,6 +314,13 @@ function currentElement(): Element {
 }
 
 /**
+ * @returns The current Element being patched, or null if no patch is in progress.
+ */
+function tryGetCurrentElement(): Element | null {
+  return currentParent as Element | null;
+}
+
+/**
  * @return The Node that will be evaluated for the next instruction.
  */
 function currentPointer(): Node {
@@ -505,5 +512,6 @@ export {
   currentContext,
   currentPointer,
   skip,
-  nextNode as skipNode
+  nextNode as skipNode,
+  tryGetCurrentElement
 };

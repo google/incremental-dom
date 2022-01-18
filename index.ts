@@ -2,7 +2,7 @@
 /** @license SPDX-License-Identifier: Apache-2.0 */
 
 export {applyAttr, applyProp, attributes, createAttributeMap} from './src/attributes';
-export {alignWithDOM, alwaysDiffAttributes, close, createPatchInner, createPatchOuter, currentElement, currentContext, currentPointer, open, patchInner as patch, patchInner, patchOuter, skip, skipNode} from './src/core';
+export {alignWithDOM, alwaysDiffAttributes, close, createPatchInner, createPatchOuter, currentElement, currentContext, currentPointer, open, patchInner as patch, patchInner, patchOuter, skip, skipNode, tryGetCurrentElement} from './src/core';
 export {setKeyAttributeName} from './src/global';
 export {clearCache,getKey, importNode, isDataInitialized} from './src/node_data';
 export {notifications} from './src/notifications';
