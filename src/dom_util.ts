@@ -96,8 +96,8 @@ function getFocusedPath(node: Node, root: Node | null): Array<Node> {
 }
 
 /**
- * Like insertBefore, but instead instead of moving the desired node, instead
- * moves all the other nodes after.
+ * Like insertBefore, but instead of moving the desired node, it moves all the
+ * other nodes after.
  * @param parentNode
  * @param node
  * @param referenceNode
