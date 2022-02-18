@@ -1,14 +1,15 @@
 package(default_visibility = ["//:__subpackages__"])
 
-load("@npm//@bazel/typescript:index.bzl", "ts_library")
+load("//tools:ts.bzl", "ts_library")
 load("//:constants.bzl", "RELEASE_FILES")
 
 ts_library(
     name = "src",
+    package_name = "@incremental_dom/src",
+    module_name = "@incremental_dom/src",
     srcs = [
         ":all_files",
     ],
-    tsickle_typed = True,
 )
 
 filegroup(

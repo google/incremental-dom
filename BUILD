@@ -1,16 +1,24 @@
 package(default_visibility = ["//:__subpackages__"])
 
-load("@npm//@bazel/typescript:index.bzl", "ts_library")
+load("//tools:ts.bzl", "ts_library")
 load("@build_bazel_rules_nodejs//:index.bzl", "pkg_npm")
+load("@io_bazel_rules_closure//closure:defs.bzl", "closure_js_binary")
 load("@npm//@bazel/rollup:index.bzl", "rollup_bundle")
 
 ### Produce umd and cjs bundles
 
 ts_library(
-    name = "dev",
+    name = "index",
     srcs = ["index.ts"],
-    tsickle_typed = True,
     deps = ["//src"],
+    package_name = "incrementaldom",
+    module_name = "incrementaldom",
+    visibility = ["//visibility:public"],
+)
+
+alias(
+    name = "dev",
+    actual = "index",
 )
 
 [
@@ -81,7 +89,6 @@ genrule(
 ts_library(
     name = "release",
     srcs = [":release_index"],
-    tsickle_typed = True,
     deps = ["//release"],
 )
 

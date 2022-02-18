@@ -1,7 +1,7 @@
 package(default_visibility = ["//:__subpackages__"])
 
 load("//:constants.bzl", "RELEASE_FILES")
-load("@npm//@bazel/typescript:index.bzl", "ts_library")
+load("//tools:ts.bzl", "ts_library")
 
 genrule(
     name = "release_files",
@@ -18,5 +18,4 @@ ts_library(
         "debug.ts",
         ":release_files",
     ],
-    tsickle_typed = True,
 )
