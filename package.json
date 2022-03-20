@@ -2,6 +2,7 @@
   "name": "incremental-dom",
   "version": "0.7.0",
   "description": "An in-place virtual DOM library",
+  "exports": "dist/incremental-dom-esm.js",
   "main": "dist/incremental-dom-cjs.js",
   "author": "The Incremental DOM Authors",
   "license": "Apache-2.0",
