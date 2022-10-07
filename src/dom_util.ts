@@ -44,7 +44,9 @@ function getAncestry(node: Node, root: Node | null) {
   while (cur !== root) {
     const n: Node = assert(cur);
     ancestry.push(n);
-    cur = n.parentNode;
+    // If `node` is inside of a ShadowRoot, then it needs to pierce the
+    // ShadowRoot boundary in order to reach `root`.
+    cur = n.parentNode || (n as ShadowRoot)?.host;
   }
 
   return ancestry;
