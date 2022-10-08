@@ -46,7 +46,7 @@ function getAncestry(node: Node, root: Node | null) {
     ancestry.push(n);
     // If `node` is inside of a ShadowRoot, then it needs to pierce the
     // ShadowRoot boundary in order to reach `root`.
-    cur = n.parentNode || (n as ShadowRoot).host;
+    cur = n.parentNode || (root ? (n as ShadowRoot).host : null);
   }
 
   return ancestry;
