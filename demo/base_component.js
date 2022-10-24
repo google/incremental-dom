@@ -9,7 +9,7 @@ export class BaseComponent extends HTMLElement {
     super();
 
     // Create a shadow root for the content of the component to render into
-    this.createShadowRoot();
+    this.attachShadow({mode: 'open'});
     this[firstUpdate] = true;
     this[props] = null;
 
