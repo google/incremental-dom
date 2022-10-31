@@ -1,0 +1,21 @@
+load(
+    "@build_bazel_rules_nodejs//:index.bzl",
+    "nodejs_binary",
+)
+
+package(
+    default_visibility = ["//visibility:public"],
+)
+
+
+nodejs_binary(
+    name = "tsc",
+    entry_point = "@npm//:node_modules/@bazel/typescript/internal/tsc_wrapped/tsc_wrapped.js",
+    templated_args = ["--bazel_patch_module_resolver", "--node_options=--max-old-space-size=2048"],
+    visibility = ["//visibility:public"],
+    data = [
+        "@npm//@bazel/typescript",
+        "@npm//tsickle",
+        "@npm//typescript",
+    ],
+)

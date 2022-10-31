@@ -58,3 +58,6 @@ try-import %workspace%/.bazelrc.user
 # It would find the "test/*.ts" reference when compiling //src:src, and the FileCache will then error
 # when TS attempts to read one of these files that doesn't belong in the compilation.
 build --worker_sandboxing
+
+# Don't allow workers for TypeScript compiler
+build --strategy=TypeScriptCompile=sandboxed

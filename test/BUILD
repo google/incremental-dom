@@ -4,6 +4,7 @@ load("@npm//@bazel/typescript:index.bzl", "ts_library")
 ts_library(
     name = "test_lib",
     srcs = glob(["**/*.ts"]),
+    compiler = "//tools/tsc",
     deps = [
         "//:dev",
         "//src",

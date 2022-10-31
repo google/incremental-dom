@@ -26,5 +26,10 @@
   ],
   "exclude": [
     "node_modules"
-  ]
+  ],
+  "bazelOptions": {
+    "workspaceName": "incrementaldom",
+    "tsickle": true,
+    "googmodule": true
+  }
 }
