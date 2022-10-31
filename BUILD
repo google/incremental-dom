@@ -4,7 +4,7 @@ load("@npm//@bazel/typescript:index.bzl", "ts_library")
 load("@build_bazel_rules_nodejs//:index.bzl", "pkg_npm")
 load("@npm//@bazel/rollup:index.bzl", "rollup_bundle")
 
-### Produce umd and cjs bundles
+### Produce umd, cjs and esm bundles
 
 ts_library(
     name = "dev",
@@ -28,6 +28,7 @@ ts_library(
     )
     for format, args in {
         "cjs": [],
+        "esm": [],
         "umd": [
             # Downlevel (transpile) to ES5.
             "-p",
@@ -64,6 +65,23 @@ pkg_npm(
     },
     deps = [
         ":incremental-dom-cjs",
+    ],
+)
+
+genrule(
+    name = "incremental-dom-esm",
+    srcs = [":bundle.esm.js"],
+    outs = ["dist/incremental-dom-esm.js"],
+    cmd = "cp $(locations :bundle.esm.js) $@",
+)
+
+pkg_npm(
+    name = "npm-esm",
+    substitutions = {
+        "const DEBUG = true;": "const DEBUG = false;",
+    },
+    deps = [
+        ":incremental-dom-esm",
     ],
 )
 
@@ -131,6 +149,7 @@ pkg_npm(
     ],
     nested_packages = [
         ":npm-cjs",
+        ":npm-esm",
         ":npm-min",
         ":npm-umd",
     ],
