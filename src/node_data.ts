@@ -135,7 +135,9 @@ function importSingleNode(node: Node, fallbackKey?: Key): NodeData {
     return node["__incrementalDOMData"];
   }
 
-  const nodeName = isElement(node) ? node.localName : node.nodeName;
+  // Cobalt 9 doesn't populate localName.
+  const nodeName =
+      isElement(node) && node.localName ? node.localName : node.nodeName;
   const keyAttrName = getKeyAttributeName();
   const keyAttr =
     isElement(node) && keyAttrName != null
